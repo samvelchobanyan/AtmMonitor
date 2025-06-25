@@ -5,21 +5,16 @@
     width: rem(112);
     padding: rem(32);
     background-color: map-get($color-scheme, "white");
-    transition: width 0.3s ease;
 
     &__logo {
         margin-bottom: rem(32);
-        position: relative;
-        width: rem(148);
-        height: rem(40);
         img {
             height: rem(40);
-            position: absolute;
             &:first-child {
-                @extend %show;
+                display: block;
             }
             &:last-child {
-                @extend %hidden;
+                display: none;
             }
         }
     }
@@ -171,10 +166,10 @@
 
             img {
                 &:first-child {
-                    @extend %hidden;
+                    display: none;
                 }
                 &:last-child {
-                    @extend %show;
+                    display: block;
                 }
             }
         }

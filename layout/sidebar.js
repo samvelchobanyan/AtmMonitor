@@ -1,10 +1,8 @@
-import { StaticElement } from '../core/static-element.js';
+import { StaticElement } from "../core/static-element.js";
 
 class SideBar extends StaticElement {
-  render() {
-    console.log('sidebar');
-    
-    return /*html*/`
+    render() {
+        return `
         <aside class="sidebar">
             <div class="sidebar__toggle sidebar-toggle"><i class="icon icon-chevrons-right"></i></div>
             <div class="sidebar__top">
@@ -47,7 +45,7 @@ class SideBar extends StaticElement {
             </div>
         </aside>
     `;
-  }
+    }
 }
 
-customElements.define('side-bar', SideBar);
+customElements.define("side-bar", SideBar);

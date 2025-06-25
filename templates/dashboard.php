@@ -1,5 +1,4 @@
 <div class="main-container">
-    <?php require 'header.php'; ?>
     <div class="row">
         <div class="column sm-2">
             <div class="info info_highlighted">

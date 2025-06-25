@@ -2,7 +2,7 @@ import { StaticElement } from "../core/static-element.js";
 
 class SideBar extends StaticElement {
     render() {
-        return `
+        return /*html*/`
         <aside class="sidebar">
             <div class="sidebar__toggle sidebar-toggle"><i class="icon icon-chevrons-right"></i></div>
             <div class="sidebar__top">

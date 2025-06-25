@@ -2,7 +2,7 @@ import { StaticElement } from "../core/static-element.js";
 
 class HeaderCustom extends StaticElement {
     render() {
-        return `
+        return /*html*/`
         <div class="main-container"> 
             <div class="row">
                 <div class="column sm-12">

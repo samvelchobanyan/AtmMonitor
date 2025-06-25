@@ -1,9 +1,20 @@
 import { StaticElement } from "../core/static-element.js";
 
-class AtmsDashboard extends StaticElement {
-    render() {
-        return `
-            <div class="main-container">
+class AtmsDashboard extends HTMLElement {
+    constructor() {
+      super();
+    }
+  
+    connectedCallback() {
+      this.render();
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      this.render();
+    }
+
+    getTemplate() {         
+        return /*html*/`<div class="main-container">
                 <div class="row">
                     <div class="column sm-2">
                         <div class="info info_highlighted">
@@ -268,7 +279,11 @@ class AtmsDashboard extends StaticElement {
                     </div>
                 </div>
             </div>
-    `;
+        `;
+      }
+    
+    render() {
+        this.innerHTML =  this.getTemplate();
     }
 }
 

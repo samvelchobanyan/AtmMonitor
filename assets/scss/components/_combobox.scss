@@ -4,7 +4,7 @@
 .combo-box {
     position: relative;
     display: block;
-    @include font(bold, 16, 1.25, inherit, 0, $fontPrimary);
+    @include font(normal, 14, 1.25, inherit, 0, $fontPrimary);
 
     // &.searchable {
     //     .combo-box-options {
@@ -42,6 +42,8 @@
     padding: 0 rem(36) 0 rem(12);
     @extend %flex;
     @extend %align-middle;
+    @include font(bold, 16, 1.25, inherit, 0, $fontPrimary);
+
 
     &:after {
         @include font-icon("\e903");
@@ -98,25 +100,25 @@
 .combo-box-dropdown {
     position: absolute;
     top: 100%;
-    left: 0;
+    right: 0;
     min-width: 100%;
-    border-bottom-right-radius: rem(5);
-    border-bottom-left-radius: rem(5);
+    border-radius: rem(8);
+    padding: rem(16);
     overflow: hidden;
     background: #fff;
     z-index: z(dropdown);
-    // box-shadow: map-get($shadows, 'sm');
+    border: rem(1) solid map-get($color-scheme, "gray-100");
     transform: translateY(rem(10));
     @extend %hidden;
     @extend %primary-transition;
 
-    &::-webkit-scrollbar {
-        width: rem(7);
+    // &::-webkit-scrollbar {
+    //     width: rem(7);
 
-        &-thumb {
-            background-color: map-get($color-scheme, "neutral");
-        }
-    }
+    //     &-thumb {
+    //         background-color: map-get($color-scheme, "neutral");
+    //     }
+    // }
 
     &.opened {
         transform: translateY(0);
@@ -159,31 +161,38 @@
     position: relative;
     display: block;
     width: 100%;
-    line-height: rem(20);
-    padding: rem(10) rem(24);
+    // padding: rem(12) rem(16);
     white-space: nowrap;
     text-overflow: ellipsis;
     color: #000;
     z-index: 1;
     cursor: pointer;
 
+    &:not(:last-child) {
+        padding-bottom: rem(12);
+        margin-bottom: rem(12);
+        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        &:after {
+            bottom: 0;
+        }
+    }
     & > img {
         display: inline-block;
         // vertical-align: -4px;
         margin-right: rem(5);
     }
 
-    &.selected,
-    &.multiSelected {
-        background: #000;
-        color: #fff;
-    }
+    // &.selected,
+    // &.multiSelected {
+    //     background: #000;
+    //     color: #fff;
+    // }
 
-    &:focus,
-    &_focused {
-        background: #cfcfcf;
-        color: #fff;
-    }
+    // &:focus,
+    // &_focused {
+    //     background: #cfcfcf;
+    //     color: #fff;
+    // }
 }
 
 .disabled {

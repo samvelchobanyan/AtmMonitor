@@ -1,0 +1,28 @@
+@function strip-unit($number) {
+    @if type-of($number) == "number" and not unitless($number) {
+        @return calc($number / ($number * 0 + 1));
+    }
+    @return $number;
+}
+
+// Px To Rem Convert
+@function rem($rem, $context: $baseFontSize) {
+    @if (unitless($rem)) {
+        $pixels: $rem * 1;
+    }
+    @if (unitless($context)) {
+        $context: $context * 1;
+    }
+    @return calc($rem / $context * 1rem);
+}
+
+// Z-index Sort Function
+@function z($name, $z-indexes-list: $z-indexes) {
+    @if index($z-indexes-list, $name) {
+        @return ((100 + length($z-indexes-list)) - index($z-indexes-list, $name)) + 1;
+    } @else {
+        @warn 'There is no item "#{$name}" in this list; choose one of: #{$z-indexes-list}';
+
+        @return null;
+    }
+}

@@ -1,0 +1,26 @@
+.stat {
+    @extend %flex;
+    @extend %align-middle;
+    height: rem(26);
+    padding: 0 rem(6) 0 rem(3);
+    border-radius: rem(1000);
+    max-width: max-content;
+    span {
+        @include font(500, 13, 1.5, inherit, 0, $fontPrimary);
+    }
+    .icon {
+        font-size: rem(16);
+    }
+    &_green {
+        background-color: map-get($color-scheme, "green-50");
+        .icon {
+            color: map-get($color-scheme, "green");
+        }
+    }
+    &_red {
+        background-color: map-get($color-scheme, "red-50");
+        .icon {
+            color: map-get($color-scheme, "red");
+        }
+    }
+}

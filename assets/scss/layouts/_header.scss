@@ -1,0 +1,31 @@
+.header {
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-between;
+    position: relative;
+    margin: rem(30) 0;
+    padding-bottom: rem(32);
+    @include horizontal-decor("../img/decor/horizontal-gray.svg");
+    &::after {
+        bottom: 0;
+    }
+    &__title {
+        @extend %flex;
+        .h1-font {
+            &:last-child:not(:only-child) {
+                margin-left: rem(14);
+                padding-left: rem(14);
+                border-left: rem(4) solid map-get($color-scheme, "gray-200");
+            }
+        }
+    }
+    &__right {
+        @extend %flex;
+        @extend %align-middle;
+        .custom-select {
+            &:not(:last-child) {
+                margin-right: rem(12);
+            }
+        }
+    }
+}

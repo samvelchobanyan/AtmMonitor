@@ -1,0 +1,139 @@
+@import "../utils/_mixins";
+
+%grid {
+    display: -ms-grid;
+    display: grid;
+}
+
+%inline-flex {
+    display: -ms-inline-flexbox;
+    display: inline-flex;
+}
+
+%flex {
+    display: -ms-flexbox;
+    display: flex;
+}
+
+%align-middle {
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+%align-top {
+    -ms-flex-align: flex-start;
+    align-items: flex-start;
+}
+
+%align-bottom {
+    -ms-flex-align: flex-end;
+    align-items: flex-end;
+}
+
+%align-stretch {
+    -ms-flex-align: stretch;
+    align-items: stretch;
+}
+
+%align-between {
+    -ms-flex-pack: space-between;
+    justify-content: space-between;
+}
+
+%align-around {
+    -ms-flex-pack: space-around;
+    justify-content: space-around;
+}
+
+%align-center {
+    -ms-flex-pack: center;
+    justify-content: center;
+}
+
+%align-left {
+    -ms-flex-pack: flex-start;
+    justify-content: flex-start;
+}
+
+%align-right {
+    -ms-flex-pack: flex-end;
+    justify-content: flex-end;
+}
+
+%justify-stretch {
+    -ms-flex-pack: stretch;
+    justify-content: stretch;
+}
+
+%primary-transition {
+    -webkit-transition: all 0.3s ease;
+    -moz-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+%user-cursor {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: pointer;
+}
+
+%not-selectable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
+%selectable {
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
+    pointer-events: auto;
+}
+
+%inline-middle {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+%hidden {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+%show {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+%slide {
+    @include transition(max-height, 1s, ease);
+    max-height: 500px;
+}
+
+%white-image {
+    filter: brightness(0) invert(1);
+}
+
+// for safari, when bg-color and border radius set together
+%safari-bg-clip {
+    -webkit-background-clip: padding-box;
+    -moz-background-clip: padding;
+    background-clip: padding-box;
+}
+
+// for iphone when set overflow hidden and border radius
+%overflow-radius {
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+%clip-text {
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent;
+}

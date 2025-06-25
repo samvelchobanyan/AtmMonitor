@@ -1,0 +1,7 @@
+.h1-font {
+    @include font(900, 36, 1.2, inherit, 0, $fontPrimary);
+}
+
+.h2-font {
+    @include font(900, 20, 1, inherit, 0, $fontPrimary);
+}

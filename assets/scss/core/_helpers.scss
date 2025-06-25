@@ -1,0 +1,178 @@
+.overflow {
+    overflow: hidden;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.relative {
+    position: relative;
+}
+
+.disabled {
+    pointer-events: none;
+    user-select: none;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.font-extrabold {
+    font-weight: 800;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.font-medium {
+    font-weight: 500;
+}
+
+.font-light {
+    font-weight: 300;
+}
+
+.font-black {
+    font-weight: 900;
+}
+
+.font-uppercase {
+    text-transform: uppercase;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-nowrap {
+    flex-wrap: nowrap;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.hide {
+    display: none !important;
+}
+
+.dn {
+    display: none;
+}
+
+.hidden {
+    @extend %hidden;
+}
+
+.shown {
+    @extend %show;
+}
+
+.cursor {
+    cursor: pointer;
+}
+
+.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+// Colors
+.bg {
+    @each $name, $color in $color-scheme {
+        &-#{$name} {
+            background-color: $color;
+        }
+    }
+
+    &-inherit {
+        background-color: inherit;
+    }
+}
+
+.color {
+    @each $name, $color in $color-scheme {
+        &-#{$name} {
+            color: $color;
+        }
+    }
+
+    &-inherit {
+        color: inherit;
+    }
+}
+
+@media (max-width: $media-xl) {
+    .hide-xl {
+        display: none;
+    }
+
+    .show-xl {
+        display: block;
+
+        &.flex-container,
+        &.xl-flex-container {
+            display: flex;
+        }
+    }
+}
+
+@media (max-width: $media-lg) {
+    .hide-lg {
+        display: none;
+    }
+
+    .show-lg {
+        display: block;
+
+        &.flex-container,
+        &.lg-flex-container {
+            display: flex;
+        }
+    }
+}
+
+@media (max-width: $media-md) {
+    .hide-md {
+        display: none;
+    }
+
+    .show-md {
+        display: block;
+
+        &.flex-container,
+        &.md-flex-container {
+            display: flex;
+        }
+    }
+}
+
+@media (max-width: $media-sm) {
+    .hide-sm {
+        display: none;
+    }
+
+    .show-sm {
+        display: block;
+
+        &.flex-container {
+            display: flex;
+        }
+    }
+}

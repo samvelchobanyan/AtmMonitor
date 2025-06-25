@@ -1,0 +1,42 @@
+.custom-check {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    @extend %user-cursor;
+
+    input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+        &:checked ~ .custom-check__checkmark {
+            background-color: map-get($color-scheme, "blue-800");
+            border-color: transparent;
+            &::after {
+                @extend %show;
+            }
+        }
+    }
+    &__checkmark {
+        width: rem(18);
+        height: rem(18);
+        border: rem(1.5) solid map-get($color-scheme, "gray-300");
+        border-radius: rem(5);
+        margin-right: rem(6);
+        position: relative;
+        color: map-get($color-scheme, "white");
+
+        &::after {
+            @include center-absolute(both);
+            @include font-icon("\e902");
+            color: inherit;
+            @extend %hidden;
+            font-size: rem(14);
+        }
+    }
+
+    &__label {
+        @include font(500, 14, 1.42, inherit, 0, $fontPrimary);
+    }
+}

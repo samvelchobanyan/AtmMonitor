@@ -1,0 +1,72 @@
+// sass --watch --style=compressed assets/scss:assets/css
+// sass --no-source-map --watch --style=compressed assets/scss:assets/css
+@import "utils/_module";
+@import "core/_icons";
+@import "components/_combobox.scss";
+@import "components/_button.scss";
+@import "components/_info.scss";
+@import "components/_stat.scss";
+@import "components/_chart.scss";
+@import "components/_checkbox.scss";
+
+.main-container {
+    @extend %primary-transition;
+    margin-left: rem(112);
+    &.active {
+        margin-left: rem(296);
+    }
+}
+
+.container {
+    @extend %flex;
+    flex-direction: column;
+    margin-bottom: rem(24);
+    height: calc(100% - rem(24));
+    background-color: map-get($color-scheme, "white");
+    padding: rem(24);
+    border-radius: rem(8);
+    box-shadow: 0 rem(4) rem(3) 0 #00000008, 0 rem(12) rem(24) 0 #00000014;
+
+    &__top {
+        @extend %flex;
+        @extend %align-middle;
+        @extend %align-between;
+    }
+    &__title {
+        @extend %flex;
+        @extend %align-middle;
+        margin-bottom: rem(20);
+    }
+}
+
+.title-icon {
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-center;
+    height: rem(36);
+    width: rem(36);
+    border-radius: 100%;
+    background-color: map-get($color-scheme, "gray-50");
+    margin-right: rem(8);
+    .icon {
+        font-size: rem(20);
+    }
+}
+
+.message {
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-center;
+    padding: 0 rem(6);
+    height: rem(24);
+    border-radius: rem(32);
+    background-color: map-get($color-scheme, "blue-50");
+    .icon {
+        color: map-get($color-scheme, "blue");
+        margin-right: rem(4);
+        font-size: rem(16);
+    }
+    span {
+        @include font(900, 13, 1.2, map-get($color-scheme, "blue"), 0, $fontSecondary);
+    }
+}

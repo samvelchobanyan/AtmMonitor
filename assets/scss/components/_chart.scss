@@ -1,0 +1,68 @@
+.chart {
+    margin: rem(16) 0;
+    position: relative;
+    &_280 {
+        height: rem(280);
+    }
+    &_252 {
+        height: rem(252);
+    }
+    canvas {
+        height: 100%;
+        width: 100%;
+    }
+}
+
+.custom-legend {
+    ul {
+        @extend %flex;
+        li {
+            list-style: none;
+            @extend %flex;
+            @extend %align-middle;
+            &:not(:last-child) {
+                margin-right: rem(16);
+            }
+            span {
+                &:first-child {
+                    margin-right: rem(6);
+                }
+                &:last-child {
+                    margin-left: rem(6);
+                }
+                display: block;
+                width: rem(10);
+                height: rem(10);
+                border-radius: 100%;
+            }
+        }
+    }
+    &_center {
+        ul {
+            @extend %align-center;
+        }
+    }
+}
+
+.chart-container {
+    &_between {
+        @extend %flex;
+        @extend %align-between;
+        flex-direction: column;
+        height: 100%;
+    }
+}
+
+.chart-info {
+    @extend %flex;
+    @extend %align-middle;
+    flex-direction: column;
+    @include center-absolute("both");
+    &__number {
+        margin-bottom: rem(4);
+        @include font(700, 18, 1, 0, 0, $fontSecondary);
+        span {
+            @include font(400, 18, 1, 0, 0, $fontPrimary);
+        }
+    }
+}

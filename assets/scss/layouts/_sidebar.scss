@@ -1,0 +1,242 @@
+.sidebar {
+    position: fixed;
+    left: 0;
+    height: 100%;
+    width: rem(112);
+    padding: rem(32);
+    background-color: map-get($color-scheme, "white");
+    transition: width 0.3s ease;
+
+    &__logo {
+        margin-bottom: rem(32);
+        position: relative;
+        width: rem(148);
+        height: rem(40);
+        img {
+            height: rem(40);
+            position: absolute;
+            &:first-child {
+                @extend %show;
+            }
+            &:last-child {
+                @extend %hidden;
+            }
+        }
+    }
+
+    &__top {
+        @extend %flex;
+        flex-wrap: wrap;
+        margin-bottom: rem(60);
+        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        &:after {
+            bottom: rem(-28);
+        }
+    }
+
+    &__toggle {
+        position: absolute;
+        top: rem(28);
+        right: rem(-24);
+        height: rem(48);
+        width: rem(48);
+        border-radius: 100%;
+        background-color: map-get($color-scheme, "white");
+        border: rem(2) solid map-get($color-scheme, "gray");
+        @extend %user-cursor;
+        @extend %flex;
+        @extend %align-center;
+        @extend %align-middle;
+
+        .icon {
+            font-size: rem(24);
+            color: map-get($color-scheme, "gray-500");
+        }
+    }
+
+    &__nav {
+        margin-bottom: rem(32);
+        padding-bottom: rem(32);
+        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        &:after {
+            bottom: 0;
+        }
+    }
+
+    &__item {
+        @extend %primary-transition;
+        @include font(bold, 16, 1.25, map-get($color-scheme, "blue-900"), 0, $fontPrimary);
+        height: rem(48);
+        width: rem(48);
+        padding: 0 rem(12);
+        opacity: 0.65;
+        border-radius: rem(12);
+        @extend %flex;
+        @extend %align-middle;
+
+        &:not(:last-child):not(.sidebar__item-has-dropdown) {
+            margin-bottom: rem(8);
+        }
+
+        span {
+            display: none;
+        }
+
+        .icon {
+            font-size: rem(24);
+        }
+
+        &-toggle {
+            display: none;
+            margin-left: auto;
+            @extend %align-center;
+            @extend %align-middle;
+        }
+
+        &.active {
+            opacity: 1;
+            color: map-get($color-scheme, "blue");
+            background-color: rgba(map-get($color-scheme, "blue"), 0.05);
+        }
+
+        &-has-dropdown {
+            position: relative;
+            @extend %user-cursor;
+        }
+        &:hover {
+            opacity: 1;
+            background-color: map-get($color-scheme, "gray");
+        }
+    }
+
+    &__dropdown {
+        @extend %primary-transition;
+        @include center-absolute("vertical");
+        left: calc(100% + rem(16));
+        border-radius: rem(16);
+        @extend %hidden;
+        background-color: map-get($color-scheme, "white");
+        padding: rem(16);
+        box-shadow: 0 rem(4) rem(12) 0 #00000008, 0 rem(8) rem(16) 0 #00000008;
+        &::after {
+            @include center-absolute("vertical");
+            content: "";
+            height: rem(12);
+            width: rem(12);
+            left: rem(-10);
+            transform: rotate(45deg) translateY(-50%);
+            background-color: map-get($color-scheme, "white");
+        }
+        a {
+            @include font(500, 14, 1.42, rgba(map-get($color-scheme, "blue-900"), 0.65), 0, $fontPrimary);
+            display: block;
+            &:not(:last-child) {
+                margin-bottom: rem(6);
+            }
+            &.active {
+                color: map-get($color-scheme, "blue");
+            }
+        }
+    }
+
+    &__section {
+        position: relative;
+        margin-bottom: rem(8);
+        border-radius: rem(12);
+
+        &.active {
+            background-color: rgba(map-get($color-scheme, "blue"), 0.05);
+
+            .sidebar__item {
+                opacity: 1;
+                color: map-get($color-scheme, "blue");
+                &:hover {
+                    background-color: transparent;
+                }
+            }
+            .sidebar__item-toggle {
+                transform: rotate(180deg);
+            }
+            .sidebar__dropdown {
+                @extend %show;
+            }
+        }
+    }
+
+    &.active {
+        width: rem(296);
+
+        .sidebar__logo {
+            margin: 0 rem(24) 0 0;
+
+            img {
+                &:first-child {
+                    @extend %hidden;
+                }
+                &:last-child {
+                    @extend %show;
+                }
+            }
+        }
+
+        .sidebar__item {
+            width: auto;
+
+            span {
+                margin-left: rem(8);
+                display: block;
+            }
+
+            &-toggle {
+                @extend %primary-transition;
+                @extend %flex;
+            }
+        }
+
+        .sidebar__dropdown {
+            box-shadow: none;
+            border-radius: 0;
+            padding: 0 rem(12) rem(12);
+            @extend %show;
+            -webkit-transition: none;
+            -moz-transition: none;
+            transition: none;
+            position: static;
+            transform: none;
+            background-color: transparent;
+            &::after {
+                display: none;
+            }
+        }
+    }
+}
+
+.notification {
+    position: relative;
+    width: rem(44);
+    height: rem(44);
+    border-radius: 100%;
+    background-color: map-get($color-scheme, "gray");
+    @extend %flex;
+    @extend %align-center;
+    @extend %align-middle;
+
+    &__count {
+        position: absolute;
+        top: rem(-8);
+        right: rem(-8);
+        width: rem(24);
+        height: rem(24);
+        border-radius: 100%;
+        background: map-get($color-scheme, "red");
+        @include font(bold, 11, 1, map-get($color-scheme, "white"), 0, $fontPrimary);
+        @extend %flex;
+        @extend %align-center;
+        @extend %align-middle;
+    }
+
+    .icon {
+        font-size: rem(24);
+        color: map-get($color-scheme, "blue");
+    }
+}

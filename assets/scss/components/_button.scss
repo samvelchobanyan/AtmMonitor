@@ -1,0 +1,56 @@
+.btn {
+    @extend %inline-flex;
+    @extend %align-middle;
+    @extend %align-center;
+    @extend %user-cursor;
+    @extend %primary-transition;
+    max-width: 100%;
+    border-radius: rem(8);
+
+    > span {
+        @include font(500, 16, 1.25, inherit, 0, $fontPrimary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    > .icon {
+        font-size: rem(16);
+        &:last-child {
+            margin-left: rem(4);
+        }
+        &:first-child {
+            margin-right: rem(4);
+        }
+    }
+
+    &_sm {
+        height: rem(32);
+        padding: 0 rem(16);
+        > span {
+            @include font(500, 16, 1.14, inherit, 0, $fontPrimary);
+        }
+    }
+
+    &_md {
+        height: rem(40);
+        padding: 0 rem(20);
+    }
+
+    &_lg {
+        height: rem(48);
+        padding: 0 rem(24);
+    }
+
+    &_link {
+        height: rem(24);
+        > span {
+            @include font(normal, 14, 1.42, inherit, 0, $fontPrimary);
+        }
+    }
+
+    &_blue {
+        background-color: map-get($color-scheme, "blue");
+        color: map-get($color-scheme, "white");
+    }
+}

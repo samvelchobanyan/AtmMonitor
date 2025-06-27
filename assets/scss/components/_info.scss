@@ -5,6 +5,8 @@
     box-shadow: 0 rem(4) rem(4) 0 #00000008, 0 rem(8) rem(16) 0 #00000008;
     height: calc(100% - rem(24));
     margin-bottom: rem(24);
+    display: block;
+    flex: 1;
     &__top,
     &__bottom {
         @extend %flex;
@@ -61,7 +63,6 @@
     @extend %flex;
     .info {
         margin-bottom: rem(20);
-        flex: 1;
         &:not(:last-child) {
             margin-right: rem(16);
         }

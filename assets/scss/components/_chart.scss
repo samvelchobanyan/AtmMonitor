@@ -60,9 +60,9 @@
     @include center-absolute("both");
     &__number {
         margin-bottom: rem(4);
-        @include font(700, 18, 1, 0, 0, $fontSecondary);
+        @include font(bold, 18, 1, 0, 0, $fontSecondary);
         span {
-            @include font(400, 18, 1, 0, 0, $fontPrimary);
+            @include font(normal, 18, 1, 0, 0, $fontPrimary);
         }
     }
 }

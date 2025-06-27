@@ -31,11 +31,11 @@
         @extend %flex;
         @extend %align-middle;
         @extend %align-between;
+        margin-bottom: rem(20);
     }
     &__title {
         @extend %flex;
         @extend %align-middle;
-        margin-bottom: rem(20);
     }
 }
 

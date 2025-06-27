@@ -19,7 +19,10 @@ $fonts: (
     $fontPrimary "95Blk" 900 normal,
     $fontPrimary "96BlkIt" 900 italic,
 
-    $fontSecondary "Black" 900 normal
+    $fontSecondary "Bold" bold normal,
+    $fontSecondary "BoldItalic" bold italic,
+    $fontSecondary "Black" 900 normal,
+    $fontSecondary "BlackItalic" 900 italic
 );
 
 @each $type in $fonts {

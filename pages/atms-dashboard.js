@@ -1,4 +1,5 @@
 import { InfoCard } from "../components/ui/infoCard.js";
+import { ContainerTop } from "../components/ui/containerTop.js";
 
 class AtmsDashboard extends HTMLElement {
     connectedCallback() {
@@ -35,13 +36,7 @@ class AtmsDashboard extends HTMLElement {
                 <div class="row">
                     <div class="column sm-6">
                         <div class="container">
-                            <div class="container__top">
-                                <div class="container__title">
-                                    <div class="title-icon"><i class="icon icon-trending-up"></i></div>
-                                    <h2 class="h2-font">Գործարքների գումար</h2>
-                                </div>
-                                <a href="#" class="btn btn_link color-blue"><span>Մանրամասն</span><i class="icon icon-chevron-right"></i></a>
-                            </div>
+                            <container-top icon="icon-trending-up" title="Գործարքների գումար" link-text="Մանրամասն" link-href="/details"> </container-top>
                             <div class="infos">
                                 <info-card title="Այսօր կանխիկացված գումար" value="510,000,217" value-currency="֏" value-color="color-green" stat='<i class="icon icon-up"></i><span>+7%</span>' stat-class="stat_green" border></info-card>
                                 <info-card title="Այսօր մուտքագրված գումար" value="50,525,800" value-currency="֏" value-color="color-blue" stat='<i class="icon icon-down"></i><span>-3%</span>' stat-class="stat_red" border></info-card>
@@ -56,16 +51,8 @@ class AtmsDashboard extends HTMLElement {
 
                     <div class="column sm-6">
                         <div class="container">
-                            <div class="container__top">
-                                <div class="container__title">
-                                    <div class="title-icon"><i class="icon icon-chart"></i></div>
-                                    <h2 class="h2-font">Գործարքների քանակ</h2>
-                                </div>
-                                <a href="#" class="btn btn_link color-blue"><span>Մանրամասն</span><i class="icon icon-chevron-right"></i></a>
-                            </div>
-
+                            <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="/details"> </container-top>
                             <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>
-
                             <div class="chart-container chart-container_between">
                                 <div class="chart chart_280">
                                     <canvas id="doughnut-chart"></canvas>
@@ -83,12 +70,8 @@ class AtmsDashboard extends HTMLElement {
                 <div class="row">
                     <div class="column sm-12">
                         <div class="container">
-                            <div class="container__top">
-                                <div class="container__title">
-                                    <div class="title-icon"><i class="icon icon-coins"></i></div>
-                                    <h2 class="h2-font">Ինկասացիա</h2>
-                                </div>
-                            </div>
+                          
+                            <container-top icon="icon-coins" title="Ինկասացիա"> </container-top>
 
                             <div class="infos">
                                 <info-card title="Այսօրվա ինկասացիաներ" value="17" icon="icon icon-box"></info-card>

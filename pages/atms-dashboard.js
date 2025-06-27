@@ -1,5 +1,6 @@
 import { InfoCard } from "../components/ui/infoCard.js";
 import { ContainerTop } from "../components/ui/containerTop.js";
+import { LineChart } from "../components/ui/LineChart.js";
 
 class AtmsDashboard extends HTMLElement {
     connectedCallback() {
@@ -42,10 +43,7 @@ class AtmsDashboard extends HTMLElement {
                                 <info-card title="Այսօր մուտքագրված գումար" value="50,525,800" value-currency="֏" value-color="color-blue" stat='<i class="icon icon-down"></i><span>-3%</span>' stat-class="stat_red" border></info-card>
                             </div>
                             <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>
-                            <div class="chart-container">
-                                <div class="chart chart_252"><canvas id="line-chart"></canvas></div>
-                                <div class="custom-legend custom-legend_checkmark" id="legend-container"></div>
-                            </div>
+                            <line-chart-container chart-id="line-chart" legend-id="legend-container"> </line-chart-container>
                         </div>
                     </div>
 
@@ -69,25 +67,16 @@ class AtmsDashboard extends HTMLElement {
 
                 <div class="row">
                     <div class="column sm-12">
-                        <div class="container">
-                          
+                        <div class="container">                    
                             <container-top icon="icon-coins" title="Ինկասացիա"> </container-top>
-
                             <div class="infos">
                                 <info-card title="Այսօրվա ինկասացիաներ" value="17" icon="icon icon-box"></info-card>
                                 <info-card title="Այսօր հետ բերված գումար" value="25,108,500" value-currency="֏" value-color="color-green" icon="icon icon-arrow-down-left"></info-card>
                                 <info-card title="Բանկոմատների թիվ" value="250,108,500" value-currency="֏" value-color="color-blue" icon="icon icon-arrow-up-right"></info-card>
                                 <info-card title="Երեկ դատարկ բանկոմատներ" value="5" value-color="color-red" icon="icon icon-box" message="2"></info-card>
                             </div>
-
                             <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>
-
-                            <div class="chart-container">
-                                <div class="chart chart_252">
-                                    <canvas id="line-chart-2"></canvas>
-                                </div>
-                                <div class="custom-legend custom-legend_checkmark" id="legend-container-2"></div>
-                            </div>
+                            <line-chart-container chart-id="line-chart-2" legend-id="legend-container-2"> </line-chart-container>
                         </div>
                     </div>
                 </div>

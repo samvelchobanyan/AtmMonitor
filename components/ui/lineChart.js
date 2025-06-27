@@ -30,4 +30,4 @@ export class LineChart extends HTMLElement {
     }
 }
 
-customElements.define("line-chart-container", LineChart);
+customElements.define("line-chart", LineChart);

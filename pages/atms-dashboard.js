@@ -43,7 +43,7 @@ class AtmsDashboard extends HTMLElement {
                                 <info-card title="Այսօր մուտքագրված գումար" value="50,525,800" value-currency="֏" value-color="color-blue" stat='<i class="icon icon-down"></i><span>-3%</span>' stat-class="stat_red" border></info-card>
                             </div>
                             <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>
-                            <line-chart-container chart-id="line-chart" legend-id="legend-container"> </line-chart-container>
+                            <line-chart chart-id="line-chart" legend-id="legend-container"> </line-chart>
                         </div>
                     </div>
 
@@ -76,7 +76,7 @@ class AtmsDashboard extends HTMLElement {
                                 <info-card title="Երեկ դատարկ բանկոմատներ" value="5" value-color="color-red" icon="icon icon-box" message="2"></info-card>
                             </div>
                             <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>
-                            <line-chart-container chart-id="line-chart-2" legend-id="legend-container-2"> </line-chart-container>
+                            <line-chart chart-id="line-chart-2" legend-id="legend-container-2"> </line-chart>
                         </div>
                     </div>
                 </div>

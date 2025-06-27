@@ -23,7 +23,7 @@ export class PillItem extends HTMLElement {
 
         const type = add ? "blue" : remove ? "gray" : "";
 
-        this.className = `pill pill_${type}`;
+        this.classList.add("pill", `pill_${type}`);
 
         this.innerHTML = `
             ${add ? `<i class="icon icon-plus-circle"></i>` : ""}

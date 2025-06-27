@@ -21,7 +21,7 @@ export class ContainerTop extends HTMLElement {
         const linkText = this.getAttribute("link-text");
         const linkHref = this.getAttribute("link-href") || "#";
 
-        this.className = "container__top";
+        this.classList.add("container__top");
 
         this.innerHTML = `
             <div class="container__title">

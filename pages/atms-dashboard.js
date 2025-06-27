@@ -14,6 +14,7 @@ class AtmsDashboard extends HTMLElement {
 
     getTemplate() {
         return /* html */ `
+      
             <div class="main-container">
                 <div class="row">
                     <div class="column sm-2">

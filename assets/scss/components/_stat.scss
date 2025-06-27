@@ -11,6 +11,10 @@
     .icon {
         font-size: rem(16);
     }
+    &_white {
+        padding: 0 rem(6);
+        border: rem(1) solid map-get($color-scheme, "gray-100");
+    }
     &_green {
         background-color: map-get($color-scheme, "green-50");
         .icon {

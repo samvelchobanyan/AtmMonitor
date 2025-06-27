@@ -49,6 +49,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const htmlLegendPlugin = {
         id: "htmlLegend",
         afterUpdate(chart, args, options) {
+            // const dataset = chart.data.datasets[item.datasetIndex];
+
             const ul = getOrCreateLegendList(chart, options.containerID);
 
             while (ul.firstChild) {
@@ -97,10 +99,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     li.appendChild(label);
                 } else {
+                    const dataset = chart.data.datasets[0];
+                    const value = dataset.data[index];
+                    const total = dataset.data.reduce((acc, val) => acc + val, 0);
+                    const percent = ((value / total) * 100).toFixed(1);
+
                     circle.style.backgroundColor = item.fillStyle;
+
                     const textContainer = document.createElement("div");
                     textContainer.className = "textcontainer";
-                    textContainer.textContent = item.text;
+
+                    if ($(chart.canvas).parents(".chart-container").children(".custom-legend").hasClass("custom-legend_percent")) {
+                        textContainer.textContent = `${item.text} (${percent}%)`;
+                    } else {
+                        textContainer.textContent = `${item.text}`;
+                    }
 
                     li.appendChild(circle);
                     li.appendChild(textContainer);

@@ -29,7 +29,7 @@ export class InfoCard extends HTMLElement {
         const isHighlighted = this.hasAttribute("highlight");
         const hasBorder = this.hasAttribute("border");
 
-        this.className = `info${isHighlighted ? " info_highlighted" : ""}${hasBorder ? " info_border" : ""}`;
+        this.classList.add("info", isHighlighted && "info_highlighted", hasBorder && "info_border");
 
         this.innerHTML = `
             <div class="info__top">

@@ -19,7 +19,7 @@ export class LineChart extends HTMLElement {
         const chartId = this.getAttribute("chart-id") || "line-chart";
         const legendId = this.getAttribute("legend-id") || "legend-container";
 
-        this.className = "chart-container";
+        this.classList.add("chart-container");
 
         this.innerHTML = `
             <div class="chart chart_252">

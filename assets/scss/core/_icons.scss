@@ -23,6 +23,12 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-plus-circle:before {
+    content: "\e918";
+}
+.icon-x:before {
+    content: "\e919";
+}
 .icon-message:before {
     content: "\e917";
 }

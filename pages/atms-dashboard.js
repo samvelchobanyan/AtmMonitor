@@ -1,6 +1,7 @@
 import { InfoCard } from "../components/ui/infoCard.js";
 import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/LineChart.js";
+import { PillItem } from "../components/ui/pillItem.js";
 
 class AtmsDashboard extends HTMLElement {
     connectedCallback() {

@@ -2,6 +2,7 @@ import { InfoCard } from "../components/ui/infoCard.js";
 import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/LineChart.js";
 import { PillItem } from "../components/ui/pillItem.js";
+import { TableCustom } from "../components/ui/tableCustom.js";
 
 class AtmsDashboard extends HTMLElement {
     connectedCallback() {
@@ -14,7 +15,6 @@ class AtmsDashboard extends HTMLElement {
 
     getTemplate() {
         return /* html */ `
-      
             <div class="main-container">
                 <div class="row">
                     <div class="column sm-2">
@@ -80,6 +80,16 @@ class AtmsDashboard extends HTMLElement {
                             <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>
                             <line-chart chart-id="line-chart-2" legend-id="legend-container-2"> </line-chart>
                         </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="row">
+                        <div class="column sm-12">
+                            <div class="container">
+                                <table-custom></table-custom>
+                            </div>
+                        </div> 
                     </div>
                 </div>
             </div>

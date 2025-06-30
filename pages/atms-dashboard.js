@@ -48,7 +48,6 @@ class AtmsDashboard extends HTMLElement {
                             <line-chart chart-id="line-chart" legend-id="legend-container"> </line-chart>
                         </div>
                     </div>
-
                     <div class="column sm-6">
                         <div class="container">
                             <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="/details"> </container-top>
@@ -66,7 +65,6 @@ class AtmsDashboard extends HTMLElement {
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="column sm-12">
                         <div class="container">                    
@@ -80,16 +78,6 @@ class AtmsDashboard extends HTMLElement {
                             <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>
                             <line-chart chart-id="line-chart-2" legend-id="legend-container-2"> </line-chart>
                         </div>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="row">
-                        <div class="column sm-12">
-                            <div class="container">
-                                <table-custom></table-custom>
-                            </div>
-                        </div> 
                     </div>
                 </div>
             </div>

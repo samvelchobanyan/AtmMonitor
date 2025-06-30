@@ -1,0 +1,22 @@
+.tabs {
+    @extend %flex;
+}
+
+.tab {
+    @include font(bold, 14, 1.1, rgba(map-get($color-scheme, "blue-900"), 0.3), 0, $fontPrimary);
+    @extend %user-cursor;
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-center;
+    height: rem(32);
+    padding: 0 rem(12);
+    background-color: map-get($color-scheme, "gray");
+    border-radius: rem(6);
+    &:not(:last-child) {
+        margin-right: rem(8);
+    }
+    &.active {
+        color: map-get($color-scheme, "blue");
+        background-color: map-get($color-scheme, "blue-50");
+    }
+}

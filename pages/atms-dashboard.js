@@ -1,8 +1,6 @@
 import { InfoCard } from "../components/ui/infoCard.js";
 import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/LineChart.js";
-import { PillItem } from "../components/ui/pillItem.js";
-
 class AtmsDashboard extends HTMLElement {
     connectedCallback() {
         this.render();
@@ -14,7 +12,6 @@ class AtmsDashboard extends HTMLElement {
 
     getTemplate() {
         return /* html */ `
-      
             <div class="main-container">
                 <div class="row">
                     <div class="column sm-2">
@@ -48,7 +45,6 @@ class AtmsDashboard extends HTMLElement {
                             <line-chart chart-id="line-chart" legend-id="legend-container"> </line-chart>
                         </div>
                     </div>
-
                     <div class="column sm-6">
                         <div class="container">
                             <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="/details"> </container-top>
@@ -66,10 +62,9 @@ class AtmsDashboard extends HTMLElement {
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="column sm-12">
-                        <div class="container">                    
+                        <div class="container">
                             <container-top icon="icon-coins" title="Ինկասացիա"> </container-top>
                             <div class="infos">
                                 <info-card title="Այսօրվա ինկասացիաներ" value="17" icon="icon icon-box"></info-card>

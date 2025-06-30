@@ -1,4 +1,4 @@
-export class TableCustom extends HTMLElement {
+export class CustomTable extends HTMLElement {
     constructor() {
         super();
     }
@@ -47,4 +47,4 @@ export class TableCustom extends HTMLElement {
     }
 }
 
-customElements.define("table-custom", TableCustom);
+customElements.define("custom-table", CustomTable);

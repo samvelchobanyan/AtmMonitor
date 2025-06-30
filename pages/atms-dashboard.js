@@ -1,9 +1,6 @@
 import { InfoCard } from "../components/ui/infoCard.js";
 import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/LineChart.js";
-import { PillItem } from "../components/ui/pillItem.js";
-import { TableCustom } from "../components/ui/tableCustom.js";
-
 class AtmsDashboard extends HTMLElement {
     connectedCallback() {
         this.render();
@@ -67,7 +64,7 @@ class AtmsDashboard extends HTMLElement {
                 </div>
                 <div class="row">
                     <div class="column sm-12">
-                        <div class="container">                    
+                        <div class="container">
                             <container-top icon="icon-coins" title="Ինկասացիա"> </container-top>
                             <div class="infos">
                                 <info-card title="Այսօրվա ինկասացիաներ" value="17" icon="icon icon-box"></info-card>

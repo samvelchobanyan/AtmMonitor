@@ -1,41 +1,45 @@
-class DynamicComponent extends HTMLElement {
+class DynamicElement extends HTMLElement {
   constructor() {
     super();
-    
+
     // Internal state
     this.state = { isLoading: false };
     this.storeSubscriptions = new Map();
     this.eventListeners = new Map();
     this.isDestroyed = false;
+    this.renderScheduled = false;
+  }
+
+  // Define which attributes to observe - override in child classes
+  static get observedAttributes() {
+    return [];
   }
 
   connectedCallback() {
-    this.onMount();
+    this.onConnected();
     this.render();
-    this.setupEventListeners();
+    this.addGlobalEventListeners();
     this.subscribeToStores();
   }
 
   disconnectedCallback() {
-    this.onUnmount();
+    this.onDisconnected();
     this.cleanup();
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue) {
       this.onAttributeChange(name, oldValue, newValue);
-      if (!this.isDestroyed) {
-        this.render();
-      }
+      this.scheduleRender();
     }
   }
 
   // Lifecycle hooks - override in child classes
-  onMount() {
+  onConnected() {
     // Called when component is added to DOM
   }
 
-  onUnmount() {
+  onDisconnected() {
     // Called when component is removed from DOM
   }
 
@@ -48,14 +52,14 @@ class DynamicComponent extends HTMLElement {
     return '<div>Override template() method</div>';
   }
 
-  // State management
+  // State management - SIMPLIFIED: always triggers render
   setState(newState) {
+    if (this.isDestroyed) return;
+
     const oldState = { ...this.state };
     this.state = { ...this.state, ...newState };
     this.onStateChange(oldState, this.state);
-    if (!this.isDestroyed) {
-      this.render();
-    }
+    this.scheduleRender();
   }
 
   getState(key) {
@@ -67,15 +71,15 @@ class DynamicComponent extends HTMLElement {
   }
 
   // Store integration methods
-  connectToStore(store, callback) {
+  subscribeToStore(store, callback) {
     if (!store || typeof store.subscribe !== 'function') {
-      console.warn('Invalid store provided to connectToStore');
+      console.warn('Invalid store provided to subscribeToStore');
       return;
     }
 
-    const unsubscribe = store.subscribe((storeState) => {
+    const unsubscribe = store.subscribe((state) => {
       if (!this.isDestroyed) {
-        callback.call(this, storeState);
+        callback.call(this, state);
       }
     });
 
@@ -86,8 +90,8 @@ class DynamicComponent extends HTMLElement {
   subscribeToStores() {
     // Override in child classes to set up store subscriptions
     // Example:
-    // this.connectToStore(userStore, (state) => {
-    //   this.setState({ user: state.user });
+    // this.subscribeToStore(store, (state) => {
+    //   this.setState({ data: state.data });
     // });
   }
 
@@ -95,25 +99,50 @@ class DynamicComponent extends HTMLElement {
   addEventListener(element, event, handler, options = {}) {
     const boundHandler = handler.bind(this);
     element.addEventListener(event, boundHandler, options);
-    
+
     if (!this.eventListeners.has(element)) {
       this.eventListeners.set(element, []);
     }
     this.eventListeners.get(element).push({ event, handler: boundHandler, options });
+
+    return boundHandler;
   }
 
-  setupEventListeners() {
-    // Override in child classes to set up event listeners
+  addGlobalEventListeners() {
+    // Override in child classes to set up global/persistent event listeners
+    // Called once when component connects to DOM
+    // Example:
+    // this.addEventListener(window, 'resize', this.handleResize);
+    // this.addEventListener(document, 'click', this.handleOutsideClick);
   }
 
-  // API methods
+  addEventListeners() {
+    // Override in child classes to set up template-based event listeners
+    // Called after every render for elements inside the component's innerHTML
+    // Example:
+    // const button = this.$('.my-button');
+    // if (button) {
+    //   this.addEventListener(button, 'click', this.handleClick);
+    // }
+  }
+
+  // API methods - SIMPLIFIED: normal setState behavior
   async fetchData(url, options = {}) {
     this.setState({ isLoading: true });
+
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers
+        },
+        ...options
+      });
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const data = await response.json();
       this.setState({ isLoading: false });
       return data;
@@ -129,18 +158,25 @@ class DynamicComponent extends HTMLElement {
     console.error('API Error:', error);
   }
 
-  // Rendering
-  render() {
-    if (this.isDestroyed) return;
-    
-    this.innerHTML = this.template();
-    
-    // Re-setup event listeners after render
-    this.setupDOMEventListeners();
+  // Rendering with batching - this handles the performance optimization
+  scheduleRender() {
+    if (this.isDestroyed || this.renderScheduled) return;
+
+    this.renderScheduled = true;
+    // Use microtask to batch multiple state updates
+    Promise.resolve().then(() => {
+      if (!this.isDestroyed) {
+        this.render();
+      }
+      this.renderScheduled = false;
+    });
   }
 
-  setupDOMEventListeners() {
-    // Override in child classes to set up DOM event listeners after render
+  render() {
+    if (this.isDestroyed) return;
+
+    this.innerHTML = this.template();
+    this.addEventListeners();
   }
 
   // Utility methods
@@ -148,7 +184,7 @@ class DynamicComponent extends HTMLElement {
     return this.querySelector(selector);
   }
 
-  $(selector) {
+  $$(selector) {
     return this.querySelectorAll(selector);
   }
 
@@ -156,12 +192,12 @@ class DynamicComponent extends HTMLElement {
     return this.getAttribute(name) || defaultValue;
   }
 
-  // Helper method to check loading state
   isLoading() {
     return this.state.isLoading;
   }
 
-  emit(eventName, detail = {}) {
+  // Custom event dispatching
+  dispatch(eventName, detail = {}) {
     this.dispatchEvent(new CustomEvent(eventName, {
       detail,
       bubbles: true,
@@ -169,14 +205,31 @@ class DynamicComponent extends HTMLElement {
     }));
   }
 
+  // Conditional CSS classes
+  classIf(condition, className) {
+    return condition ? className : '';
+  }
+
+  // Debug helper
+  debug(message, data) {
+    if (this.getAttr('debug') === 'true') {
+      console.log(`[${this.constructor.name}] ${message}`, data || '');
+    }
+  }
+
   // Cleanup
   cleanup() {
+    this.debug('Cleaning up component');
     this.isDestroyed = true;
-    
+
     // Unsubscribe from stores
     this.storeSubscriptions.forEach((unsubscribe) => {
       if (typeof unsubscribe === 'function') {
-        unsubscribe();
+        try {
+          unsubscribe();
+        } catch (error) {
+          console.warn('Error during store unsubscription:', error);
+        }
       }
     });
     this.storeSubscriptions.clear();
@@ -184,7 +237,11 @@ class DynamicComponent extends HTMLElement {
     // Remove event listeners
     this.eventListeners.forEach((listeners, element) => {
       listeners.forEach(({ event, handler, options }) => {
-        element.removeEventListener(event, handler, options);
+        try {
+          element.removeEventListener(event, handler, options);
+        } catch (error) {
+          console.warn('Error removing event listener:', error);
+        }
       });
     });
     this.eventListeners.clear();

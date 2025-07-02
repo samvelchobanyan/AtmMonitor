@@ -225,7 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
         datasets: [{ data: [60, 40] }],
     };
 
-    createLineChart("line-chart", lineChartData, "legend-container");
+    // createLineChart("line-chart", lineChartData, "legend-container");
     createLineChart("line-chart-2", lineChartData2, "legend-container-2");
 
     createDoughnutChart("doughnut-chart", doughnutChartData, "legend-container-doughnut");

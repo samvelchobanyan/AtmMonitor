@@ -9,7 +9,7 @@ export class ApiClient {
     const base = this.baseUrl + (endpoint.startsWith('/') ? endpoint : `/${endpoint}`);
     const qs = new URLSearchParams(params).toString();
     const full = qs ? `${base}?${qs}` : base;
-    return this.useProxy ? `/proxy.php?url=${encodeURIComponent(full)}` : full;
+    return this.useProxy ? `http://localhost/ATM_monitor/proxy.php?url=${encodeURIComponent(full)}` : full;
   }
 
   async get(endpoint, params = {}, headers = {}) {
@@ -56,6 +56,6 @@ export class ApiClient {
 
 // export default client for most use-cases
 export const api = new ApiClient({
-  baseUrl: 'http://37.186.122.133:3393',
+  baseUrl: 'http://37.186.122.133:3393/api',
   useProxy: true
 });

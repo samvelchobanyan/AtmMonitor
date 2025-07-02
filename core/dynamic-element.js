@@ -1,3 +1,5 @@
+import { api } from './api-client.js';
+
 export class DynamicElement extends HTMLElement {
   constructor() {
     super();
@@ -127,25 +129,33 @@ export class DynamicElement extends HTMLElement {
   }
 
   // API methods - SIMPLIFIED: normal setState behavior
-  async fetchData(url, options = {}) {
+  async fetchData(endpoint, options = {}) {
     this.setState({ isLoading: true });
 
     try {
-      const response = await fetch(url, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers
-        },
-        ...options
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      // const response = await fetch(url, {
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     ...options.headers
+      //   },
+      //   ...options
+      // });
+      let response;
+      const method = (options.method || 'GET').toUpperCase();
+      if (method.toUpperCase() === 'POST') {
+        response = await api.post(endpoint, options.body || {}, options.headers);
+      } else if (method.toUpperCase() === 'GET') {
+        // For GET, use params instead of body
+        response = await api.get(endpoint, options.params || {}, options.headers);
       }
 
-      const data = await response.json();
+      // if (!response.ok) {
+      //   throw new Error(`HTTP error! status: ${response.status}`);
+      // }
+      //
+      // const data = await response.json();
       this.setState({ isLoading: false });
-      return data;
+      return response;
     } catch (error) {
       this.setState({ isLoading: false });
       this.onApiError(error);

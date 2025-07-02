@@ -1,4 +1,4 @@
-class DynamicElement extends HTMLElement {
+export class DynamicElement extends HTMLElement {
   constructor() {
     super();
 
@@ -177,6 +177,11 @@ class DynamicElement extends HTMLElement {
 
     this.innerHTML = this.template();
     this.addEventListeners();
+    this.onAfterRender();
+  }
+
+  onAfterRender() {
+    // Override in child classes for post-render logic
   }
 
   // Utility methods

@@ -1,4 +1,8 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
+import { createLineChart } from "../../core/utils/chart-utils.js";
+// import "../ui/selectBox.js"
+import "./select-box.js";
+
 
 const observedAttrs = ['api-url', 'city', 'region', 'start-date', 'end-date'];
 class ChartComponent extends DynamicElement {
@@ -7,8 +11,7 @@ class ChartComponent extends DynamicElement {
   }
 
   onConnected() {
-    console.log('fetching data');
-    this.canvasId = this.getAttr('id', 'line-chart');
+    this.canvasId = `canvas-${this.getAttr('id', 'line-chart')}`;
     this.legendId = `legend-${this.canvasId}`;
     this.hasConnected = true;
     this.fetchAndRenderChart();
@@ -21,7 +24,6 @@ class ChartComponent extends DynamicElement {
   }
 
   async fetchAndRenderChart() {
-    console.log('fetching data');
     const endpoint = this.getAttr('api-url');
     const startDate = this.getAttr('start-date');
     const endDate = this.getAttr('end-date');
@@ -40,8 +42,6 @@ class ChartComponent extends DynamicElement {
     if (region) params.append('region', region);
 
     const url = `${endpoint}?${params.toString()}`;
-
-    console.log('fetch url',url);
 
     try {
       const response = await this.fetchData(url);
@@ -97,7 +97,16 @@ class ChartComponent extends DynamicElement {
       return `<div class="error">Failed to load chart data.</div>`;
     }
 
+    this.classList.add("chart-container");
     return `
+<!--      <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>-->
+      <combo-box data-combo-name="single" data-combo-value="today">
+         <span slot="placeholder">Այսօր</span>
+          <div class="combo-option selected" data-option-value="today">Այսօր</div>
+          <div class="combo-option" data-option-value="1">Այս շաբաթ</div>
+          <div class="combo-option" data-option-value="2">Այս ամիս</div>
+      </combo-box>
+  
       <div class="chart chart_252">
         <canvas id="${this.canvasId}"></canvas>
       </div>

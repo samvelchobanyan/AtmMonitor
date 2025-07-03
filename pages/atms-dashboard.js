@@ -3,6 +3,7 @@ import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/LineChart.js";
 import "../components/dynamic/chartComponent.js"
 // import { ChartComponent } from "../components/dynamic/chartComponent.js";
+
 class AtmsDashboard extends HTMLElement {
     connectedCallback() {
         this.render();
@@ -43,14 +44,14 @@ class AtmsDashboard extends HTMLElement {
                                 <info-card title="Այսօր կանխիկացված գումար" value="510,000,217" value-currency="֏" value-color="color-green" stat='<i class="icon icon-up"></i><span>+7%</span>' stat-class="stat_green" border></info-card>
                                 <info-card title="Այսօր մուտքագրված գումար" value="50,525,800" value-currency="֏" value-color="color-blue" stat='<i class="icon icon-down"></i><span>-3%</span>' stat-class="stat_red" border></info-card>
                             </div>
-                            <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>
+<!--                            <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>-->
 <!--                            <line-chart chart-id="line-chart" legend-id="legend-container"> </line-chart>-->
-                                <chart-component
-                                    id="line-chart"
-                                    api-url="/dashboard/transactions-amount-in-days"
-                                    start-date = "2025-06-24"
-                                    end-date = "2025-06-29"
-                                ></chart-component>
+                            <chart-component
+                                id="line-chart"
+                                api-url="/dashboard/transactions-amount-in-days"
+                                start-date = "2025-06-24"
+                                end-date = "2025-06-29"
+                            ></chart-component>
                         </div>
                     </div>
                     <div class="column sm-6">

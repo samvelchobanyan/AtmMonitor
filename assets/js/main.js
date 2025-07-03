@@ -1,3 +1,5 @@
+import { createLineChart, createDoughnutChart  } from "../../core/utils/chart-utils.js";
+
 document.addEventListener("DOMContentLoaded", function () {
     //sidebar
     $(".sidebar-toggle").on("click", function () {
@@ -135,75 +137,75 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const chartColors = ["#9BECB0", "#9BB3EE", "#BE9BEE", "#FCE2A8", "#EC9B9C", "#77E6FF"];
 
-    function createLineChart(ctxId, chartData, containerID) {
-        const ctx = document.getElementById(ctxId).getContext("2d");
+    // function createLineChart(ctxId, chartData, containerID) {
+    //     const ctx = document.getElementById(ctxId).getContext("2d");
+    //
+    //     const datasetsWithColors = chartData.datasets.map((dataset, index) => ({
+    //         ...baseDatasetOptions,
+    //         ...dataset,
+    //         borderColor: chartColors[index % chartColors.length],
+    //     }));
+    //
+    //     return new Chart(ctx, {
+    //         type: "line",
+    //         data: {
+    //             labels: chartData.labels,
+    //             datasets: datasetsWithColors,
+    //         },
+    //         options: {
+    //             maintainAspectRatio: false,
+    //             responsive: true,
+    //             plugins: {
+    //                 tooltip: { enabled: false },
+    //                 legend: { display: false },
+    //                 htmlLegend: { containerID },
+    //             },
+    //             scales: {
+    //                 y: {
+    //                     ticks: { maxTicksLimit: 6, autoSkip: true },
+    //                     beginAtZero: true,
+    //                     grid: { display: true, drawBorder: true, color: "#D9D9DD" },
+    //                     border: { dash: [2, 4] },
+    //                 },
+    //                 x: {
+    //                     grid: { display: true, drawBorder: true, color: "#D9D9DD" },
+    //                     border: { dash: [2, 4] },
+    //                     ticks: { display: false },
+    //                 },
+    //             },
+    //         },
+    //         plugins: [htmlLegendPlugin],
+    //     });
+    // }
 
-        const datasetsWithColors = chartData.datasets.map((dataset, index) => ({
-            ...baseDatasetOptions,
-            ...dataset,
-            borderColor: chartColors[index % chartColors.length],
-        }));
-
-        return new Chart(ctx, {
-            type: "line",
-            data: {
-                labels: chartData.labels,
-                datasets: datasetsWithColors,
-            },
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                plugins: {
-                    tooltip: { enabled: false },
-                    legend: { display: false },
-                    htmlLegend: { containerID },
-                },
-                scales: {
-                    y: {
-                        ticks: { maxTicksLimit: 6, autoSkip: true },
-                        beginAtZero: true,
-                        grid: { display: true, drawBorder: true, color: "#D9D9DD" },
-                        border: { dash: [2, 4] },
-                    },
-                    x: {
-                        grid: { display: true, drawBorder: true, color: "#D9D9DD" },
-                        border: { dash: [2, 4] },
-                        ticks: { display: false },
-                    },
-                },
-            },
-            plugins: [htmlLegendPlugin],
-        });
-    }
-
-    function createDoughnutChart(ctxId, chartData, containerID) {
-        const ctx = document.getElementById(ctxId).getContext("2d");
-
-        const doughnutDataset = chartData.datasets[0];
-        const filledDataset = {
-            ...doughnutDataset,
-            backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
-            hoverBackgroundColor: chartColors.slice(0, doughnutDataset.data.length),
-        };
-
-        return new Chart(ctx, {
-            type: "doughnut",
-            data: {
-                labels: chartData.labels,
-                datasets: [filledDataset],
-            },
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                plugins: {
-                    tooltip: { enabled: false },
-                    legend: { display: false },
-                    htmlLegend: { containerID },
-                },
-            },
-            plugins: [htmlLegendPlugin],
-        });
-    }
+    // function createDoughnutChart(ctxId, chartData, containerID) {
+    //     const ctx = document.getElementById(ctxId).getContext("2d");
+    //
+    //     const doughnutDataset = chartData.datasets[0];
+    //     const filledDataset = {
+    //         ...doughnutDataset,
+    //         backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
+    //         hoverBackgroundColor: chartColors.slice(0, doughnutDataset.data.length),
+    //     };
+    //
+    //     return new Chart(ctx, {
+    //         type: "doughnut",
+    //         data: {
+    //             labels: chartData.labels,
+    //             datasets: [filledDataset],
+    //         },
+    //         options: {
+    //             maintainAspectRatio: false,
+    //             responsive: true,
+    //             plugins: {
+    //                 tooltip: { enabled: false },
+    //                 legend: { display: false },
+    //                 htmlLegend: { containerID },
+    //             },
+    //         },
+    //         plugins: [htmlLegendPlugin],
+    //     });
+    // }
 
     const lineChartData = {
         labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],

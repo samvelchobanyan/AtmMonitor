@@ -1,74 +1,141 @@
+/* select-box.js — Slot-less combo-box with original search/filter logic */
+
+// 1. Template
 const comboTemplate = document.createElement('template');
 comboTemplate.innerHTML = `
   <div class="combo-box-selected">
-    <div class="combo-box-selected-wrap">
-      <slot name="placeholder">Select...</slot>
-    </div>
+    <div class="combo-box-selected-wrap"></div>
   </div>
   <div class="combo-box-dropdown">
-    <div class="combo-box-options">
-      <slot name="options"></slot>
-    </div>
+    <div class="combo-box-options"></div>
   </div>
 `;
 
 class ComboBox extends HTMLElement {
   static get observedAttributes() {
-    return ['data-combo-name', 'data-combo-value', 'data-max-items', 'data-empty-message', 'multiple', 'searchable', 'class'];
+    return [
+      'data-combo-name','data-combo-value','data-max-items',
+      'data-empty-message','multiple','searchable','tag-mode','class'
+    ];
   }
 
   constructor() {
     super();
-    // Instantiate template into light DOM
+    this.classList.add('combo-box');
     this.appendChild(comboTemplate.content.cloneNode(true));
 
-    // Element references
-    this._selectedEl = this.querySelector('.combo-box-selected');
-    this._dropdownEl = this.querySelector('.combo-box-dropdown');
+    // Refs
+    this._selectedEl     = this.querySelector('.combo-box-selected');
+    this._dropdownEl     = this.querySelector('.combo-box-dropdown');
     this._optionsWrapper = this.querySelector('.combo-box-options');
-    this._currentTabIndex = -1;
-    this._multiData = [];
-    this._emptyMessage = this.getAttribute('data-empty-message') || 'Nothing found';
-    this._maxItemsShow = Number(this.getAttribute('data-max-items')) || 3;
 
-    // Bind handlers
-    this._onDocumentClick = this._onDocumentClick.bind(this);
-    this._onKeyDown = this._onKeyDown.bind(this);
+    // State
+    this._options         = [];   // will hold all .combo-option elements
+    this._searchInput     = null; // injected when opened
+    this._multiData       = [];
+    this._emptyMessage    = this.getAttribute('data-empty-message') || 'Nothing found';
+    this._maxItemsShow    = Number(this.getAttribute('data-max-items')) || 3;
+    this._currentTabIndex = -1;
+
+    // Bindings
+    this._onDocumentClick   = this._onDocumentClick.bind(this);
+    this._onOptionClick     = this._onOptionClick.bind(this);
+    this._toggleDropdown    = this._toggleDropdown.bind(this);
+    this._handleSearchKeyUp = this._handleSearchKeyUp.bind(this);
   }
 
   connectedCallback() {
-    // Move light-DOM options into our dropdown
+    // Mirror attributes → CSS classes
+    this.classList.toggle('multiple',   this.hasAttribute('multiple'));
+    this.classList.toggle('searchable', this.hasAttribute('searchable'));
+    this.classList.toggle('tag-mode',   this.hasAttribute('tag-mode'));
+
+    // Pull in any light-DOM .combo-option nodes
     this._importOptions();
+    // Initialize selected state
     this._initSelection();
 
-    // Events
-    this._selectedEl.addEventListener('click', e => { e.stopPropagation(); this.toggleDropdown(); });
-    this.addEventListener('click', e => this._onOptionClick(e));
-    if (this.hasAttribute('searchable')) this._insertSearchInput();
-
+    // Event wiring
+    this._selectedEl.addEventListener('click', this._toggleDropdown);
+    this.addEventListener('click', this._onOptionClick);
     document.addEventListener('click', this._onDocumentClick);
-    this.addEventListener('keydown', this._onKeyDown);
-    this.setAttribute('tabindex', 0);
+
+    // Watch for keyup (for search filtering)
+    this.addEventListener('keyup', this._handleSearchKeyUp);
+
+    // Make focusable for future nav
+    this.setAttribute('tabindex','0');
   }
 
   disconnectedCallback() {
     document.removeEventListener('click', this._onDocumentClick);
-    this.removeEventListener('keydown', this._onKeyDown);
+    this.removeEventListener('keyup', this._handleSearchKeyUp);
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
     if (oldVal === newVal) return;
-    if (name === 'data-combo-value') this._syncValue(newVal);
-    if (name === 'data-empty-message') this._emptyMessage = newVal;
-    if (name === 'data-max-items') this._maxItemsShow = Number(newVal) || this._maxItemsShow;
+    switch (name) {
+      case 'data-combo-value':
+        this._syncValue(newVal);
+        break;
+      case 'data-empty-message':
+        this._emptyMessage = newVal;
+        break;
+      case 'data-max-items':
+        this._maxItemsShow = Number(newVal) || this._maxItemsShow;
+        break;
+      case 'multiple':
+      case 'searchable':
+      case 'tag-mode':
+        this.classList.toggle(name, this.hasAttribute(name));
+        break;
+      case 'class':
+        if (!this.classList.contains('combo-box')) {
+          this.classList.add('combo-box');
+        }
+        break;
+    }
   }
 
-  // Sync the displayed selection when attribute changes externally
+  // ——————————
+  // Core setup
+  // ——————————
+
+  _importOptions() {
+    // Grab existing .combo-option children, move into dropdown
+    this._options = Array.from(this.querySelectorAll('.combo-option'));
+    this._options.forEach(opt => this._optionsWrapper.appendChild(opt));
+  }
+
+  _initSelection() {
+    const initial = this.getAttribute('data-combo-value');
+    // Clear any existing selects
+    this._options.forEach(o => o.classList.remove('selected'));
+
+    if (!this.classList.contains('multiple')) {
+      // Single: find by attribute or pre-selected class
+      const sel = this._options.find(o => o.getAttribute('data-option-value') === initial)
+          || this._options.find(o => o.classList.contains('selected'));
+      if (sel) this._selectSingle(sel);
+    } else {
+      // Multiple: collect those already marked .selected
+      this._options
+      .filter(o => o.classList.contains('selected'))
+      .forEach(o => {
+        this._multiData.push({
+          value: o.getAttribute('data-option-value'),
+          text:  o.textContent.trim()
+        });
+      });
+      this._updateMultiDisplay();
+    }
+  }
+
   _syncValue(newVal) {
-    const opts = Array.from(this._optionsWrapper.querySelectorAll('.combo-option'));
-    const single = !this.classList.contains('multiple');
-    if (single) {
-      opts.forEach(o => {
+    // Sync when data-combo-value changes from outside
+    const isSingle = !this.classList.contains('multiple');
+    if (isSingle) {
+      this._options.forEach(o => {
         if (o.getAttribute('data-option-value') === newVal) {
           this._selectSingle(o);
         } else {
@@ -78,11 +145,11 @@ class ComboBox extends HTMLElement {
     } else {
       const values = newVal.split(',').map(v => v.trim());
       this._multiData = [];
-      opts.forEach(o => {
-        const val = o.getAttribute('data-option-value');
-        if (values.includes(val)) {
+      this._options.forEach(o => {
+        const v = o.getAttribute('data-option-value');
+        if (values.includes(v)) {
           o.classList.add('selected');
-          this._multiData.push({ value: val, text: o.textContent.trim() });
+          this._multiData.push({ value: v, text: o.textContent.trim() });
         } else {
           o.classList.remove('selected');
         }
@@ -91,73 +158,95 @@ class ComboBox extends HTMLElement {
     }
   }
 
-  _importOptions() {
-    const slotOptions = Array.from(this.querySelectorAll('.combo-option'));
-    slotOptions.forEach(opt => this._optionsWrapper.appendChild(opt));
-  }
+  // ——————————
+  // Open / Close / Search
+  // ——————————
 
-  _initSelection() {
-    const single = !this.classList.contains('multiple');
-    const initial = this.getAttribute('data-combo-value');
-    const opts = Array.from(this._optionsWrapper.querySelectorAll('.combo-option'));
-    opts.forEach(o => o.classList.remove('selected'));
-    if (single) {
-      const sel = opts.find(o => o.getAttribute('data-option-value') === initial) || opts.find(o => o.classList.contains('selected'));
-      if (sel) this._selectSingle(sel);
-    } else {
-      opts.filter(o => o.classList.contains('selected')).forEach(o => this._addMultiData(o));
-      this._updateMultiDisplay();
+  _toggleDropdown(e) {
+    e.stopPropagation();
+    const isOpen = this._dropdownEl.classList.toggle('opened');
+    this._selectedEl.classList.toggle('active', isOpen);
+
+    if (isOpen && this.hasAttribute('searchable')) {
+      // Inject the search input once
+      if (!this._searchInput) {
+        this._searchInput = document.createElement('input');
+        this._searchInput.type      = 'text';
+        this._searchInput.className = 'combo-box-search';
+        this._selectedEl.appendChild(this._searchInput);
+        this._searchInput.focus();
+      }
+      // Reset any previous filtering
+      this._filterOptionsWithQuery({ target: this._searchInput });
     }
-  }
-
-  toggleDropdown() {
-    const open = this._dropdownEl.classList.toggle('opened');
-    this._selectedEl.classList.toggle('active', open);
-    if (open && this.hasAttribute('searchable')) this._insertSearchInput();
-  }
-
-  _onDocumentClick(e) {
-    if (!this.contains(e.target) && this._dropdownEl.classList.contains('opened')) {
+    if (!isOpen) {
       this._closeDropdown();
     }
   }
 
-  _onKeyDown(e) {
-    // TODO: implement arrow navigation, enter, esc, backspace as needed
+  _onDocumentClick(e) {
+    if (!this.contains(e.target)) {
+      this._closeDropdown();
+    }
   }
+
+  _closeDropdown() {
+    this._dropdownEl.classList.remove('opened');
+    this._selectedEl.classList.remove('active');
+    if (this._searchInput) {
+      this._searchInput.remove();
+      this._searchInput = null;
+    }
+    // show all options again
+    this._options.forEach(o => o.classList.remove('combo-option_hidden'));
+    const msg = this._optionsWrapper.querySelector('.combo-box-message');
+    if (msg) msg.remove();
+  }
+
+  // ——————————
+  // Option Selection
+  // ——————————
 
   _onOptionClick(e) {
     const opt = e.target.closest('.combo-option');
     if (!opt) return;
+
     if (this.classList.contains('multiple')) {
-      if (opt.classList.contains('selected')) this._removeMultiOption(opt);
-      else { this._selectOption(opt); this._addMultiData(opt); }
+      // Toggle in multi-mode
+      if (opt.classList.contains('selected')) {
+        this._removeMultiOption(opt);
+      } else {
+        this._selectOption(opt);
+        this._addMultiData(opt);
+      }
       this._updateMultiDisplay();
     } else {
+      // Single
       this._selectSingle(opt);
       this._closeDropdown();
     }
   }
 
-  _selectOption(opt) {
-    if (!this.classList.contains('multiple')) {
-      this._optionsWrapper.querySelectorAll('.combo-option').forEach(o => o.classList.remove('selected'));
-      opt.classList.add('selected');
-    } else {
-      opt.classList.add('selected');
-    }
-  }
-
   _selectSingle(opt) {
     const val = opt.getAttribute('data-option-value');
+    this._options.forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
     this.setAttribute('data-combo-value', val);
     this.querySelector('.combo-box-selected-wrap').innerHTML = opt.innerHTML;
   }
 
+  _selectOption(opt) {
+    if (!this.classList.contains('multiple')) {
+      this._options.forEach(o => o.classList.remove('selected'));
+    }
+    opt.classList.add('selected');
+  }
+
   _addMultiData(opt) {
-    const val = opt.getAttribute('data-option-value');
-    const txt = opt.textContent.trim();
-    this._multiData.push({ value: val, text: txt });
+    this._multiData.push({
+      value: opt.getAttribute('data-option-value'),
+      text:  opt.textContent.trim()
+    });
   }
 
   _removeMultiOption(opt) {
@@ -167,11 +256,14 @@ class ComboBox extends HTMLElement {
   }
 
   _updateMultiDisplay() {
-    const wrap = this.querySelector('.combo-box-selected-wrap');
+    const wrap  = this.querySelector('.combo-box-selected-wrap');
+    const texts = this._multiData.map(d => d.text);
+
     if (this.classList.contains('tag-mode')) {
-      wrap.innerHTML = this._multiData.map(d => `<span class="combo-box-tag" data-tag-value="${d.value}">${d.text}</span>`).join('');
+      wrap.innerHTML = this._multiData
+      .map(d => `<span class="combo-box-tag" data-tag-value="${d.value}">${d.text}</span>`)
+      .join('');
     } else {
-      const texts = this._multiData.map(d => d.text);
       wrap.textContent = texts.length > this._maxItemsShow
           ? `${texts.slice(0, this._maxItemsShow).join(', ')} +${texts.length - this._maxItemsShow}`
           : texts.join(', ');
@@ -179,35 +271,52 @@ class ComboBox extends HTMLElement {
     this.setAttribute('data-combo-value', this._multiData.map(d => d.value).join(', '));
   }
 
-  _closeDropdown() {
-    this._dropdownEl.classList.remove('opened');
-    this._selectedEl.classList.remove('active');
-    const inp = this.querySelector('input.combo-box-search'); if (inp) inp.remove();
+  // ——————————
+  // Original plugin’s filter logic
+  // ——————————
+
+  _handleSearchKeyUp(e) {
+    // only act on keyups in the search input
+    if (!e.target.classList.contains('combo-box-search')) return;
+    this._filterOptionsWithQuery(e);
   }
 
-  _insertSearchInput() {
-    if (!this.querySelector('input.combo-box-search')) {
-      const input = document.createElement('input');
-      input.type = 'text'; input.className = 'combo-box-search';
-      this._selectedEl.appendChild(input);
-      input.focus();
-      input.addEventListener('input', e => this._filterOptions(e.target.value));
-    }
-  }
-
-  _filterOptions(query) {
-    const q = query.trim().toLowerCase();
-    const opts = Array.from(this._optionsWrapper.querySelectorAll('.combo-option'));
-    opts.forEach(o => o.classList.toggle('combo-option_hidden', q && !o.textContent.toLowerCase().includes(q)));
-    if (!opts.some(o => !o.classList.contains('combo-option_hidden'))) {
-      if (!this._optionsWrapper.querySelector('.combo-box-message')) {
-        const msg = document.createElement('div'); msg.className = 'combo-box-message'; msg.textContent = this._emptyMessage;
-        this._optionsWrapper.append(msg);
-      }
+  _filterOptionsWithQuery(e) {
+    const valRaw = e.target.value;
+    const val    = valRaw.trim();
+    const up     = val.toUpperCase();
+    console.log('filter option',val);
+    if (val.length) {
+      this._options.forEach(option => {
+        const txt = option.textContent.toUpperCase();
+        if (txt.indexOf(up) > -1) {
+          option.classList.remove('combo-option_hidden');
+        } else {
+          option.classList.add('combo-option_hidden');
+        }
+      });
     } else {
-      const msg = this._optionsWrapper.querySelector('.combo-box-message'); if (msg) msg.remove();
+      // show all when input is empty
+      this._options.forEach(option => {
+        option.classList.remove('combo-option_hidden');
+      });
+    }
+
+    // Show “nothing found” if none match
+    const noneVisible = !this._options.some(opt => !opt.classList.contains('combo-option_hidden'));
+    let msg = this._optionsWrapper.querySelector('.combo-box-message');
+    if (noneVisible) {
+      if (!msg) {
+        msg = document.createElement('div');
+        msg.className   = 'combo-box-message';
+        msg.textContent = this._emptyMessage;
+        this._optionsWrapper.appendChild(msg);
+      }
+    } else if (msg) {
+      msg.remove();
     }
   }
 }
 
+// 3. Register
 customElements.define('combo-box', ComboBox);

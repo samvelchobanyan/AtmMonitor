@@ -100,11 +100,10 @@ class ChartComponent extends DynamicElement {
     this.classList.add("chart-container");
     return `
 <!--      <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>-->
-      <combo-box data-combo-name="single" data-combo-value="today">
-         <span slot="placeholder">Այսօր</span>
-          <div class="combo-option selected" data-option-value="today">Այսօր</div>
-          <div class="combo-option" data-option-value="1">Այս շաբաթ</div>
-          <div class="combo-option" data-option-value="2">Այս ամիս</div>
+      <combo-box data-combo-name="single" data-combo-value="today" searchable>
+          <div class="combo-option selected" data-option-value="today">One</div>
+          <div class="combo-option" data-option-value="1">Two</div>
+          <div class="combo-option" data-option-value="2">three</div>
       </combo-box>
   
       <div class="chart chart_252">

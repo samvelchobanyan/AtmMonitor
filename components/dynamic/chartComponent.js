@@ -14,13 +14,82 @@ class ChartComponent extends DynamicElement {
     this.canvasId = `canvas-${this.getAttr('id', 'line-chart')}`;
     this.legendId = `legend-${this.canvasId}`;
     this.hasConnected = true;
-    this.fetchAndRenderChart();
+    // this.fetchAndRenderChart();
+    EventTarget.prototype.addEventListener.call(this, 'change', e => {
+      if (e.target.matches('select-box')) {
+        this._applyPeriodToDates(e.target.value);
+      }
+    });
+
+    this._syncPeriodFromDates();
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue && this.hasConnected && observedAttrs.includes(name)) {
       this.fetchAndRenderChart();
     }
+  }
+
+  // — Map incoming start/end → period selection —
+  _syncPeriodFromDates() {
+    const sel = this.querySelector('select-box');
+    let start = this.getAttr('start-date');
+    let end   = this.getAttr('end-date');
+
+    // Default both to today if neither provided
+    if (!start && !end) {
+      this._applyPeriodToDates('today');
+      return;
+    }
+    // If only start provided, mirror to end
+    if (start && !end) {
+      this.setAttr('end-date', start);
+      end = start;
+    }
+
+    const s = new Date(start);
+    const e = new Date(end);
+    const diffDays = (e - s) / (1000*60*60*24);
+
+    let period;
+    if (diffDays === 0) {
+      period = 'today';
+    } else if (diffDays === 7) {
+      period = 'oneWeek';
+    } else {
+      period = 'custom';
+    }
+
+    // Update the select-box UI
+    sel.value = period;
+  }
+
+  // — Map period selection → start/end attrs —
+  _applyPeriodToDates(period) {
+    const now = new Date();
+    let start;
+
+    switch (period) {
+      case 'today':
+        start = new Date(now);
+        break;
+      case 'oneWeek':
+        start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case 'custom':
+        // Custom: assume consumer will set start-date/end-date manually.
+        // If missing, default both to today.
+        if (!this.getAttr('start-date') || !this.getAttr('end-date')) {
+          this._applyPeriodToDates('today');
+        }
+        return;
+      default:
+        return;
+    }
+
+    const fmt = d => d.toISOString().slice(0, 10);
+    this.setAttr('start-date', fmt(start));
+    this.setAttr('end-date',   fmt(now));
   }
 
   async fetchAndRenderChart() {
@@ -100,11 +169,11 @@ class ChartComponent extends DynamicElement {
     this.classList.add("chart-container");
     return `
 <!--      <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>-->
-      <combo-box data-combo-name="single" data-combo-value="today" searchable>
-          <div class="combo-option selected" data-option-value="today">One</div>
-          <div class="combo-option" data-option-value="1">Two</div>
-          <div class="combo-option" data-option-value="2">three</div>
-      </combo-box>
+      <select-box name="single" value="today" searchable>
+        <div class="combo-option selected" data-option-value="today">Այսօր</div>
+        <div class="combo-option" data-option-value="week">Այս շաբաթ</div>
+        <div class="combo-option" data-option-value="custom">Ամսաթվի միջակայք</div>
+      </select-box>
   
       <div class="chart chart_252">
         <canvas id="${this.canvasId}"></canvas>
@@ -114,11 +183,11 @@ class ChartComponent extends DynamicElement {
   }
 
   onAfterRender() {
-    console.log('after render',this.state);
     if (this.state.chartData) {
       createLineChart(this.canvasId, this.state.chartData, this.legendId);
     }
   }
+
 }
 
 // Register the component

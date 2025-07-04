@@ -2,7 +2,6 @@ const htmlLegendPlugin = {
   id: "htmlLegend",
   afterUpdate(chart, args, options) {
     // const dataset = chart.data.datasets[item.datasetIndex];
-    console.log('creating legend');
     const ul = getOrCreateLegendList(chart, options.containerID);
 
     while (ul.firstChild) {
@@ -10,15 +9,12 @@ const htmlLegendPlugin = {
     }
 
     const items = chart.options.plugins.legend.labels.generateLabels(chart);
-    console.log('creating legend items', items );
     items.forEach((item, index) => {
       const li = document.createElement("li");
       const circle = document.createElement("span");
 
-      console.log('legend',chart.canvas);
 
       if ($(chart.canvas).parents(".chart-container").children(".custom-legend").hasClass("custom-legend_checkmark")) {
-        console.log('legent if');
         circle.style.backgroundColor = item.strokeStyle;
         const label = document.createElement("label");
         label.className = "custom-check";
@@ -103,7 +99,6 @@ const baseDatasetOptions = {
 const chartColors = ["#9BECB0", "#9BB3EE", "#BE9BEE", "#FCE2A8", "#EC9B9C", "#77E6FF"];
 
 export function createLineChart(ctxId, chartData, containerID) {
-  console.log("chart utils",ctxId,containerID);
   const ctx = document.getElementById(ctxId).getContext("2d");
 
   const datasetsWithColors = chartData.datasets.map((dataset, index) => ({

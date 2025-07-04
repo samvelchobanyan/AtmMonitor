@@ -1,8 +1,12 @@
-/* select-box.js — Slot-less combo-box with original search/filter logic */
+/* select-box.js — Slot-less, full-featured <select-box> Web Component
+   - Renamed from ComboBox to SelectBox
+   - Uses `name` and `value` attributes (no more `data-combo-*`)
+   - Supports single, multiple, tag-mode, searchable, max-items, empty-message
+*/
 
-// 1. Template
-const comboTemplate = document.createElement('template');
-comboTemplate.innerHTML = `
+// 1. Define the template
+const selectTemplate = document.createElement('template');
+selectTemplate.innerHTML = `
   <div class="combo-box-selected">
     <div class="combo-box-selected-wrap"></div>
   </div>
@@ -11,33 +15,56 @@ comboTemplate.innerHTML = `
   </div>
 `;
 
-class ComboBox extends HTMLElement {
+class SelectBox extends HTMLElement {
+  // 2. Observe these attributes
   static get observedAttributes() {
     return [
-      'data-combo-name','data-combo-value','data-max-items',
-      'data-empty-message','multiple','searchable','tag-mode','class'
+      'name',
+      'value',
+      'data-max-items',
+      'data-empty-message',
+      'multiple',
+      'searchable',
+      'tag-mode',
+      'class'
     ];
+  }
+
+  // 3. Property accessors for convenience
+  get value() {
+    return this.getAttribute('value');
+  }
+  set value(v) {
+    this.setAttribute('value', v);
+  }
+  get name() {
+    return this.getAttribute('name');
+  }
+  set name(n) {
+    this.setAttribute('name', n);
   }
 
   constructor() {
     super();
+    // always have base class
     this.classList.add('combo-box');
-    this.appendChild(comboTemplate.content.cloneNode(true));
+    // stamp out template into light DOM
+    this.appendChild(selectTemplate.content.cloneNode(true));
 
-    // Refs
+    // element refs
     this._selectedEl     = this.querySelector('.combo-box-selected');
     this._dropdownEl     = this.querySelector('.combo-box-dropdown');
     this._optionsWrapper = this.querySelector('.combo-box-options');
 
-    // State
-    this._options         = [];   // will hold all .combo-option elements
-    this._searchInput     = null; // injected when opened
+    // internal state
+    this._options         = [];
+    this._searchInput     = null;
     this._multiData       = [];
     this._emptyMessage    = this.getAttribute('data-empty-message') || 'Nothing found';
     this._maxItemsShow    = Number(this.getAttribute('data-max-items')) || 3;
     this._currentTabIndex = -1;
 
-    // Bindings
+    // bind handlers
     this._onDocumentClick   = this._onDocumentClick.bind(this);
     this._onOptionClick     = this._onOptionClick.bind(this);
     this._toggleDropdown    = this._toggleDropdown.bind(this);
@@ -45,25 +72,23 @@ class ComboBox extends HTMLElement {
   }
 
   connectedCallback() {
-    // Mirror attributes → CSS classes
+    // mirror boolean attrs → CSS classes
     this.classList.toggle('multiple',   this.hasAttribute('multiple'));
     this.classList.toggle('searchable', this.hasAttribute('searchable'));
     this.classList.toggle('tag-mode',   this.hasAttribute('tag-mode'));
 
-    // Pull in any light-DOM .combo-option nodes
+    // import any light-DOM .combo-option elements
     this._importOptions();
-    // Initialize selected state
+    // initialize selection from value attr or existing .selected
     this._initSelection();
 
-    // Event wiring
+    // wire events
     this._selectedEl.addEventListener('click', this._toggleDropdown);
-    this.addEventListener('click', this._onOptionClick);
-    document.addEventListener('click', this._onDocumentClick);
+    this.addEventListener('click',            this._onOptionClick);
+    document.addEventListener('click',        this._onDocumentClick);
+    this.addEventListener('keyup',            this._handleSearchKeyUp);
 
-    // Watch for keyup (for search filtering)
-    this.addEventListener('keyup', this._handleSearchKeyUp);
-
-    // Make focusable for future nav
+    // make host focusable for potential keyboard nav
     this.setAttribute('tabindex','0');
   }
 
@@ -72,11 +97,14 @@ class ComboBox extends HTMLElement {
     this.removeEventListener('keyup', this._handleSearchKeyUp);
   }
 
-  attributeChangedCallback(name, oldVal, newVal) {
+  attributeChangedCallback(attr, oldVal, newVal) {
     if (oldVal === newVal) return;
-    switch (name) {
-      case 'data-combo-value':
+    switch (attr) {
+      case 'value':
         this._syncValue(newVal);
+        break;
+      case 'name':
+        // nothing special to do for name right now
         break;
       case 'data-empty-message':
         this._emptyMessage = newVal;
@@ -87,7 +115,7 @@ class ComboBox extends HTMLElement {
       case 'multiple':
       case 'searchable':
       case 'tag-mode':
-        this.classList.toggle(name, this.hasAttribute(name));
+        this.classList.toggle(attr, this.hasAttribute(attr));
         break;
       case 'class':
         if (!this.classList.contains('combo-box')) {
@@ -97,44 +125,41 @@ class ComboBox extends HTMLElement {
     }
   }
 
-  // ——————————
-  // Core setup
-  // ——————————
+  // — Core setup methods —
 
   _importOptions() {
-    // Grab existing .combo-option children, move into dropdown
-    this._options = Array.from(this.querySelectorAll('.combo-option'));
+    // move any .combo-option children into the dropdown container
+    this._options = Array.from(
+        this.querySelectorAll('.combo-option')
+    );
     this._options.forEach(opt => this._optionsWrapper.appendChild(opt));
   }
 
   _initSelection() {
-    const initial = this.getAttribute('data-combo-value');
-    // Clear any existing selects
+    const initial = this.value;
     this._options.forEach(o => o.classList.remove('selected'));
 
-    if (!this.classList.contains('multiple')) {
-      // Single: find by attribute or pre-selected class
-      const sel = this._options.find(o => o.getAttribute('data-option-value') === initial)
+    if (!this.hasAttribute('multiple')) {
+      // single-select
+      const sel = this._options
+          .find(o => o.getAttribute('data-option-value') === initial)
           || this._options.find(o => o.classList.contains('selected'));
       if (sel) this._selectSingle(sel);
     } else {
-      // Multiple: collect those already marked .selected
+      // multi-select
       this._options
       .filter(o => o.classList.contains('selected'))
-      .forEach(o => {
-        this._multiData.push({
-          value: o.getAttribute('data-option-value'),
-          text:  o.textContent.trim()
-        });
-      });
+      .forEach(o => this._multiData.push({
+        value: o.getAttribute('data-option-value'),
+        text:  o.textContent.trim()
+      }));
       this._updateMultiDisplay();
     }
   }
 
   _syncValue(newVal) {
-    // Sync when data-combo-value changes from outside
-    const isSingle = !this.classList.contains('multiple');
-    if (isSingle) {
+    // sync external changes to `value`
+    if (!this.hasAttribute('multiple')) {
       this._options.forEach(o => {
         if (o.getAttribute('data-option-value') === newVal) {
           this._selectSingle(o);
@@ -158,9 +183,7 @@ class ComboBox extends HTMLElement {
     }
   }
 
-  // ——————————
-  // Open / Close / Search
-  // ——————————
+  // — Dropdown & Search —
 
   _toggleDropdown(e) {
     e.stopPropagation();
@@ -168,7 +191,7 @@ class ComboBox extends HTMLElement {
     this._selectedEl.classList.toggle('active', isOpen);
 
     if (isOpen && this.hasAttribute('searchable')) {
-      // Inject the search input once
+      // inject search input once
       if (!this._searchInput) {
         this._searchInput = document.createElement('input');
         this._searchInput.type      = 'text';
@@ -176,7 +199,7 @@ class ComboBox extends HTMLElement {
         this._selectedEl.appendChild(this._searchInput);
         this._searchInput.focus();
       }
-      // Reset any previous filtering
+      // reset filter
       this._filterOptionsWithQuery({ target: this._searchInput });
     }
     if (!isOpen) {
@@ -197,22 +220,19 @@ class ComboBox extends HTMLElement {
       this._searchInput.remove();
       this._searchInput = null;
     }
-    // show all options again
     this._options.forEach(o => o.classList.remove('combo-option_hidden'));
     const msg = this._optionsWrapper.querySelector('.combo-box-message');
     if (msg) msg.remove();
   }
 
-  // ——————————
-  // Option Selection
-  // ——————————
+  // — Option selection —
 
   _onOptionClick(e) {
     const opt = e.target.closest('.combo-option');
     if (!opt) return;
 
-    if (this.classList.contains('multiple')) {
-      // Toggle in multi-mode
+    if (this.hasAttribute('multiple')) {
+      // multi-select
       if (opt.classList.contains('selected')) {
         this._removeMultiOption(opt);
       } else {
@@ -221,7 +241,7 @@ class ComboBox extends HTMLElement {
       }
       this._updateMultiDisplay();
     } else {
-      // Single
+      // single-select
       this._selectSingle(opt);
       this._closeDropdown();
     }
@@ -231,12 +251,13 @@ class ComboBox extends HTMLElement {
     const val = opt.getAttribute('data-option-value');
     this._options.forEach(o => o.classList.remove('selected'));
     opt.classList.add('selected');
-    this.setAttribute('data-combo-value', val);
+    this.value = val;
     this.querySelector('.combo-box-selected-wrap').innerHTML = opt.innerHTML;
+    this.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   _selectOption(opt) {
-    if (!this.classList.contains('multiple')) {
+    if (!this.hasAttribute('multiple')) {
       this._options.forEach(o => o.classList.remove('selected'));
     }
     opt.classList.add('selected');
@@ -250,8 +271,8 @@ class ComboBox extends HTMLElement {
   }
 
   _removeMultiOption(opt) {
-    opt.classList.remove('selected');
     const val = opt.getAttribute('data-option-value');
+    opt.classList.remove('selected');
     this._multiData = this._multiData.filter(item => item.value !== val);
   }
 
@@ -259,7 +280,7 @@ class ComboBox extends HTMLElement {
     const wrap  = this.querySelector('.combo-box-selected-wrap');
     const texts = this._multiData.map(d => d.text);
 
-    if (this.classList.contains('tag-mode')) {
+    if (this.hasAttribute('tag-mode')) {
       wrap.innerHTML = this._multiData
       .map(d => `<span class="combo-box-tag" data-tag-value="${d.value}">${d.text}</span>`)
       .join('');
@@ -268,24 +289,23 @@ class ComboBox extends HTMLElement {
           ? `${texts.slice(0, this._maxItemsShow).join(', ')} +${texts.length - this._maxItemsShow}`
           : texts.join(', ');
     }
-    this.setAttribute('data-combo-value', this._multiData.map(d => d.value).join(', '));
+
+    this.value = this._multiData.map(d => d.value).join(',');
+    this.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
-  // ——————————
-  // Original plugin’s filter logic
-  // ——————————
+  // — Original plugin’s search logic —
 
   _handleSearchKeyUp(e) {
-    // only act on keyups in the search input
     if (!e.target.classList.contains('combo-box-search')) return;
     this._filterOptionsWithQuery(e);
   }
 
   _filterOptionsWithQuery(e) {
-    const valRaw = e.target.value;
-    const val    = valRaw.trim();
-    const up     = val.toUpperCase();
-    console.log('filter option',val);
+    const raw = e.target.value;
+    const val = raw.trim();
+    const up  = val.toUpperCase();
+
     if (val.length) {
       this._options.forEach(option => {
         const txt = option.textContent.toUpperCase();
@@ -296,14 +316,13 @@ class ComboBox extends HTMLElement {
         }
       });
     } else {
-      // show all when input is empty
       this._options.forEach(option => {
         option.classList.remove('combo-option_hidden');
       });
     }
 
-    // Show “nothing found” if none match
-    const noneVisible = !this._options.some(opt => !opt.classList.contains('combo-option_hidden'));
+    // “Nothing found” message
+    const noneVisible = !this._options.some(o => !o.classList.contains('combo-option_hidden'));
     let msg = this._optionsWrapper.querySelector('.combo-box-message');
     if (noneVisible) {
       if (!msg) {
@@ -318,5 +337,5 @@ class ComboBox extends HTMLElement {
   }
 }
 
-// 3. Register
-customElements.define('combo-box', ComboBox);
+// 4. Register as <select-box>
+customElements.define('select-box', SelectBox);

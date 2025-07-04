@@ -55,4 +55,4 @@ export class SelectBox extends HTMLElement {
     }
 }
 
-customElements.define("select-box", SelectBox);
+customElements.define("select-box-simple", SelectBox);

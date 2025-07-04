@@ -57,7 +57,7 @@ class AtmsDashboard extends HTMLElement {
                     <div class="column sm-6">
                         <div class="container">
                             <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="/details"> </container-top>
-                            <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>
+                            <select-box-simple value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box-simple>
                             <div class="chart-container chart-container_between">
                                 <div class="chart chart_280">
                                     <canvas id="doughnut-chart"></canvas>
@@ -81,7 +81,7 @@ class AtmsDashboard extends HTMLElement {
                                 <info-card title="Բանկոմատների թիվ" value="250,108,500" value-currency="֏" value-color="color-blue" icon="icon icon-arrow-up-right"></info-card>
                                 <info-card title="Երեկ դատարկ բանկոմատներ" value="5" value-color="color-red" icon="icon icon-box" message="2"></info-card>
                             </div>
-                            <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>
+                            <select-box-simple value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box-simple>
                             <line-chart chart-id="line-chart-2" legend-id="legend-container-2"> </line-chart>
                         </div>
                     </div>

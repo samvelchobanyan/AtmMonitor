@@ -6,22 +6,31 @@ import "./select-box.js";
 
 const observedAttrs = ['api-url', 'city', 'region', 'start-date', 'end-date'];
 class ChartComponent extends DynamicElement {
+  constructor() {
+    super();
+    this.selectBox = null;
+    this.canvasId = `canvas-${this.getAttr('id', 'line-chart')}`;
+    this.legendId = `legend-${this.canvasId}`;
+  }
+
+
   static get observedAttributes() {
     return observedAttrs;
   }
 
   onConnected() {
-    this.canvasId = `canvas-${this.getAttr('id', 'line-chart')}`;
-    this.legendId = `legend-${this.canvasId}`;
     this.hasConnected = true;
-    // this.fetchAndRenderChart();
-    EventTarget.prototype.addEventListener.call(this, 'change', e => {
-      if (e.target.matches('select-box')) {
-        this._applyPeriodToDates(e.target.value);
-      }
-    });
+    this.fetchAndRenderChart();
+  }
 
-    this._syncPeriodFromDates();
+  addEventListeners() {
+    // Override in child classes to set up template-based event listeners
+    // Called after every render for elements inside the component's innerHTML
+    // Example:
+    if (this.selectBox) {
+      this.addEventListener(this.selectBox, 'change', this._applyPeriodToDates(e.target.value));
+    }
+
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -31,7 +40,7 @@ class ChartComponent extends DynamicElement {
   }
 
   // — Map incoming start/end → period selection —
-  _syncPeriodFromDates() {
+  _dateToPeriod() {
     const sel = this.querySelector('select-box');
     let start = this.getAttr('start-date');
     let end   = this.getAttr('end-date');
@@ -43,7 +52,7 @@ class ChartComponent extends DynamicElement {
     }
     // If only start provided, mirror to end
     if (start && !end) {
-      this.setAttr('end-date', start);
+      this.setAttribute('end-date', start);
       end = start;
     }
 
@@ -61,7 +70,8 @@ class ChartComponent extends DynamicElement {
     }
 
     // Update the select-box UI
-    sel.value = period;
+    console.log(this.selectBox)
+    this.selectBox.value = period;
   }
 
   // — Map period selection → start/end attrs —
@@ -88,8 +98,8 @@ class ChartComponent extends DynamicElement {
     }
 
     const fmt = d => d.toISOString().slice(0, 10);
-    this.setAttr('start-date', fmt(start));
-    this.setAttr('end-date',   fmt(now));
+    this.setAttribute('start-date', fmt(start));
+    this.setAttribute('end-date',   fmt(now));
   }
 
   async fetchAndRenderChart() {
@@ -183,6 +193,10 @@ class ChartComponent extends DynamicElement {
   }
 
   onAfterRender() {
+    this.selectBox = this.$('select-box');
+    console.log('after render',this.selectBox)
+    this._dateToPeriod();
+
     if (this.state.chartData) {
       createLineChart(this.canvasId, this.state.chartData, this.legendId);
     }

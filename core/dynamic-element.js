@@ -58,6 +58,15 @@ export class DynamicElement extends HTMLElement {
   setState(newState) {
     if (this.isDestroyed) return;
 
+    // Simple validation - check if properties exist in current state
+    // if (this.shouldValidateState()) {
+      const invalidKeys = Object.keys(newState).filter(key => !(key in this.state));
+      if (invalidKeys.length > 0) {
+        console.warn(`[${this.constructor.name}] Setting undefined state properties:`, invalidKeys);
+        console.warn('Valid state properties:', Object.keys(this.state));
+      }
+    // }
+
     const oldState = { ...this.state };
     this.state = { ...this.state, ...newState };
     this.onStateChange(oldState, this.state);

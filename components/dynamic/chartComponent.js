@@ -8,6 +8,18 @@ const observedAttrs = ['api-url', 'city', 'region', 'start-date', 'end-date'];
 class ChartComponent extends DynamicElement {
   constructor() {
     super();
+    this.renderCount = 0;
+
+    this.state = {
+      ...this.state,
+      chartData: null,
+      endpoint: this.getAttr('api-url') || null,
+      startDate: this.getAttr('start-date') || null,
+      endDate: this.getAttr('end-date') || null,
+      city: this.getAttr('city') || null,
+      region: this.getAttr('region') || null,
+    }
+
     this.selectBox = null;
     this.canvasId = `canvas-${this.getAttr('id', 'line-chart')}`;
     this.legendId = `legend-${this.canvasId}`;
@@ -23,12 +35,27 @@ class ChartComponent extends DynamicElement {
     this.fetchAndRenderChart();
   }
 
+  onAfterRender() {
+    this.selectBox = this.$('select-box');
+    // this._dateToPeriod();
+
+    if (this.state.chartData) {
+      createLineChart(this.canvasId, this.state.chartData, this.legendId);
+    }
+  }
+
   addEventListeners() {
     // Override in child classes to set up template-based event listeners
     // Called after every render for elements inside the component's innerHTML
     // Example:
+    console.log('addEventListeners called - render count:', ++this.renderCount || 1);
+    console.log('event handler', this.selectBox);
+
     if (this.selectBox) {
-      this.addEventListener(this.selectBox, 'change', this._applyPeriodToDates(e.target.value));
+      this.addEventListener(this.selectBox, 'change', (e) => {
+        console.log('select change - listener ID:', Date.now());
+      });
+      console.log('event change event added to', this.selectBox);
     }
 
   }
@@ -70,7 +97,6 @@ class ChartComponent extends DynamicElement {
     }
 
     // Update the select-box UI
-    console.log(this.selectBox)
     this.selectBox.value = period;
   }
 
@@ -103,25 +129,18 @@ class ChartComponent extends DynamicElement {
   }
 
   async fetchAndRenderChart() {
-    const endpoint = this.getAttr('api-url');
-    const startDate = this.getAttr('start-date');
-    const endDate = this.getAttr('end-date');
-    const city = this.getAttr('city');
-    const region = this.getAttr('region');
-
-    if (!endpoint) {
+    if (!this.state.endpoint) {
       console.warn('<chart-component> is missing required "api-url" attribute');
       return;
     }
 
     const params = new URLSearchParams();
-    if (startDate) params.append('startDate', startDate);
-    if (endDate) params.append('endDate', endDate);
-    if (city) params.append('city', city);
-    if (region) params.append('region', region);
+    if (this.state.startDate) params.append('startDate', this.state.startDate);
+    if (this.state.endDate) params.append('endDate', this.state.endDate);
+    if (this.state.city) params.append('city', this.state.city);
+    if (this.state.region) params.append('region', this.state.region);
 
-    const url = `${endpoint}?${params.toString()}`;
-
+    const url = `${this.state.endpoint}?${params.toString()}`;
     try {
       const response = await this.fetchData(url);
 
@@ -192,14 +211,18 @@ class ChartComponent extends DynamicElement {
     `;
   }
 
-  onAfterRender() {
-    this.selectBox = this.$('select-box');
-    console.log('after render',this.selectBox)
-    this._dateToPeriod();
+  // Override setState to see what's triggering renders
+  setState(newState) {
+    console.log('setState called with:', newState);
+    console.trace('setState called from:');
+    super.setState(newState);
+  }
 
-    if (this.state.chartData) {
-      createLineChart(this.canvasId, this.state.chartData, this.legendId);
-    }
+// Override scheduleRender to see when renders are scheduled
+  scheduleRender() {
+    console.log('scheduleRender called');
+    console.trace('scheduleRender called from:');
+    super.scheduleRender();
   }
 
 }

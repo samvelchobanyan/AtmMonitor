@@ -5,7 +5,7 @@ export class DynamicElement extends HTMLElement {
     super();
 
     // Internal state
-    this.state = { isLoading: false };
+    this.state = { isLoading: false, error: false };
     this.storeSubscriptions = new Map();
     this.eventListeners = new Map();
     this.isDestroyed = false;
@@ -19,9 +19,10 @@ export class DynamicElement extends HTMLElement {
 
   connectedCallback() {
     this.onConnected();
-    this.render();
+    // this.render();
     this.addGlobalEventListeners();
     this.subscribeToStores();
+    this.scheduleRender();
   }
 
   disconnectedCallback() {
@@ -57,15 +58,13 @@ export class DynamicElement extends HTMLElement {
   // State management - SIMPLIFIED: always triggers render
   setState(newState) {
     if (this.isDestroyed) return;
-
     // Simple validation - check if properties exist in current state
-    // if (this.shouldValidateState()) {
-      const invalidKeys = Object.keys(newState).filter(key => !(key in this.state));
-      if (invalidKeys.length > 0) {
-        console.warn(`[${this.constructor.name}] Setting undefined state properties:`, invalidKeys);
-        console.warn('Valid state properties:', Object.keys(this.state));
-      }
-    // }
+     const invalidKeys = Object.keys(newState).filter(key => !(key in this.state));
+    if (invalidKeys.length > 0) {
+      console.warn(`[${this.constructor.name}] Setting undefined state properties:`, invalidKeys);
+      console.warn('Valid state properties:', Object.keys(this.state));
+      return;
+    }
 
     const oldState = { ...this.state };
     this.state = { ...this.state, ...newState };
@@ -137,6 +136,19 @@ export class DynamicElement extends HTMLElement {
     // }
   }
 
+  clearEventListeners() {
+    this.eventListeners.forEach((listeners, element) => {
+      listeners.forEach(({ event, handler, options }) => {
+        try {
+          element.removeEventListener(event, handler, options);
+        } catch (error) {
+          console.warn('Error removing template event listener:', error);
+        }
+      });
+    });
+    this.eventListeners.clear();
+  }
+
   // API methods - SIMPLIFIED: normal setState behavior
   async fetchData(endpoint, options = {}) {
     this.setState({ isLoading: true });
@@ -193,10 +205,13 @@ export class DynamicElement extends HTMLElement {
 
   render() {
     if (this.isDestroyed) return;
-
+    // console.trace('render() called from:');
+    console.log(`[${this.constructor.name}] render() called`);
+    this.clearEventListeners();
     this.innerHTML = this.template();
-    this.addEventListeners();
     this.onAfterRender();
+    this.addEventListeners();
+    // this.onAfterRender();
   }
 
   onAfterRender() {

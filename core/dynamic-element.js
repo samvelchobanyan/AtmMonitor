@@ -140,15 +140,13 @@ export class DynamicElement extends HTMLElement {
     // Remove listeners from elements that are inside the component's innerHTML
     // This is called before each render to prevent duplicate listeners
     const elementsToRemove = [];
-
     this.eventListeners.forEach((listeners, element) => {
-      // Check if element is inside this component's innerHTML
       if (this.contains(element) && element !== this) {
         listeners.forEach(({ event, handler, options }) => {
           try {
             element.removeEventListener(event, handler, options);
           } catch (error) {
-            console.warn('Error removing template event listener:', error);
+            console.error('❌ Error removing listener:', error);
           }
         });
         elementsToRemove.push(element);
@@ -216,9 +214,8 @@ export class DynamicElement extends HTMLElement {
   }
 
   render() {
+    console.log('render');
     if (this.isDestroyed) return;
-    // console.trace('render() called from:');
-    console.log(`[${this.constructor.name}] render() called`);
     this.clearEventListeners();
     this.innerHTML = this.template();
     this.onAfterRender();

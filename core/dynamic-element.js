@@ -106,7 +106,7 @@ export class DynamicElement extends HTMLElement {
   }
 
   // Event handling
-  addEventListener(element, event, handler, options = {}) {
+  addListener(element, event, handler, options = {}) {
     const boundHandler = handler.bind(this);
     element.addEventListener(event, boundHandler, options);
 
@@ -132,21 +132,33 @@ export class DynamicElement extends HTMLElement {
     // Example:
     // const button = this.$('.my-button');
     // if (button) {
-    //   this.addEventListener(button, 'click', this.handleClick);
+    //   this.addListener(button, 'click', this.handleClick);
     // }
   }
 
   clearEventListeners() {
+    // Remove listeners from elements that are inside the component's innerHTML
+    // This is called before each render to prevent duplicate listeners
+    const elementsToRemove = [];
+
     this.eventListeners.forEach((listeners, element) => {
-      listeners.forEach(({ event, handler, options }) => {
-        try {
-          element.removeEventListener(event, handler, options);
-        } catch (error) {
-          console.warn('Error removing template event listener:', error);
-        }
-      });
+      // Check if element is inside this component's innerHTML
+      if (this.contains(element) && element !== this) {
+        listeners.forEach(({ event, handler, options }) => {
+          try {
+            element.removeEventListener(event, handler, options);
+          } catch (error) {
+            console.warn('Error removing template event listener:', error);
+          }
+        });
+        elementsToRemove.push(element);
+      }
     });
-    this.eventListeners.clear();
+
+    // Remove cleared elements from the map
+    elementsToRemove.forEach(element => {
+      this.eventListeners.delete(element);
+    });
   }
 
   // API methods - SIMPLIFIED: normal setState behavior

@@ -52,9 +52,10 @@ class ChartComponent extends DynamicElement {
     console.log('event handler', this.selectBox);
 
     if (this.selectBox) {
-      this.addEventListener(this.selectBox, 'change', (e) => {
+      this.addListener(this.selectBox, 'change', (e) => {
         console.log('select change - listener ID:', Date.now());
       });
+
       console.log('event change event added to', this.selectBox);
     }
 

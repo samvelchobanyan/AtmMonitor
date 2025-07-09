@@ -42,7 +42,7 @@ class ChartComponent extends DynamicElement {
     // this._dateToPeriod();
     console.log('after render');
 
-    if (this.state.chartData) {
+    if (this.state.chartData && !this.state.isLoading) {
       console.log('state after render',this.state);
       createLineChart(this.canvasId, this.state.chartData, this.legendId);
     }
@@ -150,9 +150,11 @@ class ChartComponent extends DynamicElement {
 
     if (e.target.value === 'custom') {
       console.log('open popup');
+      this.selectedPeriod = 'custom';
       this._openDateRangePopup();
     }else{
       dateRangeObj = this._periodToDates(e.target.value);
+      this.selectedPeriod = e.target.value;
       this.setAttribute('start-date',dateRangeObj.start)
       this.setAttribute('end-date',dateRangeObj.end)
       // this.setState({

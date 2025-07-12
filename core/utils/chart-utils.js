@@ -74,6 +74,25 @@ const htmlLegendPlugin = {
     });
   },
 };
+const loadingPlugin = {
+  id: 'loadingPlugin',
+  beforeDraw(chart) {
+    if (!chart.options.showLoading) return;
+
+    const {ctx, width, height} = chart;
+    ctx.save();
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = '#444';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '16px sans-serif';
+    ctx.fillText('Loading…', width / 2, height / 2);
+
+    ctx.restore();
+  }
+};
 
 const getOrCreateLegendList = (chart, id) => {
   const legendContainer = document.getElementById(id);
@@ -98,22 +117,28 @@ const baseDatasetOptions = {
 
 const chartColors = ["#9BECB0", "#9BB3EE", "#BE9BEE", "#FCE2A8", "#EC9B9C", "#77E6FF"];
 
-export function createLineChart(ctxId, chartData, containerID) {
-  const ctx = document.getElementById(ctxId).getContext("2d");
-
-  const datasetsWithColors = chartData.datasets.map((dataset, index) => ({
+export function prepareData(chartData){
+  return chartData.datasets.map((dataset, index) => ({
     ...baseDatasetOptions,
     ...dataset,
     borderColor: chartColors[index % chartColors.length],
   }));
+}
+
+export function createLineChart(ctxId, chartData, containerID) {
+  console.log('creating chart');
+  const ctx = document.getElementById(ctxId).getContext("2d");
+
+  const datasetsWithColors = chartData ? prepareData(chartData) : null;
 
   return new Chart(ctx, {
     type: "line",
-    data: {
+    data: chartData ? {
       labels: chartData.labels,
       datasets: datasetsWithColors,
-    },
+    } : {},
     options: {
+      showLoading: true,
       maintainAspectRatio: false,
       responsive: true,
       plugins: {
@@ -135,7 +160,7 @@ export function createLineChart(ctxId, chartData, containerID) {
         },
       },
     },
-    plugins: [htmlLegendPlugin],
+    plugins: [htmlLegendPlugin,loadingPlugin],
   });
 }
 
@@ -166,4 +191,12 @@ export function createDoughnutChart(ctxId, chartData, containerID) {
     },
     plugins: [htmlLegendPlugin],
   });
+}
+
+export function updateChart(chart, data) {
+  console.log('updateing chart');
+  chart.options.showLoading = false;
+  chart.data.labels = data.labels;
+  chart.data.datasets = prepareData(data);
+  chart.update();
 }

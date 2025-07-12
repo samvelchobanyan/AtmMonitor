@@ -1,4 +1,16 @@
 import { api } from './api-client.js';
+const logIcons = {
+  info: '💡',
+  success: '✅',
+  warning: '⚠️',
+  error: '❌',
+  loading: '🔄',
+  api: '📡',
+  chart: '📊',
+  user: '👤',
+  data: '💾',
+  render: '🎨'
+};
 
 export class DynamicElement extends HTMLElement {
   constructor() {
@@ -161,7 +173,7 @@ export class DynamicElement extends HTMLElement {
 
   // API methods - SIMPLIFIED: normal setState behavior
   async fetchData(endpoint, options = {}) {
-    this.setState({ isLoading: true });
+    // this.setState({ isLoading: true });
 
     try {
       // const response = await fetch(url, {
@@ -185,7 +197,7 @@ export class DynamicElement extends HTMLElement {
       // }
       //
       // const data = await response.json();
-      this.setState({ isLoading: false });
+      // this.setState({ isLoading: false });
       return response;
     } catch (error) {
       this.setState({ isLoading: false });
@@ -214,7 +226,7 @@ export class DynamicElement extends HTMLElement {
   }
 
   render() {
-    console.log('render');
+    console.log(`${logIcons.render}render`);
     if (this.isDestroyed) return;
     this.clearEventListeners();
     this.innerHTML = this.template();

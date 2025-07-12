@@ -1,5 +1,5 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
-import { createLineChart } from "../../core/utils/chart-utils.js";
+import {createLineChart, updateChart} from '../../core/utils/chart-utils.js';
 // import "../ui/selectBox.js"
 import "./select-box.js";
 
@@ -24,6 +24,9 @@ class ChartComponent extends DynamicElement {
     this.selectedPeriod = this._dateToPeriod();
     this.canvasId = `canvas-${this.getAttr('id', 'line-chart')}`;
     this.legendId = `legend-${this.canvasId}`;
+
+    this.chart = null;
+    this.chartData = null;
   }
 
 
@@ -39,13 +42,13 @@ class ChartComponent extends DynamicElement {
 
   onAfterRender() {
     this.selectBox = this.$('select-box');
-    // this._dateToPeriod();
-    console.log('after render');
+    console.log('after render',this.canvasId,this.legendId);
 
-    if (this.state.chartData && !this.state.isLoading) {
-      console.log('state after render',this.state);
-      createLineChart(this.canvasId, this.state.chartData, this.legendId);
-    }
+    this.chart = createLineChart(this.canvasId, this.chartData, this.legendId);
+    // if (this.state.chartData && !this.state.isLoading) {
+    //   console.log('state after render',this.state);
+    //   createLineChart(this.canvasId, this.state.chartData, this.legendId);
+    // }
   }
 
   addEventListeners() {
@@ -203,7 +206,8 @@ class ChartComponent extends DynamicElement {
       if (!isValid) throw new Error('Invalid API response format');
 
       const chartData = this.transformData(response.data);
-      this.setState({ chartData, error: false });
+      updateChart(this.chart, chartData);
+      // this.setState({ chartData, error: false });
     } catch (err) {
       console.warn('Chart fetch error:', err);
       this.setState({ chartData: null, error: true });

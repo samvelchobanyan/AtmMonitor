@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     // createLineChart("line-chart", lineChartData, "legend-container");
-    createLineChart("line-chart-2", lineChartData2, "legend-container-2");
+    // createLineChart("line-chart-2", lineChartData2, "legend-container-2");
 
     createDoughnutChart("doughnut-chart", doughnutChartData, "legend-container-doughnut");
 });

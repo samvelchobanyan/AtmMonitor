@@ -30,7 +30,7 @@ if (!filter_var($target_url, FILTER_VALIDATE_URL)) {
 
 // ✅ Allowlist — secure usage
 $parsed = parse_url($target_url);
-$allowed_hosts = ['api.example.com', '37.186.122.133', 'localhost']; // 👈 update as needed
+$allowed_hosts = ['api.example.com', '37.186.122.133', 'localhost','atmmonitorapi-production.up.railway.app']; // 👈 update as needed
 
 if (!in_array($parsed['host'], $allowed_hosts)) {
     http_response_code(403);

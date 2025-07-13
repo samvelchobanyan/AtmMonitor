@@ -48,16 +48,10 @@ class AtmsDashboard extends HTMLElement {
 <!--                            <line-chart chart-id="line-chart" legend-id="legend-container"> </line-chart>-->
                             <chart-component
                                 id="line-chart"
-                                api-url="/api.php"
+                                api-url="/dashboard/transactions-amount-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
                             ></chart-component>
-<!--                            <chart-component-->
-<!--                                id="line-chart"-->
-<!--                                api-url="/dashboard/transactions-amount-in-days"-->
-<!--                                start-date = "2025-06-01"-->
-<!--                                end-date = "2025-07-08"-->
-<!--                            ></chart-component>-->
                         </div>
                     </div>
                     <div class="column sm-6">
@@ -88,7 +82,7 @@ class AtmsDashboard extends HTMLElement {
                                 <info-card title="Երեկ դատարկ բանկոմատներ" value="5" value-color="color-red" icon="icon icon-box" message="2"></info-card>
                             </div>
                             <select-box-simple value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box-simple>
-<!--                            <line-chart chart-id="line-chart-2" legend-id="legend-container-2"> </line-chart>-->
+                            <line-chart chart-id="line-chart-2" legend-id="legend-container-2"> </line-chart>
                         </div>
                     </div>
                 </div>

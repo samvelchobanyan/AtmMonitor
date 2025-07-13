@@ -126,7 +126,7 @@ export function prepareData(chartData){
 }
 
 export function createLineChart(ctxId, chartData, containerID) {
-  console.log('creating chart');
+  console.log('creating chart',ctxId);
   const ctx = document.getElementById(ctxId).getContext("2d");
 
   const datasetsWithColors = chartData ? prepareData(chartData) : null;

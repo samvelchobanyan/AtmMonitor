@@ -56,7 +56,8 @@ export class ApiClient {
 
 // export default client for most use-cases
 export const api = new ApiClient({
+  baseUrl: 'https://atmmonitorapi-production.up.railway.app/api',
   // baseUrl: 'http://37.186.122.133:3393/api',
-  baseUrl: 'http://localhost/ATM_monitor',
-  useProxy: false
+  // baseUrl: 'http://localhost/ATM_monitor',
+  useProxy: true
 });

@@ -1,7 +1,9 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
 import {createLineChart, updateChart} from '../../core/utils/chart-utils.js';
+import chartDataTransformer from '../../core/utils/data-transformer.js';
 // import "../ui/selectBox.js"
 import "./select-box.js";
+
 
 
 const observedAttrs = ['api-url', 'city', 'region', 'start-date', 'end-date'];
@@ -207,7 +209,9 @@ class ChartComponent extends DynamicElement {
 
       if (!isValid) throw new Error('Invalid API response format');
 
-      const chartData = this.transformData(response.data);
+      // const chartData = this.transformData(response.data);
+      const chartData = chartDataTransformer.transformData(response.data)
+      console.log('chartData',chartData)
       updateChart(this.chart, chartData);
       // this.setState({ chartData, error: false });
     } catch (err) {

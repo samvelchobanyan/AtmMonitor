@@ -77,20 +77,73 @@ const htmlLegendPlugin = {
 const loadingPlugin = {
   id: 'loadingPlugin',
   beforeDraw(chart) {
-    if (!chart.options.showLoading) return;
+    const overlay = document.getElementById(`loading-overlay-${chart.canvas.id}`);
 
-    const {ctx, width, height} = chart;
-    ctx.save();
-    ctx.fillStyle = 'rgba(255,255,255,0.8)';
-    ctx.fillRect(0, 0, width, height);
+    if (chart.options.showLoading) {
+      if (!overlay) {
+        this.createLoadingOverlay(chart);
+      } else {
+        overlay.style.display = 'flex';
+      }
+    } else {
+      if (overlay) {
+        overlay.style.display = 'none';
+      }
+    }
+  },
 
-    ctx.fillStyle = '#444';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = '16px sans-serif';
-    ctx.fillText('Loading…', width / 2, height / 2);
+  createLoadingOverlay(chart) {
+    const canvas = chart.canvas;
+    const container = canvas.parentElement;
 
-    ctx.restore();
+    // Make sure container is positioned relative
+    if (getComputedStyle(container).position === 'static') {
+      container.style.position = 'relative';
+    }
+
+    // Create overlay element
+    const overlay = document.createElement('div');
+    overlay.id = `loading-overlay-${canvas.id}`;
+    overlay.style.cssText = `
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      pointer-events: none;
+    `;
+
+    // Create CSS spinner
+    const spinner = document.createElement('div');
+    spinner.style.cssText = `
+      width: 40px;
+      height: 40px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    `;
+
+    // Add CSS animation if not already added
+    if (!document.getElementById('spinner-keyframes')) {
+      const style = document.createElement('style');
+      style.id = 'spinner-keyframes';
+      style.textContent = `
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    overlay.appendChild(spinner);
+    container.appendChild(overlay);
   }
 };
 

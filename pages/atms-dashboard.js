@@ -51,6 +51,7 @@ class AtmsDashboard extends HTMLElement {
                                 api-url="/dashboard/transactions-amount-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
+                                type="line"
                             ></chart-component>
                         </div>
                     </div>

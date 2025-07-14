@@ -13,6 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+// ─── Emulate network latency if “delay” param is present (in seconds) ───
+$delay = isset($_GET['delay']) ? (int)$_GET['delay'] : 0;
+// Clamp to max 10 seconds for safety
+$delay = max(0, min($delay, 10));
+if ($delay > 0) {
+    // sleep takes whole seconds
+    sleep($delay);
+}
+
+
 // Get target URL
 $target_url = $_GET['url'] ?? '';
 if (empty($target_url)) {
@@ -40,7 +50,7 @@ if (!in_array($parsed['host'], $allowed_hosts)) {
 
 // 🆕 ADD THIS: Handle additional query parameters
 $params = $_GET;
-unset($params['url']);
+unset($params['url'], $params['delay']);
 if (!empty($params)) {
     $query_string = http_build_query($params);
     $separator = (strpos($target_url, '?') !== false) ? '&' : '?';

@@ -176,13 +176,6 @@ export class DynamicElement extends HTMLElement {
     // this.setState({ isLoading: true });
 
     try {
-      // const response = await fetch(url, {
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     ...options.headers
-      //   },
-      //   ...options
-      // });
       let response;
       const method = (options.method || 'GET').toUpperCase();
       if (method.toUpperCase() === 'POST') {
@@ -191,13 +184,6 @@ export class DynamicElement extends HTMLElement {
         // For GET, use params instead of body
         response = await api.get(endpoint, options.params || {}, options.headers);
       }
-
-      // if (!response.ok) {
-      //   throw new Error(`HTTP error! status: ${response.status}`);
-      // }
-      //
-      // const data = await response.json();
-      // this.setState({ isLoading: false });
       return response;
     } catch (error) {
       this.setState({ isLoading: false });

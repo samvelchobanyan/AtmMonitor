@@ -1,15 +1,17 @@
 // api-client.js
 export class ApiClient {
-  constructor({ baseUrl, useProxy = false }) {
+  constructor({ baseUrl, useProxy = false, delay = null }) {
     this.baseUrl = baseUrl;
     this.useProxy = useProxy;
+    this.delay = delay;
   }
 
   buildUrl(endpoint, params = {}) {
     const base = this.baseUrl + (endpoint.startsWith('/') ? endpoint : `/${endpoint}`);
     const qs = new URLSearchParams(params).toString();
     const full = qs ? `${base}?${qs}` : base;
-    return this.useProxy ? `http://localhost/ATM_monitor/proxy.php?url=${encodeURIComponent(full)}` : full;
+    const delay = this.delay !== null ? `delay=${this.delay}&` : '';
+    return this.useProxy ? `http://localhost/ATM_monitor/proxy.php?${delay}url=${encodeURIComponent(full)}` : full;
   }
 
   async get(endpoint, params = {}, headers = {}) {
@@ -59,5 +61,6 @@ export const api = new ApiClient({
   baseUrl: 'https://atmmonitorapi-production.up.railway.app/api',
   // baseUrl: 'http://37.186.122.133:3393/api',
   // baseUrl: 'http://localhost/ATM_monitor',
-  useProxy: true
+  useProxy: true,
+  delay: 1,
 });

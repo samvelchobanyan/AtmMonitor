@@ -42,7 +42,6 @@ class ChartComponent extends DynamicElement {
 
   onAfterRender() {
     this.selectBox = this.$('select-box');
-    console.log('after render',this.canvasId,this.legendId);
 
     this.chart = createLineChart(this.canvasId, this.chartData, this.legendId);
     // if (this.state.chartData && !this.state.isLoading) {
@@ -63,7 +62,7 @@ class ChartComponent extends DynamicElement {
 
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue && this.hasConnected && observedAttrs.includes(name)) {
-      this.fetchAndRenderChart();
+      // console.log('attribute changed', name);
     }
   }
 
@@ -160,10 +159,7 @@ class ChartComponent extends DynamicElement {
       this.selectedPeriod = e.target.value;
       this.setAttribute('start-date',dateRangeObj.start)
       this.setAttribute('end-date',dateRangeObj.end)
-      // this.setState({
-      //   startDate: dateRangeObj.start,
-      //   endDate: dateRangeObj.end,
-      // })
+      this.fetchAndRenderChart();
       console.log('dateRangeObj',dateRangeObj);
     }
   }
@@ -180,6 +176,12 @@ class ChartComponent extends DynamicElement {
       return;
     }
 
+    if(this.chart !== null){
+      console.log('set loading true before fetch');
+      this.chart.options.showLoading = true;
+      this.chart.update();
+    }
+
     const startDate = this.getAttr('start-date');
     const endDate = this.getAttr('end-date');
     const city = this.getAttr('city');
@@ -191,7 +193,7 @@ class ChartComponent extends DynamicElement {
     if (city) params.append('city', city);
     if (region) params.append('region', region);
 
-    console.log(this.state);
+    console.log('fetching');
 
     const url = `${endpoint}?${params.toString()}`;
     try {
@@ -301,6 +303,35 @@ class ChartComponent extends DynamicElement {
       return `<div>Loading chart…</div>`;
     }
 
+    let chartHTML = '';
+    switch (this.getAttr('type')) {
+      case 'pie':
+        chartHTML = `
+          <div class="chart-container chart-container_between">
+              <div class="chart chart_280">
+                  <canvas id="doughnut-chart"></canvas>
+                  <div class="chart-info">
+                      <div class="chart-info__number">15,000,000<span>֏</span></div>
+                      <div class="chart-info__stat stat stat_green"><i class="icon icon-up"></i><span>+7%</span></div>
+                  </div>
+              </div>
+              <div class="custom-legend custom-legend_center" id="legend-container-doughnut"></div>
+          </div>
+        `
+        break;
+      case 'bar':
+        break;
+      case 'line':
+        chartHTML = `
+          <div class="chart chart_252">
+            <canvas id="${this.canvasId}"></canvas>
+          </div>
+          <div class="custom-legend custom-legend_checkmark" id="${this.legendId}"></div>
+          `
+      default:
+        break;
+
+    }
     if (this.state.error) {
       return `<div class="error">Failed to load chart data.</div>`;
     }
@@ -314,10 +345,7 @@ class ChartComponent extends DynamicElement {
         <div class="combo-option" data-option-value="custom">Ամսաթվի միջակայք</div>
       </select-box>
   
-      <div class="chart chart_252">
-        <canvas id="${this.canvasId}"></canvas>
-      </div>
-      <div class="custom-legend custom-legend_checkmark" id="${this.legendId}"></div>
+      ${chartHTML}
     `;
   }
 

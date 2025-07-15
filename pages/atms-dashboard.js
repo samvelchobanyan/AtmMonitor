@@ -2,6 +2,7 @@ import { InfoCard } from "../components/ui/infoCard.js";
 import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/LineChart.js";
 import "../components/dynamic/chartComponent.js"
+import "../components/static/changeIndicator.js"
 // import { ChartComponent } from "../components/dynamic/chartComponent.js";
 
 class AtmsDashboard extends HTMLElement {
@@ -64,7 +65,7 @@ class AtmsDashboard extends HTMLElement {
                                     <canvas id="doughnut-chart"></canvas>
                                     <div class="chart-info">
                                         <div class="chart-info__number">15,000,000<span>֏</span></div>
-                                        <div class="chart-info__stat stat stat_green"><i class="icon icon-up"></i><span>+7%</span></div>
+                                        <change-indicator direction="up" value="7"></change-indicator>
                                     </div>
                                 </div>
                                 <div class="custom-legend custom-legend_center" id="legend-container-doughnut"></div>

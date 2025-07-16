@@ -60,13 +60,13 @@ class AtmsDashboard extends HTMLElement {
                         <div class="container">
                             <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="/details"> </container-top>
 <!--                            <select-box-simple value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box-simple>-->
-                            <chart-component
-                                id="pie-chart"
-                                api-url="/dashboard/transactions-in-days"
-                                start-date = "2025-06-01"
-                                end-date = "2025-07-08"
-                                chart-type="pie"
-                            ></chart-component>
+<!--                            <chart-component-->
+<!--                                id="pie-chart"-->
+<!--                                api-url="/dashboard/transactions-in-days"-->
+<!--                                start-date = "2025-06-01"-->
+<!--                                end-date = "2025-07-08"-->
+<!--                                chart-type="pie"-->
+<!--                            ></chart-component>-->
 <!--                            <div class="chart-container chart-container_between">-->
 <!--                                <div class="chart chart_280">-->
 <!--                                    <canvas id="doughnut-chart"></canvas>-->

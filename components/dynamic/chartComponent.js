@@ -1,9 +1,5 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
-import {
-  createDoughnutChart,
-  createLineChart,
-  updateChart,
-} from '../../core/utils/chart-utils.js';
+import {createDoughnutChart, createLineChart, updateLineChart} from '../../core/utils/chart-utils.js';
 import chartDataTransformer from '../../core/utils/data-transformer.js';
 // import "../ui/selectBox.js"
 import "./select-box.js";
@@ -33,7 +29,7 @@ class ChartComponent extends DynamicElement {
 
     this.chart = null;
     this.chartData = null;
-    this.chartType = this.getAttr('chart-type') || 'line';
+    this.chartType = this.getAttr('chart-type')
   }
 
 
@@ -49,14 +45,16 @@ class ChartComponent extends DynamicElement {
 
   onAfterRender() {
     this.selectBox = this.$('select-box');
+    console.log('after render')
     switch (this.chartType) {
       case 'line':
         this.chart = createLineChart(this.canvasId, this.chartData, this.legendId);
-        break;
-      case 'pie':
+        break
+      case 'doughnut':
         this.chart = createDoughnutChart(this.canvasId, this.chartData, this.legendId);
-        break;
+        break
     }
+
 
     // if (this.state.chartData && !this.state.isLoading) {
     //   console.log('state after render',this.state);
@@ -221,11 +219,17 @@ class ChartComponent extends DynamicElement {
 
       if (!isValid) throw new Error('Invalid API response format');
 
-      this.chartData = chartDataTransformer.transform(response.data,this.chartType);
+      // const chartData = this.transformData(response.data);
+      this.chartData = chartDataTransformer.transformData(response.data)
       console.log('chartData',this.chartData)
-      this._updateChart(this.chartType);
-      // updateChart(this.chart, this.chartData.data);
-
+      this._updateChart();
+      // if(this.chart){
+      //   this._updateChart();
+      // }else{
+      //   this.chart = createLineChart(this.canvasId, this.chartData.data, this.legendId);
+      //   // this.chart.options.showLoading = false;
+      //   // this.chart.update();
+      // }
       // this.setState({ chartData, error: false });
     } catch (err) {
       console.warn('Chart fetch error:', err);
@@ -315,19 +319,14 @@ class ChartComponent extends DynamicElement {
     });
   }
 
-  _updateChart(chartid){
-    // if(this.chartType === 'pie'){
-    //   this.$(chart-info__number)
-    // }
-    console.log(this.chartType,'chart type',this.chartData.data);
-    updateChart(this.chart, this.chartData.data,chartid);
+  _updateChart(){
+    console.log('_upd')
+    updateLineChart(this.chart,this.chartData);
   }
-
   template() {
     if (this.isLoading()) {
       return `<div>Loading chart…</div>`;
     }
-    console.log('chartType',this.chartType);
 
     let chartHTML = '';
     switch (this.chartType) {
@@ -335,13 +334,13 @@ class ChartComponent extends DynamicElement {
         chartHTML = `
           <div class="chart-container chart-container_between">
               <div class="chart chart_280">
-                  <canvas id="${this.canvasId}"></canvas>
+                  <canvas id="doughnut-chart"></canvas>
                   <div class="chart-info">
-                      <div class="chart-info__number"><span>15,000,000</span><span>֏</span></div>
-                      <change-indicator direction="up" value="7"></change-indicator>
+                      <div class="chart-info__number">15,000,000<span>֏</span></div>
+                      <div class="chart-info__stat stat stat_green"><i class="icon icon-up"></i><span>+7%</span></div>
                   </div>
               </div>
-              <div class="custom-legend custom-legend_center" id="${this.legendId}"></div>
+              <div class="custom-legend custom-legend_center" id="legend-container-doughnut"></div>
           </div>
         `
         break;
@@ -361,6 +360,7 @@ class ChartComponent extends DynamicElement {
     if (this.state.error) {
       return `<div class="error">Failed to load chart data.</div>`;
     }
+
     this.classList.add("chart-container");
     return `
 <!--      <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>-->

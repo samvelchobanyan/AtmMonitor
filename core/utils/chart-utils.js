@@ -170,12 +170,25 @@ const baseDatasetOptions = {
 
 const chartColors = ["#9BECB0", "#9BB3EE", "#BE9BEE", "#FCE2A8", "#EC9B9C", "#77E6FF"];
 
-export function prepareData(chartData){
-  return chartData.datasets.map((dataset, index) => ({
-    ...baseDatasetOptions,
-    ...dataset,
-    borderColor: chartColors[index % chartColors.length],
-  }));
+export function prepareData(chartData, chartType)
+{
+  if(chartType === 'line')
+    return chartData.datasets.map((dataset, index) => ({
+      ...baseDatasetOptions,
+      ...dataset,
+      borderColor: chartColors[index % chartColors.length],
+    }));
+
+  if(chartType === 'doughnut'){
+    console.log('preparing doughnut');
+    const doughnutDataset = chartData.datasets[0];
+    return {
+      ...doughnutDataset,
+      backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
+      hoverBackgroundColor: chartColors.slice(0, doughnutDataset.data.length),
+    };
+  }
+
 }
 
 export function createLineChart(ctxId, chartData, containerID) {
@@ -218,21 +231,22 @@ export function createLineChart(ctxId, chartData, containerID) {
 }
 
 export function createDoughnutChart(ctxId, chartData, containerID) {
+  console.log('creating chart',ctxId);
   const ctx = document.getElementById(ctxId).getContext("2d");
 
-  const doughnutDataset = chartData.datasets[0];
-  const filledDataset = {
-    ...doughnutDataset,
-    backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
-    hoverBackgroundColor: chartColors.slice(0, doughnutDataset.data.length),
-  };
+  if(chartData) {
+    const filledDataset = prepareData(chartData, 'doughnut');
+    console.log('doghnut formating',filledDataset);
+  }
+
+
 
   return new Chart(ctx, {
     type: "doughnut",
-    data: {
+    data: chartData ? {
       labels: chartData.labels,
       datasets: [filledDataset],
-    },
+    } : {},
     options: {
       maintainAspectRatio: false,
       responsive: true,
@@ -242,12 +256,12 @@ export function createDoughnutChart(ctxId, chartData, containerID) {
         htmlLegend: { containerID },
       },
     },
-    plugins: [htmlLegendPlugin],
+    plugins: [htmlLegendPlugin,loadingPlugin],
   });
 }
 
-export function updateChart(chart, data) {
-  console.log('updateing chart');
+export function updateChart(chart, data, chartid) {
+  console.log('updateing chart',chartid);
   chart.options.showLoading = false;
   chart.data.labels = data.labels;
   chart.data.datasets = prepareData(data);

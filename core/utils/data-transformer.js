@@ -1,14 +1,16 @@
 const CHART_CONFIG = {
     // Maps API field names to chart labels
     fieldLabels: {
-        'deposit_total': 'Մուտքագրված գումար',
-        'dispense_total': 'Կանխիկացված գումար'
+        'deposit_amount': 'Մուտքագրված գումար',
+        'dispense_amount': 'Կանխիկացված գումար',
+        'total_dispense_amount': 'Կանխիկացում',
+        'total_deposit_amount': 'Մուտքագրում'
     },
 
     // Define which fields to include and their order
-    fieldsToInclude: ['dispense_total', 'deposit_total'],
+    fieldsToInclude: ['deposit_amount', 'dispense_amount'],
+    doughnutFieldsToInclude: ['total_dispense_amount', 'total_deposit_amount'],
 
-    // Date formatting options
     dateFormat: {
         locale: 'hy-AM', // Armenian locale
         options: { month: 'short', day: 'numeric' }
@@ -20,7 +22,7 @@ class ChartDataTransformer {
         this.config = config;
     }
 
-    // Main transformation method
+    // === LineChart transformation  - default ===
     transformData(apiResponse) {
         const { daily_data } = apiResponse;
 
@@ -31,15 +33,19 @@ class ChartDataTransformer {
         const labels = this.extractLabels(daily_data);
         const datasets = this.extractDatasets(daily_data);
 
-        return { labels, datasets };
+        return {
+            payload: {},
+            data: {
+                labels,
+                datasets
+            }
+        };
     }
 
-    // Extract and format date labels
     extractLabels(dailyData) {
         return dailyData.map(item => this.formatDate(item.date));
     }
 
-    // Extract datasets based on configuration
     extractDatasets(dailyData) {
         const { fieldsToInclude, fieldLabels } = this.config;
 
@@ -51,7 +57,43 @@ class ChartDataTransformer {
         });
     }
 
-    // Format date according to configuration
+    // === DoughnutChart transformation ===
+    transformDoughnutData(apiResponse) {
+        const data = apiResponse;
+
+        if (!data || typeof data !== 'object') {
+            throw new Error('Invalid data format: data must be an object');
+        }
+
+        const { fieldLabels, doughnutFieldsToInclude } = this.config;
+
+        const labels = doughnutFieldsToInclude.map(field => fieldLabels[field] || field);
+        const chartData = doughnutFieldsToInclude.map(field => data[field] || 0);
+        return {
+            payload: {
+                'total' : 15000000,
+                'percent' : 7
+            },
+            data: {
+                labels,
+                datasets: [{ data: chartData }]
+            }
+        };
+    }
+
+
+    //------------------
+    transform(apiResponse, chartType = 'line') {
+        switch (chartType) {
+            case 'pie':
+                console.log('transformed data',this.transformDoughnutData(apiResponse));
+                return this.transformDoughnutData(apiResponse);
+            case 'line':
+            default:
+                return this.transformData(apiResponse);
+        }
+    }
+
     formatDate(dateString) {
         const date = new Date(dateString);
         const { locale, options } = this.config.dateFormat;
@@ -59,10 +101,6 @@ class ChartDataTransformer {
         return date.toLocaleDateString(locale, options);
     }
 
-    // Update configuration dynamically
-    updateConfig(newConfig) {
-        this.config = { ...this.config, ...newConfig };
-    }
 }
 
 const chartDataTransformer = new ChartDataTransformer();

@@ -49,27 +49,34 @@ class AtmsDashboard extends HTMLElement {
 <!--                            <line-chart chart-id="line-chart" legend-id="legend-container"> </line-chart>-->
                             <chart-component
                                 id="line-chart"
-                                api-url="/dashboard/transactions-amount-in-days"
+                                api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
-                                type="line"
+                                chart-type="line"
                             ></chart-component>
                         </div>
                     </div>
                     <div class="column sm-6">
                         <div class="container">
                             <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="/details"> </container-top>
-                            <select-box-simple value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box-simple>
-                            <div class="chart-container chart-container_between">
-                                <div class="chart chart_280">
-                                    <canvas id="doughnut-chart"></canvas>
-                                    <div class="chart-info">
-                                        <div class="chart-info__number">15,000,000<span>֏</span></div>
-                                        <change-indicator direction="up" value="7"></change-indicator>
-                                    </div>
-                                </div>
-                                <div class="custom-legend custom-legend_center" id="legend-container-doughnut"></div>
-                            </div>
+<!--                            <select-box-simple value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box-simple>-->
+                            <chart-component
+                                id="pie-chart"
+                                api-url="/dashboard/transactions-in-days"
+                                start-date = "2025-06-01"
+                                end-date = "2025-07-08"
+                                chart-type="pie"
+                            ></chart-component>
+<!--                            <div class="chart-container chart-container_between">-->
+<!--                                <div class="chart chart_280">-->
+<!--                                    <canvas id="doughnut-chart"></canvas>-->
+<!--                                    <div class="chart-info">-->
+<!--                                        <div class="chart-info__number">15,000,000<span>֏</span></div>-->
+<!--                                        <change-indicator direction="up" value="7"></change-indicator>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                                <div class="custom-legend custom-legend_center" id="legend-container-doughnut"></div>-->
+<!--                            </div>-->
                         </div>
                     </div>
                 </div>

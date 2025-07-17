@@ -1,5 +1,10 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
-import {createDoughnutChart, createLineChart, updateLineChart} from '../../core/utils/chart-utils.js';
+import {
+  createDoughnutChart,
+  createLineChart,
+  updateDoughnutChart,
+  updateLineChart,
+} from '../../core/utils/chart-utils.js';
 import chartDataTransformer from '../../core/utils/data-transformer.js';
 // import "../ui/selectBox.js"
 import "./select-box.js";
@@ -28,7 +33,7 @@ class ChartComponent extends DynamicElement {
     this.legendId = `legend-${this.canvasId}`;
 
     this.chart = null;
-    this.chartData = null;
+    this.transformedData = null;
     this.chartType = this.getAttr('chart-type')
   }
 
@@ -45,13 +50,14 @@ class ChartComponent extends DynamicElement {
 
   onAfterRender() {
     this.selectBox = this.$('select-box');
-    console.log('after render')
+    const chartData = this.transformedData ? this.transformedData.chartData : null;
+    console.log('after render', this.transformedData, chartData)
     switch (this.chartType) {
       case 'line':
-        this.chart = createLineChart(this.canvasId, this.chartData, this.legendId);
+        this.chart = createLineChart(this.canvasId, chartData, this.legendId);
         break
       case 'doughnut':
-        this.chart = createDoughnutChart(this.canvasId, this.chartData, this.legendId);
+        this.chart = createDoughnutChart(this.canvasId, chartData, this.legendId);
         break
     }
 
@@ -78,29 +84,12 @@ class ChartComponent extends DynamicElement {
     }
   }
 
-
-
   // — Map incoming start/end → period selection —
   _dateToPeriod() {
     // const sel = this.querySelector('select-box');
     let start = this.getAttr('start-date');
     let end   = this.getAttr('end-date');
-    // let start = this.state.startDate;
-    // let end   = this.state.endDate;
 
-    // Default both to today if neither provided
-
-    // if (!start && !end) {
-    //   // this._applyPeriodToDates('today');
-    //   // return;
-    //   return 'today';
-    // }
-    // // If only start provided, mirror to end
-    // if (start && !end) {
-    //   // this.setAttribute('end-date', start);
-    //   // end = start;
-    //   return 'today';
-    // }
     let period;
     if(!end || !start){
       return 'today'
@@ -220,17 +209,16 @@ class ChartComponent extends DynamicElement {
       if (!isValid) throw new Error('Invalid API response format');
 
       // const chartData = this.transformData(response.data);
-      this.chartData = chartDataTransformer.transformData(response.data)
-      console.log('chartData',this.chartData)
-      this._updateChart();
-      // if(this.chart){
-      //   this._updateChart();
-      // }else{
-      //   this.chart = createLineChart(this.canvasId, this.chartData.data, this.legendId);
-      //   // this.chart.options.showLoading = false;
-      //   // this.chart.update();
-      // }
-      // this.setState({ chartData, error: false });
+      switch (this.chartType){
+        case 'line':
+          this.transformedData = chartDataTransformer.transformData(response.data)
+          this._updateChart();
+          break;
+        case 'doughnut':
+            this.transformedData = chartDataTransformer.transformDoughnutData(response.data)
+            this._updateChart();
+            break;
+      }
     } catch (err) {
       console.warn('Chart fetch error:', err);
       this.setState({ chartData: null, error: true });
@@ -320,9 +308,19 @@ class ChartComponent extends DynamicElement {
   }
 
   _updateChart(){
-    console.log('_upd')
-    updateLineChart(this.chart,this.chartData);
+    switch (this.chartType) {
+      case 'line':
+        updateLineChart(this.chart,this.transformedData.chartData);
+        break;
+      case 'doughnut':
+        this.$('.chart-info__number').childNodes[0].textContent = this.transformedData.metaData.total;
+        this.$('change-indicator').setAttribute('value',15)
+        updateDoughnutChart(this.chart,this.transformedData.chartData);
+        break;
+    }
+
   }
+
   template() {
     if (this.isLoading()) {
       return `<div>Loading chart…</div>`;
@@ -330,17 +328,17 @@ class ChartComponent extends DynamicElement {
 
     let chartHTML = '';
     switch (this.chartType) {
-      case 'pie':
+      case 'doughnut':
         chartHTML = `
           <div class="chart-container chart-container_between">
               <div class="chart chart_280">
-                  <canvas id="doughnut-chart"></canvas>
+                  <canvas id="${this.canvasId}"></canvas>
                   <div class="chart-info">
                       <div class="chart-info__number">15,000,000<span>֏</span></div>
-                      <div class="chart-info__stat stat stat_green"><i class="icon icon-up"></i><span>+7%</span></div>
+                      <change-indicator value="7"></change-indicator>
                   </div>
               </div>
-              <div class="custom-legend custom-legend_center" id="legend-container-doughnut"></div>
+              <div class="custom-legend custom-legend_center" id="${this.legendId}"></div>
           </div>
         `
         break;
@@ -360,7 +358,7 @@ class ChartComponent extends DynamicElement {
     if (this.state.error) {
       return `<div class="error">Failed to load chart data.</div>`;
     }
-
+    console.log('preparing template', chartHTML);
     this.classList.add("chart-container");
     return `
 <!--      <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>-->

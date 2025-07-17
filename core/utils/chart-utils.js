@@ -170,6 +170,8 @@ const baseDatasetOptions = {
 
 const chartColors = ["#9BECB0", "#9BB3EE", "#BE9BEE", "#FCE2A8", "#EC9B9C", "#77E6FF"];
 
+/* ====== LineChart ====== */
+
 export function prepareLineChartData(chartData){
   console.log('preparing data',chartData)
   return chartData.datasets.map((dataset, index) => ({
@@ -183,12 +185,12 @@ export function createLineChart(ctxId, chartData, containerID) {
   console.log('creating chart',ctxId,chartData,containerID);
   const ctx = document.getElementById(ctxId).getContext("2d");
 
-  const datasetsWithColors = chartData ? prepareLineChartData(chartData.data) : null;
+  const datasetsWithColors = chartData ? prepareLineChartData(chartData) : null;
 
   return new Chart(ctx, {
     type: "line",
     data: chartData ? {
-      labels: chartData.data.labels,
+      labels: chartData.labels,
       datasets: datasetsWithColors,
     } : {},
     options: {
@@ -218,23 +220,35 @@ export function createLineChart(ctxId, chartData, containerID) {
   });
 }
 
+export function updateLineChart(chart, chartData) {
+  chart.options.showLoading = false;
+  chart.data.labels = chartData.labels;
+  chart.data.datasets = prepareLineChartData(chartData);
+  chart.update();
+}
+
+/* ====== DoughnutChart ====== */
+
 export function createDoughnutChart(ctxId, chartData, containerID) {
+  console.log('creating Doughnut chart',ctxId,chartData,containerID);
   const ctx = document.getElementById(ctxId).getContext("2d");
 
-  const doughnutDataset = chartData.datasets[0];
-  const filledDataset = {
-    ...doughnutDataset,
-    backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
-    hoverBackgroundColor: chartColors.slice(0, doughnutDataset.data.length),
-  };
+  // const doughnutDataset = chartData.datasets[0];
+  // const filledDataset = {
+  //   ...doughnutDataset,
+  //   backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
+  //   hoverBackgroundColor: chartColors.slice(0, doughnutDataset.data.length),
+  // };
+  const filledDataset = chartData ? prepareDoughnutChart(chartData) : null;
 
   return new Chart(ctx, {
     type: "doughnut",
-    data: {
+    data: chartData ? {
       labels: chartData.labels,
       datasets: [filledDataset],
-    },
+    } : null,
     options: {
+      showLoading: true,
       maintainAspectRatio: false,
       responsive: true,
       plugins: {
@@ -243,13 +257,22 @@ export function createDoughnutChart(ctxId, chartData, containerID) {
         htmlLegend: { containerID },
       },
     },
-    plugins: [htmlLegendPlugin],
+    plugins: [htmlLegendPlugin, loadingPlugin],
   });
 }
 
-export function updateLineChart(chart, chartData) {
+export function prepareDoughnutChart(chartData) {
+  const doughnutDataset = chartData.datasets[0];
+  return {
+    ...doughnutDataset,
+    backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
+    hoverBackgroundColor: chartColors.slice(0, doughnutDataset.data.length),
+  };
+}
+
+export function updateDoughnutChart(chart, chartData) {
   chart.options.showLoading = false;
-  chart.data.labels = chartData.data.labels;
-  chart.data.datasets = prepareLineChartData(chartData.data);
+  chart.data.labels = chartData.labels;
+  chart.data.datasets = [prepareDoughnutChart(chartData)];
   chart.update();
 }

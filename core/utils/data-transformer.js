@@ -34,8 +34,8 @@ class ChartDataTransformer {
         const datasets = this.extractDatasets(daily_data);
 
         return {
-            payload: {},
-            data: {
+            metaData: {},
+            chartData: {
                 labels,
                 datasets
             }
@@ -70,11 +70,11 @@ class ChartDataTransformer {
         const labels = doughnutFieldsToInclude.map(field => fieldLabels[field] || field);
         const chartData = doughnutFieldsToInclude.map(field => data[field] || 0);
         return {
-            payload: {
-                'total' : 15000000,
+            metaData: {
+                'total' : 379852,
                 'percent' : 7
             },
-            data: {
+            chartData: {
                 labels,
                 datasets: [{ data: chartData }]
             }

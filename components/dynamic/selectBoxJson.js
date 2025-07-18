@@ -1,5 +1,11 @@
 import { DynamicElement } from '../../core/dynamic-element.js';
 
+
+// <select-box-json> is a lightweight alternative to <select-box>.
+// Options are provided via JSON and the component supports
+// "multiple" and "searchable" attributes much like the original.
+
+
 export default class SelectBoxJson extends DynamicElement {
   static get observedAttributes() {
     return ['options', 'value', 'multiple', 'searchable'];
@@ -10,15 +16,19 @@ export default class SelectBoxJson extends DynamicElement {
     this.optionsData = [];
     this.selectedValues = [];
     this._updatingValue = false;
-    this.searchInput = null;
 
     this.toggleDropdown = this.toggleDropdown.bind(this);
     this.handleOutsideClick = this.handleOutsideClick.bind(this);
     this.onOptionClick = this.onOptionClick.bind(this);
     this.onSearchKeyUp = this.onSearchKeyUp.bind(this);
+
+    this.searchInput = null;
   }
 
   onConnected() {
+    // Parse initial data and restore value when the component
+    // is inserted into the DOM.
+
     this.optionsData = this._parseOptions();
     const attrVal = this.getAttribute('value');
     if (attrVal) {
@@ -47,6 +57,15 @@ export default class SelectBoxJson extends DynamicElement {
     }
   }
 
+
+  attributeChangedCallback(name, oldVal, newVal) {
+    if (oldVal === newVal) return;
+    this.onAttributeChange(name, oldVal, newVal);
+    if (!(name === 'value' && this._updatingValue)) {
+      this.scheduleRender();
+    }
+  }
+
   _parseValue(val) {
     if (!val) return [];
     return String(val)
@@ -56,6 +75,8 @@ export default class SelectBoxJson extends DynamicElement {
   }
 
   _parseOptions() {
+    // Parse the JSON "options" attribute into
+    // an array of { value, label, selected } objects.
     const raw = this.getAttribute('options') || '[]';
     try {
       const parsed = JSON.parse(raw);
@@ -67,6 +88,12 @@ export default class SelectBoxJson extends DynamicElement {
   }
 
   _updateValueAttribute() {
+
+    // Update the host element's "value" attribute based on
+    // the current selection. In multiple mode a comma separated
+    // string is written. Internal updates are guarded to avoid
+    // infinite attributeChangedCallback loops.
+
     const val = this.hasAttribute('multiple')
       ? this.selectedValues.join(',')
       : (this.selectedValues[0] || '');
@@ -86,6 +113,14 @@ export default class SelectBoxJson extends DynamicElement {
     }
     const opt = this.optionsData.find(o => this.selectedValues.includes(String(o.value)));
     return opt ? opt.label : '';
+  }
+
+  _updateDisplay() {
+    const wrap = this.$('.combo-box-selected-wrap');
+    if (wrap) {
+      wrap.textContent = this._selectedLabel();
+    }
+
   }
 
   template() {
@@ -114,6 +149,7 @@ export default class SelectBoxJson extends DynamicElement {
   }
 
   addEventListeners() {
+    // Wire up DOM events after each render.
     const selected = this.$('.combo-box-selected');
     if (selected) this.addListener(selected, 'click', this.toggleDropdown);
     this.$$('.combo-option').forEach(opt => {
@@ -122,8 +158,12 @@ export default class SelectBoxJson extends DynamicElement {
   }
 
   toggleDropdown(e) {
+    // Mirrors the behaviour of SelectBox._toggleDropdown.
+    // Opens or closes the dropdown and injects a temporary
+    // search input when "searchable" is present.
     e.stopPropagation();
-    const dd = this.$('.combo-box-dropdown');
+    const dd  = this.$('.combo-box-dropdown');
+
     const sel = this.$('.combo-box-selected');
     const isOpen = dd.classList.toggle('opened');
     sel.classList.toggle('active', isOpen);
@@ -151,7 +191,10 @@ export default class SelectBoxJson extends DynamicElement {
   }
 
   closeDropdown() {
-    const dd = this.$('.combo-box-dropdown');
+    // Reset dropdown state and remove temporary search input
+    // when the menu is closed.
+    const dd  = this.$('.combo-box-dropdown');
+
     const sel = this.$('.combo-box-selected');
     if (dd) dd.classList.remove('opened');
     if (sel) sel.classList.remove('active');
@@ -160,6 +203,7 @@ export default class SelectBoxJson extends DynamicElement {
       if (this.eventListeners) {
         this.eventListeners.delete(this.searchInput);
       }
+
       this.searchInput.remove();
       this.searchInput = null;
     }
@@ -167,6 +211,8 @@ export default class SelectBoxJson extends DynamicElement {
   }
 
   onOptionClick(e) {
+    // Update selected values when an option is clicked.
+
     const opt = e.target.closest('.combo-option');
     if (!opt) return;
     const val = String(opt.getAttribute('data-option-value'));
@@ -188,15 +234,19 @@ export default class SelectBoxJson extends DynamicElement {
     }
 
     this._updateValueAttribute();
+    this._updateDisplay();
     this.scheduleRender();
     this.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   onSearchKeyUp(e) {
+    // Filter visible options as the user types.
+
     this._filterOptions(e.target.value);
   }
 
   _filterOptions(query) {
+    // Simple client-side filtering based on the option text.
     const raw = (query || '').trim().toUpperCase();
     const options = Array.from(this.$$('.combo-option'));
     options.forEach(option => {

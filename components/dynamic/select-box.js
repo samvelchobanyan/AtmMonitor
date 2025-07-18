@@ -10,7 +10,7 @@ selectTemplate.innerHTML = `
   </div>
 `;
 
-class SelectBox extends HTMLElement {
+export default class SelectBox extends HTMLElement {
   static get observedAttributes() {
     return [
       'name',

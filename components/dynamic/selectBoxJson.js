@@ -10,6 +10,7 @@ export default class SelectBoxJson extends DynamicElement {
     this.optionsData = [];
     this.selectedValues = [];
     this._updatingValue = false;
+    this.searchInput = null;
 
     this.toggleDropdown = this.toggleDropdown.bind(this);
     this.handleOutsideClick = this.handleOutsideClick.bind(this);
@@ -88,9 +89,6 @@ export default class SelectBoxJson extends DynamicElement {
   }
 
   template() {
-    const searchInput = this.hasAttribute('searchable')
-      ? '<div class="combo-box-search"><input type="text" /></div>'
-      : '';
     const optionsHtml = this.optionsData
       .map(opt => {
         const sel = this.selectedValues.includes(String(opt.value)) ? ' selected' : '';
@@ -109,7 +107,6 @@ export default class SelectBoxJson extends DynamicElement {
           <div class="combo-box-selected-wrap">${label}</div>
         </div>
         <div class="combo-box-dropdown">
-          ${searchInput}
           <div class="combo-box-options">${optionsHtml}</div>
         </div>
       </div>
@@ -122,8 +119,6 @@ export default class SelectBoxJson extends DynamicElement {
     this.$$('.combo-option').forEach(opt => {
       this.addListener(opt, 'click', this.onOptionClick);
     });
-    const search = this.$('.combo-box-search input');
-    if (search) this.addListener(search, 'keyup', this.onSearchKeyUp);
   }
 
   toggleDropdown(e) {
@@ -132,13 +127,19 @@ export default class SelectBoxJson extends DynamicElement {
     const sel = this.$('.combo-box-selected');
     const isOpen = dd.classList.toggle('opened');
     sel.classList.toggle('active', isOpen);
+
     if (isOpen && this.hasAttribute('searchable')) {
-      const input = this.$('.combo-box-search input');
-      if (input) {
-        input.focus();
-        this._filterOptions(input.value);
+      if (!this.searchInput) {
+        this.searchInput = document.createElement('input');
+        this.searchInput.type = 'text';
+        this.searchInput.className = 'combo-box-search';
+        sel.appendChild(this.searchInput);
+        this.addListener(this.searchInput, 'keyup', this.onSearchKeyUp);
+        this.searchInput.focus();
       }
-    } else if (!isOpen) {
+      this._filterOptions(this.searchInput.value);
+    }
+    if (!isOpen) {
       this.closeDropdown();
     }
   }
@@ -154,8 +155,14 @@ export default class SelectBoxJson extends DynamicElement {
     const sel = this.$('.combo-box-selected');
     if (dd) dd.classList.remove('opened');
     if (sel) sel.classList.remove('active');
-    const input = this.$('.combo-box-search input');
-    if (input) input.value = '';
+    if (this.searchInput) {
+      this.searchInput.removeEventListener('keyup', this.onSearchKeyUp);
+      if (this.eventListeners) {
+        this.eventListeners.delete(this.searchInput);
+      }
+      this.searchInput.remove();
+      this.searchInput = null;
+    }
     this._filterOptions('');
   }
 

@@ -1,5 +1,5 @@
 import { DynamicElement } from '../../core/dynamic-element.js';
-import '../dynamic/select-box.js';
+import './select-box.js';
 
 const proxyAttrs = [
   'name',
@@ -22,79 +22,57 @@ export default class SelectBoxJson extends DynamicElement {
     this.selectBox = null;
   }
 
+  _parseOptions() {
+    const raw = this.getAttribute('options') || '[]';
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.warn('Invalid JSON for <select-box-json> options:', e);
+      return [];
+    }
+  }
+
+  _passthroughAttrs() {
+    return proxyAttrs
+      .filter(attr => this.hasAttribute(attr))
+      .map(attr => {
+        const val = this.getAttribute(attr);
+        if (val === '' || val === 'true') return attr;
+        return `${attr}="${val}"`;
+      })
+      .join(' ');
+  }
+
+  _renderOptions() {
+    return this._parseOptions()
+      .map(opt => {
+        const sel = opt.selected ? ' selected' : '';
+        return `<div class="combo-option${sel}" data-option-value="${opt.value}">${opt.label}</div>`;
+      })
+      .join('');
+  }
+
   template() {
-    return `<select-box></select-box>`;
+    return `<select-box ${this._passthroughAttrs()}>${this._renderOptions()}</select-box>`;
   }
 
   onAfterRender() {
     this.selectBox = this.querySelector('select-box');
     if (!this.selectBox) return;
-
-    this._applyAttributes();
-    this._buildOptions();
-    this.addListener(this.selectBox, 'change', (e) => {
-      this.setAttribute('value', e.target.value);
+    this.addListener(this.selectBox, 'change', e => {
+      this.setAttribute('value', e.target.getAttribute('value'));
       this.dispatchEvent(new Event('change', { bubbles: true }));
     });
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
     if (oldVal === newVal) return;
-    if (name !== 'value') {
-      super.attributeChangedCallback(name, oldVal, newVal);
+    if (this.selectBox && name === 'value') {
+      this.selectBox.setAttribute('value', newVal);
+      return;
     }
-    if (this.selectBox) {
-      if (name === 'options') {
-        this._buildOptions();
-      } else {
-        if (newVal === null) {
-          this.selectBox.removeAttribute(name);
-        } else {
-          this.selectBox.setAttribute(name, newVal);
-        }
-      }
-    }
-  }
-
-  _applyAttributes() {
-    proxyAttrs.forEach(attr => {
-      if (this.hasAttribute(attr)) {
-        this.selectBox.setAttribute(attr, this.getAttribute(attr));
-      }
-    });
-    if (this.hasAttribute('value')) {
-      this.selectBox.setAttribute('value', this.getAttribute('value'));
-    }
-  }
-
-  _buildOptions() {
-    if (!this.selectBox) return;
-    const raw = this.getAttribute('options') || '[]';
-    let data = [];
-    try {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) {
-        data = parsed;
-      }
-    } catch (e) {
-      console.warn('Invalid JSON for <select-box-json> options:', e);
-    }
-    const wrapper = this.selectBox.querySelector('.combo-box-options');
-    if (!wrapper) return;
-    wrapper.innerHTML = '';
-    data.forEach(opt => {
-      const div = document.createElement('div');
-      div.className = 'combo-option';
-      div.setAttribute('data-option-value', opt.value);
-      if (opt.selected) div.classList.add('selected');
-      div.textContent = opt.label;
-      wrapper.appendChild(div);
-    });
-    // Re-import options for select-box internal tracking
-    if (typeof this.selectBox._importOptions === 'function') {
-      this.selectBox._importOptions();
-      this.selectBox._initSelection();
-    }
+    super.attributeChangedCallback(name, oldVal, newVal);
   }
 }
 

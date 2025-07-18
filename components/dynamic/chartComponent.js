@@ -349,8 +349,8 @@ class ChartComponent extends DynamicElement {
     this.classList.add("chart-container");
     return `
 <!--      <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>-->
-      <select-box name="single" value="${this.selectedPeriod}" searchable>
-        <div class="combo-option selected" data-option-value="today">Այսօր</div>
+      <select-box name="single" value="${this.selectedPeriod}">
+        <div class="combo-option" data-option-value="today">Այսօր</div>
         <div class="combo-option" data-option-value="week">Այս շաբաթ</div>
         <div class="combo-option" data-option-value="custom">Ամսաթվի միջակայք</div>
       </select-box>

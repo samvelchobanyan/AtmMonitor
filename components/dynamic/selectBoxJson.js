@@ -186,6 +186,7 @@ export default class SelectBoxJson extends DynamicElement {
   }
 
   onSearchKeyUp(e) {
+    console.log('searching');
     this._filterOptions(e.target.value);
   }
 

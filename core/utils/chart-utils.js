@@ -173,7 +173,6 @@ const chartColors = ["#9BECB0", "#9BB3EE", "#BE9BEE", "#FCE2A8", "#EC9B9C", "#77
 /* ====== LineChart ====== */
 
 export function prepareLineChartData(chartData){
-  console.log('preparing data',chartData)
   return chartData.datasets.map((dataset, index) => ({
     ...baseDatasetOptions,
     ...dataset,
@@ -182,7 +181,6 @@ export function prepareLineChartData(chartData){
 }
 
 export function createLineChart(ctxId, chartData, containerID) {
-  console.log('creating chart',ctxId,chartData,containerID);
   const ctx = document.getElementById(ctxId).getContext("2d");
 
   const datasetsWithColors = chartData ? prepareLineChartData(chartData) : null;
@@ -230,7 +228,6 @@ export function updateLineChart(chart, chartData) {
 /* ====== DoughnutChart ====== */
 
 export function createDoughnutChart(ctxId, chartData, containerID) {
-  console.log('creating Doughnut chart',ctxId,chartData,containerID);
   const ctx = document.getElementById(ctxId).getContext("2d");
 
   // const doughnutDataset = chartData.datasets[0];

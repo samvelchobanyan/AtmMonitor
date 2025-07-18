@@ -43,7 +43,6 @@ class ChartComponent extends DynamicElement {
   }
 
   onConnected() {
-    console.log('connected');
     this.hasConnected = true;
     this.fetchAndRenderChart();
   }
@@ -51,7 +50,6 @@ class ChartComponent extends DynamicElement {
   onAfterRender() {
     this.selectBox = this.$('select-box');
     const chartData = this.transformedData ? this.transformedData.chartData : null;
-    console.log('after render', this.transformedData, chartData)
     switch (this.chartType) {
       case 'line':
         this.chart = createLineChart(this.canvasId, chartData, this.legendId);
@@ -60,7 +58,6 @@ class ChartComponent extends DynamicElement {
         this.chart = createDoughnutChart(this.canvasId, chartData, this.legendId);
         break
     }
-
 
     // if (this.state.chartData && !this.state.isLoading) {
     //   console.log('state after render',this.state);
@@ -148,11 +145,9 @@ class ChartComponent extends DynamicElement {
   }
 
   onSelectChange(e){
-    console.log('select change - listener ID:', e.target.value);
     let dateRangeObj = null;
 
     if (e.target.value === 'custom') {
-      console.log('open popup');
       this.selectedPeriod = 'custom';
       this._openDateRangePopup();
     }else{
@@ -161,12 +156,10 @@ class ChartComponent extends DynamicElement {
       this.setAttribute('start-date',dateRangeObj.start)
       this.setAttribute('end-date',dateRangeObj.end)
       this.fetchAndRenderChart();
-      console.log('dateRangeObj',dateRangeObj);
     }
   }
 
   setState(newState) {
-    console.log('child set state', newState);
     return super.setState(newState);
   }
 
@@ -178,7 +171,6 @@ class ChartComponent extends DynamicElement {
     }
 
     if(this.chart !== null){
-      console.log('set loading true before fetch');
       this.chart.options.showLoading = true;
       this.chart.update();
     }
@@ -193,8 +185,6 @@ class ChartComponent extends DynamicElement {
     if (endDate) params.append('endDate', endDate);
     if (city) params.append('city', city);
     if (region) params.append('region', region);
-
-    console.log('fetching');
 
     const url = `${endpoint}?${params.toString()}`;
     try {
@@ -278,9 +268,7 @@ class ChartComponent extends DynamicElement {
       </div>
     </div>
   `;
-    console.log('opening modal');
     document.body.appendChild(modal);
-    console.log('opening modal append');
     // 2. Wire up OK/Cancel
     modal.querySelector('#cancelBtn').addEventListener('click', () => modal.remove());
 
@@ -358,7 +346,6 @@ class ChartComponent extends DynamicElement {
     if (this.state.error) {
       return `<div class="error">Failed to load chart data.</div>`;
     }
-    console.log('preparing template', chartHTML);
     this.classList.add("chart-container");
     return `
 <!--      <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>-->

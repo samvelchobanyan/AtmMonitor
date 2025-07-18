@@ -18,10 +18,10 @@ export class DynamicElement extends HTMLElement {
 
     // Internal state
     this.state = { isLoading: false, error: false };
-    this.storeSubscriptions = new Map();
     this.eventListeners = new Map();
     this.isDestroyed = false;
     this.renderScheduled = false;
+    this.unsubscribeFromStore = null;
   }
 
   // Define which attributes to observe - override in child classes
@@ -31,9 +31,12 @@ export class DynamicElement extends HTMLElement {
 
   connectedCallback() {
     this.onConnected();
-    // this.render();
     this.addGlobalEventListeners();
-    this.subscribeToStores();
+
+    if (typeof this.onStoreChange === 'function' && this.onStoreChange !== DynamicElement.prototype.onStoreChange) {
+      this.subscribeToStore(this.onStoreChange);
+    }
+
     this.scheduleRender();
   }
 
@@ -93,20 +96,17 @@ export class DynamicElement extends HTMLElement {
   }
 
   // Store integration methods
-  subscribeToStore(store, callback) {
+  subscribeToStore(callback) {
     if (!store || typeof store.subscribe !== 'function') {
       console.warn('Invalid store provided to subscribeToStore');
       return;
     }
 
-    const unsubscribe = store.subscribe((state) => {
+    this.unsubscribeFromStore = store.subscribe((state) => {
       if (!this.isDestroyed) {
         callback.call(this, state);
       }
     });
-
-    this.storeSubscriptions.set(store, unsubscribe);
-    return unsubscribe;
   }
 
   subscribeToStores() {
@@ -115,6 +115,10 @@ export class DynamicElement extends HTMLElement {
     // this.subscribeToStore(store, (state) => {
     //   this.setState({ data: state.data });
     // });
+  }
+
+  onStoreChange(state) {
+    // Optional — only override if you want to subscribe
   }
 
   // Event handling

@@ -3,7 +3,7 @@ header('Content-Type: application/json');
 
 $delay = isset($_GET['delay']) ? (int)$_GET['delay'] : 0;
 
-// Clamp delay to max 10 seconds just for safety
+// Clamp delay to max 1 second just for safety
 $delay = max(0, min($delay, 1));
 
 // Simulate delay

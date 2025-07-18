@@ -1,6 +1,6 @@
 import { InfoCard } from "../components/ui/infoCard.js";
 import { ContainerTop } from "../components/ui/containerTop.js";
-import { LineChart } from "../components/ui/LineChart.js";
+import { LineChart } from "../components/ui/lineChart.js";
 import "../components/dynamic/chartComponent.js"
 import "../components/dynamic/selectBoxJson.js"
 import "../components/static/changeIndicator.js"

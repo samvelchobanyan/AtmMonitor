@@ -3,6 +3,7 @@ import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/lineChart.js";
 import "../components/dynamic/chartComponent.js"
 import "../components/dynamic/selectBoxJson.js"
+import "../components/ui/selectBoxAttr.js"
 import "../components/static/changeIndicator.js"
 // import { ChartComponent } from "../components/dynamic/chartComponent.js";
 
@@ -61,15 +62,14 @@ class AtmsDashboard extends HTMLElement {
                         <div class="container">
                             <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="/details"> </container-top>
 <!--                            <select-box-simple value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box-simple>-->
-                            <select-box-json
-                                searchable
+                            <select-box-attr                                
                                 name="newselect"
                                 options = '[
                                     { "value": "today",  "label": "Այսօր" },
                                     { "value": "week",   "label": "Այս շաբաթ", "selected": true },
                                     { "value": "custom", "label": "Ամսաթվի միջակայք" }
                                 ]'
-                            ></select-box-json>
+                            ></select-box-attr>
                             <chart-component
                                 id="pie-chart"
                                 api-url="/dashboard/transactions-in-days"

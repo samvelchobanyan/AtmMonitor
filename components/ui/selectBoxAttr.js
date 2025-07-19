@@ -180,6 +180,9 @@ export default class SelectBoxAttr extends HTMLElement {
     this._currentTabIndex = -1;
     const isOpen = this._dropdownEl.classList.toggle('opened');
     this._selectedEl.classList.toggle('active', isOpen);
+    if (isOpen) {
+      this.focus();
+    }
 
     if (isOpen && this.hasAttribute('searchable')) {
       if (!this._searchInput) {
@@ -239,6 +242,9 @@ export default class SelectBoxAttr extends HTMLElement {
         this._addMultiData(opt);
       }
       this._updateMultiDisplay();
+      if (this._searchInput) {
+        this._resetSearchInput();
+      }
     } else {
       this._selectSingle(opt);
       this._closeDropdown();

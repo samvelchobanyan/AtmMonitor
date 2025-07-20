@@ -37,7 +37,7 @@ class AtmsDashboard extends DynamicElement  {
         if(city){
             params.append('city',city);
         }
-
+//todo: add checking to avoid undefined value for city and region
         try {
             const response = await this.fetchData(`/dashboard/summary?region=${encodeURIComponent(region)}`);
             console.log('fetch result',response)

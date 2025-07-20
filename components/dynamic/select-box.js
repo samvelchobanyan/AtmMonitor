@@ -57,6 +57,7 @@ class SelectBox extends HTMLElement {
     this._emptyMessage = this.getAttribute('data-empty-message') || 'Nothing found';
     this._maxItemsShow = Number(this.getAttribute('data-max-items')) || 3;
     this._currentTabIndex = -1;
+    this._optionsAttr = JSON.parse(this.getAttribute('options')) || null;
 
     // bind handlers
     this._onDocumentClick   = this._onDocumentClick.bind(this);
@@ -66,12 +67,17 @@ class SelectBox extends HTMLElement {
   }
 
   connectedCallback() {
+    const attrs = {};
+    for (const attr of this.attributes) {
+      attrs[attr.name] = attr.value;
+    }
     // mirror boolean attrs → CSS classes
     ['multiple','searchable','tag-mode'].forEach(attr =>
         this.classList.toggle(attr, this.hasAttribute(attr))
     );
 
-    this._importOptions();
+    // this._importOptions();
+    this._buildOptions();
     this._initSelection();
 
     // wire events
@@ -121,6 +127,21 @@ class SelectBox extends HTMLElement {
   _importOptions() {
     this._options = Array.from(this.querySelectorAll('.combo-option'));
     this._options.forEach(opt => this._optionsWrapper.appendChild(opt));
+  }
+
+  _buildOptions(){
+    if(this._optionsAttr){
+      this._options = this._optionsAttr.map(opt => {
+        const optEl = document.createElement('div');
+        optEl.className = 'combo-option';
+        optEl.setAttribute('data-option-value', opt.value);
+        if (opt.selected) optEl.classList.add('selected');
+        optEl.textContent = opt.label;
+        this._optionsWrapper.appendChild(optEl);
+        return optEl
+      })
+    }
+
   }
 
   // — Initialize selection based on `value` or existing .selected —

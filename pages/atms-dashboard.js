@@ -1,21 +1,67 @@
 import { InfoCard } from "../components/ui/infoCard.js";
 import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/lineChart.js";
+import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/chartComponent.js"
-import "../components/dynamic/selectBoxJson.js"
 import "../components/static/changeIndicator.js"
 // import { ChartComponent } from "../components/dynamic/chartComponent.js";
 
-class AtmsDashboard extends HTMLElement {
-    connectedCallback() {
-        this.render();
+class AtmsDashboard extends DynamicElement  {
+    constructor() {
+        super();
+        this.state = {
+            selectedRegion: null,
+            selectedCity: null,
+            summary: null
+        };
     }
 
-    render() {
-        this.innerHTML = this.getTemplate();
+    onConnected() {
+        console.log('atm-dashboard connected',this.state)
+        this.fetchSummary()
     }
 
-    getTemplate() {
+    onStoreChange(storeState) {
+        const region = storeState.selectedRegion;
+        const city = storeState.selectedCity
+        if (region !== this.state.selectedRegion || city !== this.state.selectedCity) {
+            this.fetchSummary(region, city); // one API call → one render
+        }
+    }
+
+    async fetchSummary(region, city){
+        const params = new URLSearchParams();
+        if (region){
+            params.append('region', region);
+        }
+        if(city){
+            params.append('city',city);
+        }
+
+        try {
+            const response = await this.fetchData(`/dashboard/summary?region=${encodeURIComponent(region)}`);
+            console.log('fetch result',response)
+            this.setState({
+                selectedRegion: region,
+                selectedCity: city,
+                summary: response
+            }); // ✅ single re-render
+        } catch (err) {
+            console.error('❌ Error fetching summary:', err);
+            this.setState({ summary: null });
+        }
+    }
+
+    template() {
+        if (!this.state.summary) {
+            return /*html*/ `
+              <div class="loading-wrapper">
+                <div class="spinner"></div>
+                <div class="loading-text">Տվյալները բեռնվում են…</div>
+              </div>
+            `;
+        }
+        console.log('atm-dashboar',this.state)
         return /* html */ `
             <div class="main-container">
                 <div class="row">
@@ -53,6 +99,8 @@ class AtmsDashboard extends HTMLElement {
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
+                                city="${this.state.selectedCity}"
+                                region="${this.state.selectedRegion}"
                                 chart-type="line"
                             ></chart-component>
                         </div>

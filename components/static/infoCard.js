@@ -1,9 +1,9 @@
 // components/static/info-card-new.js
 import { BaseElement } from '../../core/base-element.js';
 
-class InfoCardNew extends BaseElement {
+class InfoCard extends BaseElement {
   static get properties() {
-    return ['title', 'value', 'value-currency', 'value-color', 'icon', 'button-text', 'stat', 'stat-class', 'message', 'highlight', 'border'];
+    return ['title', 'value', 'value-currency', 'value-color', 'icon', 'button-text', 'trend', 'stat-class', 'message', 'highlight', 'border'];
   }
 
   render() {
@@ -13,7 +13,7 @@ class InfoCardNew extends BaseElement {
     const valueColor = this.getAttribute('value-color') || '';
     const icon = this.getAttribute('icon') || '';
     const buttonText = this.getAttribute('button-text');
-    const stat = this.getAttribute('stat');
+    const trend = this.getAttribute('trend');
     const statClass = this.getAttribute('stat-class') || '';
     const message = this.getAttribute('message');
 
@@ -29,7 +29,7 @@ class InfoCardNew extends BaseElement {
       </div>
       <div class="info__bottom">
         <div class="info__text ${valueColor}">${value}${valueCurrency ? `<span>${valueCurrency}</span>` : ''}</div>
-        ${stat ? `<div class="info__stat stat ${statClass}">${stat}</div>` : ''}
+        ${trend ? `<change-indicator value="${trend}"></change-indicator>` : ''}
         ${buttonText ? `<div class="btn btn_link"><span>${buttonText}</span> <i class="icon icon-chevron-right"></i></div>` : ''}
         ${message ? `<div class="info__message message"><i class="icon icon-message"></i><span>${message}</span></div>` : ''}
       </div>
@@ -37,4 +37,4 @@ class InfoCardNew extends BaseElement {
   }
 }
 
-customElements.define('info-card-new', InfoCardNew);
+customElements.define('info-card', InfoCard);

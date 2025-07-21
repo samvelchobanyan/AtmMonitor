@@ -1,6 +1,7 @@
 console.log('index.js')
 import { api } from './core/api-client.js';
 import { store } from './core/store/store.js';
+import { startRouter } from './core/router.js';
 
 async function initializeApp() {
   try {
@@ -11,19 +12,9 @@ async function initializeApp() {
       appReady: true
     })
 
-    // Populate the store with the response
-    // store.setState({
-    //   user: {
-    //     id: userSettings.data.id,
-    //     surname: userSettings.data.name
-    //   },
-    //   settings: {
-    //     theme: userSettings.data.theme,
-    //     language: userSettings.data.language
-    //   }
-    // });
+    console.log('✅ Initial app data loaded into store.');
 
-    console.log('✅ Initial app data loaded into the store.');
+    startRouter();
 
   } catch (error) {
     console.error('❌ Failed to load initial application data:', error);

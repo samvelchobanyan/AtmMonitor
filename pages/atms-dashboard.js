@@ -30,16 +30,16 @@ class AtmsDashboard extends DynamicElement  {
     }
 
     async fetchSummary(region, city){
-        const params = new URLSearchParams();
+        const queryString = new URLSearchParams();
         if (region){
-            params.append('region', region);
+            queryString.append('region', region);
         }
         if(city){
-            params.append('city',city);
+            queryString.append('city',city);
         }
-//todo: add checking to avoid undefined value for city and region
+
         try {
-            const response = await this.fetchData(`/dashboard/summary?region=${encodeURIComponent(region)}`);
+            const response = await this.fetchData(`/dashboard/summary?${queryString}`);
             console.log('fetch result',response)
             this.setState({
                 selectedRegion: region,
@@ -96,12 +96,12 @@ class AtmsDashboard extends DynamicElement  {
 <!--                            <line-chart chart-id="line-chart" legend-id="legend-container"> </line-chart>-->
                             <chart-component
                                 id="line-chart"
+                                chart-type="line"                                
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
-                                city="${this.state.selectedCity}"
-                                region="${this.state.selectedRegion}"
-                                chart-type="line"
+                                ${this.attrIf('city',this.state.selectedCity)}
+                                ${this.attrIf('region',this.state.selectedRegion)}
                             ></chart-component>
                         </div>
                     </div>
@@ -120,10 +120,12 @@ class AtmsDashboard extends DynamicElement  {
                             ></select-box-json>
                             <chart-component
                                 id="pie-chart"
+                                chart-type="doughnut"                               
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
-                                chart-type="doughnut"
+                                ${this.attrIf('city',this.state.selectedCity)}
+                                ${this.attrIf('region',this.state.selectedRegion)}
                             ></chart-component>
 <!--                            <div class="chart-container chart-container_between">-->
 <!--                                <div class="chart chart_280">-->

@@ -187,6 +187,8 @@ class ChartComponent extends DynamicElement {
     if (city) params.append('city', city);
     if (region) params.append('region', region);
 
+    console.log('chart component query params-city=',city,' region=',region );
+
     const url = `${endpoint}?${params.toString()}`;
     try {
       const response = await this.fetchData(url);

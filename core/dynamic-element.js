@@ -262,6 +262,13 @@ export class DynamicElement extends HTMLElement {
     }));
   }
 
+  // Utility: Conditionally render an attribute if the value is defined (and not null)
+  attrIf(name, value) {
+    return value !== undefined && value !== null
+        ? `${name}="${String(value)}"`
+        : '';
+  }
+
   // Conditional CSS classes
   classIf(condition, className) {
     return condition ? className : '';

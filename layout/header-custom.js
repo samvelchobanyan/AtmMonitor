@@ -39,8 +39,8 @@ class HeaderCustom extends DynamicElement {
                                 <div class="h1-font">Ակնարկ</div>
                             </div>
                             <div class="header__right">
-                                <select-box id="province-selector" value="1" options='${JSON.stringify((this.cities))}'></select-box>
-                                <select-box id="city-selector" value="all" options='[ {"value":"all","label":"Բոլոր համայնքները"}, {"value":"2","label":"Երևան"}]'></select-box>
+                                <select-box id="city-selector" value="1" options='${JSON.stringify((this.cities))}'></select-box>
+                                <select-box id="province-selector" value="all" options='[ {"value":"all","label":"Բոլոր համայնքները"}, {"value":"2","label":"Երևան"}]'></select-box>
                             </div>
                         </div>
                     </div>

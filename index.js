@@ -6,7 +6,10 @@ async function initializeApp() {
   try {
     // Fetch whatever initial data you need, for example, user info or settings
     const response = await api.get('/dashboard/cities-with-districts');
-    console.log('cities',response);
+    store.setState({
+      regionsData: response,
+      appReady: true
+    })
 
     // Populate the store with the response
     // store.setState({

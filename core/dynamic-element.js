@@ -1,4 +1,5 @@
 import { api } from './api-client.js';
+import { store } from './store/store.js';
 const logIcons = {
   info: '💡',
   success: '✅',
@@ -30,6 +31,20 @@ export class DynamicElement extends HTMLElement {
   }
 
   connectedCallback() {
+    if (store.getState().appReady) {
+      this.runComponentLifecycle();
+    } else {
+      this.delayedInit = store.subscribe(state => {
+        if (state.appReady) {
+          this.delayedInit?.(); // unsubscribe
+          this.delayedInit = null;  // Prevent future calls
+          this.runComponentLifecycle();
+        }
+      });
+    }
+  }
+
+  runComponentLifecycle() {
     this.onConnected();
     this.addGlobalEventListeners();
 
@@ -107,14 +122,6 @@ export class DynamicElement extends HTMLElement {
         callback.call(this, state);
       }
     });
-  }
-
-  subscribeToStores() {
-    // Override in child classes to set up store subscriptions
-    // Example:
-    // this.subscribeToStore(store, (state) => {
-    //   this.setState({ data: state.data });
-    // });
   }
 
   onStoreChange(state) {
@@ -216,7 +223,7 @@ export class DynamicElement extends HTMLElement {
   }
 
   render() {
-    console.log(`${logIcons.render}render`);
+    console.log(`${logIcons.render}[${this.tagName}]render`);
     if (this.isDestroyed) return;
     this.clearEventListeners();
     this.innerHTML = this.template();
@@ -273,16 +280,14 @@ export class DynamicElement extends HTMLElement {
     this.isDestroyed = true;
 
     // Unsubscribe from stores
-    this.storeSubscriptions.forEach((unsubscribe) => {
-      if (typeof unsubscribe === 'function') {
-        try {
-          unsubscribe();
-        } catch (error) {
-          console.warn('Error during store unsubscription:', error);
-        }
+    if (typeof this.unsubscribeFromStore === 'function') {
+      try {
+        this.unsubscribeFromStore();
+      } catch (err) {
+        console.warn('Error during store unsubscribe', err);
       }
-    });
-    this.storeSubscriptions.clear();
+      this.unsubscribeFromStore = null;
+    }
 
     // Remove event listeners
     this.eventListeners.forEach((listeners, element) => {
@@ -295,5 +300,10 @@ export class DynamicElement extends HTMLElement {
       });
     });
     this.eventListeners.clear();
+
+    if (typeof this.delayedInit === 'function') {
+      try { this.delayedInit(); } catch {}
+      this.delayedInit = null;
+    }
   }
 }

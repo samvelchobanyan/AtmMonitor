@@ -43,6 +43,7 @@ class ChartComponent extends DynamicElement {
   }
 
   onConnected() {
+    console.log('chart component connected')
     this.hasConnected = true;
     this.fetchAndRenderChart();
   }
@@ -175,10 +176,10 @@ class ChartComponent extends DynamicElement {
       this.chart.update();
     }
 
-    const startDate = this.getAttr('start-date');
-    const endDate = this.getAttr('end-date');
-    const city = this.getAttr('city');
-    const region = this.getAttr('region');
+    const startDate = this.getAttr('start-date') || null;
+    const endDate = this.getAttr('end-date') || null;
+    const city = this.getAttr('city') || null;
+    const region = this.getAttr('region') || null;
 
     const params = new URLSearchParams();
     if (startDate) params.append('startDate', startDate);
@@ -348,12 +349,16 @@ class ChartComponent extends DynamicElement {
     }
     this.classList.add("chart-container");
     return `
-<!--      <select-box value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box>-->
-      <select-box name="single" value="${this.selectedPeriod}">
-        <div class="combo-option" data-option-value="today">Այսօր</div>
-        <div class="combo-option" data-option-value="week">Այս շաբաթ</div>
-        <div class="combo-option" data-option-value="custom">Ամսաթվի միջակայք</div>
+      <select-box 
+        value="${this.selectedPeriod}" 
+        options='[ 
+          {"value":"today","label":"Այսօր"}, 
+          {"value":"week","label":"Այս շաբաթ"}, 
+          {"value":"custom","label":"Ամսաթվի միջակայք"} 
+          ]'
+      >
       </select-box>
+      
   
       ${chartHTML}
     `;

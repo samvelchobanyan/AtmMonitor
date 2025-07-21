@@ -8,5 +8,8 @@ export const initialState = {
       theme: 'light',
       language: 'en'
     },
-    cities: []
+    regionsData: null,
+    selectedRegion: null,
+    selectedCity: null,
+    appReady: false
   };

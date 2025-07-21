@@ -1,6 +1,10 @@
+# WebComponents Framework (No Node.js)
 # Microframework Overview
 
-This project is a small microframework for building front‑end applications without requiring a backend runtime such as Node.js. It focuses on simplicity, minimal dependencies and clear structure.
+This project is a small microframework for building front‑end applications without requiring a backend runtime such as Node.js. 
+It focuses on simplicity, minimal dependencies and clear structure.
+⚠️ This project does **not** use Node.js, npm, build tools, or any agents.  
+No tests or runtime environments should be inferred.
 
 ## Features
 

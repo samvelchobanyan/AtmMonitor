@@ -1,6 +1,18 @@
 import { StaticElement } from "../core/static-element.js";
+import { navigate } from "../router.js";
 
 class SideBar extends StaticElement {
+    connectedCallback() {
+        super.connectedCallback();
+        const geoLink = this.querySelector('#geo');
+        if (geoLink) {
+            geoLink.addEventListener('click', e => {
+                e.preventDefault();
+                navigate('/geo');
+            });
+        }
+    }
+
     render() {
         return /* html */ `
             <aside class="sidebar">

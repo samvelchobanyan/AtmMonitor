@@ -4,6 +4,10 @@ import "../components/ui/selectBox.js";
 import locationTransformer from '../core/utils/location-transformer.js';
 
 class HeaderCustom extends DynamicElement {
+    static get observedAttributes() {
+        return ['page-title'];
+    }
+
     onConnected() {
         const state = store.getState();
         const regionsData = store.getState().regionsData;
@@ -30,13 +34,14 @@ class HeaderCustom extends DynamicElement {
     }
 
     template() {
+        const title = this.getAttribute('page-title') || 'Ակնարկ';
         return /* html */ `
             <div class="main-container">
                 <div class="row">
                     <div class="column sm-12">
                         <div class="header">
                             <div class="header__title">
-                                <div class="h1-font">Ակնարկ</div>
+                                <div class="h1-font">${title}</div>
                             </div>
                             <div class="header__right">
                                 <select-box id="city-selector" value="1" options='${JSON.stringify((this.cities))}'></select-box>

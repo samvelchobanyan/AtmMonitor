@@ -3,8 +3,6 @@
 
 This project is a small microframework for building front‑end applications without requiring a backend runtime such as Node.js. 
 It focuses on simplicity, minimal dependencies and clear structure.
-⚠️ This project does **not** use Node.js, npm, build tools, or any agents.  
-No tests or runtime environments should be inferred.
 
 ## Features
 
@@ -17,7 +15,7 @@ No tests or runtime environments should be inferred.
 ## Getting started
 
 1. Clone the repository.
-2. Serve the `AtmMonitor` directory as static files (e.g. with `python3 -m http.server`).
+2. Serve the `AtmMonitor` directory as static files
 3. Open the site in your browser.
 
 That is all you need to start experimenting with the framework.

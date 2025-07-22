@@ -10,20 +10,22 @@ function mountComponent(tagName, title=null, query = {}) {
     pageComponent.setAttribute(k, v);
   }
 
+  mount.appendChild(pageComponent);
+
   //dispatch route-title event
   if (title) {
-    el.dispatchEvent(new CustomEvent('route-title', {
+    console.log('router mount component - dispatching',tagName, title);
+    document.dispatchEvent(new CustomEvent('route-title', {
       detail: { title },
       bubbles: true,
       composed: true
     }));
   }
-
-  mount.appendChild(pageComponent);
 }
 
 export function startRouter() {
-  console.log('router start')
+  page.base('/ATM_monitor');
+
 // — Home Route
   page('/', async ctx => {
     console.log('router home route');
@@ -52,8 +54,6 @@ export function startRouter() {
     if (!customElements.get('analytics-view')) {
       await import('../pages/analytics.js');
     }
-
-    // In the future: trigger some analytics tracking here
     mountComponent('analytics-view', 'Վերլուծություն', ctx.query);
   });
 

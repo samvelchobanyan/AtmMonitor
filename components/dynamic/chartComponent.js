@@ -43,7 +43,6 @@ class ChartComponent extends DynamicElement {
   }
 
   onConnected() {
-    console.log('chart component connected')
     this.hasConnected = true;
     this.fetchAndRenderChart();
   }
@@ -186,8 +185,6 @@ class ChartComponent extends DynamicElement {
     if (endDate) params.append('endDate', endDate);
     if (city) params.append('city', city);
     if (region) params.append('region', region);
-
-    console.log('chart component query params-city=',city,' region=',region );
 
     const url = `${endpoint}?${params.toString()}`;
     try {

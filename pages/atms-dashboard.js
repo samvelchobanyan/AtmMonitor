@@ -17,7 +17,6 @@ class AtmsDashboard extends DynamicElement  {
     }
 
     onConnected() {
-        console.log('atm-dashboard connected',this.state)
         this.fetchSummary()
     }
 
@@ -40,7 +39,6 @@ class AtmsDashboard extends DynamicElement  {
 
         try {
             const response = await this.fetchData(`/dashboard/summary?${queryString}`);
-            console.log('fetch result',response)
             this.setState({
                 selectedRegion: region,
                 selectedCity: city,
@@ -67,7 +65,6 @@ class AtmsDashboard extends DynamicElement  {
         const encashmentData = this.state.summary.encashmentInfo;
         const atmWorkHours = this.state.summary.atmWorkHours;
 
-        console.log('atm-dashboar',this.state)
         return /* html */ `
             <div class="main-container">
                 <div class="row">

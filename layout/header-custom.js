@@ -5,6 +5,7 @@ import locationTransformer from '../core/utils/location-transformer.js';
 
 class HeaderCustom extends DynamicElement {
     onConnected() {
+        console.log('header connected');
         const state = store.getState();
         const regionsData = store.getState().regionsData;
         // console.log('✅ store from sidebar after appReady', state);
@@ -15,6 +16,16 @@ class HeaderCustom extends DynamicElement {
         this.cities = locationTransformer.getAllCityOptions(regionsData)
 
         // console.log('province from header',this.province, this.cities)
+    }
+
+    addGlobalEventListeners() {
+        this.addListener(document,'route-title', (e) => {
+            const title = e.detail?.title || '';
+            console.log('header title change event',e);
+            const el = this.$('#title-text');
+            if (el) el.textContent = title;
+            // this.$('#title-text').textContent (title);
+        })
     }
 
     addEventListeners() {
@@ -30,13 +41,14 @@ class HeaderCustom extends DynamicElement {
     }
 
     template() {
+        console.log('header template');
         return /* html */ `
             <div class="main-container">
                 <div class="row">
                     <div class="column sm-12">
                         <div class="header">
                             <div class="header__title">
-                                <div class="h1-font">Ակնարկ</div>
+                                <div id="title-text" class="h1-font">Ակնարկ</div>
                             </div>
                             <div class="header__right">
                                 <select-box id="city-selector" value="1" options='${JSON.stringify((this.cities))}'></select-box>

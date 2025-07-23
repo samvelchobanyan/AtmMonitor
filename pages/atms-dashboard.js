@@ -54,14 +54,18 @@ class AtmsDashboard extends DynamicElement {
         if (!this.state.summary) {
             return /*html*/ `
             <div class="main-container">
-              <div class="loading-wrapper">
-                <div class="spinner"></div>
-                <div class="loading-text">Տվյալները բեռնվում են…</div>
-              </div>
+                <div class="row">
+                    <div class="column sm-12">
+                        <div class="loader">
+                            <div class="loader__spinner spinner"></div>
+                            <div class="loader__text">Տվյալները բեռնվում են…</div>
+                        </div>
+                    </div>
+                </div>
             </div>
             `;
         }
-        debugger;
+
         const generalData = this.state.summary;
         const transactionsData = this.state.summary.transactionsInfo;
         const encashmentData = this.state.summary.encashmentInfo;

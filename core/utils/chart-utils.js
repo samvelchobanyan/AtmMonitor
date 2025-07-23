@@ -117,29 +117,8 @@ const loadingPlugin = {
       pointer-events: none;
     `;
 
-        // Create CSS spinner
         const spinner = document.createElement("div");
-        spinner.style.cssText = `
-      width: 40px;
-      height: 40px;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #007bff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    `;
-
-        // Add CSS animation if not already added
-        if (!document.getElementById("spinner-keyframes")) {
-            const style = document.createElement("style");
-            style.id = "spinner-keyframes";
-            style.textContent = `
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `;
-            document.head.appendChild(style);
-        }
+        spinner.classList.add("spinner");
 
         overlay.appendChild(spinner);
         container.appendChild(overlay);

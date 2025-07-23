@@ -73,3 +73,33 @@
         @include font(900, 13, 1.2, map-get($color-scheme, "blue"), 0, $fontSecondary);
     }
 }
+
+.loader {
+    @extend %flex;
+    @extend %align-middle;
+    flex-direction: column;
+    &__text {
+        @include font(400, 24, 1.2, inherit, 0, $fontPrimary);
+    }
+    &__spinner {
+        margin-bottom: rem(32);
+    }
+}
+
+.spinner {
+    width: rem(40);
+    height: rem(40);
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007bff;
+    border-radius: 100%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

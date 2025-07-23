@@ -60,7 +60,6 @@ class HeaderCustom extends DynamicElement {
     }
 
     template() {
-        console.log('header template');
         return /* html */ `
             <div class="main-container">
                 <div class="row">

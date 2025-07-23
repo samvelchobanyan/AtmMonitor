@@ -37,7 +37,6 @@ class ChartComponent extends DynamicElement {
     this.chartType = this.getAttr('chart-type')
   }
 
-
   static get observedAttributes() {
     return observedAttrs;
   }
@@ -73,12 +72,6 @@ class ChartComponent extends DynamicElement {
       this.addListener(this.selectBox, 'change', this.onSelectChange);
     }
 
-  }
-
-  attributeChangedCallback(name, oldValue, newValue) {
-    if (oldValue !== newValue && this.hasConnected && observedAttrs.includes(name)) {
-      // console.log('attribute changed', name);
-    }
   }
 
   // — Map incoming start/end → period selection —

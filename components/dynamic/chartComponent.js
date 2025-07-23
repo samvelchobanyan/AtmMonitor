@@ -133,7 +133,7 @@ class ChartComponent extends DynamicElement {
 
     onSelectChange(e) {
         let dateRangeObj = null;
-
+        console.log('onSelectChange', e.target.value);
         if (e.target.value === "custom") {
             console.log("custom");
             this.selectedPeriod = "custom";
@@ -230,6 +230,36 @@ class ChartComponent extends DynamicElement {
     }
 
     _openDateRangePopup() {
+        console.log('openDateRangePopup');
+        //============
+        const popup = document.createElement('modal-popup');
+        popup.setAttribute('open', '');
+        popup.innerHTML = `
+          <div slot="content">
+            <h2>Ընտրեք ամսաթվի միջակայքը</h2>
+            <input type="date" id="start" />
+            <input type="date" id="end" />
+            <button class="ok">Կիրառել</button>
+            <button class="cancel">Չեղարկել</button>
+          </div>
+        `;
+
+        popup.querySelector('.cancel').addEventListener('click', () => popup.remove());
+
+        popup.querySelector('.ok').addEventListener('click', () => {
+            const start = popup.querySelector('#start').value;
+            const end = popup.querySelector('#end').value;
+            if (start && end) {
+                this.setAttribute('start-date', start);
+                this.setAttribute('end-date', end);
+                this.fetchAndRenderChart();
+                popup.remove();
+            }
+        });
+
+        document.body.appendChild(popup);
+        //============
+        /*
         // 1. Build a simple modal
         const modal = document.createElement("div");
         modal.className = "date-modal";
@@ -256,10 +286,11 @@ class ChartComponent extends DynamicElement {
       </div>
     </div>
   `;
+        console.log('openDateRangePopup',modal);
         document.body.appendChild(modal);
+
         // 2. Wire up OK/Cancel
         modal.querySelector("#cancelBtn").addEventListener("click", () => modal.remove());
-
         modal.querySelector("#okBtn").addEventListener("click", () => {
             const start = modal.querySelector("#startDate").value;
             const end = modal.querySelector("#endDate").value;
@@ -279,6 +310,7 @@ class ChartComponent extends DynamicElement {
             // 5. Finally, re-fetch
             this.fetchAndRenderChart();
         });
+        */
     }
 
     _updateChart() {

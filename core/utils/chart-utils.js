@@ -103,19 +103,7 @@ const loadingPlugin = {
         // Create overlay element
         const overlay = document.createElement("div");
         overlay.id = `loading-overlay-${canvas.id}`;
-        overlay.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      pointer-events: none;
-    `;
+        overlay.classList.add("loading-overlay");
 
         const spinner = document.createElement("div");
         spinner.classList.add("spinner");

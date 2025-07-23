@@ -37,7 +37,7 @@
         width: rem(48);
         border-radius: 100%;
         background-color: map-get($color-scheme, "white");
-        border: rem(2) solid map-get($color-scheme, "gray");
+        border: 2px solid map-get($color-scheme, "gray");
         @extend %user-cursor;
         @extend %flex;
         @extend %align-center;

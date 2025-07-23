@@ -6,7 +6,7 @@ table {
     border-spacing: 0;
     th,
     td {
-        border: rem(1) solid map-get($color-scheme, "gray-100");
+        border: 1px solid map-get($color-scheme, "gray-100");
         padding: rem(12) rem(8);
         &:not(:last-child) {
             border-right: 0;

@@ -65,16 +65,12 @@ const htmlLegendPlugin = {
                 circle.style.backgroundColor = item.fillStyle;
 
                 const textContainer = document.createElement("div");
-                textContainer.className = "textcontainer";
 
                 if (customLegendEl.hasClass("custom-legend_percent")) {
-                    // Show label with percentage only
                     textContainer.textContent = `${item.text} (${percent}%)`;
                 } else if (customLegendEl.hasClass("custom-legend_data")) {
-                    // Show label with count, percentage and value separated by " / "
-                    textContainer.textContent = `${item.text} ${value} (${percent}%) / ${value}`;
+                    textContainer.innerHTML = `${item.text} <div>${percent}% / ${value}</div>`;
                 } else {
-                    // Default: label text only
                     textContainer.textContent = `${item.text}`;
                 }
 
@@ -210,15 +206,14 @@ export function updateLineChart(chart, chartData) {
 /* ====== DoughnutChart ====== */
 
 export function createDoughnutChart(ctxId, chartData, containerID) {
-    const ctx = document.getElementById(ctxId).getContext("2d");
+    const canvas = document.getElementById(ctxId);
+    const ctx = canvas.getContext("2d");
 
-    // const doughnutDataset = chartData.datasets[0];
-    // const filledDataset = {
-    //   ...doughnutDataset,
-    //   backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
-    //   hoverBackgroundColor: chartColors.slice(0, doughnutDataset.data.length),
-    // };
     const filledDataset = chartData ? prepareDoughnutChart(chartData) : null;
+
+    const hasCustomCutout = canvas.classList.contains("custom-cutout");
+
+    console.log(canvas.classList);
 
     return new Chart(ctx, {
         type: "doughnut",
@@ -229,11 +224,12 @@ export function createDoughnutChart(ctxId, chartData, containerID) {
               }
             : null,
         options: {
+            cutout: hasCustomCutout ? "60%" : "50%",
             showLoading: true,
             maintainAspectRatio: false,
             responsive: true,
             plugins: {
-                tooltip: { enabled: true },
+                tooltip: { enabled: false },
                 legend: { display: false },
                 htmlLegend: { containerID },
             },

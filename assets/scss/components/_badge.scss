@@ -1,3 +1,8 @@
+.badges {
+    @extend %flex;
+    @extend %align-middle;
+}
+
 .badge {
     background-color: map-get($color-scheme, "white");
     height: rem(26);
@@ -8,6 +13,9 @@
     @extend %align-middle;
     border-radius: rem(1000);
     border: 1px solid map-get($color-scheme, "gray-100");
+    &:not(:last-child) {
+        margin-right: rem(8);
+    }
     span {
         @include font(500, 13, 1.5, inherit, 0, $fontPrimary);
     }

@@ -37,7 +37,7 @@
     z-index: 1;
     height: rem(44);
     border-radius: rem(8);
-    border: rem(1) solid map-get($color-scheme, "gray-200");
+    border: 1px solid map-get($color-scheme, "gray-200");
     background: #fff;
     padding: 0 rem(36) 0 rem(12);
     @extend %flex;
@@ -106,7 +106,7 @@
     overflow: hidden;
     background: #fff;
     z-index: z(dropdown);
-    border: rem(1) solid map-get($color-scheme, "gray-100");
+    border: 1px solid map-get($color-scheme, "gray-100");
     transform: translateY(rem(10));
     @extend %hidden;
     @extend %primary-transition;

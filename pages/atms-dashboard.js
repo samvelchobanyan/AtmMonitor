@@ -4,9 +4,10 @@ import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/chartComponent.js";
 import "../components/dynamic/doughnutChart.js";
 
+
+import "../components/ui/customTab.js";
 import "../components/static/changeIndicator.js";
 import "../components/static/infoCard.js";
-import "../components/static/badge.js";
 // import { ChartComponent } from "../components/dynamic/chartComponent.js";
 
 class AtmsDashboard extends DynamicElement {
@@ -109,7 +110,7 @@ class AtmsDashboard extends DynamicElement {
                                 chart-type="line"                                
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
-                                end-date = "2025-07-08"
+                                end-date = "2025-06-08"
                                 ${this.attrIf("city", this.state.selectedCity)}
                                 ${this.attrIf("region", this.state.selectedRegion)}
                             ></chart-component>
@@ -171,7 +172,11 @@ class AtmsDashboard extends DynamicElement {
                  <div class="row">
                     <div class="column sm-6">
                         <div class="container">
-                           <badge-item text="Օրական միջին՝ 200.000.000֏"></badge-item>
+                           <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
+                            <div class="tabs">
+                                <custom-tab name="language" active>English</custom-tab>
+                                <custom-tab name="language">Հայերեն</custom-tab>
+                            </div> 
                            <doughnut-chart id="finance-chart"></doughnut-chart>
                         </div>
                     </div>

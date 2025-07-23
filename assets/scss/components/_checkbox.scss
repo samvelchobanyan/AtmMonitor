@@ -21,7 +21,7 @@
     &__checkmark {
         width: rem(18);
         height: rem(18);
-        border: rem(1.5) solid map-get($color-scheme, "gray-300");
+        border: 1.5px solid map-get($color-scheme, "gray-300");
         border-radius: rem(5);
         margin-right: rem(6);
         position: relative;

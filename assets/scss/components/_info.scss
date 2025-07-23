@@ -58,7 +58,7 @@
     }
     &_border {
         box-shadow: none;
-        border: rem(1) solid map-get($color-scheme, "gray-100");
+        border: 1px solid map-get($color-scheme, "gray-100");
     }
 }
 

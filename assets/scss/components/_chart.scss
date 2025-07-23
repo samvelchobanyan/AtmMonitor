@@ -49,11 +49,18 @@
         }
     }
     &_data {
+       flex: 1;
         ul {
+           flex: 1;
             flex-direction: column;
             li {
                 &:not(:last-child) {
                     margin: 0 0 rem(6) 0;
+                }
+                > div {
+                    width: 100%;
+                    @extend %flex;
+                    @extend %align-between;
                 }
             }
         }

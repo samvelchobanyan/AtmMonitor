@@ -1,20 +1,27 @@
 const htmlLegendPlugin = {
     id: "htmlLegend",
     afterUpdate(chart, args, options) {
-        // const dataset = chart.data.datasets[item.datasetIndex];
+        // Helper to get or create the legend container (assumed defined elsewhere)
         const ul = getOrCreateLegendList(chart, options.containerID);
 
+        // Clear existing legend items
         while (ul.firstChild) {
             ul.firstChild.remove();
         }
 
+        // Generate legend items using Chart.js built-in function
         const items = chart.options.plugins.legend.labels.generateLabels(chart);
+
         items.forEach((item, index) => {
             const li = document.createElement("li");
             const circle = document.createElement("span");
 
-            if ($(chart.canvas).parents(".chart-container").children(".custom-legend").hasClass("custom-legend_checkmark")) {
+            const customLegendEl = $(chart.canvas).parents(".chart-container").children(".custom-legend");
+
+            if (customLegendEl.hasClass("custom-legend_checkmark")) {
+                // Show checkboxes with custom styles
                 circle.style.backgroundColor = item.strokeStyle;
+
                 const label = document.createElement("label");
                 label.className = "custom-check";
                 label.setAttribute("for", `${chart.canvas.id}-${index}`);
@@ -49,6 +56,7 @@ const htmlLegendPlugin = {
 
                 li.appendChild(label);
             } else {
+                // Show simple legend with colors and text, optionally percentage and data
                 const dataset = chart.data.datasets[0];
                 const value = dataset.data[index];
                 const total = dataset.data.reduce((acc, val) => acc + val, 0);
@@ -59,9 +67,14 @@ const htmlLegendPlugin = {
                 const textContainer = document.createElement("div");
                 textContainer.className = "textcontainer";
 
-                if ($(chart.canvas).parents(".chart-container").children(".custom-legend").hasClass("custom-legend_percent")) {
+                if (customLegendEl.hasClass("custom-legend_percent")) {
+                    // Show label with percentage only
                     textContainer.textContent = `${item.text} (${percent}%)`;
+                } else if (customLegendEl.hasClass("custom-legend_data")) {
+                    // Show label with count, percentage and value separated by " / "
+                    textContainer.textContent = `${item.text} ${value} (${percent}%) / ${value}`;
                 } else {
+                    // Default: label text only
                     textContainer.textContent = `${item.text}`;
                 }
 
@@ -73,6 +86,7 @@ const htmlLegendPlugin = {
         });
     },
 };
+
 const loadingPlugin = {
     id: "loadingPlugin",
     beforeDraw(chart) {
@@ -219,7 +233,7 @@ export function createDoughnutChart(ctxId, chartData, containerID) {
             maintainAspectRatio: false,
             responsive: true,
             plugins: {
-                tooltip: { enabled: false },
+                tooltip: { enabled: true },
                 legend: { display: false },
                 htmlLegend: { containerID },
             },

@@ -2,8 +2,11 @@ import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/lineChart.js";
 import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/chartComponent.js";
+import "../components/dynamic/doughnutChart.js";
+
 import "../components/static/changeIndicator.js";
 import "../components/static/infoCard.js";
+import "../components/static/badge.js";
 // import { ChartComponent } from "../components/dynamic/chartComponent.js";
 
 class AtmsDashboard extends DynamicElement {
@@ -147,7 +150,7 @@ class AtmsDashboard extends DynamicElement {
                         </div>
                     </div>
                 </div>
-                      <div class="row">
+                <div class="row">
                     <div class="column sm-6">
                         <div class="container">
                             <container-top icon="icon-trello" title="Բանկոմատի ցանցի արտադրողականություն"> </container-top>
@@ -162,6 +165,14 @@ class AtmsDashboard extends DynamicElement {
                                 end-date = "2025-07-08"
                                 chart-type="bar"
                             ></chart-component>
+                        </div>
+                    </div>
+                </div>
+                 <div class="row">
+                    <div class="column sm-6">
+                        <div class="container">
+                           <badge-item text="Օրական միջին՝ 200.000.000֏"></badge-item>
+                           <doughnut-chart id="finance-chart"></doughnut-chart>
                         </div>
                     </div>
                 </div>

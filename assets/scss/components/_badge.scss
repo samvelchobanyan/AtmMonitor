@@ -1,0 +1,14 @@
+.badge {
+    background-color: map-get($color-scheme, "white");
+    height: rem(26);
+    padding: 0 rem(6);
+    max-width: max-content;
+    @extend %flex;
+    @extend %align-center;
+    @extend %align-middle;
+    border-radius: rem(1000);
+    border: 1px solid map-get($color-scheme, "gray-100");
+    span {
+        @include font(500, 13, 1.5, inherit, 0, $fontPrimary);
+    }
+}

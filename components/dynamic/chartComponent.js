@@ -135,6 +135,7 @@ class ChartComponent extends DynamicElement {
         let dateRangeObj = null;
 
         if (e.target.value === "custom") {
+            console.log("custom");
             this.selectedPeriod = "custom";
             this._openDateRangePopup();
         } else {

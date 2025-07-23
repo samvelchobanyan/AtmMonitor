@@ -26,6 +26,9 @@
             @include font(500, 24, 1.1, 0, 0, $fontPrimary);
         }
     }
+    &__duration {
+        @include font(400, 14, 1.4, 0, 0, $fontPrimary);
+    }
     &__icon {
         @extend %flex;
         @extend %align-middle;

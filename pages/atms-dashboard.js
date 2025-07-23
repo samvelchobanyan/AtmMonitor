@@ -1,40 +1,40 @@
 import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/lineChart.js";
 import { DynamicElement } from "../core/dynamic-element.js";
-import "../components/dynamic/chartComponent.js"
-import "../components/static/changeIndicator.js"
-import "../components/static/infoCard.js"
+import "../components/dynamic/chartComponent.js";
+import "../components/static/changeIndicator.js";
+import "../components/static/infoCard.js";
 // import { ChartComponent } from "../components/dynamic/chartComponent.js";
 
-class AtmsDashboard extends DynamicElement  {
+class AtmsDashboard extends DynamicElement {
     constructor() {
         super();
         this.state = {
             selectedRegion: null,
             selectedCity: null,
-            summary: null
+            summary: null,
         };
     }
 
     onConnected() {
-        this.fetchSummary()
+        this.fetchSummary();
     }
 
     onStoreChange(storeState) {
         const region = storeState.selectedRegion;
-        const city = storeState.selectedCity
+        const city = storeState.selectedCity;
         if (region !== this.state.selectedRegion || city !== this.state.selectedCity) {
             this.fetchSummary(region, city); // one API call → one render
         }
     }
 
-    async fetchSummary(region, city){
+    async fetchSummary(region, city) {
         const queryString = new URLSearchParams();
-        if (region){
-            queryString.append('region', region);
+        if (region) {
+            queryString.append("region", region);
         }
-        if(city){
-            queryString.append('city',city);
+        if (city) {
+            queryString.append("city", city);
         }
 
         try {
@@ -42,10 +42,10 @@ class AtmsDashboard extends DynamicElement  {
             this.setState({
                 selectedRegion: region,
                 selectedCity: city,
-                summary: response.data
+                summary: response.data,
             }); // ✅ single re-render
         } catch (err) {
-            console.error('❌ Error fetching summary:', err);
+            console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });
         }
     }
@@ -53,13 +53,15 @@ class AtmsDashboard extends DynamicElement  {
     template() {
         if (!this.state.summary) {
             return /*html*/ `
+            <div class="main-container">
               <div class="loading-wrapper">
                 <div class="spinner"></div>
                 <div class="loading-text">Տվյալները բեռնվում են…</div>
               </div>
+            </div>
             `;
         }
-
+        debugger;
         const generalData = this.state.summary;
         const transactionsData = this.state.summary.transactionsInfo;
         const encashmentData = this.state.summary.encashmentInfo;
@@ -92,8 +94,8 @@ class AtmsDashboard extends DynamicElement  {
                         <div class="container">
                             <container-top icon="icon-trending-up" title="Գործարքների գումար" link-text="Մանրամասն" link-href="/details"> </container-top>
                             <div class="infos">
-                                <info-card title="Այսօր կանխիկացված գումար" value="${transactionsData.current_dispense_amount}" value-currency="֏" value-color="color-green" trend="${transactionsData.current_dispense_amount_percent_change}" border></info-card>
-                                <info-card title="Այսօր մուտքագրված գումար" value="${transactionsData.current_deposit_amount}" value-currency="֏" value-color="color-blue" trend="${transactionsData.current_deposit_amount_percent_change}" border></info-card>
+                                <info-card title="Այսօր կանխիկացված գումար" value="${transactionsData.current_dispense_amount}" value-currency="֏" value-color="color-green" trend="${transactionsData.current_dispense_amount_percent_change}" show-border="true"></info-card>
+                                <info-card title="Այսօր մուտքագրված գումար" value="${transactionsData.current_deposit_amount}" value-currency="֏" value-color="color-blue" trend="${transactionsData.current_deposit_amount_percent_change}" show-border="true"></info-card>
                             </div>
                             <chart-component
                                 id="line-chart"
@@ -101,8 +103,8 @@ class AtmsDashboard extends DynamicElement  {
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
-                                ${this.attrIf('city',this.state.selectedCity)}
-                                ${this.attrIf('region',this.state.selectedRegion)}
+                                ${this.attrIf("city", this.state.selectedCity)}
+                                ${this.attrIf("region", this.state.selectedRegion)}
                             ></chart-component>
                         </div>
                     </div>
@@ -115,8 +117,8 @@ class AtmsDashboard extends DynamicElement  {
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
-                                ${this.attrIf('city',this.state.selectedCity)}
-                                ${this.attrIf('region',this.state.selectedRegion)}
+                                ${this.attrIf("city", this.state.selectedCity)}
+                                ${this.attrIf("region", this.state.selectedRegion)}
                             ></chart-component>
                         </div>
                     </div>
@@ -126,13 +128,36 @@ class AtmsDashboard extends DynamicElement  {
                         <div class="container">
                             <container-top icon="icon-coins" title="Ինկասացիա"> </container-top>
                             <div class="infos">
-                                <info-card title="Այսօրվա ինկասացիաներ" value="${encashmentData.today_encashments}" icon="icon icon-box"></info-card>
-                                <info-card title="Այսօր հետ բերված գումար" value="${encashmentData.today_collected_amount}" value-currency="֏" value-color="color-green" icon="icon icon-arrow-down-left"></info-card>
-                                <info-card title="Բանկոմատների թիվ" value="${encashmentData.today_added_amount}" value-currency="֏" value-color="color-blue" icon="icon icon-arrow-up-right"></info-card>
-                                <info-card title="Երեկ դատարկ բանկոմատներ" value="${encashmentData.yesterday_marked_as_empty}" value-color="color-red" icon="icon icon-box" message="2"></info-card>
+                                <info-card title="Այսօրվա ինկասացիաներ" value="${encashmentData.today_encashments}" icon="icon icon-box" show-border="true"></info-card>
+                                <info-card title="Այսօր հետ բերված գումար" value="${encashmentData.today_collected_amount}" value-currency="֏" value-color="color-green" icon="icon icon-arrow-down-left" show-border="true"></info-card>
+                                <info-card title="Բանկոմատների թիվ" value="${encashmentData.today_added_amount}" value-currency="֏" value-color="color-blue" icon="icon icon-arrow-up-right" show-border="true"></info-card>
+                                <info-card title="Երեկ դատարկ բանկոմատներ" value="${encashmentData.yesterday_marked_as_empty}" value-color="color-red" icon="icon icon-box" message="2" show-border="true"></info-card>
                             </div>
-                            <select-box-simple value="1" options='[ {"value":"1","label":"Այսօր"}, {"value":"2","label":"Այս շաբաթ"}, {"value":"3","label":"Այս ամիս"} ]'></select-box-simple>
-                            <line-chart chart-id="line-chart-2" legend-id="legend-container-2"> </line-chart>
+                           <chart-component
+                                id="line-chart-transit"
+                                api-url="/dashboard/transactions-in-days"
+                                start-date = "2025-06-01"
+                                end-date = "2025-07-08"
+                                chart-type="line"
+                            ></chart-component>
+                        </div>
+                    </div>
+                </div>
+                      <div class="row">
+                    <div class="column sm-6">
+                        <div class="container">
+                            <container-top icon="icon-trello" title="Բանկոմատի ցանցի արտադրողականություն"> </container-top>
+                             <div class="infos">
+                                <info-card title="Այսօր աշխատաժամանակ" value="98%" icon="icon icon-clock" show-border="true" duration="23 ժամ 15 րոպե"></info-card>
+                                <info-card title="Այսօր պարապուրդ" value="2%" icon="icon icon-clock" show-border="true" duration="45 րոպե"></info-card>
+                            </div>
+                             <chart-component
+                                id="bar-chart"
+                                api-url="/dashboard/transactions-in-days"
+                                start-date = "2025-06-01"
+                                end-date = "2025-07-08"
+                                chart-type="bar"
+                            ></chart-component>
                         </div>
                     </div>
                 </div>

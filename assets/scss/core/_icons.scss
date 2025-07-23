@@ -23,6 +23,12 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-clock:before {
+    content: "\e91a";
+}
+.icon-trello:before {
+    content: "\e91b";
+}
 .icon-plus-circle:before {
     content: "\e918";
 }

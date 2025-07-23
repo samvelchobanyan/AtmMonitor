@@ -56,9 +56,9 @@ class AtmsDashboard extends DynamicElement {
             <div class="main-container">
                 <div class="row">
                     <div class="column sm-12">
-                        <div class="loader">
-                            <div class="loader__spinner spinner"></div>
-                            <div class="loader__text">Տվյալները բեռնվում են…</div>
+                        <div class="loading">
+                            <div class="loading__spinner spinner"></div>
+                            <div class="loading__text">Տվյալները բեռնվում են…</div>
                         </div>
                     </div>
                 </div>

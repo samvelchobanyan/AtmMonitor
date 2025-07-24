@@ -80,34 +80,56 @@ class AtmsDashboard extends DynamicElement {
             <div class="main-container">
                 <div class="row">
                     <div class="column sm-2">
-                        <info-card title="Առկա գումար" value="${
-                          generalData.total_atm_balance
-                        }" value-currency="֏" icon="icon icon-coins" highlight></info-card>
+                        <info-card 
+                            title="Առկա գումար" 
+                            value="${generalData.total_atm_balance}" 
+                            value-currency="֏" 
+                            icon="icon icon-coins" 
+                            highlight>
+                        </info-card>
                     </div>
                     <div class="column sm-2">
-                        <info-card title="Բանկոմատների թիվ" value="${
-                          generalData.total_atms
-                        }" icon="icon icon-box"></info-card>
+                        <info-card 
+                            title="Բանկոմատների թիվ" 
+                            value="${generalData.total_atms}" 
+                            icon="icon icon-box">
+                        </info-card>
                     </div>
                     <div class="column sm-2">
-                        <info-card title="Չաշխատող" value="${
-                          generalData.not_working_atm_count
-                        }" value-color="color-red" icon="icon icon-x-octagon" button-text="Տեսնել"></info-card>
+                        <info-card 
+                            title="Չաշխատող" 
+                            value="${generalData.not_working_atm_count}" 
+                            value-color="color-red" 
+                            icon="icon icon-x-octagon" 
+                            button-text="Տեսնել">
+                        </info-card>
                     </div>
                     <div class="column sm-2">
-                        <info-card title="Դատարկ" value="${
-                          generalData.empty_cassettes_count
-                        }" value-color="color-red" icon="icon icon-minus-circle" button-text="Տեսնել"></info-card>
+                        <info-card 
+                            title="Դատարկ" 
+                            value="${generalData.empty_cassettes_count}" 
+                            value-color="color-red" 
+                            icon="icon icon-minus-circle" 
+                            button-text="Տեսնել">
+                        </info-card>
                     </div>
                     <div class="column sm-2">
-                        <info-card title="Վերջացող" value="${
-                          generalData.almost_empty_cassettes_count
-                        }" icon="icon icon-box" value-color="color-orange" button-text="Տեսնել"></info-card>
+                        <info-card 
+                            title="Վերջացող" 
+                            value="${generalData.almost_empty_cassettes_count}" 
+                            icon="icon icon-box" 
+                            value-color="color-orange" 
+                            button-text="Տեսնել">
+                        </info-card>
                     </div>
                     <div class="column sm-2">
-                        <info-card title="Առգրավված քարտեր" value="${
-                          generalData.taken_cards_count
-                        }" value-color="color-red" icon="icon icon-card" button-text="Տեսնել"></info-card>
+                        <info-card 
+                            title="Առգրավված քարտեր" 
+                            value="${generalData.taken_cards_count}" 
+                            value-color="color-red" 
+                            icon="icon icon-card" 
+                            button-text="Տեսնել">
+                        </info-card>
                     </div>
                 </div>
                 <div class="row">
@@ -162,18 +184,37 @@ class AtmsDashboard extends DynamicElement {
                         <div class="container">
                             <container-top icon="icon-coins" title="Ինկասացիա"> </container-top>
                             <div class="infos">
-                                <info-card title="Այսօրվա ինկասացիաներ" value="${
-                                  encashmentData.today_encashments
-                                }" icon="icon icon-box" show-border="true"></info-card>
-                                <info-card title="Այսօր հետ բերված գումար" value="${
-                                  encashmentData.today_collected_amount
-                                }" value-currency="֏" value-color="color-green" icon="icon icon-arrow-down-left" show-border="true"></info-card>
-                                <info-card title="Բանկոմատների թիվ" value="${
-                                  encashmentData.today_added_amount
-                                }" value-currency="֏" value-color="color-blue" icon="icon icon-arrow-up-right" show-border="true"></info-card>
-                                <info-card title="Երեկ դատարկ բանկոմատներ" value="${
-                                  encashmentData.yesterday_marked_as_empty
-                                }" value-color="color-red" icon="icon icon-box" message="2" message-endpoint='dashboard/comments' show-border="true"></info-card>
+                                <info-card 
+                                    title="Այսօրվա ինկասացիաներ" 
+                                    value="${encashmentData.today_encashments}" 
+                                    icon="icon icon-box" 
+                                    show-border="true">
+                                </info-card>
+                                <info-card 
+                                    title="Այսօր հետ բերված գումար" 
+                                    value="${encashmentData.today_collected_amount}" 
+                                    value-currency="֏" 
+                                    value-color="color-green" 
+                                    icon="icon icon-arrow-down-left" 
+                                    show-border="true">
+                                </info-card>
+                                <info-card 
+                                    title="Բանկոմատների թիվ" 
+                                    value="${encashmentData.today_added_amount}" 
+                                    value-currency="֏" 
+                                    value-color="color-blue" 
+                                    icon="icon icon-arrow-up-right" 
+                                    show-border="true">
+                                </info-card>
+                                <info-card 
+                                    title="Երեկ դատարկ բանկոմատներ" 
+                                    value="${encashmentData.yesterday_marked_as_empty}" 
+                                    value-color="color-red" 
+                                    icon="icon icon-box" 
+                                    message="2" 
+                                    message-endpoint='dashboard/comments' 
+                                    show-border="true">
+                                </info-card>
                             </div>
                            <chart-component
                                 id="line-chart-transit"

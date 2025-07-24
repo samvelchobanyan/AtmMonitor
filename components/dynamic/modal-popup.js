@@ -1,33 +1,55 @@
 // components/ui/modal-popup.js
 import { BaseElement } from "../../core/base-element.js";
 class ModalPopup extends BaseElement {
-    static get observedAttributes() {
-        return ["open"];
+    connectedCallback() {
+        this.innerHTML = `
+    <div class="modal-overlay">
+      <div class="modal-content" id="popup-content"></div>
+    </div>
+  `;
+
+        // Close on outside click
+        this.querySelector(".modal-overlay")?.addEventListener("click", (e) => {
+            if (e.target === e.currentTarget) {
+                this.remove();
+            }
+        });
+
+        // Close on ESC
+        this._escHandler = (e) => {
+            if (e.key === 'Escape') this.remove();
+        };
+        document.addEventListener('keydown', this._escHandler);
+    }
+
+    disconnectedCallback() {
+        if (this._escHandler) {
+            document.removeEventListener('keydown', this._escHandler);
+        }
     }
 
     render() {
-        if (!this.hasAttribute("open")) {
-            this.innerHTML = "";
-            return;
-        }
-
-        const content = this.querySelector('[slot="content"]');
-
         this.innerHTML = `
-          <div class="modal-overlay">
-            <div class="modal-content"></div>
-          </div>
-        `;
+      <div class="modal-overlay">
+        <div class="modal-content" id="popup-content"></div>
+      </div>
+    `;
+    }
 
-        if (content) {
-            this.querySelector(".modal-content").appendChild(content);
+    /**
+     * Injects HTML or Node into the modal content area
+     * @param {string | Node} content
+     */
+    setContent(content) {
+        const target = this.querySelector('#popup-content');
+        if (!target) return;
+
+        if (typeof content === 'string') {
+            target.innerHTML = content;
+        } else if (content instanceof Node) {
+            target.innerHTML = '';
+            target.appendChild(content);
         }
-
-        this.querySelector(".modal-overlay").addEventListener("click", (e) => {
-            if (e.target.classList.contains("modal-overlay")) {
-                this.removeAttribute("open");
-            }
-        });
     }
 }
 

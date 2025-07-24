@@ -226,48 +226,48 @@ class AtmsDashboard extends DynamicElement {
                         </div>
                     </div>
                 </div>
-                      <div class="row">
-                    <div class="column sm-6">
-                        <div class="container">
-                            <container-top icon="icon-trello" title="Բանկոմատի ցանցի արտադրողականություն"> </container-top>
-                             <div class="infos">
-                                <info-card 
-                                    title="Այսօր աշխատաժամանակ" 
-                                    value="${atmWorkHours.today_working_percent}"
-                                    icon="icon icon-clock" 
-                                    show-border="true" 
-                                    duration="${atmWorkHours.today_total_working_time}">
-                                </info-card>
-                                <info-card 
-                                    title="Այսօր պարապուրդ" 
-                                    value="${atmWorkHours.today_non_working_percent}" 
-                                    icon="icon icon-clock" 
-                                    show-border="true" 
-                                    duration="${atmWorkHours.today_total_non_working_time}">
-                                </info-card>
-                            </div>
-                             <chart-component
-                                id="bar-chart"
-                                api-url="/dashboard/atm-worktime-in-days"
-                                start-date = "2025-06-01"
-                                end-date = "2025-07-08"
-                                chart-type="bar" 
-                            ></chart-component>
-                        </div>
+              <div class="row">
+            <div class="column sm-6">
+                <div class="container">
+                    <container-top icon="icon-trello" title="Բանկոմատի ցանցի արտադրողականություն"> </container-top>
+                     <div class="infos">
+                        <info-card 
+                            title="Այսօր աշխատաժամանակ" 
+                            value="${atmWorkHours.today_working_percent}"
+                            icon="icon icon-clock" 
+                            show-border="true" 
+                            duration="${atmWorkHours.today_total_working_time}">
+                        </info-card>
+                        <info-card 
+                            title="Այսօր պարապուրդ" 
+                            value="${atmWorkHours.today_non_working_percent}" 
+                            icon="icon icon-clock" 
+                            show-border="true" 
+                            duration="${atmWorkHours.today_total_non_working_time}">
+                        </info-card>
+                    </div>
+                     <chart-component
+                        id="bar-chart"
+                        api-url="/dashboard/atm-worktime-in-days"
+                        start-date = "2025-06-01"
+                        end-date = "2025-07-08"
+                        chart-type="bar" 
+                    ></chart-component>
+                </div>
+            </div>
+        </div>
+              <div class="row">
+                <div class="column sm-6">
+                    <div class="container">
+                         <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
+                        <div class="tabs">
+                            <custom-tab name="language" active>English</custom-tab>
+                            <custom-tab name="language">Հայերեն</custom-tab>
+                        </div> 
+                       <doughnut-chart id="finance-chart"></doughnut-chart>
                     </div>
                 </div>
-                      <div class="row">
-                    <div class="column sm-6">
-                        <div class="container">
-                             <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
-                            <div class="tabs">
-                                <custom-tab name="language" active>English</custom-tab>
-                                <custom-tab name="language">Հայերեն</custom-tab>
-                            </div> 
-                           <doughnut-chart id="finance-chart"></doughnut-chart>
-                        </div>
-                    </div>
-                </div>
+              </div>
             </div>
         `;
   }

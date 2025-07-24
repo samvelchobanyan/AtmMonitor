@@ -35,6 +35,14 @@ export function startRouter() {
     mountComponent('atms-dashboard', 'Ակնարկ', ctx.query);
   });
 
+  // — Input-output page Route
+  page('/inout', async ctx => {
+    if (!customElements.get('in-out')) {
+      await import('../pages/in-out.js');
+    }
+    mountComponent('in-out', 'Մուտք/Ելք', ctx.query);
+  });
+
 // — Geo Analytics Route
   page('/geo', async ctx => {
     if (!customElements.get('atms-dashboard')) {

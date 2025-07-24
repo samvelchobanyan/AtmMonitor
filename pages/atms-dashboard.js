@@ -201,7 +201,7 @@ class AtmsDashboard extends DynamicElement {
                                 api-url="/dashboard/atm-worktime-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
-                                chart-type="bar"
+                                chart-type="bar" 
                             ></chart-component>
                         </div>
                     </div>

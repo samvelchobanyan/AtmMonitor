@@ -1,4 +1,4 @@
-import { DynamicElement } from '../../core/dynamic-element.js';
+import { DynamicElement } from "../../core/dynamic-element.js";
 import {
   createBarChart,
   updateBarChart,
@@ -6,13 +6,13 @@ import {
   updateDoughnutChart,
   createLineChart,
   updateLineChart,
-} from '../../core/utils/chart-utils.js';
-import chartDataTransformer from '../../core/utils/data-transformer.js';
+} from "../../core/utils/chart-utils.js";
+import chartDataTransformer from "../../core/utils/data-transformer.js";
 // import "../ui/selectBox.js"
-import './select-box.js';
-import './modal-popup.js';
+import "./select-box.js";
+import "./modal-popup.js";
 
-const observedAttrs = ['api-url', 'city', 'region', 'start-date', 'end-date'];
+const observedAttrs = ["api-url", "city", "region", "start-date", "end-date"];
 class ChartComponent extends DynamicElement {
   constructor() {
     super();
@@ -30,12 +30,12 @@ class ChartComponent extends DynamicElement {
 
     this.selectBox = null;
     this.selectedPeriod = this._dateToPeriod();
-    this.canvasId = `canvas-${this.getAttr('id', 'line-chart')}`;
+    this.canvasId = `canvas-${this.getAttr("id", "line-chart")}`;
     this.legendId = `legend-${this.canvasId}`;
 
     this.chart = null;
     this.transformedData = null;
-    this.chartType = this.getAttr('chart-type');
+    this.chartType = this.getAttr("chart-type");
   }
 
   static get observedAttributes() {
@@ -48,17 +48,17 @@ class ChartComponent extends DynamicElement {
   }
 
   onAfterRender() {
-    this.selectBox = this.$('select-box');
+    this.selectBox = this.$("select-box");
 
     const chartData = this.transformedData ? this.transformedData.chartData : null;
     switch (this.chartType) {
-      case 'line':
+      case "line":
         this.chart = createLineChart(this.canvasId, chartData, this.legendId);
         break;
-      case 'doughnut':
+      case "doughnut":
         this.chart = createDoughnutChart(this.canvasId, chartData, this.legendId);
         break;
-      case 'bar':
+      case "bar":
         this.chart = createBarChart(this.canvasId, chartData, this.legendId);
         break;
     }
@@ -74,19 +74,19 @@ class ChartComponent extends DynamicElement {
     // Called after every render for elements inside the component's innerHTML
     // Example:
     if (this.selectBox) {
-      this.addListener(this.selectBox, 'change', this.onSelectChange);
+      this.addListener(this.selectBox, "change", this.onSelectChange);
     }
   }
 
   // — Map incoming start/end → period selection —
   _dateToPeriod() {
     // const sel = this.querySelector('select-box');
-    let start = this.getAttr('start-date');
-    let end = this.getAttr('end-date');
+    let start = this.getAttr("start-date");
+    let end = this.getAttr("end-date");
 
     let period;
     if (!end || !start) {
-      return 'today';
+      return "today";
     }
 
     const s = new Date(start);
@@ -94,11 +94,11 @@ class ChartComponent extends DynamicElement {
     const diffDays = (e - s) / (1000 * 60 * 60 * 24);
 
     if (diffDays === 0) {
-      period = 'today';
+      period = "today";
     } else if (diffDays === 7) {
-      period = 'week';
+      period = "week";
     } else {
-      period = 'custom';
+      period = "custom";
     }
 
     // Update the select-box UI
@@ -112,19 +112,19 @@ class ChartComponent extends DynamicElement {
     let start, end;
 
     switch (period) {
-      case 'today':
+      case "today":
         start = new Date(now);
         end = start;
         break;
-      case 'week':
+      case "week":
         start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         end = new Date(now);
         break;
-      case 'custom':
+      case "custom":
         // Custom: assume consumer will set start-date/end-date manually.
         // If missing, default both to today.
-        if (!this.getAttr('start-date') || !this.getAttr('end-date')) {
-          this._applyPeriodToDates('today');
+        if (!this.getAttr("start-date") || !this.getAttr("end-date")) {
+          this._applyPeriodToDates("today");
         }
         return;
       default:
@@ -143,14 +143,14 @@ class ChartComponent extends DynamicElement {
   onSelectChange(e) {
     let dateRangeObj = null;
 
-    if (e.target.value === 'custom') {
-      this.selectedPeriod = 'custom';
+    if (e.target.value === "custom") {
+      this.selectedPeriod = "custom";
       this._openDateRangePopup();
     } else {
       dateRangeObj = this._periodToDates(e.target.value);
       this.selectedPeriod = e.target.value;
-      this.setAttribute('start-date', dateRangeObj.start);
-      this.setAttribute('end-date', dateRangeObj.end);
+      this.setAttribute("start-date", dateRangeObj.start);
+      this.setAttribute("end-date", dateRangeObj.end);
       this.fetchAndRenderChart();
     }
   }
@@ -160,7 +160,7 @@ class ChartComponent extends DynamicElement {
   }
 
   async fetchAndRenderChart() {
-    const endpoint = this.getAttr('api-url');
+    const endpoint = this.getAttr("api-url");
     if (!endpoint) {
       console.warn('<chart-component> is missing required "api-url" attribute');
       return;
@@ -171,41 +171,41 @@ class ChartComponent extends DynamicElement {
       this.chart.update();
     }
 
-    const startDate = this.getAttr('start-date') || null;
-    const endDate = this.getAttr('end-date') || null;
-    const city = this.getAttr('city') || null;
-    const region = this.getAttr('region') || null;
+    const startDate = this.getAttr("start-date") || null;
+    const endDate = this.getAttr("end-date") || null;
+    const city = this.getAttr("city") || null;
+    const region = this.getAttr("region") || null;
 
     const params = new URLSearchParams();
-    if (startDate) params.append('startDate', startDate);
-    if (endDate) params.append('endDate', endDate);
-    if (city) params.append('city', city);
-    if (region) params.append('region', region);
+    if (startDate) params.append("startDate", startDate);
+    if (endDate) params.append("endDate", endDate);
+    if (city) params.append("city", city);
+    if (region) params.append("region", region);
 
     const url = `${endpoint}?${params.toString()}`;
     try {
       const response = await this.fetchData(url);
       const isValid = response && response.errors === null && response.data;
 
-      if (!isValid) throw new Error('Invalid API response format');
+      if (!isValid) throw new Error("Invalid API response format");
 
       // const chartData = this.transformData(response.data);
       switch (this.chartType) {
-        case 'line':
+        case "line":
           this.transformedData = chartDataTransformer.transformData(response.data);
           this._updateChart();
           break;
-        case 'doughnut':
+        case "doughnut":
           this.transformedData = chartDataTransformer.transformDoughnutData(response.data);
           this._updateChart();
           break;
-        case 'bar':
+        case "bar":
           this.transformedData = chartDataTransformer.transformBarData(response.data);
           this._updateChart();
           break;
       }
     } catch (err) {
-      console.warn('Chart fetch error:', err);
+      console.warn("Chart fetch error:", err);
       this.setState({ chartData: null, error: true });
     }
   }
@@ -225,11 +225,11 @@ class ChartComponent extends DynamicElement {
       labels,
       datasets: [
         {
-          label: 'Աշխատաժամանակ',
+          label: "Աշխատաժամանակ",
           data: workingData,
         },
         {
-          label: 'Պարապուրդ',
+          label: "Պարապուրդ",
           data: nonWorkingData,
         },
       ],
@@ -251,11 +251,11 @@ class ChartComponent extends DynamicElement {
       labels,
       datasets: [
         {
-          label: 'Կանխիկացված գումար',
+          label: "Կանխիկացված գումար",
           data: dispenseData,
         },
         {
-          label: 'Մուտքագրված գումար',
+          label: "Մուտքագրված գումար",
           data: depositData,
         },
       ],
@@ -263,10 +263,10 @@ class ChartComponent extends DynamicElement {
   }
 
   _openDateRangePopup() {
-    console.log('openDateRangePopup');
+    console.log("openDateRangePopup");
     //============
-    const popup = document.createElement('modal-popup');
-    popup.setAttribute('open', '');
+    const popup = document.createElement("modal-popup");
+    popup.setAttribute("open", "");
     popup.innerHTML = `
           <div slot="content">
             <div class="modal__title">
@@ -282,13 +282,13 @@ class ChartComponent extends DynamicElement {
             </div>
           </div>
         `;
-    popup.querySelector('.cancel').addEventListener('click', () => popup.remove());
-    popup.querySelector('.ok').addEventListener('click', () => {
-      const start = popup.querySelector('#start').value;
-      const end = popup.querySelector('#end').value;
+    popup.querySelector(".cancel").addEventListener("click", () => popup.remove());
+    popup.querySelector(".ok").addEventListener("click", () => {
+      const start = popup.querySelector("#start").value;
+      const end = popup.querySelector("#end").value;
       if (start && end) {
-        this.setAttribute('start-date', start);
-        this.setAttribute('end-date', end);
+        this.setAttribute("start-date", start);
+        this.setAttribute("end-date", end);
         this.fetchAndRenderChart();
         popup.remove();
       }
@@ -298,16 +298,16 @@ class ChartComponent extends DynamicElement {
 
   _updateChart() {
     switch (this.chartType) {
-      case 'line':
+      case "line":
         updateLineChart(this.chart, this.transformedData.chartData);
         break;
-      case 'doughnut':
-        this.$('.chart-info__number').childNodes[0].textContent =
+      case "doughnut":
+        this.$(".chart-info__number").childNodes[0].textContent =
           this.transformedData.metaData.total;
-        this.$('change-indicator').setAttribute('value', 15);
+        this.$("change-indicator").setAttribute("value", 15);
         updateDoughnutChart(this.chart, this.transformedData.chartData);
         break;
-      case 'bar':
+      case "bar":
         updateBarChart(this.chart, this.transformedData.chartData);
         break;
     }
@@ -318,9 +318,9 @@ class ChartComponent extends DynamicElement {
       return `<div>Loading chart…</div>`;
     }
 
-    let chartHTML = '';
+    let chartHTML = "";
     switch (this.chartType) {
-      case 'doughnut':
+      case "doughnut":
         chartHTML = `
           <div class="chart-container chart-container_between">
               <div class="chart chart_280">
@@ -334,7 +334,7 @@ class ChartComponent extends DynamicElement {
           </div>
         `;
         break;
-      case 'bar':
+      case "bar":
         chartHTML = `
         <div class="chart chart_228">
           <canvas id="${this.canvasId}"></canvas>
@@ -342,7 +342,7 @@ class ChartComponent extends DynamicElement {
         <div class="custom-legend custom-legend_checkmark" id="${this.legendId}"></div>
     `;
         break;
-      case 'line':
+      case "line":
         chartHTML = `
           <div class="chart chart_252">
             <canvas id="${this.canvasId}"></canvas>
@@ -355,7 +355,8 @@ class ChartComponent extends DynamicElement {
     if (this.state.error) {
       return `<div class="error">Failed to load chart data.</div>`;
     }
-    this.classList.add('chart-container');
+    this.classList.add("chart-container");
+
     return `
       <select-box 
         value="${this.selectedPeriod}" 
@@ -374,4 +375,4 @@ class ChartComponent extends DynamicElement {
 }
 
 // Register the component
-customElements.define('chart-component', ChartComponent);
+customElements.define("chart-component", ChartComponent);

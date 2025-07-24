@@ -115,16 +115,21 @@ class AtmsDashboard extends DynamicElement {
                         <div class="container">
                             <container-top icon="icon-trending-up" title="Գործարքների գումար" link-text="Մանրամասն" link-href="/details"> </container-top>
                             <div class="infos">
-                                <info-card title="Այսօր կանխիկացված գումար" value="${
-                                  transactionsData.current_dispense_amount
-                                }" value-currency="֏" value-color="color-green" trend="${
-      transactionsData.current_dispense_amount_percent_change
-    }" show-border="true"></info-card>
-                                                        <info-card title="Այսօր մուտքագրված գումար" value="${
-                                                          transactionsData.current_deposit_amount
-                                                        }" value-currency="֏" value-color="color-blue" trend="${
-      transactionsData.current_deposit_amount_percent_change
-    }" show-border="true"></info-card>
+                                <info-card 
+                                    title="Այսօր կանխիկացված գումար" 
+                                    value="${transactionsData.current_dispense_amount}" 
+                                    value-currency="֏" value-color="color-green" 
+                                    trend="${transactionsData.current_dispense_amount_percent_change}" 
+                                    show-border="true">
+                                </info-card>
+                                <info-card 
+                                    title="Այսօր մուտքագրված գումար" 
+                                    value="${transactionsData.current_deposit_amount}" 
+                                    value-currency="֏" 
+                                    value-color="color-blue" 
+                                    trend="${transactionsData.current_deposit_amount_percent_change}" 
+                                    show-border="true">
+                                </info-card>
                             </div>
                             <chart-component
                                 id="line-chart"
@@ -185,16 +190,20 @@ class AtmsDashboard extends DynamicElement {
                         <div class="container">
                             <container-top icon="icon-trello" title="Բանկոմատի ցանցի արտադրողականություն"> </container-top>
                              <div class="infos">
-                                <info-card title="Այսօր աշխատաժամանակ" value="${
-                                  atmWorkHours.today_working_percent
-                                }"  icon="icon icon-clock" show-border="true" duration="${
-      atmWorkHours.today_total_working_time
-    }" ></info-card>
-                                <info-card title="Այսօր պարապուրդ" value="${
-                                  atmWorkHours.today_non_working_percent
-                                }" icon="icon icon-clock" show-border="true" duration="${
-      atmWorkHours.today_total_non_working_time
-    }"></info-card>
+                                <info-card 
+                                    title="Այսօր աշխատաժամանակ" 
+                                    value="${atmWorkHours.today_working_percent}"
+                                    icon="icon icon-clock" 
+                                    show-border="true" 
+                                    duration="${atmWorkHours.today_total_working_time}">
+                                </info-card>
+                                <info-card 
+                                    title="Այսօր պարապուրդ" 
+                                    value="${atmWorkHours.today_non_working_percent}" 
+                                    icon="icon icon-clock" 
+                                    show-border="true" 
+                                    duration="${atmWorkHours.today_total_non_working_time}">
+                                </info-card>
                             </div>
                              <chart-component
                                 id="bar-chart"

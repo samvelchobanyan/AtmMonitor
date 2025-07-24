@@ -1,5 +1,12 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
-import { createBarChart, updateBarChart, createDoughnutChart, updateDoughnutChart, createLineChart, updateLineChart } from "../../core/utils/chart-utils.js";
+import {
+  createBarChart,
+  updateBarChart,
+  createDoughnutChart,
+  updateDoughnutChart,
+  createLineChart,
+  updateLineChart,
+} from "../../core/utils/chart-utils.js";
 import chartDataTransformer from "../../core/utils/data-transformer.js";
 // import "../ui/selectBox.js"
 import "./select-box.js";
@@ -7,53 +14,54 @@ import "./modal-popup.js";
 
 const observedAttrs = ["api-url", "city", "region", "start-date", "end-date"];
 class ChartComponent extends DynamicElement {
-    constructor() {
-        super();
-        this.renderCount = 0;
+  constructor() {
+    super();
+    this.renderCount = 0;
 
-        this.state = {
-            ...this.state,
-            chartData: null,
-            // endpoint: this.getAttr('api-url') || null,
-            // startDate: this.getAttr('start-date') || null,
-            // endDate: this.getAttr('end-date') || null,
-            // city: this.getAttr('city') || null,
-            // region: this.getAttr('region') || null,
-        };
+    this.state = {
+      ...this.state,
+      chartData: null,
+      // endpoint: this.getAttr('api-url') || null,
+      // startDate: this.getAttr('start-date') || null,
+      // endDate: this.getAttr('end-date') || null,
+      // city: this.getAttr('city') || null,
+      // region: this.getAttr('region') || null,
+    };
 
-        this.selectBox = null;
-        this.selectedPeriod = this._dateToPeriod();
-        this.canvasId = `canvas-${this.getAttr("id", "line-chart")}`;
-        this.legendId = `legend-${this.canvasId}`;
+    this.selectBox = null;
+    this.selectedPeriod = this._dateToPeriod();
+    this.canvasId = `canvas-${this.getAttr("id", "line-chart")}`;
+    this.legendId = `legend-${this.canvasId}`;
 
-        this.chart = null;
-        this.transformedData = null;
-        this.chartType = this.getAttr("chart-type");
+    this.chart = null;
+    this.transformedData = null;
+    this.chartType = this.getAttr("chart-type");
+  }
+
+  static get observedAttributes() {
+    return observedAttrs;
+  }
+
+  onConnected() {
+    this.hasConnected = true;
+    this.fetchAndRenderChart();
+  }
+
+  onAfterRender() {
+    this.selectBox = this.$("select-box");
+
+    const chartData = this.transformedData ? this.transformedData.chartData : null;
+    switch (this.chartType) {
+      case "line":
+        this.chart = createLineChart(this.canvasId, chartData, this.legendId);
+        break;
+      case "doughnut":
+        this.chart = createDoughnutChart(this.canvasId, chartData, this.legendId);
+        break;
+      case "bar":
+        this.chart = createBarChart(this.canvasId, chartData, this.legendId);
+        break;
     }
-
-    static get observedAttributes() {
-        return observedAttrs;
-    }
-
-    onConnected() {
-        this.hasConnected = true;
-        this.fetchAndRenderChart();
-    }
-
-    onAfterRender() {
-        this.selectBox = this.$("select-box");
-        const chartData = this.transformedData ? this.transformedData.chartData : null;
-        switch (this.chartType) {
-            case "line":
-                this.chart = createLineChart(this.canvasId, chartData, this.legendId);
-                break;
-            case "doughnut":
-                this.chart = createDoughnutChart(this.canvasId, chartData, this.legendId);
-                break;
-            case "bar":
-                this.chart = createBarChart(this.canvasId, chartData, this.legendId);
-                break;
-        }
 
         // if (this.state.chartData && !this.state.isLoading) {
         //   console.log('state after render',this.state);
@@ -204,10 +212,36 @@ class ChartComponent extends DynamicElement {
         }
     }
 
-    transformData(data) {
-        const labels = [];
-        const depositData = [];
-        const dispenseData = [];
+  transformBarData(data) {
+    const labels = [];
+    const workingData = [];
+    const nonWorkingData = [];
+
+    for (const day of data.work_hours_per_day) {
+      labels.push(day.date);
+      workingData.push(day.working_percent);
+      nonWorkingData.push(day.non_working_percent);
+    }
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: "Աշխատաժամանակ",
+          data: workingData,
+        },
+        {
+          label: "Պարապուրդ",
+          data: nonWorkingData,
+        },
+      ],
+    };
+  }
+
+  transformData(data) {
+    const labels = [];
+    const depositData = [];
+    const dispenseData = [];
 
         for (const day of data.daily_data) {
             labels.push(day.date);
@@ -284,21 +318,22 @@ class ChartComponent extends DynamicElement {
 
     }
 
-    _updateChart() {
-        switch (this.chartType) {
-            case "line":
-                updateLineChart(this.chart, this.transformedData.chartData);
-                break;
-            case "doughnut":
-                this.$(".chart-info__number").childNodes[0].textContent = this.transformedData.metaData.total;
-                this.$("change-indicator").setAttribute("value", 15);
-                updateDoughnutChart(this.chart, this.transformedData.chartData);
-                break;
-            case "bar":
-                updateBarChart(this.chart, this.transformedData.chartData);
-                break;
-        }
+  _updateChart() {
+    switch (this.chartType) {
+      case "line":
+        updateLineChart(this.chart, this.transformedData.chartData);
+        break;
+      case "doughnut":
+        this.$(".chart-info__number").childNodes[0].textContent =
+          this.transformedData.metaData.total;
+        this.$("change-indicator").setAttribute("value", 15);
+        updateDoughnutChart(this.chart, this.transformedData.chartData);
+        break;
+      case "bar":
+        updateBarChart(this.chart, this.transformedData.chartData);
+        break;
     }
+  }
 
     template() {
         if (this.isLoading()) {

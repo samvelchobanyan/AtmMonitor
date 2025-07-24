@@ -1,15 +1,15 @@
-import { ContainerTop } from '../components/ui/containerTop.js';
-import { LineChart } from '../components/ui/lineChart.js';
-import { DynamicElement } from '../core/dynamic-element.js';
-import '../components/dynamic/chartComponent.js';
-import '../components/dynamic/modal-popup.js';
-import '../components/static/changeIndicator.js';
-import '../components/static/infoCard.js';
-import '../components/ui/customTab.js';
+import { ContainerTop } from "../components/ui/containerTop.js";
+import { LineChart } from "../components/ui/lineChart.js";
+import { DynamicElement } from "../core/dynamic-element.js";
+import "../components/dynamic/chartComponent.js";
+import "../components/dynamic/modal-popup.js";
+import "../components/static/changeIndicator.js";
+import "../components/static/infoCard.js";
+import "../components/ui/customTab.js";
 // import { ChartComponent } from "../components/dynamic/chartComponent.js";
-import '../components/dynamic/doughnutChart.js';
+import "../components/dynamic/doughnutChart.js";
 // import '../components/static/badge.js';
-import '../components/ui/customTab.js';
+import "../components/ui/customTab.js";
 
 class AtmsDashboard extends DynamicElement {
   constructor() {
@@ -36,10 +36,10 @@ class AtmsDashboard extends DynamicElement {
   async fetchSummary(region, city) {
     const queryString = new URLSearchParams();
     if (region) {
-      queryString.append('district', region);
+      queryString.append("district", region);
     }
     if (city) {
-      queryString.append('city', city);
+      queryString.append("city", city);
     }
 
     try {
@@ -50,7 +50,7 @@ class AtmsDashboard extends DynamicElement {
         summary: response.data,
       });
     } catch (err) {
-      console.error('❌ Error fetching summary:', err);
+      console.error("❌ Error fetching summary:", err);
       this.setState({ summary: null });
     }
   }
@@ -132,8 +132,8 @@ class AtmsDashboard extends DynamicElement {
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-06-08"
-                                ${this.attrIf('city', this.state.selectedCity)}
-                                ${this.attrIf('region', this.state.selectedRegion)}
+                                ${this.attrIf("city", this.state.selectedCity)}
+                                ${this.attrIf("region", this.state.selectedRegion)}
                             ></chart-component>
                         </div>
                     </div>
@@ -146,8 +146,8 @@ class AtmsDashboard extends DynamicElement {
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
-                                ${this.attrIf('city', this.state.selectedCity)}
-                                ${this.attrIf('region', this.state.selectedRegion)}
+                                ${this.attrIf("city", this.state.selectedCity)}
+                                ${this.attrIf("region", this.state.selectedRegion)}
                             ></chart-component>
                         </div>
                     </div>
@@ -168,7 +168,7 @@ class AtmsDashboard extends DynamicElement {
                                 }" value-currency="֏" value-color="color-blue" icon="icon icon-arrow-up-right" show-border="true"></info-card>
                                 <info-card title="Երեկ դատարկ բանկոմատներ" value="${
                                   encashmentData.yesterday_marked_as_empty
-                                }" value-color="color-red" icon="icon icon-box" message="2" show-border="true"></info-card>
+                                }" value-color="color-red" icon="icon icon-box" message="2" message-endpoint='dashboard/comments' show-border="true"></info-card>
                             </div>
                            <chart-component
                                 id="line-chart-transit"
@@ -223,4 +223,4 @@ class AtmsDashboard extends DynamicElement {
   }
 }
 
-customElements.define('atms-dashboard', AtmsDashboard);
+customElements.define("atms-dashboard", AtmsDashboard);

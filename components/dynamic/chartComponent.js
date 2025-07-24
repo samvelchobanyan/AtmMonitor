@@ -187,7 +187,7 @@ class ChartComponent extends DynamicElement {
         try {
             const response = await this.fetchData(url);
 
-            const isValid = response && response.errors === null && response.data && Array.isArray(response.data.daily_data);
+            const isValid = response && response.errors === null && response.data;
 
             if (!isValid) throw new Error("Invalid API response format");
 
@@ -202,7 +202,7 @@ class ChartComponent extends DynamicElement {
                     this._updateChart();
                     break;
                 case "bar":
-                    this.transformedData = chartDataTransformer.transformData(response.data);
+                    this.transformedData = chartDataTransformer.transformBarData(response.data);
                     this._updateChart();
                     break;
             }

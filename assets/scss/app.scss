@@ -12,6 +12,7 @@
 @import "components/_table.scss";
 @import "components/_tab.scss";
 @import "components/_badge.scss";
+@import "components/_modal.scss";
 
 .main-container {
     @extend %primary-transition;
@@ -106,7 +107,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 2;
     pointer-events: none;
 }
 
@@ -149,5 +150,37 @@
     }
     100% {
         transform: rotate(360deg);
+    }
+}
+
+.datepicker {
+    position: relative;
+    &__input {
+        @include font(normal, 14, 1.2, inherit, uppercase, $fontPrimary);
+        @extend %flex;
+        @extend %align-middle;
+        @extend %align-center;
+        height: rem(40);
+        padding: 0 rem(12);
+        border: 1px solid map-get($color-scheme, "gray-200");
+        border-radius: rem(8);
+        &::-webkit-calendar-picker-indicator {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            color: transparent;
+            background: transparent;
+        }
+    }
+    &__label {
+        @include font(normal, 11, 1.2, map-get($color-scheme, "gray-800"), uppercase, $fontPrimary);
+        padding: rem(2);
+        position: absolute;
+        top: rem(-8);
+        left: rem(11);
+        background-color: map-get($color-scheme, "white");
     }
 }

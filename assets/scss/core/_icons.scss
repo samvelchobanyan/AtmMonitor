@@ -23,6 +23,12 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-arrow-left:before {
+    content: "\e91c";
+}
+.icon-arrow-right:before {
+    content: "\e91d";
+}
 .icon-clock:before {
     content: "\e91a";
 }

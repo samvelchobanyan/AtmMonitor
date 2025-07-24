@@ -3,6 +3,7 @@ import { createBarChart, updateBarChart, createDoughnutChart, updateDoughnutChar
 import chartDataTransformer from "../../core/utils/data-transformer.js";
 // import "../ui/selectBox.js"
 import "./select-box.js";
+import "./modal-popup.js";
 
 const observedAttrs = ["api-url", "city", "region", "start-date", "end-date"];
 class ChartComponent extends DynamicElement {
@@ -133,7 +134,7 @@ class ChartComponent extends DynamicElement {
 
     onSelectChange(e) {
         let dateRangeObj = null;
-        console.log('onSelectChange', e.target.value);
+        console.log("onSelectChange", e.target.value);
         if (e.target.value === "custom") {
             console.log("custom");
             this.selectedPeriod = "custom";
@@ -230,87 +231,40 @@ class ChartComponent extends DynamicElement {
     }
 
     _openDateRangePopup() {
-        console.log('openDateRangePopup');
+        console.log("openDateRangePopup");
         //============
-        const popup = document.createElement('modal-popup');
-        popup.setAttribute('open', '');
+        const popup = document.createElement("modal-popup");
+        popup.setAttribute("open", "");
         popup.innerHTML = `
           <div slot="content">
-            <h2>Ընտրեք ամսաթվի միջակայքը</h2>
-            <input type="date" id="start" />
-            <input type="date" id="end" />
-            <button class="ok">Կիրառել</button>
-            <button class="cancel">Չեղարկել</button>
+            <div class="modal__title">
+                Ընտրեք ամսաթվի միջակայքը
+            </div>
+            <div class="modal__datepickers">
+                <div class="datepicker"> <label for="start" class="datepicker__label">սկիզբ</label> <input type="date" id="start" class="datepicker__input" /> </div>
+                <div class="datepicker"> <label for="start" class="datepicker__label">ավարտ</label> <input type="date" id="end" class="datepicker__input"  /> </div>
+            </div>
+            <div class="modal__buttons">
+              <button class="cancel btn btn_md btn_white"><span>Չեղարկել</span></button>
+              <button class="ok btn btn_md btn_blue"><span>Կիրառել</span></button>
+            </div> 
           </div>
         `;
 
-        popup.querySelector('.cancel').addEventListener('click', () => popup.remove());
+        popup.querySelector(".cancel").addEventListener("click", () => popup.remove());
 
-        popup.querySelector('.ok').addEventListener('click', () => {
-            const start = popup.querySelector('#start').value;
-            const end = popup.querySelector('#end').value;
+        popup.querySelector(".ok").addEventListener("click", () => {
+            const start = popup.querySelector("#start").value;
+            const end = popup.querySelector("#end").value;
             if (start && end) {
-                this.setAttribute('start-date', start);
-                this.setAttribute('end-date', end);
+                this.setAttribute("start-date", start);
+                this.setAttribute("end-date", end);
                 this.fetchAndRenderChart();
                 popup.remove();
             }
         });
 
         document.body.appendChild(popup);
-        //============
-        /*
-        // 1. Build a simple modal
-        const modal = document.createElement("div");
-        modal.className = "date-modal";
-        modal.innerHTML = `
-      <div class="date-modal-content">
-      <h2>Ընտրեք ամսաթվի միջակայքը</h2>
-      <hr/>
-  
-      <div class="date-inputs">
-        <label>
-          Սկիզբ
-          <input type="date" id="startDate" />
-        </label>
-        <span class="arrow">→</span>
-        <label>
-          Ավարտ
-          <input type="date" id="endDate" />
-        </label>
-      </div>
-  
-      <div class="modal-footer">
-        <button id="cancelBtn" class="btn btn-cancel">Չեղարկել</button>
-        <button id="okBtn" class="btn btn-ok">Կիրառել</button>
-      </div>
-    </div>
-  `;
-        console.log('openDateRangePopup',modal);
-        document.body.appendChild(modal);
-
-        // 2. Wire up OK/Cancel
-        modal.querySelector("#cancelBtn").addEventListener("click", () => modal.remove());
-        modal.querySelector("#okBtn").addEventListener("click", () => {
-            const start = modal.querySelector("#startDate").value;
-            const end = modal.querySelector("#endDate").value;
-            if (!start || !end) return;
-
-            // 3. Close modal
-            modal.remove();
-
-            // 4. Reflect back into your component:
-            //    – Set ChartComponent attrs so fetchAndRenderChart sees them:
-            this.setAttribute("start-date", start);
-            this.setAttribute("end-date", end);
-
-            //    – Update the label in the select-box so user sees “YYYY-MM-DD – YYYY-MM-DD”
-            this.selectBox.querySelector(".combo-box-selected-wrap").textContent = `${start} – ${end}`;
-
-            // 5. Finally, re-fetch
-            this.fetchAndRenderChart();
-        });
-        */
     }
 
     _updateChart() {

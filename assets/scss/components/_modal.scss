@@ -1,0 +1,60 @@
+.modal-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-center;
+}
+
+.modal-content {
+    background-color: map-get($color-scheme, "white");
+    border-radius: rem(16);
+    box-shadow: 0px 4px 4px 0px #00000008 0px 8px 16px 0px #00000008;
+    max-width: fit-content;
+    padding: rem(24);
+}
+
+.modal {
+    &__title {
+        @include font(bold, 16, 1.2, inherit, 0, $fontPrimary);
+        margin-bottom: rem(24);
+        padding-bottom: rem(24);
+        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        &:after {
+            bottom: 0;
+        }
+    }
+    &__datepickers {
+        @extend %flex;
+        margin-bottom: rem(24);
+        .datepicker {
+            &:first-child {
+                position: relative;
+                &::after {
+                    @include center-absolute("vertical");
+                    right: rem(-32);
+                    @include font-icon("\e91d");
+                    color: inherit;
+                    font-size: rem(16);
+                }
+            }
+            &:not(:last-child) {
+                margin-right: rem(48);
+            }
+        }
+    }
+    &__buttons {
+        @extend %flex;
+        @extend %align-right;
+        .btn {
+            &:not(:last-child) {
+                margin-right: rem(16);
+            }
+        }
+    }
+}

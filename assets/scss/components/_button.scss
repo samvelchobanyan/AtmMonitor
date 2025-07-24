@@ -53,4 +53,9 @@
         background-color: map-get($color-scheme, "blue");
         color: map-get($color-scheme, "white");
     }
+
+    &_white {
+        background-color: map-get($color-scheme, "white");
+        color: map-get($color-scheme, "blue");
+    }
 }

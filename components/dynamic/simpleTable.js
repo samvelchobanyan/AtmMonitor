@@ -78,7 +78,12 @@ export class SimpleTable extends DynamicElement {
 
     if (this.$("table")) {
       loadDataTableModule().then(module => {
-        this.datatableInstance = new module.default(this.$("table"));
+        this.datatableInstance = new module.DataTable(this.$("table"),{
+          perPage: 0,            // disables pagination
+          perPageSelect: false,  // hides the dropdown for rows-per-page
+          searchable: false,     // disables search box
+          sortable: true         // optional: keep sorting
+        });
       });
     }
   }

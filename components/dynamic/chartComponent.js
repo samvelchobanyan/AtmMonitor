@@ -11,6 +11,7 @@ import chartDataTransformer from "../../core/utils/data-transformer.js";
 // import "../ui/selectBox.js"
 import "./select-box.js";
 import "./modal-popup.js";
+import { openDateRangePopup, resolvePeriodToDates } from "../../core/utils/date-utils.js";
 
 const observedAttrs = ["api-url", "city", "region", "start-date", "end-date"];
 class ChartComponent extends DynamicElement {
@@ -106,52 +107,25 @@ class ChartComponent extends DynamicElement {
         return period;
     }
 
-    // — Map period selection → start/end attrs —
-    _periodToDates(period) {
-        const now = new Date();
-        let start, end;
-
-        switch (period) {
-            case "today":
-                start = new Date(now);
-                end = start;
-                break;
-            case "week":
-                start = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                end = new Date(now);
-                break;
-            case "custom":
-                // Custom: assume consumer will set start-date/end-date manually.
-                // If missing, default both to today.
-                if (!this.getAttr("start-date") || !this.getAttr("end-date")) {
-                    this._applyPeriodToDates("today");
-                }
-                return;
-            default:
-                return;
-        }
-
-        const fmt = (d) => d.toISOString().slice(0, 10);
-        return {
-            start: fmt(start),
-            end: fmt(end),
-        };
-        // this.setAttribute('start-date', fmt(start));
-        // this.setAttribute('end-date',   fmt(now));
-    }
 
     onSelectChange(e) {
-        let dateRangeObj = null;
-        console.log("onSelectChange", e.target.value);
-        if (e.target.value === "custom") {
-            console.log("custom");
+        const val = e.target.value;
+        if (val === "custom") {
             this.selectedPeriod = "custom";
-            this._openDateRangePopup();
+            openDateRangePopup().then(range => {
+                if (!range) return;
+                this.setAttribute("start-date", range.startDate);
+                this.setAttribute("end-date", range.endDate);
+                this.selectBox
+                    .querySelector('.combo-box-selected-wrap').textContent = `${range.startDate} – ${range.endDate}`;
+                this.fetchAndRenderChart();
+            });
         } else {
-            dateRangeObj = this._periodToDates(e.target.value);
-            this.selectedPeriod = e.target.value;
-            this.setAttribute("start-date", dateRangeObj.start);
-            this.setAttribute("end-date", dateRangeObj.end);
+            const dateRangeObj = resolvePeriodToDates(val);
+            if (!dateRangeObj) return;
+            this.selectedPeriod = val;
+            this.setAttribute("start-date", dateRangeObj.startDate);
+            this.setAttribute("end-date", dateRangeObj.endDate);
             this.fetchAndRenderChart();
         }
     }
@@ -264,59 +238,6 @@ class ChartComponent extends DynamicElement {
         };
     }
 
-    _openDateRangePopup() {
-        console.log("openDateRangePopup");
-        //============
-        const modal = document.createElement('modal-popup');
-        document.body.appendChild(modal);
-
-        modal.setContent(`
-          <div class="modal__title">
-            Ընտրեք ամսաթվի միջակայքը
-          </div>
-        
-          <div class="modal__datepickers">
-            <div class="datepicker">
-              <label for="start" class="datepicker__label">սկիզբ</label>
-              <input type="date" id="start" class="datepicker__input" />
-            </div>
-            <div class="datepicker">
-              <label for="end" class="datepicker__label">ավարտ</label>
-              <input type="date" id="end" class="datepicker__input" />
-            </div>
-          </div>
-        
-          <div class="modal__buttons">
-            <button class="cancel btn btn_md btn_white"><span>Չեղարկել</span></button>
-            <button class="ok btn btn_md btn_blue"><span>Կիրառել</span></button>
-          </div>
-        `);
-
-        // Add button listeners
-        const cancelBtn = modal.querySelector('.cancel');
-        const okBtn = modal.querySelector('.ok');
-
-        cancelBtn?.addEventListener('click', () => modal.remove());
-        okBtn?.addEventListener('click', () => {
-            const start = modal.querySelector('#start').value;
-            const end   = modal.querySelector('#end').value;
-            if (!start || !end) return;
-
-            modal.remove();
-
-            //    – Set ChartComponent attrs so fetchAndRenderChart sees them:
-            this.setAttribute('start-date', start);
-            this.setAttribute('end-date',   end);
-
-            //    – Update the label in the select-box so user sees “YYYY-MM-DD – YYYY-MM-DD”
-            this.selectBox
-            .querySelector('.combo-box-selected-wrap').textContent = `${start} – ${end}`;
-
-            // 5. Finally, re-fetch
-            this.fetchAndRenderChart();
-        });
-
-    }
 
   _updateChart() {
     switch (this.chartType) {

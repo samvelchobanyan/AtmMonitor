@@ -12,6 +12,12 @@ It focuses on simplicity, minimal dependencies and clear structure.
 - **Web Components without shadow DOM** – components are implemented as standard custom elements so that global styles can apply across the application.
 - **Minimal dependencies** – the core library relies only on the browser APIs and a few small helper scripts.
 
+### Third-Party Library Guidelines
+
+- Shared UI libraries (e.g. Chart.js) → import in `index.js`
+- Page-specific tools (e.g. page.js) → import in the file that needs it
+- Component-specific libraries (e.g. Simple-DataTables) → lazy load inside the component
+
 ## Getting started
 
 1. Clone the repository.
@@ -19,3 +25,4 @@ It focuses on simplicity, minimal dependencies and clear structure.
 3. Open the site in your browser.
 
 That is all you need to start experimenting with the framework.
+

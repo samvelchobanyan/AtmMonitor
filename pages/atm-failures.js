@@ -16,6 +16,7 @@ class AtmFailures extends DynamicElement {
                 <div class="row">
                     <div class="column sm-12">
                         <div class="container">
+                            <div class="header-row">
                             <container-top icon="icon-x-octagon" title="Ամենահաճախ փչացող 10 բանկոմատները"> </container-top>
                             <select-box 
                                 value="${this.selectedPeriod}" 
@@ -26,6 +27,7 @@ class AtmFailures extends DynamicElement {
                                   ]'
                             >
                             </select-box>
+                            </div>
                             <simple-table
                               data-source="/device-faults/summary?startDate=2025-06-01"
                               columns='["atm_and_address", "total_faults", "faults_summary"]'>

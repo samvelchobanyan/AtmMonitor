@@ -49,7 +49,7 @@ class ChartComponent extends DynamicElement {
   }
 
   onAfterRender() {
-    this.selectBox = this.$("select-box");
+    this.selectBox = this.$("select-box-date");
 
     const chartData = this.transformedData ? this.transformedData.chartData : null;
     switch (this.chartType) {
@@ -109,6 +109,7 @@ class ChartComponent extends DynamicElement {
 
 
     onSelectChange(e) {
+      console.log('select change', e.target.value);
         const val = e.target.value;
         if (val === "custom") {
             this.selectedPeriod = "custom";

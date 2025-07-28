@@ -9,7 +9,7 @@ import {
 } from "../../core/utils/chart-utils.js";
 import chartDataTransformer from "../../core/utils/data-transformer.js";
 // import "../ui/selectBox.js"
-import "./select-box.js";
+import "./select-box-date.js";
 import "./modal-popup.js";
 import { openDateRangePopup, resolvePeriodToDates } from "../../core/utils/date-utils.js";
 

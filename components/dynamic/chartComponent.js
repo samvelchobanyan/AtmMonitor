@@ -300,7 +300,7 @@ class ChartComponent extends DynamicElement {
         }
         this.classList.add("chart-container");
         return `
-      <select-box 
+      <select-box-date 
         value="${this.selectedPeriod}" 
         options='[ 
           {"value":"today","label":"Այսօր"}, 
@@ -308,7 +308,7 @@ class ChartComponent extends DynamicElement {
           {"value":"custom","label":"Ամսաթվի միջակայք"} 
           ]'
       >
-      </select-box>
+      </select-box-date>
       
   
       ${chartHTML}

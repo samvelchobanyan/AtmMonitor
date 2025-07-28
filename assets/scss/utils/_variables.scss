@@ -1,37 +1,49 @@
+@import "_functions.scss";
+
 /*colors*/
 $color-scheme: (
-    "white": #ffffff,
-    "black": #000000,
-    "gray": #f8f8f8,
-    "gray-800": #666666,
-    "gray-700": #848484,
-    "gray-500": #bababa,
-    "gray-300": #d1d1d1,
-    "gray-200": #dfdfdf,
-    "gray-100": #eaeaea,
-    "gray-50": #f8f8f8,
-    //red 500
-    "red": #d93526,
-    "red-50": #fbebe9,
-    //blue 500
-    "blue": #2659d9,
-    "blue-50": #e9eefb,
-    //orange 500
-    "orange": #ff9830,
-    //green 600
-    "green": #1db044,
-    "green-50": #e9fbee,
-    "blue-800": #153177,
-    "blue-900": #10255b,
-    "text-black": #252525,
+  "white": #ffffff,
+  "black": #000000,
+  "gray": #f8f8f8,
+  "gray-800": #666666,
+  "gray-700": #848484,
+  "gray-500": #bababa,
+  "gray-300": #d1d1d1,
+  "gray-200": #dfdfdf,
+  "gray-100": #eaeaea,
+  "gray-50": #f8f8f8,
+  //red 500
+  "red": #d93526,
+  "red-50": #fbebe9,
+  //blue 500
+  "blue": #2659d9,
+  "blue-50": #e9eefb,
+  //orange 500
+  "orange": #ff9830,
+  //green 600
+  "green": #1db044,
+  "green-50": #e9fbee,
+  "blue-800": #153177,
+  "blue-900": #10255b,
+  "text-black": #252525,
 );
 
-$color-main: map-get($color-scheme, "main");
-$color-primary: map-get($color-scheme, "primary");
-$color-secondary: map-get($color-scheme, "secondary");
+// $color-main: map-get($color-scheme, "main");
+// $color-primary: map-get($color-scheme, "primary");
+// $color-secondary: map-get($color-scheme, "secondary");
 
 // Z-index Order (From Hight To Low) starts with 101
-$z-indexes: ("intro", "toast", "modal", "header-dropdown", "header", "header-body", "header-menu", "sticky-element", "dropdown");
+$z-indexes: (
+  "intro",
+  "toast",
+  "modal",
+  "header-dropdown",
+  "header",
+  "header-body",
+  "header-menu",
+  "sticky-element",
+  "dropdown"
+);
 
 /* font */
 $defaultHtmlFont: "Tahoma", sans-serif;

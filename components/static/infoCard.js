@@ -1,47 +1,3 @@
-// // components/static/info-card-new.js
-// import { BaseElement } from "../../core/base-element.js";
-
-// class InfoCard extends BaseElement {
-//     static get properties() {
-//         return ["title", "value", "value-currency", "value-color", "icon", "button-text", "trend", "stat-class", "message", "highlight", "border", "duration"];
-//     }
-
-//     render() {
-//         const title = this.getAttribute("title") || "";
-//         const value = this.getAttribute("value") || "";
-//         const valueCurrency = this.getAttribute("value-currency");
-//         const valueColor = this.getAttribute("value-color") || "";
-//         const icon = this.getAttribute("icon") || "";
-//         const buttonText = this.getAttribute("button-text");
-//         const trend = this.getAttribute("trend");
-//         const statClass = this.getAttribute("stat-class") || "";
-//         const message = this.getAttribute("message");
-//         const duration = this.getAttribute("duration");
-
-//         const isHighlighted = this.hasAttribute("highlight");
-//         const hasBorder = this.getAttribute("show-border") === "true";
-
-//         this.classList.add("info", isHighlighted && "info_highlighted", hasBorder && "info_border");
-
-//         this.innerHTML = `
-//       <div class="info__top">
-//         <div class="info__title">${title}</div>
-//         ${icon ? `<div class="info__icon"><i class="${icon}"></i></div>` : ""}
-//       </div>
-//       <div class="info__bottom">
-//         <div class="info__text ${valueColor}">${value}${valueCurrency ? `<span>${valueCurrency}</span>` : ""}</div>
-//         ${trend ? `<change-indicator value="${trend}"></change-indicator>` : ""}
-//         ${buttonText ? `<div class="btn btn_link"><span>${buttonText}</span> <i class="icon icon-chevron-right"></i></div>` : ""}
-//         ${duration ? `<div class="info__duration">${duration}</div>` : ""}
-//         ${message ? `<div class="info__message message"><i class="icon icon-message"></i><span>${message}</span></div>` : ""}
-//       </div>
-//     `;
-//     }
-// }
-
-// customElements.define("info-card", InfoCard);
-
-// components/dynamic/info-card-new.js
 import { DynamicElement } from "../../core/dynamic-element.js";
 import { api } from "../../core/api-client.js";
 
@@ -75,41 +31,46 @@ class InfoCard extends DynamicElement {
     }
   }
 
-  // todo change design of modal content, move to dynamic if needed
+  // todo : move to dynamic if needed
   _openMessagesPopup(messages) {
-    const popup = document.createElement("modal-popup");
-    popup.setAttribute("open", "");
+    const modal = document.createElement("modal-popup");
+    document.body.appendChild(modal);
+    modal.setContent(`
+   <div class="modal__header">
+      <div class="modal__title">Մեկնաբանություններ</div>
+      <img class="modal__close"   src="assets/img/icons/x-circle.svg" alt="" />
 
-    const content = document.createElement("div");
-    content.setAttribute("slot", "content");
-
-    content.innerHTML = `
-    <div class="modal__title">Մեկնաբանություններ</div>
-    <div class="modal__messages">
-      ${
-        messages.length
-          ? messages
-              .map(
-                (msg) => `
-        <div class="modal__message">
-          <div class="modal__message-text">${msg.comment}</div>
-          <div class="modal__message-meta">
-            <span>${msg.date_time}</span> | <span>User ID: ${msg.user_id}</span>
-          </div>
-        </div>`
-              )
-              .join("")
-          : `<div class="modal__message-empty">Մեկնաբանություններ չկան</div>`
-      }
     </div>
-    <div class="modal__buttons">
-      <button class="ok btn btn_md btn_blue"><span>Փակել</span></button>
-    </div>
-  `;
+      <div class="modal__messages">
+       ${
+         messages.length
+           ? messages
+               .map((msg) => {
+                 const dt = new Date(msg.date_time);
+                 const formattedDate = dt.toLocaleDateString("en-GB", {
+                   day: "2-digit",
+                   month: "long",
+                 });
+                 const formattedTime = dt.toLocaleTimeString("en-GB", {
+                   hour: "2-digit",
+                   minute: "2-digit",
+                 });
+                 return `
+                    <div class="modal__message">
+                      <div class="modal__message-meta">${formattedDate} | ${formattedTime}</div>
+                      <div class="modal__message-text">${msg.comment}</div>
+                    </div>`;
+               })
+               .join("")
+           : `<div class="modal__message-empty">Մեկնաբանություններ չկան</div>`
+       }
+      </div>
+   
+    `);
 
-    content.querySelector(".ok").addEventListener("click", () => popup.remove());
-    popup.appendChild(content);
-    document.body.appendChild(popup);
+    // Add close button listener
+    const closeBtn = modal.querySelector(".modal__close");
+    closeBtn?.addEventListener("click", () => modal.remove());
   }
 
   async handleMessageClick() {

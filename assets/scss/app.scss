@@ -15,172 +15,172 @@
 @import "components/_modal.scss";
 
 .main-container {
-    @extend %primary-transition;
-    margin-left: rem(112);
-    &.active {
-        margin-left: rem(296);
-    }
+  @extend %primary-transition;
+  margin-left: rem(112);
+  &.active {
+    margin-left: rem(296);
+  }
 }
 
 .container {
-    @extend %flex;
-    flex-direction: column;
-    margin-bottom: rem(24);
-    height: calc(100% - rem(24));
-    background-color: map-get($color-scheme, "white");
-    padding: rem(24);
-    border-radius: rem(8);
-    box-shadow: 0 rem(4) rem(3) 0 #00000008, 0 rem(12) rem(24) 0 #00000014;
+  @extend %flex;
+  flex-direction: column;
+  margin-bottom: rem(24);
+  height: calc(100% - rem(24));
+  background-color: map-get($color-scheme, "white");
+  padding: rem(24);
+  border-radius: rem(8);
+  box-shadow: 0 rem(4) rem(3) 0 #00000008, 0 rem(12) rem(24) 0 #00000014;
 
-    &__top {
-        @extend %flex;
-        @extend %align-middle;
-        @extend %align-between;
-        margin-bottom: rem(20);
-    }
-    &__title {
-        @extend %flex;
-        @extend %align-middle;
-    }
+  &__top {
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-between;
+    margin-bottom: rem(20);
+  }
+  &__title {
+    @extend %flex;
+    @extend %align-middle;
+  }
 }
 
 .title-icon {
-    @extend %flex;
-    @extend %align-middle;
-    @extend %align-center;
-    height: rem(36);
-    width: rem(36);
-    border-radius: 100%;
-    background-color: map-get($color-scheme, "gray-50");
-    margin-right: rem(8);
-    .icon {
-        font-size: rem(20);
-    }
+  @extend %flex;
+  @extend %align-middle;
+  @extend %align-center;
+  height: rem(36);
+  width: rem(36);
+  border-radius: 100%;
+  background-color: map-get($color-scheme, "gray-50");
+  margin-right: rem(8);
+  .icon {
+    font-size: rem(20);
+  }
 }
 
 .message {
-    @extend %flex;
-    @extend %align-middle;
-    @extend %align-center;
-    padding: 0 rem(6);
-    height: rem(24);
-    border-radius: rem(32);
-    background-color: map-get($color-scheme, "blue-50");
-    .icon {
-        color: map-get($color-scheme, "blue");
-        margin-right: rem(4);
-        font-size: rem(16);
-    }
-    span {
-        @include font(900, 13, 1.2, map-get($color-scheme, "blue"), 0, $fontSecondary);
-    }
+  @extend %flex;
+  @extend %align-middle;
+  @extend %align-center;
+  padding: 0 rem(6);
+  height: rem(24);
+  border-radius: rem(32);
+  background-color: map-get($color-scheme, "blue-50");
+  .icon {
+    color: map-get($color-scheme, "blue");
+    margin-right: rem(4);
+    font-size: rem(16);
+  }
+  span {
+    @include font(900, 13, 1.2, map-get($color-scheme, "blue"), 0, $fontSecondary);
+  }
 }
 
 .loading {
-    @extend %flex;
-    @extend %align-middle;
-    flex-direction: column;
-    &__text {
-        @include font(400, 24, 1.2, inherit, 0, $fontPrimary);
-    }
-    &__spinner {
-        margin-bottom: rem(32);
-    }
+  @extend %flex;
+  @extend %align-middle;
+  flex-direction: column;
+  &__text {
+    @include font(400, 24, 1.2, inherit, 0, $fontPrimary);
+  }
+  &__spinner {
+    margin-bottom: rem(32);
+  }
 }
 
 .spinner {
-    width: rem(40);
-    height: rem(40);
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #007bff;
-    border-radius: 100%;
-    animation: spin 1s linear infinite;
+  width: rem(40);
+  height: rem(40);
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 100%;
+  animation: spin 1s linear infinite;
 }
 
 .loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
-    pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .overview {
-    padding: rem(24);
-    border-radius: rem(8);
-    border: 1px solid map-get($color-scheme, "gray-100");
-    &:not(:last-child) {
-        margin-bottom: rem(20);
-    }
+  padding: rem(24);
+  border-radius: rem(8);
+  border: 1px solid map-get($color-scheme, "gray-100");
+  &:not(:last-child) {
+    margin-bottom: rem(20);
+  }
 }
 
 .overview-top {
-    margin-bottom: rem(16);
-    padding-bottom: rem(16);
-    @include horizontal-decor("../img/decor/horizontal-gray.svg");
-    &:after {
-        bottom: 0;
+  margin-bottom: rem(16);
+  padding-bottom: rem(16);
+  @include horizontal-decor("../img/decor/horizontal-gray.svg");
+  &:after {
+    bottom: 0;
+  }
+  &__title {
+    @include font(500, 16, 1.25, inherit, 0, $fontPrimary);
+    margin-bottom: rem(10);
+  }
+  &__info {
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-between;
+  }
+  &__subtitle {
+    @include font(900, 24, 1.25, inherit, 0, $fontSecondary);
+    span {
+      @include font(500, 24, 1.25, inherit, 0, $fontPrimary);
     }
-    &__title {
-        @include font(500, 16, 1.25, inherit, 0, $fontPrimary);
-        margin-bottom: rem(10);
-    }
-    &__info {
-        @extend %flex;
-        @extend %align-middle;
-        @extend %align-between;
-    }
-    &__subtitle {
-        @include font(900, 24, 1.25, inherit, 0, $fontSecondary);
-        span {
-            @include font(500, 24, 1.25, inherit, 0, $fontPrimary);
-        }
-    }
+  }
 }
 
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .datepicker {
-    position: relative;
-    &__input {
-        @include font(normal, 14, 1.2, inherit, uppercase, $fontPrimary);
-        @extend %flex;
-        @extend %align-middle;
-        @extend %align-center;
-        height: rem(40);
-        padding: 0 rem(12);
-        border: 1px solid map-get($color-scheme, "gray-200");
-        border-radius: rem(8);
-        &::-webkit-calendar-picker-indicator {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-            padding: 0;
-            color: transparent;
-            background: transparent;
-        }
+  position: relative;
+  &__input {
+    @include font(normal, 14, 1.2, inherit, uppercase, $fontPrimary);
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-center;
+    height: rem(40);
+    padding: 0 rem(12);
+    border: 1px solid map-get($color-scheme, "gray-200");
+    border-radius: rem(8);
+    &::-webkit-calendar-picker-indicator {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      color: transparent;
+      background: transparent;
     }
-    &__label {
-        @include font(normal, 11, 1.2, map-get($color-scheme, "gray-800"), uppercase, $fontPrimary);
-        padding: rem(2);
-        position: absolute;
-        top: rem(-8);
-        left: rem(11);
-        background-color: map-get($color-scheme, "white");
-    }
+  }
+  &__label {
+    @include font(normal, 11, 1.2, map-get($color-scheme, "gray-800"), uppercase, $fontPrimary);
+    padding: rem(2);
+    position: absolute;
+    top: rem(-8);
+    left: rem(11);
+    background-color: map-get($color-scheme, "white");
+  }
 }

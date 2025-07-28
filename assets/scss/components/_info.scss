@@ -1,73 +1,73 @@
 .info {
-    background-color: map-get($color-scheme, "white");
-    padding: rem(16) rem(22);
-    border-radius: rem(8);
-    box-shadow: 0 rem(4) rem(4) 0 #00000008, 0 rem(8) rem(16) 0 #00000008;
-    height: calc(100% - rem(24));
-    margin-bottom: rem(24);
-    display: block;
-    flex: 1;
-    &__top,
-    &__bottom {
-        @extend %flex;
-        @extend %align-middle;
-        @extend %align-between;
+  background-color: map-get($color-scheme, "white");
+  padding: rem(16) rem(22);
+  border-radius: rem(8);
+  box-shadow: 0 rem(4) rem(4) 0 #00000008, 0 rem(8) rem(16) 0 #00000008;
+  height: calc(100% - rem(24));
+  margin-bottom: rem(24);
+  display: block;
+  flex: 1;
+  &__top,
+  &__bottom {
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-between;
+  }
+  &__top {
+    margin-bottom: rem(6);
+  }
+  &__title {
+    @include font(bold, 16, 1.1, inherit, 0, $fontPrimary);
+    margin-right: rem(6);
+  }
+  &__text {
+    @include font(900, 24, 1.1, 0, 0, $fontSecondary);
+    span {
+      @include font(500, 24, 1.1, 0, 0, $fontPrimary);
     }
-    &__top {
-        margin-bottom: rem(6);
+  }
+  &__duration {
+    @include font(400, 14, 1.4, 0, 0, $fontPrimary);
+  }
+  &__icon {
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-center;
+    height: rem(36);
+    width: rem(36);
+    border-radius: 100%;
+    background-color: map-get($color-scheme, "gray-50");
+    .icon {
+      font-size: rem(20);
     }
-    &__title {
-        @include font(bold, 16, 1.1, inherit, 0, $fontPrimary);
-        margin-right: rem(6);
-    }
-    &__text {
-        @include font(900, 24, 1.1, 0, 0, $fontSecondary);
-        span {
-            @include font(500, 24, 1.1, 0, 0, $fontPrimary);
-        }
-    }
-    &__duration {
-        @include font(400, 14, 1.4, 0, 0, $fontPrimary);
-    }
-    &__icon {
-        @extend %flex;
-        @extend %align-middle;
-        @extend %align-center;
-        height: rem(36);
-        width: rem(36);
-        border-radius: 100%;
-        background-color: map-get($color-scheme, "gray-50");
+  }
+  &_highlighted {
+    background-color: map-get($color-scheme, "blue-900");
+    .info {
+      &__title,
+      &__text {
+        color: map-get($color-scheme, "white");
+      }
+      &__icon {
+        background-color: rgba(map-get($color-scheme, "white"), 0.15);
         .icon {
-            font-size: rem(20);
+          color: map-get($color-scheme, "white");
         }
+      }
     }
-    &_highlighted {
-        background-color: map-get($color-scheme, "blue-900");
-        .info {
-            &__title,
-            &__text {
-                color: map-get($color-scheme, "white");
-            }
-            &__icon {
-                background-color: rgba(map-get($color-scheme, "white"), 0.15);
-                .icon {
-                    color: map-get($color-scheme, "white");
-                }
-            }
-        }
-    }
-    &_border {
-        box-shadow: none;
-        border: 1px solid map-get($color-scheme, "gray-100");
-    }
+  }
+  &_border {
+    box-shadow: none;
+    border: 1px solid map-get($color-scheme, "gray-100");
+  }
 }
 
 .infos {
-    @extend %flex;
-    .info {
-        margin-bottom: rem(20);
-        &:not(:last-child) {
-            margin-right: rem(16);
-        }
+  @extend %flex;
+  .info {
+    margin-bottom: rem(20);
+    &:not(:last-child) {
+      margin-right: rem(16);
     }
+  }
 }

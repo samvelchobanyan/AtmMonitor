@@ -11,7 +11,6 @@ import chartDataTransformer from "../../core/utils/data-transformer.js";
 // import "../ui/selectBox.js"
 import "./select-box-date.js";
 import "./modal-popup.js";
-import { openDateRangePopup, resolvePeriodToDates } from "../../core/utils/date-utils.js";
 
 const observedAttrs = ["api-url", "city", "region", "start-date", "end-date"];
 class ChartComponent extends DynamicElement {
@@ -71,11 +70,8 @@ class ChartComponent extends DynamicElement {
     }
 
     addEventListeners() {
-        // Override in child classes to set up template-based event listeners
-        // Called after every render for elements inside the component's innerHTML
-        // Example:
         if (this.selectBox) {
-            this.addListener(this.selectBox, "change", this.onSelectChange);
+            this.addListener(this.selectBox, "date-range-change", this.onDateRangeChange);
         }
     }
 
@@ -108,27 +104,17 @@ class ChartComponent extends DynamicElement {
     }
 
 
-    onSelectChange(e) {
-      console.log('select change', e.target.value);
-        const val = e.target.value;
-        if (val === "custom") {
-            this.selectedPeriod = "custom";
-            openDateRangePopup().then(range => {
-                if (!range) return;
-                this.setAttribute("start-date", range.startDate);
-                this.setAttribute("end-date", range.endDate);
-                this.selectBox
-                    .querySelector('.combo-box-selected-wrap').textContent = `${range.startDate} – ${range.endDate}`;
-                this.fetchAndRenderChart();
-            });
-        } else {
-            const dateRangeObj = resolvePeriodToDates(val);
-            if (!dateRangeObj) return;
-            this.selectedPeriod = val;
-            this.setAttribute("start-date", dateRangeObj.startDate);
-            this.setAttribute("end-date", dateRangeObj.endDate);
-            this.fetchAndRenderChart();
+    onDateRangeChange(e) {
+        const { startDate, endDate, period } = e.detail || {};
+        if (!startDate || !endDate) return;
+        this.selectedPeriod = period || this.selectedPeriod;
+        this.setAttribute("start-date", startDate);
+        this.setAttribute("end-date", endDate);
+        if (period === "custom") {
+            this.selectBox
+                .querySelector('.combo-box-selected-wrap').textContent = `${startDate} – ${endDate}`;
         }
+        this.fetchAndRenderChart();
     }
 
     setState(newState) {

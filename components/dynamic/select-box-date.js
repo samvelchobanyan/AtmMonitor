@@ -31,16 +31,17 @@ class SelectBoxDate extends DynamicElement {
 
   onSelectChange(e) {
     const val = e.target.value;
+    this.setAttribute("value", val);
     if (val === "custom") {
       openDateRangePopup().then((range) => {
         if (range && range.startDate && range.endDate) {
-          this.dispatch("date-range-change", range);
+          this.dispatch("date-range-change", { ...range, period: val });
         }
       });
     } else {
       const range = resolvePeriodToDates(val);
       if (range) {
-        this.dispatch("date-range-change", range);
+        this.dispatch("date-range-change", { ...range, period: val });
       }
     }
   }

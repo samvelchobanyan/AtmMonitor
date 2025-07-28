@@ -9,7 +9,7 @@ import {
 } from "../../core/utils/chart-utils.js";
 import chartDataTransformer from "../../core/utils/data-transformer.js";
 // import "../ui/selectBox.js"
-import "./select-box.js";
+import "./select-box-date.js";
 import "./modal-popup.js";
 import { openDateRangePopup, resolvePeriodToDates } from "../../core/utils/date-utils.js";
 
@@ -49,7 +49,7 @@ class ChartComponent extends DynamicElement {
   }
 
   onAfterRender() {
-    this.selectBox = this.$("select-box");
+    this.selectBox = this.$("select-box-date");
 
     const chartData = this.transformedData ? this.transformedData.chartData : null;
     switch (this.chartType) {
@@ -109,6 +109,7 @@ class ChartComponent extends DynamicElement {
 
 
     onSelectChange(e) {
+      console.log('select change', e.target.value);
         const val = e.target.value;
         if (val === "custom") {
             this.selectedPeriod = "custom";
@@ -300,7 +301,7 @@ class ChartComponent extends DynamicElement {
         }
         this.classList.add("chart-container");
         return `
-      <select-box 
+      <select-box-date 
         value="${this.selectedPeriod}" 
         options='[ 
           {"value":"today","label":"Այսօր"}, 
@@ -308,7 +309,7 @@ class ChartComponent extends DynamicElement {
           {"value":"custom","label":"Ամսաթվի միջակայք"} 
           ]'
       >
-      </select-box>
+      </select-box-date>
       
   
       ${chartHTML}

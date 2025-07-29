@@ -41,6 +41,7 @@ class AtmsDashboard extends DynamicElement {
     if (city) {
       queryString.append("city", city);
     }
+    queryString.append("date", "today");
 
     try {
       const response = await this.fetchData(`/dashboard/summary?${queryString}`);
@@ -156,6 +157,7 @@ class AtmsDashboard extends DynamicElement {
                             <chart-component
                                 id="line-chart"
                                 chart-type="line"                                
+                                chart-data='${JSON.stringify(this.state.summary.transactionsInDays || {})}'
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-06-08"
@@ -170,6 +172,7 @@ class AtmsDashboard extends DynamicElement {
                             <chart-component
                                 id="pie-chart"
                                 chart-type="doughnut"                               
+                                chart-data='${JSON.stringify(this.state.summary.transactionsInDays || {})}'
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
@@ -222,6 +225,7 @@ class AtmsDashboard extends DynamicElement {
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
                                 chart-type="line"
+                                chart-data='${JSON.stringify(this.state.summary.encashmentsInDays || {})}'
                             ></chart-component>
                         </div>
                     </div>
@@ -252,6 +256,7 @@ class AtmsDashboard extends DynamicElement {
                         start-date = "2025-06-01"
                         end-date = "2025-07-08"
                         chart-type="bar" 
+                          chart-data='${JSON.stringify(this.state.summary.atmWorkHours || {})}'
                     ></chart-component>
                 </div>
             </div>

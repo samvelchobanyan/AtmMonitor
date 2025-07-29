@@ -1,6 +1,7 @@
 const CHART_CONFIG = {
   // Maps API field names to chart labels
   fieldLabels: {
+    // dashboard page
     deposit_amount: "Մուտքագրված գումար",
     dispense_amount: "Կանխիկացված գումար",
     total_dispense_count: "Կանխիկացում",
@@ -9,11 +10,19 @@ const CHART_CONFIG = {
     working_percent: "Աշխատաժամանակ",
     added_amount: "Ինկասացիայի գումար",
     collected_amount: "Հետ բերված գումար",
+
+    // in/out page
+    with_card_amount: "Քարտով",
+    without_card_amount: "Անքարտ",
+    with_card_count: "Քարտով",
+    without_card_count: "Անքարտ",
   },
 
   // Define which fields to include and their order
   fieldsToInclude: ["deposit_amount", "dispense_amount"],
   encashmentFieldsToInclude: ["added_amount", "collected_amount"],
+  inOutCountFieldsToInclude: ["with_card_count", "without_card_count"],
+  inOutAmountFieldsToInclude: ["with_card_amount", "without_card_amount"],
   doughnutFieldsToInclude: ["total_dispense_count", "total_deposit_count"],
   barFieldsToInclude: ["working_percent", "non_working_percent"],
 
@@ -105,11 +114,24 @@ class ChartDataTransformer {
     if (!data || typeof data !== "object") {
       throw new Error("Invalid data format: data must be an object");
     }
+    const {
+      fieldLabels,
+      doughnutFieldsToInclude,
+      inOutCountFieldsToInclude,
+      inOutAmountFieldsToInclude,
+    } = this.config;
 
-    const { fieldLabels, doughnutFieldsToInclude } = this.config;
+    let fieldsToInclude;
+    if (data.hasOwnProperty("without_card_count")) {
+      fieldsToInclude = inOutCountFieldsToInclude;
+    } else if (data.hasOwnProperty("without_card_amount")) {
+      fieldsToInclude = inOutAmountFieldsToInclude;
+    } else {
+      fieldsToInclude = doughnutFieldsToInclude;
+    }
 
-    const labels = doughnutFieldsToInclude.map((field) => fieldLabels[field] || field);
-    const chartData = doughnutFieldsToInclude.map((field) => data[field] || 0);
+    const labels = fieldsToInclude.map((field) => fieldLabels[field] || field);
+    const chartData = fieldsToInclude.map((field) => data[field] || 0);
 
     return {
       metaData: {

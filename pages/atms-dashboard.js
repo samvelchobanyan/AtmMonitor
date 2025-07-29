@@ -255,21 +255,7 @@ class AtmsDashboard extends DynamicElement {
                     ></chart-component>
                 </div>
             </div>
-        </div>
-              <div class="row">
-                <div class="column sm-6">
-                    <div class="container">
-                         <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
-                        <div class="tabs">
-                            <custom-tab name="language" active>English</custom-tab>
-                            <custom-tab name="language">Հայերեն</custom-tab>
-                        </div> 
-                       <doughnut-chart id="finance-chart"></doughnut-chart>
-                    </div>
-                </div>
-              </div>
-            </div>
-        `;
+        </div>`;
   }
 }
 

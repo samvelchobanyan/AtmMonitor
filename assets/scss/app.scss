@@ -115,9 +115,12 @@
   padding: rem(24);
   border-radius: rem(8);
   border: 1px solid map-get($color-scheme, "gray-100");
-  &:not(:last-child) {
-    margin-bottom: rem(20);
-  }
+}
+
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: rem(20);
 }
 
 .overview-top {

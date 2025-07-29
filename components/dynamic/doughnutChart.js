@@ -1,53 +1,133 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
 import { createDoughnutChart, updateDoughnutChart } from "../../core/utils/chart-utils.js";
 import "../../components/static/badge.js";
+import chartDataTransformer from "../../core/utils/data-transformer.js";
 
+const observedAttrs = ["api-url", "initdata", "title"];
 class DoughnutChartComponent extends DynamicElement {
-    constructor() {
-        super();
+  constructor() {
+    super();
 
-        const baseId = this.getAttribute("id") || "doughnut";
-        this.canvasId = `canvas-${baseId}`;
-        this.legendId = `legend-${baseId}`;
-        this.chart = null;
+    const baseId = this.getAttribute("id") || "doughnut";
+    this.title = this.getAttribute("title") || "";
+    this.canvasId = `canvas-${baseId}`;
+    this.legendId = `legend-${baseId}`;
+    this.chart = null;
+    this.selectedPeriod = this._dateToPeriod();
+    this.selectBox = null;
+    let stringifiedData = this.getAttr("initdata");
+    this.transformedData = null;
+    this.chartType = this.getAttribute("type") || "";
+    try {
+      this.chartData = stringifiedData ? JSON.parse(stringifiedData) : null;
+    } catch (e) {
+      console.error("Invalid initData JSON:", stringifiedData, e);
+      this.chartData = null;
+    }
+    this.changeValue = 12;
+  }
 
-        this.chartData = {
-            labels: ["Անուն A", "Անուն B", "Անուն C"],
-            datasets: [
-                {
-                    data: [11, 100, 8],
-                },
-            ],
-        };
+  static get observedAttributes() {
+    return observedAttrs;
+  }
+  _dateToPeriod() {
+    let start = this.getAttr("start-date");
+    let end = this.getAttr("end-date");
 
-        this.total = 10000000;
-        this.changeValue = 12;
+    let period;
+    if (!end || !start) {
+      return "today";
     }
 
-    onConnected() {
-        this.render();
+    const s = new Date(start);
+    const e = new Date(end);
+    const diffDays = (e - s) / (1000 * 60 * 60 * 24);
+
+    if (diffDays === 0) {
+      period = "today";
+    } else if (diffDays === 7) {
+      period = "week";
+    } else {
+      period = "custom";
     }
 
-    onAfterRender() {
-        this.chart = createDoughnutChart(this.canvasId, this.chartData, this.legendId);
+    return period;
+  }
 
-        updateDoughnutChart(this.chart, this.chartData, () => {
-            this.$("change-indicator").setAttribute("value", this.changeValue);
-        });
+  onConnected() {
+    this.render();
+  }
+
+  onAfterRender() {
+    this.selectBox = this.$("select-box");
+
+    // extract those props which needed in this chart according on type
+    let filteredBreakdown = {};
+
+    const breakdown = this.chartData.card_breakdown;
+    if (breakdown) {
+      const field = this.chartType === "amount" ? "amount" : "count";
+      filteredBreakdown = {
+        [`with_card_${field}`]: breakdown.with_card?.[field] ?? 0,
+        [`without_card_${field}`]: breakdown.without_card?.[field] ?? 0,
+      };
     }
 
-    template() {
-        return `
+    // should transform data
+    this.transformedData = chartDataTransformer.transformDoughnutData(filteredBreakdown);
+    this.chart = createDoughnutChart(this.canvasId, this.transformedData.chartData, this.legendId);
+
+    updateDoughnutChart(this.chart, this.transformedData.chartData, () => {
+      this.$("change-indicator").setAttribute("value", this.changeValue);
+    });
+  }
+  addEventListeners() {
+    // Override in child classes to set up template-based event listeners
+    // Called after every render for elements inside the component's innerHTML
+    // Example:
+    if (this.selectBox) {
+      this.addListener(this.selectBox, "change", this.onSelectChange);
+    }
+  }
+
+  onSelectChange(e) {
+    let dateRangeObj = null;
+
+    if (e.target.value === "custom") {
+      console.log("custom");
+      this.selectedPeriod = "custom";
+      this._openDateRangePopup();
+    } else {
+      dateRangeObj = this._periodToDates(e.target.value);
+      this.selectedPeriod = e.target.value;
+      this.setAttribute("start-date", dateRangeObj.start);
+      this.setAttribute("end-date", dateRangeObj.end);
+      this.fetchAndRenderChart();
+    }
+  }
+  template() {
+    let data = this.chartData;
+    let text = this.chartType == "amount" ? "Կանխիկացված գումար" : "Կանխիկացումների քանակ";
+    let changedPercent =
+      this.chartType == "amount"
+        ? data.dispense_amount_percent_change
+        : data.dispense_count_percent_change;
+
+    if (this.isLoading()) {
+      return `<div>Loading chart…</div>`;
+    }
+
+    return `
         <div class="overview">
             <div class="overview-top">
-                <div class="overview-top__title">Կանխիկացված գումար</div>
+                <div class="overview-top__title">${text}</div>
                 <div class="overview-top__info">
                     <div class="overview-top__subtitle">
-                        236,150,456<span>֏</span>
+                       <p> ${this.title}<span>֏</span></p>
                     </div>
                    <div class="badges">
-                        <badge-item text="Օրական միջին՝ 200.000.000֏"></badge-item>
-                        <badge-item text="Միջին գործարք 200.000.000֏"></badge-item>
+                        <badge-item text="Օրական միջին՝ ${data.daily_median}֏"></badge-item>
+                        <badge-item text="Միջին գործարք ${data.transaction_median}֏"></badge-item>
                     </div>
                 </div>
             </div>
@@ -56,13 +136,13 @@ class DoughnutChartComponent extends DynamicElement {
                 <div class="chart chart_162">
                     <canvas id="${this.canvasId}" class="custom-cutout"></canvas>
                     <div class="chart-info">
-                        <change-indicator value="0"></change-indicator>
+                        <change-indicator value=${changedPercent}></change-indicator>
                     </div>
                 </div>
             </div>
         </div>
     `;
-    }
+  }
 }
 
 customElements.define("doughnut-chart", DoughnutChartComponent);

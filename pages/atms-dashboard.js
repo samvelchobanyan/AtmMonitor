@@ -41,7 +41,6 @@ class AtmsDashboard extends DynamicElement {
     if (city) {
       queryString.append("city", city);
     }
-    queryString.append("date", "today");
 
     try {
       const response = await this.fetchData(`/dashboard/summary?${queryString}`);

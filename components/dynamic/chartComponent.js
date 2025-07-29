@@ -8,6 +8,7 @@ import {
   updateLineChart,
 } from "../../core/utils/chart-utils.js";
 import chartDataTransformer from "../../core/utils/data-transformer.js";
+import { memoryStore } from "../../core/memory-store.js";
 // import "../ui/selectBox.js"
 import "./select-box-date.js";
 import "./modal-popup.js";
@@ -36,6 +37,7 @@ class ChartComponent extends DynamicElement {
     this.chart = null;
     this.transformedData = null;
     this.chartType = this.getAttr("chart-type");
+    this.memoryKey = `chart-${this.getAttr("id")}`;
   }
 
   static get observedAttributes() {
@@ -44,7 +46,38 @@ class ChartComponent extends DynamicElement {
 
   onConnected() {
     this.hasConnected = true;
-    this.fetchAndRenderChart();
+    const override = memoryStore.get(this.memoryKey);
+
+    if (override) {
+      this.selectedPeriod = override.period || this.selectedPeriod;
+      this.setAttribute("start-date", override.startDate);
+      this.setAttribute("end-date", override.endDate);
+      this.fetchAndRenderChart();
+    } else {
+      const dataAttr = this.getAttr("chart-data");
+      if (dataAttr) {
+        try {
+          const parsed = JSON.parse(dataAttr);
+          switch (this.chartType) {
+            case "line":
+              this.transformedData = chartDataTransformer.transformData(parsed);
+              break;
+            case "doughnut":
+              this.transformedData = chartDataTransformer.transformDoughnutData(parsed);
+              break;
+            case "bar":
+              this.transformedData = chartDataTransformer.transformBarData(parsed);
+              break;
+          }
+        } catch (err) {
+          console.warn("Invalid chart-data attribute", err);
+          this.fetchAndRenderChart();
+          return;
+        }
+      } else {
+        this.fetchAndRenderChart();
+      }
+    }
   }
 
   onAfterRender() {
@@ -106,9 +139,14 @@ class ChartComponent extends DynamicElement {
     onDateRangeChange(e){
         const { startDate, endDate, period } = e.detail || {};
         if (!startDate || !endDate) return;
+
+        memoryStore.set(this.memoryKey, { startDate, endDate, period });
+
         this.selectedPeriod = period || this.selectedPeriod;
         this.setAttribute("start-date", startDate);
         this.setAttribute("end-date", endDate);
+
+
         if (period === "custom") {
             this.selectBox
                 .querySelector('.combo-box-selected-wrap').textContent = `${startDate} – ${endDate}`;

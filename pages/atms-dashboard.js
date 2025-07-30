@@ -76,6 +76,10 @@ class AtmsDashboard extends DynamicElement {
     const encashmentData = this.state.summary.encashmentInfo;
     const atmWorkHours = this.state.summary.atmWorkHours;
 
+    const transactionDaily = this.state.summary.hourly_transactions;
+    const encashmentsDaily = this.state.summary.hourly_encashments;
+    // const atmPrductivityDaily = this.state.summary.hourly_encashments;
+
     return /* html */ `
             <div class="main-container">
                 <div class="row">
@@ -156,10 +160,10 @@ class AtmsDashboard extends DynamicElement {
                             <chart-component
                                 id="line-chart"
                                 chart-type="line"                                
-                                chart-data='${JSON.stringify(this.state.summary.transactionsInDays || {})}'
+                                chart-data='${JSON.stringify(transactionDaily || {})}'
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
-                                end-date = "2025-06-08"
+                                end-date = "2025-07-08"
                                 ${this.attrIf("city", this.state.selectedCity)}
                                 ${this.attrIf("region", this.state.selectedRegion)}
                             ></chart-component>
@@ -171,7 +175,6 @@ class AtmsDashboard extends DynamicElement {
                             <chart-component
                                 id="pie-chart"
                                 chart-type="doughnut"                               
-                                chart-data='${JSON.stringify(this.state.summary.transactionsInDays || {})}'
                                 api-url="/dashboard/transactions-in-days"
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
@@ -224,7 +227,7 @@ class AtmsDashboard extends DynamicElement {
                                 start-date = "2025-06-01"
                                 end-date = "2025-07-08"
                                 chart-type="line"
-                                chart-data='${JSON.stringify(this.state.summary.encashmentsInDays || {})}'
+                                chart-data='${JSON.stringify(encashmentsDaily || {})}'
                             ></chart-component>
                         </div>
                     </div>
@@ -254,8 +257,7 @@ class AtmsDashboard extends DynamicElement {
                         api-url="/dashboard/atm-worktime-in-days"
                         start-date = "2025-06-01"
                         end-date = "2025-07-08"
-                        chart-type="bar" 
-                          chart-data='${JSON.stringify(this.state.summary.atmWorkHours || {})}'
+                        chart-type="bar"                           
                     ></chart-component>
                 </div>
             </div>

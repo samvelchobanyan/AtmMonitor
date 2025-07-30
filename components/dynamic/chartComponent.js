@@ -44,10 +44,13 @@ class ChartComponent extends DynamicElement {
     return observedAttrs;
   }
 
+  static get nonRenderingAttributes() {
+    return new Set(["start-date", "end-date"]);
+  }
+
   onConnected() {
     this.hasConnected = true;
     const override = memoryStore.get(this.memoryKey);
-
     if (override) {
       this.selectedPeriod = override.period || this.selectedPeriod;
       this.setAttribute("start-date", override.startDate);
@@ -82,6 +85,7 @@ class ChartComponent extends DynamicElement {
 
   onAfterRender() {
     this.selectBox = this.$("select-box-date");
+    if(this.getAttr('id') === 'line-chart') console.log('after render');
 
     const chartData = this.transformedData ? this.transformedData.chartData : null;
     switch (this.chartType) {
@@ -128,9 +132,10 @@ class ChartComponent extends DynamicElement {
         } else if (diffDays === 7) {
             period = "week";
         } else {
-            period = "custom";
+            // period = "custom";
+            period = `${start} – ${end}`;
         }
-
+      console.log('period', period);
         // Update the select-box UI
         // this.selectBox.value = period;
         return period;
@@ -159,6 +164,7 @@ class ChartComponent extends DynamicElement {
     }
 
     async fetchAndRenderChart() {
+        if(this.getAttr('id') === 'line-chart') console.log('fetchand render');
         const endpoint = this.getAttr("api-url");
         if (!endpoint) {
             console.warn('<chart-component> is missing required "api-url" attribute');
@@ -192,7 +198,7 @@ class ChartComponent extends DynamicElement {
             // const chartData = this.transformData(response.data);
             switch (this.chartType) {
                 case "line":
-                    this.transformedData = chartDataTransformer.transformData(response.data);
+                    this.transformedData = chartDataTransformer.transformData(response.data.daily_data);
                     this._updateChart();
                     break;
                 case "doughnut":
@@ -209,32 +215,6 @@ class ChartComponent extends DynamicElement {
             this.setState({ chartData: null, error: true });
         }
     }
-
-  transformBarData(data) {
-    const labels = [];
-    const workingData = [];
-    const nonWorkingData = [];
-
-    for (const day of data.work_hours_per_day) {
-      labels.push(day.date);
-      workingData.push(day.working_percent);
-      nonWorkingData.push(day.non_working_percent);
-    }
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: "Աշխատաժամանակ",
-          data: workingData,
-        },
-        {
-          label: "Պարապուրդ",
-          data: nonWorkingData,
-        },
-      ],
-    };
-  }
 
   _updateChart() {
     switch (this.chartType) {
@@ -254,6 +234,8 @@ class ChartComponent extends DynamicElement {
   }
 
     template() {
+      console.log('template period',this.selectedPeriod);
+      if(this.getAttr('id') === 'line-chart') console.log('template');
         if (this.isLoading()) {
             return `<div>Loading chart…</div>`;
         }

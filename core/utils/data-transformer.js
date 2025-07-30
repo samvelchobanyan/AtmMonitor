@@ -29,8 +29,8 @@ class ChartDataTransformer {
   }
 
   // === LineChart transformation  - default ===
-  transformData(apiResponse) {
-    const { daily_data } = apiResponse;
+  transformData(daily_data) {
+    // const { daily_data } = apiResponse;
 
     if (!Array.isArray(daily_data)) {
       throw new Error("Invalid data format: daily_data must be an array");
@@ -77,7 +77,20 @@ class ChartDataTransformer {
   }
 
   extractLabels(dailyData) {
-    return dailyData.map((item) => this.formatDate(item.date));
+    // return dailyData.map((item) => this.formatDate(item.date));
+    return dailyData.map(item => {
+      // Prefer date, fallback hour
+      if (item.date) {
+        return this.formatDate(item.date);
+      } else if (typeof item.hour === "number") {
+        // Format hour as string, e.g. "13:00"
+        return `${item.hour.toString().padStart(2, "0")}:00`;
+      } else if (typeof item.hour === "string") {
+        // In case hour is string "13"
+        return `${item.hour.padStart(2, "0")}:00`;
+      }
+      return "";
+    });
   }
 
   extractDatasets(dailyData) {

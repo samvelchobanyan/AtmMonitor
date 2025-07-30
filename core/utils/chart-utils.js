@@ -210,6 +210,7 @@ export function prepareLineChartData(chartData) {
 }
 
 export function createLineChart(ctxId, chartData, containerID) {
+  console.log('create line chart');
   const ctx = document.getElementById(ctxId).getContext("2d");
 
   const datasetsWithColors = chartData ? prepareLineChartData(chartData) : null;
@@ -223,7 +224,7 @@ export function createLineChart(ctxId, chartData, containerID) {
         }
       : {},
     options: {
-      showLoading: true,
+      showLoading: !chartData,
       maintainAspectRatio: false,
       responsive: true,
       plugins: {
@@ -250,6 +251,7 @@ export function createLineChart(ctxId, chartData, containerID) {
 }
 
 export function updateLineChart(chart, chartData) {
+  console.log('update line chart');
   chart.options.showLoading = false;
   chart.data.labels = chartData.labels;
   chart.data.datasets = prepareLineChartData(chartData);

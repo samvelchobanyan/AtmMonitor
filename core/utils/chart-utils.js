@@ -1,5 +1,5 @@
 const htmlLegendPlugin = {
-  id: 'htmlLegend',
+  id: "htmlLegend",
   afterUpdate(chart, args, options) {
     // const dataset = chart.data.datasets[item.datasetIndex];
     const ul = getOrCreateLegendList(chart, options.containerID);
@@ -10,8 +10,8 @@ const htmlLegendPlugin = {
 
     const items = chart.options.plugins.legend.labels.generateLabels(chart);
     items.forEach((item, index) => {
-      const li = document.createElement('li');
-      const circle = document.createElement('span');
+      const li = document.createElement("li");
+      const circle = document.createElement("span");
 
       // if (
       //   $(chart.canvas)
@@ -19,23 +19,23 @@ const htmlLegendPlugin = {
       //     .children('.custom-legend')
       //     .hasClass('custom-legend_checkmark')
       // ) {
-      const customLegendEl = $(chart.canvas).parents('.chart-container').children('.custom-legend');
+      const customLegendEl = $(chart.canvas).parents(".chart-container").children(".custom-legend");
 
-      if (customLegendEl.hasClass('custom-legend_checkmark')) {
+      if (customLegendEl.hasClass("custom-legend_checkmark")) {
         circle.style.backgroundColor = item.strokeStyle;
-        const label = document.createElement('label');
-        label.className = 'custom-check';
-        label.setAttribute('for', `${chart.canvas.id}-${index}`);
+        const label = document.createElement("label");
+        label.className = "custom-check";
+        label.setAttribute("for", `${chart.canvas.id}-${index}`);
 
-        const input = document.createElement('input');
-        input.type = 'checkbox';
+        const input = document.createElement("input");
+        input.type = "checkbox";
         input.id = `${chart.canvas.id}-${index}`;
         input.value = item.text;
         input.checked = !item.hidden;
 
-        input.addEventListener('change', () => {
+        input.addEventListener("change", () => {
           const { type } = chart.config;
-          if (type === 'pie' || type === 'doughnut') {
+          if (type === "pie" || type === "doughnut") {
             chart.toggleDataVisibility(item.index);
           } else {
             chart.setDatasetVisibility(
@@ -46,11 +46,11 @@ const htmlLegendPlugin = {
           chart.update();
         });
 
-        const checkmark = document.createElement('div');
-        checkmark.className = 'custom-check__checkmark';
+        const checkmark = document.createElement("div");
+        checkmark.className = "custom-check__checkmark";
 
-        const labelText = document.createElement('div');
-        labelText.className = 'custom-check__label';
+        const labelText = document.createElement("div");
+        labelText.className = "custom-check__label";
         labelText.textContent = item.text;
 
         label.appendChild(input);
@@ -67,11 +67,11 @@ const htmlLegendPlugin = {
 
         circle.style.backgroundColor = item.fillStyle;
 
-        const textContainer = document.createElement('div');
+        const textContainer = document.createElement("div");
 
-        if (customLegendEl.hasClass('custom-legend_percent')) {
+        if (customLegendEl.hasClass("custom-legend_percent")) {
           textContainer.textContent = `${item.text} (${percent}%)`;
-        } else if (customLegendEl.hasClass('custom-legend_data')) {
+        } else if (customLegendEl.hasClass("custom-legend_data")) {
           textContainer.innerHTML = `${item.text} <div>${percent}% / ${value}</div>`;
         } else {
           // Default: label text only
@@ -87,7 +87,7 @@ const htmlLegendPlugin = {
   },
 };
 const loadingPlugin = {
-  id: 'loadingPlugin',
+  id: "loadingPlugin",
   beforeDraw(chart) {
     const overlay = document.getElementById(`loading-overlay-${chart.canvas.id}`);
 
@@ -95,11 +95,11 @@ const loadingPlugin = {
       if (!overlay) {
         this.createLoadingOverlay(chart);
       } else {
-        overlay.style.display = 'flex';
+        overlay.style.display = "flex";
       }
     } else {
       if (overlay) {
-        overlay.style.display = 'none';
+        overlay.style.display = "none";
       }
     }
   },
@@ -109,17 +109,17 @@ const loadingPlugin = {
     const container = canvas.parentElement;
 
     // Make sure container is positioned relative
-    if (getComputedStyle(container).position === 'static') {
-      container.style.position = 'relative';
+    if (getComputedStyle(container).position === "static") {
+      container.style.position = "relative";
     }
 
     // Create overlay element
-    const overlay = document.createElement('div');
+    const overlay = document.createElement("div");
     overlay.id = `loading-overlay-${canvas.id}`;
-    overlay.classList.add('loading-overlay');
+    overlay.classList.add("loading-overlay");
 
-    const spinner = document.createElement('div');
-    spinner.classList.add('spinner');
+    const spinner = document.createElement("div");
+    spinner.classList.add("spinner");
 
     overlay.appendChild(spinner);
     container.appendChild(overlay);
@@ -127,7 +127,7 @@ const loadingPlugin = {
 };
 
 const doughnutLabelLinesPlugin = {
-  id: 'labelLines',
+  id: "labelLines",
   afterDatasetsDraw(chart) {
     const datasetMeta = chart.getDatasetMeta(0);
     if (!datasetMeta || !datasetMeta.data || !datasetMeta.data.length) return;
@@ -154,7 +154,7 @@ const doughnutLabelLinesPlugin = {
       const lineEndY = lineMidY;
 
       ctx.save();
-      ctx.strokeStyle = dataset.backgroundColor?.[index] || 'blue';
+      ctx.strokeStyle = dataset.backgroundColor?.[index] || "blue";
       ctx.lineWidth = 1;
 
       ctx.beginPath();
@@ -163,10 +163,10 @@ const doughnutLabelLinesPlugin = {
       ctx.lineTo(lineEndX, lineEndY);
       ctx.stroke();
 
-      ctx.fillStyle = '#848484';
-      ctx.font = '12px sans-serif';
-      ctx.textAlign = isLeftSide ? 'right' : 'left';
-      ctx.textBaseline = 'middle';
+      ctx.fillStyle = "#848484";
+      ctx.font = "12px sans-serif";
+      ctx.textAlign = isLeftSide ? "right" : "left";
+      ctx.textBaseline = "middle";
 
       const label = dataset.data[index];
       ctx.fillText(label, lineEndX + (isLeftSide ? -5 : 5), lineEndY);
@@ -178,10 +178,10 @@ const doughnutLabelLinesPlugin = {
 
 const getOrCreateLegendList = (chart, id) => {
   const legendContainer = document.getElementById(id);
-  let listContainer = legendContainer.querySelector('ul');
+  let listContainer = legendContainer.querySelector("ul");
 
   if (!listContainer) {
-    listContainer = document.createElement('ul');
+    listContainer = document.createElement("ul");
     legendContainer.appendChild(listContainer);
   }
 
@@ -189,15 +189,15 @@ const getOrCreateLegendList = (chart, id) => {
 };
 
 const baseDatasetOptions = {
-  backgroundColor: 'transparent',
+  backgroundColor: "transparent",
   borderWidth: 2,
   fill: true,
   tension: 0.4,
-  pointBackgroundColor: 'white',
+  pointBackgroundColor: "white",
   pointRadius: 4,
 };
 
-const chartColors = ['#9BECB0', '#9BB3EE', '#BE9BEE', '#FCE2A8', '#EC9B9C', '#77E6FF'];
+const chartColors = ["#9BECB0", "#9BB3EE", "#BE9BEE", "#FCE2A8", "#EC9B9C", "#77E6FF"];
 
 /* ====== LineChart ====== */
 
@@ -210,12 +210,13 @@ export function prepareLineChartData(chartData) {
 }
 
 export function createLineChart(ctxId, chartData, containerID) {
-  const ctx = document.getElementById(ctxId).getContext('2d');
+  console.log('create line chart');
+  const ctx = document.getElementById(ctxId).getContext("2d");
 
   const datasetsWithColors = chartData ? prepareLineChartData(chartData) : null;
 
   return new Chart(ctx, {
-    type: 'line',
+    type: "line",
     data: chartData
       ? {
           labels: chartData.labels,
@@ -223,7 +224,7 @@ export function createLineChart(ctxId, chartData, containerID) {
         }
       : {},
     options: {
-      showLoading: true,
+      showLoading: !chartData,
       maintainAspectRatio: false,
       responsive: true,
       plugins: {
@@ -235,11 +236,11 @@ export function createLineChart(ctxId, chartData, containerID) {
         y: {
           ticks: { maxTicksLimit: 6, autoSkip: true },
           beginAtZero: true,
-          grid: { display: true, drawBorder: true, color: '#D9D9DD' },
+          grid: { display: true, drawBorder: true, color: "#D9D9DD" },
           border: { dash: [2, 4] },
         },
         x: {
-          grid: { display: true, drawBorder: true, color: '#D9D9DD' },
+          grid: { display: true, drawBorder: true, color: "#D9D9DD" },
           border: { dash: [2, 4] },
           ticks: { display: false },
         },
@@ -250,6 +251,7 @@ export function createLineChart(ctxId, chartData, containerID) {
 }
 
 export function updateLineChart(chart, chartData) {
+  console.log('update line chart');
   chart.options.showLoading = false;
   chart.data.labels = chartData.labels;
   chart.data.datasets = prepareLineChartData(chartData);
@@ -260,13 +262,13 @@ export function updateLineChart(chart, chartData) {
 
 export function createDoughnutChart(ctxId, chartData, containerID) {
   const canvas = document.getElementById(ctxId);
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   const filledDataset = chartData ? prepareDoughnutChart(chartData) : null;
-  const hasCustomCutout = canvas.classList.contains('custom-cutout');
+  const hasCustomCutout = canvas.classList.contains("custom-cutout");
 
   return new Chart(ctx, {
-    type: 'doughnut',
+    type: "doughnut",
     data: chartData
       ? {
           labels: chartData.labels,
@@ -274,7 +276,7 @@ export function createDoughnutChart(ctxId, chartData, containerID) {
         }
       : null,
     options: {
-      cutout: hasCustomCutout ? '60%' : '50%',
+      cutout: hasCustomCutout ? "60%" : "50%",
       showLoading: true,
       maintainAspectRatio: false,
       responsive: true,
@@ -307,11 +309,11 @@ export function updateDoughnutChart(chart, chartData) {
 /* ====== BarChart ====== */
 
 export function createBarChart(ctxId, chartData, containerID) {
-  const ctx = document.getElementById(ctxId).getContext('2d');
+  const ctx = document.getElementById(ctxId).getContext("2d");
   const datasetsWithColors = chartData ? prepareBarChart(chartData) : null;
 
   return new Chart(ctx, {
-    type: 'bar',
+    type: "bar",
     data: chartData
       ? {
           labels: chartData.labels,
@@ -331,11 +333,11 @@ export function createBarChart(ctxId, chartData, containerID) {
         y: {
           beginAtZero: true,
           ticks: { maxTicksLimit: 6, autoSkip: true },
-          grid: { display: true, color: '#D9D9DD' },
+          grid: { display: true, color: "#D9D9DD" },
           border: { dash: [2, 4] },
         },
         x: {
-          grid: { display: true, color: '#D9D9DD' },
+          grid: { display: true, color: "#D9D9DD" },
           border: { dash: [2, 4] },
           ticks: { display: false },
         },

@@ -14,7 +14,7 @@ function mountComponent(tagName, title=null, query = {}) {
 
   //dispatch route-title event
   if (title) {
-    console.log('router mount component - dispatching',tagName, title);
+    // console.log('router mount component - dispatching',tagName, title);
     document.dispatchEvent(new CustomEvent('route-title', {
       detail: { title },
       bubbles: true,
@@ -28,7 +28,7 @@ export function startRouter() {
 
 // — Home Route
   page('/', async ctx => {
-    console.log('router home route');
+    // console.log('router home route');
     if (!customElements.get('atms-dashboard')) {
       await import('../pages/atms-dashboard.js');
     }

@@ -1,22 +1,25 @@
 const CHART_CONFIG = {
   // Maps API field names to chart labels
   fieldLabels: {
-    deposit_amount: 'Մուտքագրված գումար',
-    dispense_amount: 'Կանխիկացված գումար',
-    total_dispense_count: 'Կանխիկացում',
-    total_deposit_count: 'Մուտքագրում',
-    non_working_percent: 'Պարապուրդ',
-    working_percent: 'Աշխատաժամանակ',
+    deposit_amount: "Մուտքագրված գումար",
+    dispense_amount: "Կանխիկացված գումար",
+    total_dispense_count: "Կանխիկացում",
+    total_deposit_count: "Մուտքագրում",
+    non_working_percent: "Պարապուրդ",
+    working_percent: "Աշխատաժամանակ",
+    added_amount: "Ինկասացիայի գումար",
+    collected_amount: "Հետ բերված գումար",
   },
 
   // Define which fields to include and their order
-  fieldsToInclude: ['deposit_amount', 'dispense_amount'],
-  doughnutFieldsToInclude: ['total_dispense_count', 'total_deposit_count'],
-  barFieldsToInclude: ['working_percent', 'non_working_percent'],
+  fieldsToInclude: ["deposit_amount", "dispense_amount"],
+  encashmentFieldsToInclude: ["added_amount", "collected_amount"],
+  doughnutFieldsToInclude: ["total_dispense_count", "total_deposit_count"],
+  barFieldsToInclude: ["working_percent", "non_working_percent"],
 
   dateFormat: {
-    locale: 'hy-AM', // Armenian locale
-    options: { month: 'short', day: 'numeric' },
+    locale: "hy-AM", // Armenian locale
+    options: { month: "short", day: "numeric" },
   },
 };
 
@@ -26,11 +29,11 @@ class ChartDataTransformer {
   }
 
   // === LineChart transformation  - default ===
-  transformData(apiResponse) {
-    const { daily_data } = apiResponse;
+  transformData(daily_data) {
+    // const { daily_data } = apiResponse;
 
     if (!Array.isArray(daily_data)) {
-      throw new Error('Invalid data format: daily_data must be an array');
+      throw new Error("Invalid data format: daily_data must be an array");
     }
 
     const labels = this.extractLabels(daily_data);
@@ -50,7 +53,7 @@ class ChartDataTransformer {
     const { work_hours_per_day } = apiResponse;
 
     if (!Array.isArray(work_hours_per_day)) {
-      throw new Error('Invalid data format: work_hours_per_day must be an array');
+      throw new Error("Invalid data format: work_hours_per_day must be an array");
     }
 
     const { fieldLabels, barFieldsToInclude } = this.config;
@@ -60,7 +63,7 @@ class ChartDataTransformer {
       return {
         label: fieldLabels[field] || field,
         data: work_hours_per_day.map((item) => item[field] ?? 0),
-        backgroundColor: field === 'working_percent' ? '#4CAF50' : '#F44336',
+        backgroundColor: field === "working_percent" ? "#4CAF50" : "#F44336",
       };
     });
 
@@ -74,16 +77,36 @@ class ChartDataTransformer {
   }
 
   extractLabels(dailyData) {
-    return dailyData.map((item) => this.formatDate(item.date));
+    // return dailyData.map((item) => this.formatDate(item.date));
+    return dailyData.map(item => {
+      // Prefer date, fallback hour
+      if (item.date) {
+        return this.formatDate(item.date);
+      } else if (typeof item.hour === "number") {
+        // Format hour as string, e.g. "13:00"
+        return `${item.hour.toString().padStart(2, "0")}:00`;
+      } else if (typeof item.hour === "string") {
+        // In case hour is string "13"
+        return `${item.hour.padStart(2, "0")}:00`;
+      }
+      return "";
+    });
   }
 
   extractDatasets(dailyData) {
-    const { fieldsToInclude, fieldLabels } = this.config;
+    const { fieldLabels, encashmentFieldsToInclude, fieldsToInclude } = this.config;
 
-    return fieldsToInclude.map((fieldName) => {
+    // handle encashment chart and other one
+    let fields;
+    if (dailyData[0].hasOwnProperty("encashment_count")) {
+      fields = encashmentFieldsToInclude;
+    } else {
+      fields = fieldsToInclude;
+    }
+
+    return fields.map((fieldName) => {
       const label = fieldLabels[fieldName] || fieldName;
       const data = dailyData.map((item) => item[fieldName] || 0);
-
       return { label, data };
     });
   }
@@ -92,8 +115,8 @@ class ChartDataTransformer {
   transformDoughnutData(apiResponse) {
     const data = apiResponse;
 
-    if (!data || typeof data !== 'object') {
-      throw new Error('Invalid data format: data must be an object');
+    if (!data || typeof data !== "object") {
+      throw new Error("Invalid data format: data must be an object");
     }
 
     const { fieldLabels, doughnutFieldsToInclude } = this.config;
@@ -115,13 +138,13 @@ class ChartDataTransformer {
   }
 
   //------------------
-  transform(apiResponse, chartType = 'line') {
+  transform(apiResponse, chartType = "line") {
     switch (chartType) {
-      case 'pie':
+      case "pie":
         return this.transformDoughnutData(apiResponse);
-      case 'bar':
+      case "bar":
         return this.transformBarData(apiResponse);
-      case 'line':
+      case "line":
       default:
         return this.transformData(apiResponse);
     }

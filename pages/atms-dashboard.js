@@ -5,7 +5,6 @@ import "../components/dynamic/chartComponent.js";
 import "../components/dynamic/modal-popup.js";
 import "../components/static/changeIndicator.js";
 import "../components/static/infoCard.js";
-import "../components/ui/customTab.js";
 // import { ChartComponent } from "../components/dynamic/chartComponent.js";
 import "../components/dynamic/doughnutChart.js";
 // import '../components/static/badge.js';

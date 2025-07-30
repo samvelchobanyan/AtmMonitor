@@ -189,3 +189,18 @@
         background-color: map-get($color-scheme, "white");
     }
 }
+
+.tabs-container {
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-between;
+    padding-bottom: rem(20);
+    margin-bottom: rem(20);
+    @include horizontal-decor("../img/decor/horizontal-gray.svg");
+    &::after {
+        bottom: 0;
+    }
+    .tabs {
+        margin-bottom: 0;
+    }
+}

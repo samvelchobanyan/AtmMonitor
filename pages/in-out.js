@@ -76,12 +76,27 @@ class inOut extends DynamicElement {
         const depositSummary = this.state.summary.deposit_summary;
         const safeDepositData = JSON.stringify(depositSummary).replace(/"/g, "&quot;");
 
-        return `
+        return /* html */ `
             <div class="main-container">
+               <div class="row">
+                    <div class="column sm-6">
+                        <div class="container">
+                          <div class="tabs-container">
+                            <div class="tabs">
+                                <custom-tab name="geo" active>Աշխարհագրական</custom-tab>
+                                <custom-tab name="atms">Բանկոմատներ</custom-tab>
+                            </div>
+                            <select-box  value="today" options='[{"value":"today","label":"Այսօր"}, {"value":"week","label":"Այս շաբաթ"}, {"value":"custom","label":"Ամսաթվի միջակայք"} ]'></select-box>
+                          </div>
+                          <div class="tab-content" data-tab="geo">geo</div>
+                          <div class="tab-content" data-tab="atms" style="display: none;">atms</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="column sm-6">
                         <div class="container">
-                             <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
+                            <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
                             <div class="radio-buttons">
                                 <custom-radio name="cash-out" value="1" checked>Քարտով / Անքարտ</custom-radio>
                                 <custom-radio name="cash-out" value="2">Ըստ վճարային համակարգի</custom-radio>
@@ -102,8 +117,7 @@ class inOut extends DynamicElement {
                             </div> 
                               <doughnut-chart id="deposit-amount" title='${depositSummary.deposit_amount}' percentChange=${depositSummary.deposit_amount_percent_change} initData="${safeDepositData}" type='amount' ></doughnut-chart>
                               <doughnut-chart id="deposit-count" title='${depositSummary.deposit_count}' percentChange=${depositSummary.deposit_count_percent_change} initData="${safeDepositData}" type='count' ></doughnut-chart>
-                        </div>
-                        
+                        </div>     
                     </div>
               </div>
             </div>

@@ -20,28 +20,27 @@ export class CustomTab extends HTMLElement {
         const groupName = this.getAttribute("name");
         if (!groupName) return;
 
-        const allTabs = document.querySelectorAll(`custom-tab[name="${groupName}"]`);
+        const allTabs = Array.from(document.querySelectorAll(`custom-tab`));
+        const allContents = Array.from(document.querySelectorAll(`.tab-content`));
+
         allTabs.forEach((tab) => tab.removeAttribute("active"));
 
+        allContents.forEach((content) => {
+            content.style.display = "none";
+        });
+
         this.setAttribute("active", "");
+
+        const target = document.querySelector(`.tab-content[data-tab="${groupName}"]`);
+
+        if (target) {
+            target.style.display = "block";
+        }
     }
 
     render() {
         this.className = "tab" + (this.hasAttribute("active") ? " active" : "");
-        this.innerHTML = this.textContent.trim();
     }
 }
 
 customElements.define("custom-tab", CustomTab);
-
-// implementation example
-
-/* <div class="tabs">
-  <custom-tab name="location" active>Մարզ</custom-tab>
-  <custom-tab name="location">Քաղաք</custom-tab>
-</div>
-
-<div class="tabs">
-  <custom-tab name="language" active>English</custom-tab>
-  <custom-tab name="language">Հայերեն</custom-tab>
-</div> */

@@ -39,7 +39,6 @@ class InfoCard extends DynamicElement {
    <div class="modal__header">
       <div class="modal__title">Մեկնաբանություններ</div>
       <img class="modal__close"   src="assets/img/icons/x-circle.svg" alt="" />
-
     </div>
       <div class="modal__messages">
        ${

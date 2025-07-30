@@ -59,6 +59,7 @@
 }
 
 .message {
+  @extend %user-cursor;
   @extend %flex;
   @extend %align-middle;
   @extend %align-center;

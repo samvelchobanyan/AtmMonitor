@@ -289,8 +289,6 @@ export function createDoughnutChart(ctxId, chartData, containerID) {
 }
 
 export function prepareDoughnutChart(chartData) {
-  console.log("chartData in prepareDoughnutChart", chartData);
-
   const doughnutDataset = chartData.datasets[0];
   return {
     ...doughnutDataset,

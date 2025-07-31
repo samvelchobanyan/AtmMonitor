@@ -5,6 +5,7 @@ import "../components/ui/customTab.js";
 import "../components/ui/customRadio.js";
 import "../components/dynamic/doughnutChart.js";
 import "../components/dynamic/select-box-search.js";
+import "../components/dynamic/list-view.js";
 
 class journal extends DynamicElement {
     constructor() {
@@ -62,7 +63,21 @@ class journal extends DynamicElement {
                             <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>
                         </div>
                         <div class="tab-content" data-tab="atms" style="display: none;">
-                            
+                            <list-view
+                              searchable
+                              search-fields="text"
+                              items='[
+                                        { "text": "active" },
+                                        { "text": "offline" },
+                                        { "text": "asdast" },
+                                        { "text": "actual" }
+                                      ]'
+                              item-component="badge-item"
+                            >
+                              <template>
+                                <badge-item text="{{text}}" ></badge-item>
+                              </template>
+                            </list-view>
                         </div>
                     </div>
                     </div>

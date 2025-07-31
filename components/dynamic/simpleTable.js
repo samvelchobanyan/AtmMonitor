@@ -24,7 +24,7 @@ export class SimpleTable extends DynamicElement {
   }
 
   static get observedAttributes() {
-    return ["data-source", "columns"];
+    return ["data-source", "columns", "clickable-columns", "per-page", "per-page-select"];
   }
 
   async onConnected() {
@@ -50,6 +50,28 @@ export class SimpleTable extends DynamicElement {
       console.warn("Invalid columns attribute JSON", e);
       return [];
     }
+  }
+
+  parseClickableColumnsAttr() {
+    try {
+      const raw = this.getAttr("clickable-columns");
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      console.warn("Invalid clickable-columns attribute JSON", e);
+      return [];
+    }
+  }
+
+  getPerPageOption() {
+    const raw = this.getAttr("per-page");
+    const val = parseInt(raw, 10);
+    return isNaN(val) ? 0 : val;
+  }
+
+  getPerPageSelectOption() {
+    const raw = this.getAttr("per-page-select");
+    if (raw === "false" || raw === "0") return false;
+    return [5, 10, 15, 25, 50]; // Default options
   }
 
   async loadRemoteData() {
@@ -79,13 +101,38 @@ export class SimpleTable extends DynamicElement {
     if (this.$("table")) {
       loadDataTableModule().then(module => {
         this.datatableInstance = new module.DataTable(this.$("table"),{
-          perPage: 0,            // disables pagination
-          perPageSelect: false,  // hides the dropdown for rows-per-page
-          searchable: false,     // disables search box
+          perPage: this.getPerPageOption(),
+          perPageSelect: this.getPerPageSelectOption(),
+          searchable: true,     // disables search box
           sortable: true         // optional: keep sorting
         });
       });
     }
+  }
+
+  addEventListeners() {
+    const table = this.$("table");
+    if (!table) return;
+
+    const clickable = this.parseClickableColumnsAttr();
+    const colIndices = clickable.map(col => this.state.columns.indexOf(col)).filter(i => i !== -1);
+
+    this.$$("tbody tr").forEach((rowEl, rowIndex) => {
+      const rowData = this.state.data[rowIndex];
+      const cells = rowEl.children;
+      colIndices.forEach(i => {
+        const cell = cells[i];
+        if (!cell) return;
+        cell.classList.add("clickable");
+        this.addListener(cell, "click", () => {
+          this.dispatch("cell-click", {
+            column: this.state.columns[i],
+            cellValue: rowData[this.state.columns[i]],
+            rowData
+          });
+        });
+      });
+    });
   }
 
   template() {

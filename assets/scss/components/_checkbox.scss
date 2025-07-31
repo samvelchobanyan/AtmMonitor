@@ -40,3 +40,15 @@
         @include font(500, 14, 1.42, inherit, 0, $fontPrimary);
     }
 }
+
+.checkboxes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: rem(12) rem(32);
+    .custom-check {
+        label {
+            @extend %flex;
+            @extend %align-middle;
+        }
+    }
+}

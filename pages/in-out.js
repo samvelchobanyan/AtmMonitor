@@ -4,7 +4,6 @@ import "../components/dynamic/infoCard.js";
 import "../components/ui/customTab.js";
 import "../components/ui/customRadio.js";
 import "../components/dynamic/doughnutChart.js";
-import "../components/dynamic/select-box-search.js";
 import "../components/dynamic/tabsDoughnutChart.js";
 
 class inOut extends DynamicElement {
@@ -118,29 +117,11 @@ class inOut extends DynamicElement {
 
         return /*html*/ `
             <div class="main-container">
-               <div class="row">
-                    <div class="column sm-6">
-                        <div class="container">
-                          <div class="tabs-container">
-                            <div class="tabs">
-                                <custom-tab name="geo" active>Աշխարհագրական</custom-tab>
-                                <custom-tab name="atms">Բանկոմատներ</custom-tab>
-                            </div>
-                          </div>
-                          <div class="tab-content" data-tab="geo"> 
-                            <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>
-                          </div>
-                          <div class="tab-content" data-tab="atms" style="display: none;">atms</div>
-                        </div>
-                    </div>
-                </div>
                 <div class="row">
                     <div class="column sm-6">
-
                         <div class="container">
                              <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
-                                                 <tabs-doughnut-chart id="dispense" summary="${safeDispenseData}"></tabs-doughnut-chart>
-                           
+                             <tabs-doughnut-chart id="dispense" summary="${safeDispenseData}"></tabs-doughnut-chart>
                           </div>      
                     </div>
                     <div class="column sm-6">

@@ -109,11 +109,7 @@ class DoughnutChartComponent extends DynamicElement {
         // should transform data
         this.transformedData = chartDataTransformer.transformDoughnutData(filteredBreakdown);
 
-        this.chart = createDoughnutChart(
-            this.canvasId,
-            this.transformedData.chartData,
-            this.legendId
-        );
+        this.chart = createDoughnutChart(this.canvasId, this.transformedData.chartData, this.legendId, false);
 
         updateDoughnutChart(this.chart, this.transformedData.chartData, () => {
             this.$("change-indicator").setAttribute("value", this.changeValue);

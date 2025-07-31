@@ -60,16 +60,3 @@ export class CustomCheckbox extends HTMLElement {
 customElements.define("custom-checkbox", CustomCheckbox);
 
 
-/* <div class="checkboxes">
-    <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
-    <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
-    <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
-    <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
-    <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
-    <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
-    <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
-    <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
-    <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
-    <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
-    <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
-</div>   */

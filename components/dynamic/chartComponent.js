@@ -1,12 +1,5 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
-import {
-  createBarChart,
-  updateBarChart,
-  createDoughnutChart,
-  updateDoughnutChart,
-  createLineChart,
-  updateLineChart,
-} from "../../core/utils/chart-utils.js";
+import { createBarChart, updateBarChart, createDoughnutChart, updateDoughnutChart, createLineChart, updateLineChart } from "../../core/utils/chart-utils.js";
 import chartDataTransformer from "../../core/utils/data-transformer.js";
 import { memoryStore } from "../../core/memory-store.js";
 import "./select-box-date.js";
@@ -14,87 +7,87 @@ import "./modal-popup.js";
 
 const observedAttrs = ["api-url", "city", "region", "start-date", "end-date"];
 class ChartComponent extends DynamicElement {
-  constructor() {
-    super();
-    this.renderCount = 0;
+    constructor() {
+        super();
+        this.renderCount = 0;
 
-    this.state = {
-      ...this.state,
-      chartData: null,
-      // endpoint: this.getAttr('api-url') || null,
-      // startDate: this.getAttr('start-date') || null,
-      // endDate: this.getAttr('end-date') || null,
-      // city: this.getAttr('city') || null,
-      // region: this.getAttr('region') || null,
-    };
+        this.state = {
+            ...this.state,
+            chartData: null,
+            // endpoint: this.getAttr('api-url') || null,
+            // startDate: this.getAttr('start-date') || null,
+            // endDate: this.getAttr('end-date') || null,
+            // city: this.getAttr('city') || null,
+            // region: this.getAttr('region') || null,
+        };
 
-    this.selectBox = null;
-    this.canvasId = `canvas-${this.getAttr("id", "line-chart")}`;
-    this.legendId = `legend-${this.canvasId}`;
+        this.selectBox = null;
+        this.canvasId = `canvas-${this.getAttr("id", "line-chart")}`;
+        this.legendId = `legend-${this.canvasId}`;
 
-    this.chart = null;
-    this.transformedData = null;
-    this.chartType = this.getAttr("chart-type");
-    this.memoryKey = `chart-${this.getAttr("id")}`;
-  }
+        this.chart = null;
+        this.transformedData = null;
+        this.chartType = this.getAttr("chart-type");
+        this.memoryKey = `chart-${this.getAttr("id")}`;
+    }
 
-  static get observedAttributes() {
-    return observedAttrs;
-  }
+    static get observedAttributes() {
+        return observedAttrs;
+    }
 
-  static get nonRenderingAttributes() {
-    return new Set(["start-date", "end-date"]);
-  }
+    static get nonRenderingAttributes() {
+        return new Set(["start-date", "end-date"]);
+    }
 
-  onConnected() {
-    this.hasConnected = true;
-    const override = memoryStore.get(this.memoryKey);
-    if (override) {
-      if (override.startDate) this.setAttribute("start-date", override.startDate);
-      if (override.endDate) this.setAttribute("end-date", override.endDate);
-      this.fetchAndRenderChart();
-    } else {
-      const dataAttr = this.getAttr("chart-data");
-      if (dataAttr) {
-        try {
-          const parsed = JSON.parse(dataAttr);
-          switch (this.chartType) {
-            case "line":
-              this.transformedData = chartDataTransformer.transformData(parsed);
-              break;
-            case "doughnut":
-              this.transformedData = chartDataTransformer.transformDoughnutData(parsed);
-              break;
-            case "bar":
-              this.transformedData = chartDataTransformer.transformBarData(parsed);
-              break;
-          }
-        } catch (err) {
-          console.warn("Invalid chart-data attribute", err);
-          this.fetchAndRenderChart();
-          return;
+    onConnected() {
+        this.hasConnected = true;
+        const override = memoryStore.get(this.memoryKey);
+        if (override) {
+            if (override.startDate) this.setAttribute("start-date", override.startDate);
+            if (override.endDate) this.setAttribute("end-date", override.endDate);
+            this.fetchAndRenderChart();
+        } else {
+            const dataAttr = this.getAttr("chart-data");
+            if (dataAttr) {
+                try {
+                    const parsed = JSON.parse(dataAttr);
+                    switch (this.chartType) {
+                        case "line":
+                            this.transformedData = chartDataTransformer.transformData(parsed);
+                            break;
+                        case "doughnut":
+                            this.transformedData = chartDataTransformer.transformDoughnutData(parsed);
+                            break;
+                        case "bar":
+                            this.transformedData = chartDataTransformer.transformBarData(parsed);
+                            break;
+                    }
+                } catch (err) {
+                    console.warn("Invalid chart-data attribute", err);
+                    this.fetchAndRenderChart();
+                    return;
+                }
+            } else {
+                this.fetchAndRenderChart();
+            }
         }
-      } else {
-        this.fetchAndRenderChart();
-      }
     }
-  }
 
-  onAfterRender() {
-    this.selectBox = this.$("select-box-date");
+    onAfterRender() {
+        this.selectBox = this.$("select-box-date");
 
-    const chartData = this.transformedData ? this.transformedData.chartData : null;
-    switch (this.chartType) {
-      case "line":
-        this.chart = createLineChart(this.canvasId, chartData, this.legendId);
-        break;
-      case "doughnut":
-        this.chart = createDoughnutChart(this.canvasId, chartData, this.legendId);
-        break;
-      case "bar":
-        this.chart = createBarChart(this.canvasId, chartData, this.legendId);
-        break;
-    }
+        const chartData = this.transformedData ? this.transformedData.chartData : null;
+        switch (this.chartType) {
+            case "line":
+                this.chart = createLineChart(this.canvasId, chartData, this.legendId);
+                break;
+            case "doughnut":
+                this.chart = createDoughnutChart(this.canvasId, chartData, this.legendId);
+                break;
+            case "bar":
+                this.chart = createBarChart(this.canvasId, chartData, this.legendId);
+                break;
+        }
 
         // if (this.state.chartData && !this.state.isLoading) {
         //   console.log('state after render',this.state);
@@ -108,7 +101,7 @@ class ChartComponent extends DynamicElement {
         }
     }
 
-    onDateRangeChange(e){
+    onDateRangeChange(e) {
         const { startDate, endDate, period } = e.detail || {};
         if (!startDate || !endDate) return;
 
@@ -152,7 +145,7 @@ class ChartComponent extends DynamicElement {
             const isValid = response && response.errors === null && response.data;
 
             if (!isValid) throw new Error("Invalid API response format");
-            const data_array_name = startDate === endDate ? 'hourly_data' : 'daily_data'
+            const data_array_name = startDate === endDate ? "hourly_data" : "daily_data";
 
             // const chartData = this.transformData(response.data);
             switch (this.chartType) {
@@ -175,25 +168,24 @@ class ChartComponent extends DynamicElement {
         }
     }
 
-  _updateChart() {
-    switch (this.chartType) {
-      case "line":
-        updateLineChart(this.chart, this.transformedData.chartData);
-        break;
-      case "doughnut":
-        this.$(".chart-info__number").childNodes[0].textContent =
-          this.transformedData.metaData.total;
-        this.$("change-indicator").setAttribute("value", 15);
-        updateDoughnutChart(this.chart, this.transformedData.chartData);
-        break;
-      case "bar":
-        updateBarChart(this.chart, this.transformedData.chartData);
-        break;
+    _updateChart() {
+        switch (this.chartType) {
+            case "line":
+                updateLineChart(this.chart, this.transformedData.chartData);
+                break;
+            case "doughnut":
+                this.$(".chart-info__number").childNodes[0].textContent = this.transformedData.metaData.total.toLocaleString();
+                this.$("change-indicator").setAttribute("value", this.transformedData.metaData.percent);
+                updateDoughnutChart(this.chart, this.transformedData.chartData);
+                break;
+            case "bar":
+                updateBarChart(this.chart, this.transformedData.chartData);
+                break;
+        }
     }
-  }
 
     template() {
-      if(this.getAttr('id') === 'line-chart') console.log('template');
+        if (this.getAttr("id") === "line-chart") console.log("template");
         if (this.isLoading()) {
             return `<div>Loading chart…</div>`;
         }
@@ -201,17 +193,21 @@ class ChartComponent extends DynamicElement {
         let chartHTML = "";
         switch (this.chartType) {
             case "doughnut":
+                const dataAttr = this.getAttr("chart-data");
+                const parsed = JSON.parse(dataAttr);
+                this.transformedData = chartDataTransformer.transformDoughnutData(parsed);
+                
                 chartHTML = `
-          <div class="chart-container chart-container_between">
-              <div class="chart chart_280">
-                  <canvas id="${this.canvasId}"></canvas>
-                  <div class="chart-info">
-                      <div class="chart-info__number">15,000,000<span>֏</span></div>
-                      <change-indicator value="7"></change-indicator>
+                  <div class="chart-container chart-container_between">
+                      <div class="chart chart_280">
+                          <canvas id="${this.canvasId}"></canvas>
+                          <div class="chart-info">
+                              <div class="chart-info__number">${this.transformedData.metaData.total.toLocaleString()}<span>֏</span></div>
+                              <change-indicator value="${this.transformedData.metaData.percent}"></change-indicator>
+                          </div>
+                      </div>
+                      <div class="custom-legend custom-legend_center" id="${this.legendId}"></div>
                   </div>
-              </div>
-              <div class="custom-legend custom-legend_center" id="${this.legendId}"></div>
-          </div>
         `;
                 break;
             case "bar":
@@ -238,8 +234,8 @@ class ChartComponent extends DynamicElement {
         this.classList.add("chart-container");
         return `
       <select-box-date
-        start-date="${this.getAttr('start-date')}"
-        end-date="${this.getAttr('end-date')}"
+        start-date="${this.getAttr("start-date")}"
+        end-date="${this.getAttr("end-date")}"
       ></select-box-date>
 
       ${chartHTML}

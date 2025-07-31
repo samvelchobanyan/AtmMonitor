@@ -85,7 +85,7 @@ class AtmsDashboard extends DynamicElement {
     const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
 
         return /* html */ `
-                    <div class="main-container">
+        <div class="main-container">
             <div class="row">
                 <div class="column sm-2">
                     <info-card

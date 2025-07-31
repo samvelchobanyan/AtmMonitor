@@ -277,7 +277,7 @@ export function createDoughnutChart(ctxId, chartData, containerID) {
       : null,
     options: {
       cutout: hasCustomCutout ? "60%" : "50%",
-      showLoading: true,
+      showLoading: !chartData,
       maintainAspectRatio: false,
       responsive: true,
       plugins: {
@@ -321,7 +321,7 @@ export function createBarChart(ctxId, chartData, containerID) {
         }
       : {},
     options: {
-      showLoading: true,
+      showLoading: !chartData,
       maintainAspectRatio: false,
       responsive: true,
       plugins: {

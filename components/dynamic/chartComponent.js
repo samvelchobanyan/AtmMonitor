@@ -82,7 +82,6 @@ class ChartComponent extends DynamicElement {
 
   onAfterRender() {
     this.selectBox = this.$("select-box-date");
-    if(this.getAttr('id') === 'line-chart') console.log('after render');
 
     const chartData = this.transformedData ? this.transformedData.chartData : null;
     switch (this.chartType) {
@@ -124,7 +123,6 @@ class ChartComponent extends DynamicElement {
     }
 
     async fetchAndRenderChart() {
-        if(this.getAttr('id') === 'line-chart') console.log('fetchand render');
         const endpoint = this.getAttr("api-url");
         if (!endpoint) {
             console.warn('<chart-component> is missing required "api-url" attribute');
@@ -154,11 +152,12 @@ class ChartComponent extends DynamicElement {
             const isValid = response && response.errors === null && response.data;
 
             if (!isValid) throw new Error("Invalid API response format");
+            const data_array_name = startDate === endDate ? 'hourly_data' : 'daily_data'
 
             // const chartData = this.transformData(response.data);
             switch (this.chartType) {
                 case "line":
-                    this.transformedData = chartDataTransformer.transformData(response.data.daily_data);
+                    this.transformedData = chartDataTransformer.transformData(response.data[data_array_name]);
                     this._updateChart();
                     break;
                 case "doughnut":

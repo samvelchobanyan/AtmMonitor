@@ -281,6 +281,7 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
             maintainAspectRatio: false,
             responsive: true,
             plugins: {
+                tooltip: { enabled: !useLabelLines },
                 legend: { display: false },
                 htmlLegend: { containerID },
             },

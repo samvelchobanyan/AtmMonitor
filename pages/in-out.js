@@ -4,6 +4,7 @@ import "../components/static/infoCard.js";
 import "../components/ui/customTab.js";
 import "../components/ui/customRadio.js";
 import "../components/dynamic/doughnutChart.js";
+import "../components/dynamic/select-box-search.js";
 
 class inOut extends DynamicElement {
     constructor() {
@@ -86,9 +87,10 @@ class inOut extends DynamicElement {
                                 <custom-tab name="geo" active>Աշխարհագրական</custom-tab>
                                 <custom-tab name="atms">Բանկոմատներ</custom-tab>
                             </div>
-                            <select-box  value="today" options='[{"value":"today","label":"Այսօր"}, {"value":"week","label":"Այս շաբաթ"}, {"value":"custom","label":"Ամսաթվի միջակայք"} ]'></select-box>
                           </div>
-                          <div class="tab-content" data-tab="geo">geo</div>
+                          <div class="tab-content" data-tab="geo"> 
+                            <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>
+                          </div>
                           <div class="tab-content" data-tab="atms" style="display: none;">atms</div>
                         </div>
                     </div>
@@ -126,3 +128,7 @@ class inOut extends DynamicElement {
 }
 
 customElements.define("in-out", inOut);
+
+
+
+

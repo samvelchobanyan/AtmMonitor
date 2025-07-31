@@ -29,7 +29,7 @@
 
         &::after {
             @include center-absolute(both);
-            @include font-icon("\e902");
+            @include font-icon("\e903");
             color: inherit;
             @extend %hidden;
             font-size: rem(14);

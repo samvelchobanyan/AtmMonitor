@@ -32,7 +32,7 @@
                 &::after {
                     @include center-absolute("vertical");
                     right: rem(-32);
-                    @include font-icon("\e91d");
+                    @include font-icon("\e91e");
                     color: inherit;
                     font-size: rem(16);
                 }

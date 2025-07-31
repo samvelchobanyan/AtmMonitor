@@ -1,17 +1,25 @@
-.custom-select {
-}
 .combo-box {
     width: max-content;
     position: relative;
     display: block;
     @include font(normal, 14, 1.25, inherit, 0, $fontPrimary);
 
-    // &.searchable {
-    //     .combo-box-options {
-    //         padding-top: rem(60);
-    //         max-height: rem(260);
-    //     }
-    // }
+    &.searchable {
+        width: 100%;
+        .combo-box-selected {
+            @include font(normal, 16, 1.25, rgba(map-get($color-scheme, "black"), 0.5), 0, $fontPrimary);
+            &::after {
+                color: map-get($color-scheme, "black");
+                z-index: 2;
+                @include font-icon("\e900");
+            }
+            &.active {
+                &::after {
+                    transform: none;
+                }
+            }
+        }
+    }
 
     // &.tag-mode {
     //     .combo-box-selected {
@@ -39,13 +47,13 @@
     border-radius: rem(8);
     border: 1px solid map-get($color-scheme, "gray-200");
     background: #fff;
-    padding: 0 rem(36) 0 rem(12);
+    padding: 0 rem(36) 0 rem(16);
     @extend %flex;
     @extend %align-middle;
     @include font(bold, 16, 1.25, inherit, 0, $fontPrimary);
 
     &:after {
-        @include font-icon("\e903");
+        @include font-icon("\e904");
         position: absolute;
         font-size: rem(20);
         cursor: pointer;
@@ -129,12 +137,11 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: calc(100% - #{rem(7)});
-    padding: rem(10) rem(24);
+    padding: 0 rem(36) 0 rem(16);
     background-color: #fff;
     z-index: 2;
     height: 100%;
-    @include font(bold, 16, 1.25, inherit, 0, $fontPrimary);
+    @include font(normal, 16, 1.25, map-get($color-scheme, "black"), 0, $fontPrimary);
 
     input {
         // box-shadow: map-get($shadows, 'xs');
@@ -209,4 +216,15 @@
 .disabled:hover {
     background-color: #fff !important;
     color: #888 !important;
+}
+
+.selected-values {
+    @extend %flex;
+    margin-top: rem(12);
+}
+
+.selected-value {
+    &:not(:last-child) {
+        margin-right: rem(8);
+    }
 }

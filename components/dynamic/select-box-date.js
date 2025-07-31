@@ -23,6 +23,12 @@ class SelectBoxDate extends DynamicElement {
   onAttributeChange(name, oldValue, newValue) {
     if (name === "start-date" || name === "end-date") {
       this._updateFromAttributes();
+      if (this.selectEl) {
+        this.selectEl.value = this.period;
+        if (this.period === "custom") {
+          this._setCustomLabel(this.startDate, this.endDate);
+        }
+      }
     }
   }
 
@@ -50,8 +56,6 @@ class SelectBoxDate extends DynamicElement {
           this.startDate = range.startDate;
           this.endDate = range.endDate;
           this.period = "custom";
-          this.setAttribute("start-date", this.startDate);
-          this.setAttribute("end-date", this.endDate);
           this._setCustomLabel(this.startDate, this.endDate);
           this.dispatch("date-range-change", {
             startDate: this.startDate,
@@ -66,8 +70,6 @@ class SelectBoxDate extends DynamicElement {
         this.startDate = range.startDate;
         this.endDate = range.endDate;
         this.period = val;
-        this.setAttribute("start-date", this.startDate);
-        this.setAttribute("end-date", this.endDate);
         this.dispatch("date-range-change", {
           startDate: this.startDate,
           endDate: this.endDate,

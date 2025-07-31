@@ -30,6 +30,10 @@ export class DynamicElement extends HTMLElement {
     return [];
   }
 
+  static get nonRenderingAttributes() {
+    return new Set(); // No attributes blacklisted by default
+  }
+
   connectedCallback() {
     if (store.getState().appReady) {
       this.runComponentLifecycle();
@@ -63,7 +67,10 @@ export class DynamicElement extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue !== newValue) {
       this.onAttributeChange(name, oldValue, newValue);
-      this.scheduleRender();
+
+      if (!this.constructor.nonRenderingAttributes.has(name)) {
+        this.scheduleRender();
+      }
     }
   }
 
@@ -223,7 +230,7 @@ export class DynamicElement extends HTMLElement {
   }
 
   render() {
-    console.log(`${logIcons.render}[${this.tagName}]render`);
+    // console.log(`${logIcons.render}[${this.tagName}]render`);
     if (this.isDestroyed) return;
     this.clearEventListeners();
     this.innerHTML = this.template();

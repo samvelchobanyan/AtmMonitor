@@ -75,6 +75,10 @@ class AtmsDashboard extends DynamicElement {
     const encashmentData = this.state.summary.encashmentInfo;
     const atmWorkHours = this.state.summary.atmWorkHours;
 
+    const transactionDaily = this.state.summary.hourly_transactions;
+    const encashmentsDaily = this.state.summary.hourly_encashments;
+    const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
+
     return /* html */ `
             <div class="main-container">
                 <div class="row">
@@ -138,26 +142,25 @@ class AtmsDashboard extends DynamicElement {
                             <div class="infos">
                                 <info-card 
                                     title="Այսօր կանխիկացված գումար" 
-                                    value="${transactionsData.current_dispense_amount}" 
+                                    value="${transactionsData.total_dispense_amount}" 
                                     value-currency="֏" value-color="color-green" 
-                                    trend="${transactionsData.current_dispense_amount_percent_change}" 
+                                    trend="${transactionsData.dispense_amount_percent_change}" 
                                     show-border="true">
                                 </info-card>
                                 <info-card 
                                     title="Այսօր մուտքագրված գումար" 
-                                    value="${transactionsData.current_deposit_amount}" 
+                                    value="${transactionsData.total_deposit_amount}" 
                                     value-currency="֏" 
                                     value-color="color-blue" 
-                                    trend="${transactionsData.current_deposit_amount_percent_change}" 
+                                    trend="${transactionsData.deposit_amount_percent_change}" 
                                     show-border="true">
                                 </info-card>
                             </div>
                             <chart-component
                                 id="line-chart"
                                 chart-type="line"                                
+                                chart-data='${JSON.stringify(transactionDaily || {})}'
                                 api-url="/dashboard/transactions-in-days"
-                                start-date = "2025-06-01"
-                                end-date = "2025-06-08"
                                 ${this.attrIf("city", this.state.selectedCity)}
                                 ${this.attrIf("region", this.state.selectedRegion)}
                             ></chart-component>
@@ -170,8 +173,7 @@ class AtmsDashboard extends DynamicElement {
                                 id="pie-chart"
                                 chart-type="doughnut"                               
                                 api-url="/dashboard/transactions-in-days"
-                                start-date = "2025-06-01"
-                                end-date = "2025-07-08"
+                                chart-data='${JSON.stringify(transactionsData || {})}'                                
                                 ${this.attrIf("city", this.state.selectedCity)}
                                 ${this.attrIf("region", this.state.selectedRegion)}
                             ></chart-component>
@@ -185,21 +187,21 @@ class AtmsDashboard extends DynamicElement {
                             <div class="infos">
                                 <info-card 
                                     title="Այսօրվա ինկասացիաներ" 
-                                    value="${encashmentData.today_encashments}" 
+                                    value="${encashmentData.total_encashments}" 
                                     icon="icon icon-box" 
                                     show-border="true">
                                 </info-card>
                                 <info-card 
                                     title="Այսօր հետ բերված գումար" 
-                                    value="${encashmentData.today_collected_amount}" 
+                                    value="${encashmentData.total_collected_amount}" 
                                     value-currency="֏" 
                                     value-color="color-green" 
                                     icon="icon icon-arrow-down-left" 
                                     show-border="true">
                                 </info-card>
                                 <info-card 
-                                    title="Բանկոմատների թիվ" 
-                                    value="${encashmentData.today_added_amount}" 
+                                    title="Այսօրվա ինկասացիայի գումար" 
+                                    value="${encashmentData.total_added_amount}" 
                                     value-currency="֏" 
                                     value-color="color-blue" 
                                     icon="icon icon-arrow-up-right" 
@@ -218,9 +220,8 @@ class AtmsDashboard extends DynamicElement {
                            <chart-component
                                 id="line-chart-transit"
                                 api-url="/dashboard/encashments-in-days"
-                                start-date = "2025-06-01"
-                                end-date = "2025-07-08"
                                 chart-type="line"
+                                chart-data='${JSON.stringify(encashmentsDaily || {})}'
                             ></chart-component>
                         </div>
                     </div>
@@ -232,25 +233,24 @@ class AtmsDashboard extends DynamicElement {
                      <div class="infos">
                         <info-card 
                             title="Այսօր աշխատաժամանակ" 
-                            value="${atmWorkHours.today_working_percent}"
+                            value="${atmWorkHours.working_percent}"
                             icon="icon icon-clock" 
                             show-border="true" 
-                            duration="${atmWorkHours.today_total_working_time}">
+                            duration="${atmWorkHours.total_working_time}">
                         </info-card>
                         <info-card 
                             title="Այսօր պարապուրդ" 
-                            value="${atmWorkHours.today_non_working_percent}" 
+                            value="${atmWorkHours.non_working_percent}" 
                             icon="icon icon-clock" 
                             show-border="true" 
-                            duration="${atmWorkHours.today_total_non_working_time}">
+                            duration="${atmWorkHours.total_non_working_time}">
                         </info-card>
                     </div>
                      <chart-component
                         id="bar-chart"
                         api-url="/dashboard/atm-worktime-in-days"
-                        start-date = "2025-06-01"
-                        end-date = "2025-07-08"
-                        chart-type="bar" 
+                        chart-data='${JSON.stringify(atmPrductivityDaily || {})}'                        
+                        chart-type="bar"                           
                     ></chart-component>
                 </div>
             </div>

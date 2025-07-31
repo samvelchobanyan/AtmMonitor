@@ -10,6 +10,14 @@ class AtmFailures extends DynamicElement {
         super();
     }
 
+    addEventListeners(){
+        this.$("simple-table")?.addEventListener("cell-click", (e) => {
+            const { column, cellValue, rowData } = e.detail;
+            // Open popup or do something with the data
+            console.log('cellValue',column,cellValue,rowData);
+        });
+    }
+
     template(){
         return `
             <div class="main-container">
@@ -30,7 +38,10 @@ class AtmFailures extends DynamicElement {
                             </div>
                             <simple-table
                               data-source="/device-faults/summary?startDate=2025-06-01"
-                              columns='["atm_and_address", "total_faults", "faults_summary"]'>
+                              columns='["atm_and_address", "total_faults", "faults_summary"]'
+                              clickable-columns='["faults_summary"]'
+                              per-page="10"
+                              per-page-select="false">
                             </simple-table>
                         </div>
                     </div>

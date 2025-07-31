@@ -1,67 +1,93 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
-import {
-  createBarChart,
-  updateBarChart,
-  createDoughnutChart,
-  updateDoughnutChart,
-  createLineChart,
-  updateLineChart,
-} from "../../core/utils/chart-utils.js";
+import { createBarChart, updateBarChart, createDoughnutChart, updateDoughnutChart, createLineChart, updateLineChart } from "../../core/utils/chart-utils.js";
 import chartDataTransformer from "../../core/utils/data-transformer.js";
-// import "../ui/selectBox.js"
+import { memoryStore } from "../../core/memory-store.js";
 import "./select-box-date.js";
 import "./modal-popup.js";
 
 const observedAttrs = ["api-url", "city", "region", "start-date", "end-date"];
 class ChartComponent extends DynamicElement {
-  constructor() {
-    super();
-    this.renderCount = 0;
+    constructor() {
+        super();
+        this.renderCount = 0;
 
-    this.state = {
-      ...this.state,
-      chartData: null,
-      // endpoint: this.getAttr('api-url') || null,
-      // startDate: this.getAttr('start-date') || null,
-      // endDate: this.getAttr('end-date') || null,
-      // city: this.getAttr('city') || null,
-      // region: this.getAttr('region') || null,
-    };
+        this.state = {
+            ...this.state,
+            chartData: null,
+            // endpoint: this.getAttr('api-url') || null,
+            // startDate: this.getAttr('start-date') || null,
+            // endDate: this.getAttr('end-date') || null,
+            // city: this.getAttr('city') || null,
+            // region: this.getAttr('region') || null,
+        };
 
-    this.selectBox = null;
-    this.selectedPeriod = this._dateToPeriod();
-    this.canvasId = `canvas-${this.getAttr("id", "line-chart")}`;
-    this.legendId = `legend-${this.canvasId}`;
+        this.selectBox = null;
+        this.canvasId = `canvas-${this.getAttr("id", "line-chart")}`;
+        this.legendId = `legend-${this.canvasId}`;
 
-    this.chart = null;
-    this.transformedData = null;
-    this.chartType = this.getAttr("chart-type");
-  }
-
-  static get observedAttributes() {
-    return observedAttrs;
-  }
-
-  onConnected() {
-    this.hasConnected = true;
-    this.fetchAndRenderChart();
-  }
-
-  onAfterRender() {
-    this.selectBox = this.$("select-box-date");
-
-    const chartData = this.transformedData ? this.transformedData.chartData : null;
-    switch (this.chartType) {
-      case "line":
-        this.chart = createLineChart(this.canvasId, chartData, this.legendId);
-        break;
-      case "doughnut":
-        this.chart = createDoughnutChart(this.canvasId, chartData, this.legendId);
-        break;
-      case "bar":
-        this.chart = createBarChart(this.canvasId, chartData, this.legendId);
-        break;
+        this.chart = null;
+        this.transformedData = null;
+        this.chartType = this.getAttr("chart-type");
+        this.memoryKey = `chart-${this.getAttr("id")}`;
     }
+
+    static get observedAttributes() {
+        return observedAttrs;
+    }
+
+    static get nonRenderingAttributes() {
+        return new Set(["start-date", "end-date"]);
+    }
+
+    onConnected() {
+        this.hasConnected = true;
+        const override = memoryStore.get(this.memoryKey);
+        if (override) {
+            if (override.startDate) this.setAttribute("start-date", override.startDate);
+            if (override.endDate) this.setAttribute("end-date", override.endDate);
+            this.fetchAndRenderChart();
+        } else {
+            const dataAttr = this.getAttr("chart-data");
+            if (dataAttr) {
+                try {
+                    const parsed = JSON.parse(dataAttr);
+                    switch (this.chartType) {
+                        case "line":
+                            this.transformedData = chartDataTransformer.transformData(parsed);
+                            break;
+                        case "doughnut":
+                            this.transformedData = chartDataTransformer.transformDoughnutData(parsed);
+                            break;
+                        case "bar":
+                            this.transformedData = chartDataTransformer.transformBarData(parsed);
+                            break;
+                    }
+                } catch (err) {
+                    console.warn("Invalid chart-data attribute", err);
+                    this.fetchAndRenderChart();
+                    return;
+                }
+            } else {
+                this.fetchAndRenderChart();
+            }
+        }
+    }
+
+    onAfterRender() {
+        this.selectBox = this.$("select-box-date");
+
+        const chartData = this.transformedData ? this.transformedData.chartData : null;
+        switch (this.chartType) {
+            case "line":
+                this.chart = createLineChart(this.canvasId, chartData, this.legendId);
+                break;
+            case "doughnut":
+                this.chart = createDoughnutChart(this.canvasId, chartData, this.legendId);
+                break;
+            case "bar":
+                this.chart = createBarChart(this.canvasId, chartData, this.legendId);
+                break;
+        }
 
         // if (this.state.chartData && !this.state.isLoading) {
         //   console.log('state after render',this.state);
@@ -75,45 +101,13 @@ class ChartComponent extends DynamicElement {
         }
     }
 
-    // — Map incoming start/end → period selection —
-    _dateToPeriod() {
-        // const sel = this.querySelector('select-box');
-        let start = this.getAttr("start-date");
-        let end = this.getAttr("end-date");
-
-        let period;
-        if (!end || !start) {
-            return "today";
-        }
-
-        const s = new Date(start);
-        const e = new Date(end);
-        const diffDays = (e - s) / (1000 * 60 * 60 * 24);
-
-        if (diffDays === 0) {
-            period = "today";
-        } else if (diffDays === 7) {
-            period = "week";
-        } else {
-            period = "custom";
-        }
-
-        // Update the select-box UI
-        // this.selectBox.value = period;
-        return period;
-    }
-
-
     onDateRangeChange(e) {
         const { startDate, endDate, period } = e.detail || {};
         if (!startDate || !endDate) return;
-        this.selectedPeriod = period || this.selectedPeriod;
+
+        memoryStore.set(this.memoryKey, { startDate, endDate });
         this.setAttribute("start-date", startDate);
         this.setAttribute("end-date", endDate);
-        if (period === "custom") {
-            this.selectBox
-                .querySelector('.combo-box-selected-wrap').textContent = `${startDate} – ${endDate}`;
-        }
         this.fetchAndRenderChart();
     }
 
@@ -151,11 +145,12 @@ class ChartComponent extends DynamicElement {
             const isValid = response && response.errors === null && response.data;
 
             if (!isValid) throw new Error("Invalid API response format");
+            const data_array_name = startDate === endDate ? "hourly_data" : "daily_data";
 
             // const chartData = this.transformData(response.data);
             switch (this.chartType) {
                 case "line":
-                    this.transformedData = chartDataTransformer.transformData(response.data);
+                    this.transformedData = chartDataTransformer.transformData(response.data[data_array_name]);
                     this._updateChart();
                     break;
                 case "doughnut":
@@ -173,77 +168,24 @@ class ChartComponent extends DynamicElement {
         }
     }
 
-  transformBarData(data) {
-    const labels = [];
-    const workingData = [];
-    const nonWorkingData = [];
-
-    for (const day of data.work_hours_per_day) {
-      labels.push(day.date);
-      workingData.push(day.working_percent);
-      nonWorkingData.push(day.non_working_percent);
-    }
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: "Աշխատաժամանակ",
-          data: workingData,
-        },
-        {
-          label: "Պարապուրդ",
-          data: nonWorkingData,
-        },
-      ],
-    };
-  }
-
-  transformData(data) {
-    const labels = [];
-    const depositData = [];
-    const dispenseData = [];
-
-        for (const day of data.daily_data) {
-            labels.push(day.date);
-            depositData.push(day.deposit_total);
-            dispenseData.push(day.dispense_total);
+    _updateChart() {
+        switch (this.chartType) {
+            case "line":
+                updateLineChart(this.chart, this.transformedData.chartData);
+                break;
+            case "doughnut":
+                this.$(".chart-info__number").childNodes[0].textContent = this.transformedData.metaData.total.toLocaleString();
+                this.$("change-indicator").setAttribute("value", this.transformedData.metaData.percent);
+                updateDoughnutChart(this.chart, this.transformedData.chartData);
+                break;
+            case "bar":
+                updateBarChart(this.chart, this.transformedData.chartData);
+                break;
         }
-
-        return {
-            labels,
-            datasets: [
-                {
-                    label: "Կանխիկացված գումար",
-                    data: dispenseData,
-                },
-                {
-                    label: "Մուտքագրված գումար",
-                    data: depositData,
-                },
-            ],
-        };
     }
-
-
-  _updateChart() {
-    switch (this.chartType) {
-      case "line":
-        updateLineChart(this.chart, this.transformedData.chartData);
-        break;
-      case "doughnut":
-        this.$(".chart-info__number").childNodes[0].textContent =
-          this.transformedData.metaData.total;
-        this.$("change-indicator").setAttribute("value", 15);
-        updateDoughnutChart(this.chart, this.transformedData.chartData);
-        break;
-      case "bar":
-        updateBarChart(this.chart, this.transformedData.chartData);
-        break;
-    }
-  }
 
     template() {
+        if (this.getAttr("id") === "line-chart") console.log("template");
         if (this.isLoading()) {
             return `<div>Loading chart…</div>`;
         }
@@ -251,17 +193,21 @@ class ChartComponent extends DynamicElement {
         let chartHTML = "";
         switch (this.chartType) {
             case "doughnut":
+                const dataAttr = this.getAttr("chart-data");
+                const parsed = JSON.parse(dataAttr);
+                this.transformedData = chartDataTransformer.transformDoughnutData(parsed);
+                
                 chartHTML = `
-          <div class="chart-container chart-container_between">
-              <div class="chart chart_280">
-                  <canvas id="${this.canvasId}"></canvas>
-                  <div class="chart-info">
-                      <div class="chart-info__number">15,000,000<span>֏</span></div>
-                      <change-indicator value="7"></change-indicator>
+                  <div class="chart-container chart-container_between">
+                      <div class="chart chart_280">
+                          <canvas id="${this.canvasId}"></canvas>
+                          <div class="chart-info">
+                              <div class="chart-info__number">${this.transformedData.metaData.total.toLocaleString()}<span>֏</span></div>
+                              <change-indicator value="${this.transformedData.metaData.percent}"></change-indicator>
+                          </div>
+                      </div>
+                      <div class="custom-legend custom-legend_center" id="${this.legendId}"></div>
                   </div>
-              </div>
-              <div class="custom-legend custom-legend_center" id="${this.legendId}"></div>
-          </div>
         `;
                 break;
             case "bar":
@@ -287,17 +233,11 @@ class ChartComponent extends DynamicElement {
         }
         this.classList.add("chart-container");
         return `
-      <select-box-date 
-        value="${this.selectedPeriod}" 
-        options='[ 
-          {"value":"today","label":"Այսօր"}, 
-          {"value":"week","label":"Այս շաբաթ"}, 
-          {"value":"custom","label":"Ամսաթվի միջակայք"} 
-          ]'
-      >
-      </select-box-date>
-      
-  
+      <select-box-date
+        start-date="${this.getAttr("start-date")}"
+        end-date="${this.getAttr("end-date")}"
+      ></select-box-date>
+
       ${chartHTML}
     `;
     }

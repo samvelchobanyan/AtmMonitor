@@ -39,7 +39,6 @@ class InfoCard extends DynamicElement {
    <div class="modal__header">
       <div class="modal__title">Մեկնաբանություններ</div>
       <img class="modal__close"   src="assets/img/icons/x-circle.svg" alt="" />
-
     </div>
       <div class="modal__messages">
        ${
@@ -126,6 +125,7 @@ class InfoCard extends DynamicElement {
   template() {
     const title = this.getAttr("title");
     const value = this.getAttr("value");
+    const formattedValue = isNaN(value) ? value : Number(value).toLocaleString();
     const valueCurrency = this.getAttr("value-currency");
     const valueColor = this.getAttr("value-color");
     const icon = this.getAttr("icon");
@@ -147,7 +147,7 @@ class InfoCard extends DynamicElement {
         ${icon ? `<div class="info__icon"><i class="${icon}"></i></div>` : ""}
       </div>
       <div class="info__bottom">
-        <div class="info__text ${valueColor}">${value}${
+        <div class="info__text ${valueColor}">${formattedValue}${
       valueCurrency ? `<span>${valueCurrency}</span>` : ""
     }</div>
         ${trend ? `<change-indicator value="${trend}"></change-indicator>` : ""}

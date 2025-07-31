@@ -22,7 +22,7 @@
     &__right {
         @extend %flex;
         @extend %align-middle;
-        .custom-select {
+        .combo-box {
             &:not(:last-child) {
                 margin-right: rem(12);
             }

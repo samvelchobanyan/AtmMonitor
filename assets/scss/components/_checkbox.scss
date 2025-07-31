@@ -2,7 +2,6 @@
     position: relative;
     display: inline-flex;
     align-items: center;
-    @extend %user-cursor;
 
     input {
         position: absolute;
@@ -18,6 +17,13 @@
             }
         }
     }
+
+    label {
+        @extend %user-cursor;
+        @extend %flex;
+        @extend %align-middle;
+    }
+
     &__checkmark {
         width: rem(18);
         height: rem(18);
@@ -29,7 +35,7 @@
 
         &::after {
             @include center-absolute(both);
-            @include font-icon("\e902");
+            @include font-icon("\e903");
             color: inherit;
             @extend %hidden;
             font-size: rem(14);
@@ -39,4 +45,10 @@
     &__label {
         @include font(500, 14, 1.42, inherit, 0, $fontPrimary);
     }
+}
+
+.checkboxes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: rem(12) rem(32);
 }

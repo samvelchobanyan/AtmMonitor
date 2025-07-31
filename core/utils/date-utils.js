@@ -26,8 +26,10 @@ export function openDateRangePopup() {
     document.body.appendChild(modal);
 
     modal.setContent(`
-      <div class="modal__title">
-        Ընտրեք ամսաթվի միջակայքը
+      <div class="modal__header">
+        <div class="modal__title">
+          Ընտրեք ամսաթվի միջակայքը
+        </div>
       </div>
 
       <div class="modal__datepickers">

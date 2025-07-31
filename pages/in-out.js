@@ -1,10 +1,11 @@
 import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/chartComponent.js";
-import "../components/static/infoCard.js";
+import "../components/dynamic/infoCard.js";
 import "../components/ui/customTab.js";
 import "../components/ui/customRadio.js";
 import "../components/dynamic/doughnutChart.js";
 import "../components/dynamic/select-box-search.js";
+import "../components/dynamic/tabsDoughnutChart.js";
 
 class inOut extends DynamicElement {
     constructor() {
@@ -55,6 +56,44 @@ class inOut extends DynamicElement {
         }
     }
 
+    onConnected() {
+        this.fetchSummary();
+
+        this.addEventListener("change", (e) => {
+            if (e.target.matches('custom-radio[name="cash-in"]')) {
+                const selected = e.target.getAttribute("value");
+                this.updateDepositCharts(selected);
+            } else if (e.target.matches('custom-radio[name="cash-out"]')) {
+                console.log("click");
+
+                const selected = e.target.getAttribute("value");
+                this.updateDispenseCharts(selected);
+            }
+        });
+    }
+
+    updateDepositCharts(type) {
+        const chartAmount = this.querySelector("#deposit-amount");
+        const chartCount = this.querySelector("#deposit-count");
+
+        if (chartAmount && chartCount) {
+            chartAmount.setAttribute("activetab", type);
+            chartCount.setAttribute("activetab", type);
+        }
+    }
+
+    updateDispenseCharts(type) {
+        const chartAmount = this.querySelector("#dispence-amount");
+        const chartCount = this.querySelector("#dispence-count");
+
+        if (chartAmount && chartCount) {
+            console.log("new type", type);
+
+            chartAmount.setAttribute("activetab", type);
+            chartCount.setAttribute("activetab", type);
+        }
+    }
+
     template() {
         if (!this.state.summary) {
             return /*html*/ `
@@ -77,7 +116,7 @@ class inOut extends DynamicElement {
         const depositSummary = this.state.summary.deposit_summary;
         const safeDepositData = JSON.stringify(depositSummary).replace(/"/g, "&quot;");
 
-        return /* html */ `
+        return /*html*/ `
             <div class="main-container">
                <div class="row">
                     <div class="column sm-6">
@@ -97,17 +136,11 @@ class inOut extends DynamicElement {
                 </div>
                 <div class="row">
                     <div class="column sm-6">
+
                         <div class="container">
-                            <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
-                            <div class="radio-buttons">
-                                <custom-radio name="cash-out" value="1" checked>Քարտով / Անքարտ</custom-radio>
-                                <custom-radio name="cash-out" value="2">Ըստ վճարային համակարգի</custom-radio>
-                                <custom-radio name="cash-out" value="3">Սեփական քարտ / Այլ քարտ</custom-radio>
-                            </div> 
-                            <div class="chart-container">
-                              <doughnut-chart id="dispence-amount" title='${dispenseSummary.dispense_amount}' percentChange=${dispenseSummary.dispense_amount_percent_change} initData="${safeDispenseData}" type='amount' ></doughnut-chart>
-                              <doughnut-chart id="dispence-count" title='${dispenseSummary.dispense_count}'  percentChange=${dispenseSummary.dispense_count_percent_change} initData="${safeDispenseData}" type='count'></doughnut-chart>
-                            </div>
+                             <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
+                                                 <tabs-doughnut-chart id="dispense" summary="${safeDispenseData}"></tabs-doughnut-chart>
+                           
                           </div>      
                     </div>
                     <div class="column sm-6">
@@ -117,9 +150,9 @@ class inOut extends DynamicElement {
                                 <custom-radio name="cash-in" value="1" checked>Քարտով / Անքարտ</custom-radio>
                                 <custom-radio name="cash-in" value="2">Ըստ տեսակի</custom-radio>
                             </div> 
-                              <doughnut-chart id="deposit-amount" title='${depositSummary.deposit_amount}' percentChange=${depositSummary.deposit_amount_percent_change} initData="${safeDepositData}" type='amount' ></doughnut-chart>
-                              <doughnut-chart id="deposit-count" title='${depositSummary.deposit_count}' percentChange=${depositSummary.deposit_count_percent_change} initData="${safeDepositData}" type='count' ></doughnut-chart>
-                        </div>     
+                              <doughnut-chart id="deposit-amount" title='${depositSummary.deposit_amount}' percentChange=${depositSummary.deposit_amount_percent_change} initData="${safeDepositData}" type='amount'  activetab="with_without_card"></doughnut-chart>
+                              <doughnut-chart id="deposit-count" title='${depositSummary.deposit_count}' percentChange=${depositSummary.deposit_count_percent_change} initData="${safeDepositData}" type='count'  activetab="with_without_card"></doughnut-chart>
+                        </div>
                     </div>
               </div>
             </div>

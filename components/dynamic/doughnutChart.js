@@ -3,7 +3,7 @@ import { createDoughnutChart, updateDoughnutChart } from "../../core/utils/chart
 import "../../components/static/badge.js";
 import chartDataTransformer from "../../core/utils/data-transformer.js";
 
-const observedAttrs = ["api-url", "initdata", "title", "percentchange"];
+const observedAttrs = ["api-url", "initdata", "title", "percentchange", "activetab"];
 class DoughnutChartComponent extends DynamicElement {
     constructor() {
         super();
@@ -19,7 +19,7 @@ class DoughnutChartComponent extends DynamicElement {
         let stringifiedData = this.getAttr("initdata");
         this.transformedData = null;
         this.chartType = this.getAttribute("type") || "";
-
+        this.activeTab = this.getAttribute("activetab") || "";
         try {
             this.chartData = stringifiedData ? JSON.parse(stringifiedData) : null;
         } catch (e) {
@@ -59,24 +59,56 @@ class DoughnutChartComponent extends DynamicElement {
     onConnected() {
         this.render();
     }
+    onAttributeChange(name, oldValue, newValue) {
+        if (name === "activetab" && oldValue !== newValue) {
+            this.activeTab = newValue;
+            this.render();
+        }
+    }
 
     onAfterRender() {
         this.selectBox = this.$("select-box");
 
         // extract those props which needed in this chart according on type
         let filteredBreakdown = {};
+        const field = this.chartType === "amount" ? "amount" : "count";
 
         const breakdown = this.chartData.card_breakdown;
-        if (breakdown) {
-            const field = this.chartType === "amount" ? "amount" : "count";
-            filteredBreakdown = {
-                [`with_card_${field}`]: breakdown.with_card?.[field] ?? 0,
-                [`without_card_${field}`]: breakdown.without_card?.[field] ?? 0,
-            };
-        }
+        if (breakdown && this.activeTab)
+            if (this.activeTab == "with_without_card") {
+                filteredBreakdown = {
+                    with_card: breakdown.with_card?.[field] ?? 0,
+                    without_card: breakdown.without_card?.[field] ?? 0,
+                };
+            } else if (this.activeTab == "by_method") {
+                // right code
+                // breakdown.by_method.map((method) => {
+                //     return (filteredBreakdown[method["method_name"]] = method[field]);
+                // });
+
+                // no data in api yet, can use this to test
+                filteredBreakdown = {
+                    master: 5454,
+                    visa: 1200,
+                    arca: 102,
+                };
+            } else if (this.activeTab == "own_other_card") {
+                // right code
+                // filteredBreakdown = {
+                //     own_card: breakdown.own_card?.[field] ?? 0,
+                //     other_card: breakdown.other_card?.[field] ?? 0,
+                // };
+
+                // no data in api yet, can use this to test
+                filteredBreakdown = {
+                    own_card: 3454,
+                    other_card: 12100,
+                };
+            }
 
         // should transform data
         this.transformedData = chartDataTransformer.transformDoughnutData(filteredBreakdown);
+
         this.chart = createDoughnutChart(
             this.canvasId,
             this.transformedData.chartData,

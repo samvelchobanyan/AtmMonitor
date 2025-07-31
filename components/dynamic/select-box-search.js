@@ -263,3 +263,6 @@ class SelectBoxSearch extends DynamicElement {
 customElements.define("select-box-search", SelectBoxSearch);
 
 export { SelectBoxSearch };
+
+
+                            // <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>

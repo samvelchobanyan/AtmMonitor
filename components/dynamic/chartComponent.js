@@ -8,7 +8,7 @@ import {
   updateLineChart,
 } from "../../core/utils/chart-utils.js";
 import chartDataTransformer from "../../core/utils/data-transformer.js";
-// import "../ui/selectBox.js"
+import { memoryStore } from "../../core/memory-store.js";
 import "./select-box-date.js";
 import "./modal-popup.js";
 
@@ -29,22 +29,55 @@ class ChartComponent extends DynamicElement {
     };
 
     this.selectBox = null;
-    this.selectedPeriod = this._dateToPeriod();
     this.canvasId = `canvas-${this.getAttr("id", "line-chart")}`;
     this.legendId = `legend-${this.canvasId}`;
 
     this.chart = null;
     this.transformedData = null;
     this.chartType = this.getAttr("chart-type");
+    this.memoryKey = `chart-${this.getAttr("id")}`;
   }
 
   static get observedAttributes() {
     return observedAttrs;
   }
 
+  static get nonRenderingAttributes() {
+    return new Set(["start-date", "end-date"]);
+  }
+
   onConnected() {
     this.hasConnected = true;
-    this.fetchAndRenderChart();
+    const override = memoryStore.get(this.memoryKey);
+    if (override) {
+      if (override.startDate) this.setAttribute("start-date", override.startDate);
+      if (override.endDate) this.setAttribute("end-date", override.endDate);
+      this.fetchAndRenderChart();
+    } else {
+      const dataAttr = this.getAttr("chart-data");
+      if (dataAttr) {
+        try {
+          const parsed = JSON.parse(dataAttr);
+          switch (this.chartType) {
+            case "line":
+              this.transformedData = chartDataTransformer.transformData(parsed);
+              break;
+            case "doughnut":
+              this.transformedData = chartDataTransformer.transformDoughnutData(parsed);
+              break;
+            case "bar":
+              this.transformedData = chartDataTransformer.transformBarData(parsed);
+              break;
+          }
+        } catch (err) {
+          console.warn("Invalid chart-data attribute", err);
+          this.fetchAndRenderChart();
+          return;
+        }
+      } else {
+        this.fetchAndRenderChart();
+      }
+    }
   }
 
   onAfterRender() {
@@ -75,44 +108,13 @@ class ChartComponent extends DynamicElement {
         }
     }
 
-    // — Map incoming start/end → period selection —
-    _dateToPeriod() {
-        // const sel = this.querySelector('select-box');
-        let start = this.getAttr("start-date");
-        let end = this.getAttr("end-date");
-
-        let period;
-        if (!end || !start) {
-            return "today";
-        }
-
-        const s = new Date(start);
-        const e = new Date(end);
-        const diffDays = (e - s) / (1000 * 60 * 60 * 24);
-
-        if (diffDays === 0) {
-            period = "today";
-        } else if (diffDays === 7) {
-            period = "week";
-        } else {
-            period = "custom";
-        }
-
-        // Update the select-box UI
-        // this.selectBox.value = period;
-        return period;
-    }
-
     onDateRangeChange(e){
         const { startDate, endDate, period } = e.detail || {};
         if (!startDate || !endDate) return;
-        this.selectedPeriod = period || this.selectedPeriod;
+
+        memoryStore.set(this.memoryKey, { startDate, endDate });
         this.setAttribute("start-date", startDate);
         this.setAttribute("end-date", endDate);
-        if (period === "custom") {
-            this.selectBox
-                .querySelector('.combo-box-selected-wrap').textContent = `${startDate} – ${endDate}`;
-        }
         this.fetchAndRenderChart();
     }
 
@@ -150,11 +152,12 @@ class ChartComponent extends DynamicElement {
             const isValid = response && response.errors === null && response.data;
 
             if (!isValid) throw new Error("Invalid API response format");
+            const data_array_name = startDate === endDate ? 'hourly_data' : 'daily_data'
 
             // const chartData = this.transformData(response.data);
             switch (this.chartType) {
                 case "line":
-                    this.transformedData = chartDataTransformer.transformData(response.data);
+                    this.transformedData = chartDataTransformer.transformData(response.data[data_array_name]);
                     this._updateChart();
                     break;
                 case "doughnut":
@@ -171,32 +174,6 @@ class ChartComponent extends DynamicElement {
             this.setState({ chartData: null, error: true });
         }
     }
-
-  transformBarData(data) {
-    const labels = [];
-    const workingData = [];
-    const nonWorkingData = [];
-
-    for (const day of data.work_hours_per_day) {
-      labels.push(day.date);
-      workingData.push(day.working_percent);
-      nonWorkingData.push(day.non_working_percent);
-    }
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: "Աշխատաժամանակ",
-          data: workingData,
-        },
-        {
-          label: "Պարապուրդ",
-          data: nonWorkingData,
-        },
-      ],
-    };
-  }
 
   _updateChart() {
     switch (this.chartType) {
@@ -216,6 +193,7 @@ class ChartComponent extends DynamicElement {
   }
 
     template() {
+      if(this.getAttr('id') === 'line-chart') console.log('template');
         if (this.isLoading()) {
             return `<div>Loading chart…</div>`;
         }
@@ -259,17 +237,11 @@ class ChartComponent extends DynamicElement {
         }
         this.classList.add("chart-container");
         return `
-      <select-box-date 
-        value="${this.selectedPeriod}" 
-        options='[ 
-          {"value":"today","label":"Այսօր"}, 
-          {"value":"week","label":"Այս շաբաթ"}, 
-          {"value":"custom","label":"Ամսաթվի միջակայք"} 
-          ]'
-      >
-      </select-box-date>
-      
-  
+      <select-box-date
+        start-date="${this.getAttr('start-date')}"
+        end-date="${this.getAttr('end-date')}"
+      ></select-box-date>
+
       ${chartHTML}
     `;
     }

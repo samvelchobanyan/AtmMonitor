@@ -1,6 +1,6 @@
 export class CustomCheckbox extends HTMLElement {
     static get observedAttributes() {
-        return ["checked", "id", "value"];
+        return ["checked", "id", "value", "color"];
     }
 
     constructor() {
@@ -43,20 +43,21 @@ export class CustomCheckbox extends HTMLElement {
         const id = this.getAttribute("id") || `custom-checkbox-${Math.random().toString(36).substr(2, 9)}`;
         const value = this.getAttribute("value") || "";
         const checked = this.hasAttribute("checked");
+        const color = this.getAttribute("color");
 
-        // Save label text before clearing innerHTML
         const labelText = this.textContent.trim();
 
+        const colorSpan = color ? `<span style="background-color: ${color}; display: inline-block;"></span>` : "";
+
         this.innerHTML = `
-      <label for="${id}">
-        <input type="checkbox" id="${id}" value="${value}" ${checked ? "checked" : ""} />
-        <div class="custom-check__checkmark"></div>
-        <div class="custom-check__label">${labelText}</div>
-      </label>
+        <label for="${id}">
+            <input type="checkbox" id="${id}" value="${value}" ${checked ? "checked" : ""} />
+            <div class="custom-check__checkmark"></div>
+            <div class="custom-check__label">${labelText}</div>
+            ${colorSpan}
+        </label>
     `;
     }
 }
 
 customElements.define("custom-checkbox", CustomCheckbox);
-
-

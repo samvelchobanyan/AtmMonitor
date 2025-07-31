@@ -13,27 +13,22 @@ const htmlLegendPlugin = {
             const li = document.createElement("li");
             const circle = document.createElement("span");
 
-            // if (
-            //   $(chart.canvas)
-            //     .parents('.chart-container')
-            //     .children('.custom-legend')
-            //     .hasClass('custom-legend_checkmark')
-            // ) {
             const customLegendEl = $(chart.canvas).parents(".chart-container").children(".custom-legend");
 
             if (customLegendEl.hasClass("custom-legend_checkmark")) {
-                circle.style.backgroundColor = item.strokeStyle;
-                const label = document.createElement("label");
-                label.className = "custom-check";
-                label.setAttribute("for", `${chart.canvas.id}-${index}`);
+                const checkbox = document.createElement("custom-checkbox");
 
-                const input = document.createElement("input");
-                input.type = "checkbox";
-                input.id = `${chart.canvas.id}-${index}`;
-                input.value = item.text;
-                input.checked = !item.hidden;
+                checkbox.setAttribute("id", `${chart.canvas.id}-${index}`);
+                checkbox.setAttribute("value", item.text);
+                checkbox.setAttribute("color", item.strokeStyle);
 
-                input.addEventListener("change", () => {
+                checkbox.textContent = item.text;
+
+                if (!item.hidden) {
+                    checkbox.setAttribute("checked", "");
+                }
+
+                checkbox.addEventListener("change", () => {
                     const { type } = chart.config;
                     if (type === "pie" || type === "doughnut") {
                         chart.toggleDataVisibility(item.index);
@@ -43,19 +38,7 @@ const htmlLegendPlugin = {
                     chart.update();
                 });
 
-                const checkmark = document.createElement("div");
-                checkmark.className = "custom-check__checkmark";
-
-                const labelText = document.createElement("div");
-                labelText.className = "custom-check__label";
-                labelText.textContent = item.text;
-
-                label.appendChild(input);
-                label.appendChild(checkmark);
-                label.appendChild(labelText);
-                label.appendChild(circle);
-
-                li.appendChild(label);
+                li.appendChild(checkbox);
             } else {
                 const dataset = chart.data.datasets[0];
                 const value = dataset.data[index];

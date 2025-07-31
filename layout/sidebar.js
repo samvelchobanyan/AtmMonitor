@@ -16,7 +16,7 @@ class SideBar extends StaticElement {
                     </div>
                 </div>
                 <div class="sidebar__nav">
-                    <a href="" class="sidebar__item active"> <i class="icon icon-grid"></i><span>Ակնարկ</span> </a>
+                    <a href="./" class="sidebar__item active"> <i class="icon icon-grid"></i><span>Ակնարկ</span> </a>
                     <div class="sidebar__section">
                         <div class="sidebar__item sidebar__item-has-dropdown">
                             <i class="icon icon-activity"></i><span>Անալիտիկա</span>
@@ -33,7 +33,7 @@ class SideBar extends StaticElement {
                     </div>
                     <a href="geo" class="sidebar__item"> <i class="icon icon-box"></i><span>Բանկոմատներ</span> </a>
                     <a href="failures" class="sidebar__item"> <i class="icon icon-x-octagon"></i><span>Անսարքություններ</span> </a>
-                    <a href="./" class="sidebar__item"> <i class="icon icon-clipboard"></i><span>Մատյան</span> </a>
+                    <a href="journal" class="sidebar__item"> <i class="icon icon-clipboard"></i><span>Մատյան</span> </a>
                 </div>
             </aside>
         `;

@@ -51,6 +51,14 @@ export function startRouter() {
     mountComponent('atm-failures', 'Անսարքություններ', ctx.query);
   });
 
+  // — Journal page Route
+  page('/journal', async ctx => {
+    if (!customElements.get('journal-page')) {
+      await import('../pages/journal.js');
+    }
+    mountComponent('journal-page', 'Մատյան', ctx.query);
+  });
+
 // — Geo Analytics Route
   page('/geo', async ctx => {
     if (!customElements.get('atms-dashboard')) {

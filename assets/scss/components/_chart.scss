@@ -16,6 +16,8 @@
     canvas {
         height: 100%;
         width: 100%;
+        z-index: 1;
+        position: relative;
     }
 }
 
@@ -49,9 +51,9 @@
         }
     }
     &_data {
-       flex: 1;
+        flex: 1;
         ul {
-           flex: 1;
+            flex: 1;
             flex-direction: column;
             li {
                 &:not(:last-child) {

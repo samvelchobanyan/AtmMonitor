@@ -224,7 +224,6 @@ export function createLineChart(ctxId, chartData, containerID) {
             maintainAspectRatio: false,
             responsive: true,
             plugins: {
-                tooltip: { enabled: false },
                 legend: { display: false },
                 htmlLegend: { containerID },
             },
@@ -282,7 +281,6 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
             maintainAspectRatio: false,
             responsive: true,
             plugins: {
-                tooltip: { enabled: false },
                 legend: { display: false },
                 htmlLegend: { containerID },
             },
@@ -326,7 +324,6 @@ export function createBarChart(ctxId, chartData, containerID) {
             maintainAspectRatio: false,
             responsive: true,
             plugins: {
-                tooltip: { enabled: false },
                 legend: { display: false },
                 htmlLegend: { containerID },
             },

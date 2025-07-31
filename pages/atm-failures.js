@@ -37,9 +37,7 @@ class AtmFailures extends DynamicElement {
                             <simple-table
                               data-source="/device-faults/summary?startDate=2025-06-01"
                               columns='["atm_and_address", "total_faults", "faults_summary"]'
-                              clickable-columns='["faults_summary"]'
-                              per-page="10"
-                              per-page-select="false">
+                              clickable-columns='["faults_summary"]'>
                             </simple-table>
                         </div>
                     </div>

@@ -68,14 +68,24 @@ class DoughnutChartComponent extends DynamicElement {
 
     onAfterRender() {
         this.selectBox = this.$("select-box");
+        console.log("!!!!", this.activeTab);
 
         // extract those props which needed in this chart according on type
         let filteredBreakdown = {};
-        const field = this.chartType === "amount" ? "amount" : "count";
-
+        let field;
+        if (this.activeTab == "deposit_by_method") {
+            // todo :ask them to change this prop from total amount to amount, to avoid condition
+            field = this.chartType === "amount" ? "total_amount" : "count";
+        } else {
+            field = this.chartType === "amount" ? "amount" : "count";
+        }
         const breakdown = this.chartData.card_breakdown;
+        const depositTypeBreakdown = this.chartData.deposit_type_breakdown || null;
         if (breakdown && this.activeTab)
-            if (this.activeTab == "with_without_card") {
+            if (
+                this.activeTab == "with_without_card" ||
+                this.activeTab == "deposit_with_without_card"
+            ) {
                 filteredBreakdown = {
                     with_card: breakdown.with_card?.[field] ?? 0,
                     without_card: breakdown.without_card?.[field] ?? 0,
@@ -104,7 +114,42 @@ class DoughnutChartComponent extends DynamicElement {
                     own_card: 3454,
                     other_card: 12100,
                 };
+            } else if (this.activeTab == "deposit_by_method") {
+                let fakeData = [
+                    {
+                        count: 8,
+                        deposit_type_id: 10,
+                        deposit_type_name: "Մուտքագրում ",
+                        total_amount: 16000,
+                    },
+                    {
+                        count: 7,
+                        deposit_type_id: 1,
+                        deposit_type_name: "Մուտքագրում քարտին",
+                        total_amount: 14000,
+                    },
+                    {
+                        count: 10,
+                        deposit_type_id: 2,
+                        deposit_type_name: " քարտին",
+                        total_amount: 10000,
+                    },
+                ];
+                // depositTypeBreakdown.map((type) => {
+                //     return (filteredBreakdown = {
+                //         deposit_type_id: type.deposit_type_id,
+                //         deposit_type_name: type.deposit_type_name,
+                //         number: type[field],
+                //     });
+                // });
+                filteredBreakdown = fakeData.map((type) => ({
+                    deposit_type_id: type.deposit_type_id,
+                    deposit_type_name: type.deposit_type_name,
+                    number: type[field], // make sure field is defined and valid
+                }));
             }
+
+        //todo continue here, should handle somehow custom label from api
 
         // should transform data
         this.transformedData = chartDataTransformer.transformDoughnutData(filteredBreakdown);

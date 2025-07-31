@@ -4,59 +4,59 @@ import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/chartComponent.js";
 import "../components/dynamic/modal-popup.js";
 import "../components/static/changeIndicator.js";
-import "../components/static/infoCard.js";
+import "../components/dynamic/infoCard.js";
 // import { ChartComponent } from "../components/dynamic/chartComponent.js";
 import "../components/dynamic/doughnutChart.js";
 // import '../components/static/badge.js';
 import "../components/ui/customTab.js";
 
 class AtmsDashboard extends DynamicElement {
-  constructor() {
-    super();
-    this.state = {
-      selectedRegion: null,
-      selectedCity: null,
-      summary: null,
-    };
-  }
-
-  onConnected() {
-    this.fetchSummary();
-  }
-
-  onStoreChange(storeState) {
-    const region = storeState.selectedRegion;
-    const city = storeState.selectedCity;
-    if (region !== this.state.selectedRegion || city !== this.state.selectedCity) {
-      this.fetchSummary(region, city); // one API call → one render
-    }
-  }
-
-  async fetchSummary(region, city) {
-    const queryString = new URLSearchParams();
-    if (region) {
-      queryString.append("district", region);
-    }
-    if (city) {
-      queryString.append("city", city);
+    constructor() {
+        super();
+        this.state = {
+            selectedRegion: null,
+            selectedCity: null,
+            summary: null,
+        };
     }
 
-    try {
-      const response = await this.fetchData(`/dashboard/summary?${queryString}`);
-      this.setState({
-        selectedRegion: region,
-        selectedCity: city,
-        summary: response.data,
-      });
-    } catch (err) {
-      console.error("❌ Error fetching summary:", err);
-      this.setState({ summary: null });
+    onConnected() {
+        this.fetchSummary();
     }
-  }
 
-  template() {
-    if (!this.state.summary) {
-      return /*html*/ `
+    onStoreChange(storeState) {
+        const region = storeState.selectedRegion;
+        const city = storeState.selectedCity;
+        if (region !== this.state.selectedRegion || city !== this.state.selectedCity) {
+            this.fetchSummary(region, city); // one API call → one render
+        }
+    }
+
+    async fetchSummary(region, city) {
+        const queryString = new URLSearchParams();
+        if (region) {
+            queryString.append("district", region);
+        }
+        if (city) {
+            queryString.append("city", city);
+        }
+
+        try {
+            const response = await this.fetchData(`/dashboard/summary?${queryString}`);
+            this.setState({
+                selectedRegion: region,
+                selectedCity: city,
+                summary: response.data,
+            });
+        } catch (err) {
+            console.error("❌ Error fetching summary:", err);
+            this.setState({ summary: null });
+        }
+    }
+
+    template() {
+        if (!this.state.summary) {
+            return /*html*/ `
             <div class="main-container">
                 <div class="row">
                     <div class="column sm-12">
@@ -68,7 +68,7 @@ class AtmsDashboard extends DynamicElement {
                 </div>
             </div>
             `;
-    }
+        }
 
     const generalData = this.state.summary;
     const transactionsData = this.state.summary.transactionsInfo;
@@ -79,7 +79,7 @@ class AtmsDashboard extends DynamicElement {
     const encashmentsDaily = this.state.summary.hourly_encashments;
     const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
 
-    return /* html */ `
+        return /* html */ `
             <div class="main-container">
                 <div class="row">
                     <div class="column sm-2">
@@ -255,7 +255,7 @@ class AtmsDashboard extends DynamicElement {
                 </div>
             </div>
         </div>`;
-  }
+    }
 }
 
 customElements.define("atms-dashboard", AtmsDashboard);

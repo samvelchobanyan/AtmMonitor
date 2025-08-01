@@ -96,13 +96,11 @@ class inOut extends DynamicElement {
     template() {
         if (!this.state.summary) {
             return /*html*/ `
-            <div class="main-container">
-                <div class="row">
-                    <div class="column sm-12">
-                        <div class="loading">
-                            <div class="loading__spinner spinner"></div>
-                            <div class="loading__text">Տվյալները բեռնվում են…</div>
-                        </div>
+            <div class="row">
+                <div class="column sm-12">
+                    <div class="loading">
+                        <div class="loading__spinner spinner"></div>
+                        <div class="loading__text">Տվյալները բեռնվում են…</div>
                     </div>
                 </div>
             </div>
@@ -131,22 +129,19 @@ class inOut extends DynamicElement {
         const safeDepositTabsData = JSON.stringify(depositTabs).replace(/"/g, "&quot;");
 
         return /*html*/ `
-            <div class="main-container">
-                <div class="row">
-                    <div class="column sm-6">
-                        <div class="container">
-                            <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
-                            <tabs-doughnut-chart id="dispense" summary="${safeDispenseData}" tabsinfo="${safeDispenseTabsData}"></tabs-doughnut-chart>
-                          </div>      
+            <div class="row">
+                <div class="column sm-6">
+                    <div class="container">
+                        <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
+                        <tabs-doughnut-chart id="dispense" summary="${safeDispenseData}" tabsinfo="${safeDispenseTabsData}"></tabs-doughnut-chart>
+                        </div>      
+                </div>
+                <div class="column sm-6">
+                    <div class="container">
+                        <container-top icon="icon-arrow-up-right" title="Մուտքագրում"> </container-top>
+                        <tabs-doughnut-chart id="deposit" summary="${safeDepositData}" tabsinfo="${safeDepositTabsData}"></tabs-doughnut-chart>
                     </div>
-                    <div class="column sm-6">
-                        <div class="container">
-                            <container-top icon="icon-arrow-up-right" title="Մուտքագրում"> </container-top>
-                            <tabs-doughnut-chart id="deposit" summary="${safeDepositData}" tabsinfo="${safeDepositTabsData}"></tabs-doughnut-chart>
-                           
-                        </div>
-                    </div>
-              </div>
+                </div>
             </div>
         `;
     }

@@ -101,35 +101,51 @@ export class SimpleTable extends DynamicElement {
     if (this.$("table")) {
       loadDataTableModule().then(module => {
         this.datatableInstance = new module.DataTable(this.$("table"),{
-          perPage: this.getPerPageOption(),
+          perPage: this.getPerPageOption() || 10,
           perPageSelect: this.getPerPageSelectOption(),
           searchable: true,     // disables search box
           sortable: true         // optional: keep sorting
         });
+
+        // Listen to Simple-DataTables events to re-attach click listeners after pagination/sort/search
+        this.datatableInstance.on("datatable.page", () => {this.addEventListeners()});
+        this.datatableInstance.on("datatable.sort", () => this.addEventListeners());
+        this.datatableInstance.on("datatable.search", () => this.addEventListeners());
+
+        // Attach listeners initially
+        this.addEventListeners();
       });
     }
   }
 
   addEventListeners() {
+    console.log('adding event listners');
+    this.clearEventListeners();
     const table = this.$("table");
     if (!table) return;
 
     const clickable = this.parseClickableColumnsAttr();
-    const colIndices = clickable.map(col => this.state.columns.indexOf(col)).filter(i => i !== -1);
+    const colIndices = clickable
+    .map(col => this.state.columns.indexOf(col))
+    .filter(i => i !== -1);
 
-    this.$$("tbody tr").forEach((rowEl, rowIndex) => {
-      const rowData = this.state.data[rowIndex];
+    this.$$("tbody tr").forEach(rowEl => {
       const cells = rowEl.children;
+
       colIndices.forEach(i => {
         const cell = cells[i];
         if (!cell) return;
         cell.classList.add("clickable");
-        this.addListener(cell, "click", () => {
-          this.dispatch("cell-click", {
-            column: this.state.columns[i],
-            cellValue: rowData[this.state.columns[i]],
-            rowData
-          });
+
+        this.addListener(cell, "click", (event) => {
+          const clickedRow = event.target.closest("tr");
+          const rowIndex = parseInt(clickedRow.getAttribute("data-row-index"), 10);
+
+          const rowData = this.state.data[rowIndex];
+          const column = this.state.columns[i];
+          const cellValue = rowData ? rowData[column] : null;
+
+          this.dispatch("cell-click", { column, cellValue, rowData });
         });
       });
     });
@@ -149,9 +165,9 @@ export class SimpleTable extends DynamicElement {
     }
 
     const header = this.state.columns.map(c => `<th>${c}</th>`).join("");
-    const rows = this.state.data.map(row => {
+    const rows = this.state.data.map((row, index) => {
       const cells = this.state.columns.map(col => `<td>${row[col] ?? ""}</td>`).join("");
-      return `<tr>${cells}</tr>`;
+      return `<tr data-row-index="${index}">${cells}</tr>`;
     }).join("");
 
     return /* html */`

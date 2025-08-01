@@ -62,13 +62,11 @@ class AtmsDashboard extends DynamicElement {
     template() {
         if (!this.state.summary) {
             return /*html*/ `
-            <div class="main-container">
-                <div class="row">
-                    <div class="column sm-12">
-                        <div class="loading">
-                            <div class="loading__spinner spinner"></div>
-                            <div class="loading__text">Տվյալները բեռնվում են…</div>
-                        </div>
+            <div class="row">
+                <div class="column sm-12">
+                    <div class="loading">
+                        <div class="loading__spinner spinner"></div>
+                        <div class="loading__text">Տվյալները բեռնվում են…</div>
                     </div>
                 </div>
             </div>
@@ -85,208 +83,207 @@ class AtmsDashboard extends DynamicElement {
     const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
 
         return /* html */ `
-                    <div class="main-container">
-            <div class="row">
-                <div class="column sm-2">
-                    <info-card
-                        title="Առկա գումար"
-                        value="${generalData.total_atm_balance}"
-                        value-currency="֏"
-                        icon="icon icon-coins"
-                        highlight>
-                    </info-card>
-                </div>
-                <div class="column sm-2">
-                    <info-card
-                        title="Բանկոմատների թիվ"
-                        value="${generalData.total_atms}"
-                        icon="icon icon-box">
-                    </info-card>
-                </div>
-                <div class="column sm-2">
-                    <info-card
-                        title="Չաշխատող"
-                        value="${generalData.not_working_atm_count}"
-                        value-color="color-red"
-                        icon="icon icon-x-octagon"
-                        button-text="Տեսնել">
-                    </info-card>
-                </div>
-                <div class="column sm-2">
-                    <info-card
-                        title="Դատարկ"
-                        value="${generalData.empty_cassettes_count}"
-                        value-color="color-red"
-                        icon="icon icon-minus-circle"
-                        button-text="Տեսնել">
-                    </info-card>
-                </div>
-                <div class="column sm-2">
-                    <info-card
-                        title="Վերջացող"
-                        value="${generalData.almost_empty_cassettes_count}"
-                        icon="icon icon-box"
-                        value-color="color-orange"
-                        button-text="Տեսնել">
-                    </info-card>
-                </div>
-                <div class="column sm-2">
-                    <info-card
-                        title="Առգրավված քարտեր"
-                        value="${generalData.taken_cards_count}"
-                        value-color="color-red"
-                        icon="icon icon-card"
-                        button-text="Տեսնել">
-                    </info-card>
+        <div class="row">
+            <div class="column sm-2">
+                <info-card
+                    title="Առկա գումար"
+                    value="${generalData.total_atm_balance}"
+                    value-currency="֏"
+                    icon="icon icon-coins"
+                    highlight>
+                </info-card>
+            </div>
+            <div class="column sm-2">
+                <info-card
+                    title="Բանկոմատների թիվ"
+                    value="${generalData.total_atms}"
+                    icon="icon icon-box">
+                </info-card>
+            </div>
+            <div class="column sm-2">
+                <info-card
+                    title="Չաշխատող"
+                    value="${generalData.not_working_atm_count}"
+                    value-color="color-red"
+                    icon="icon icon-x-octagon"
+                    button-text="Տեսնել">
+                </info-card>
+            </div>
+            <div class="column sm-2">
+                <info-card
+                    title="Դատարկ"
+                    value="${generalData.empty_cassettes_count}"
+                    value-color="color-red"
+                    icon="icon icon-minus-circle"
+                    button-text="Տեսնել">
+                </info-card>
+            </div>
+            <div class="column sm-2">
+                <info-card
+                    title="Վերջացող"
+                    value="${generalData.almost_empty_cassettes_count}"
+                    icon="icon icon-box"
+                    value-color="color-orange"
+                    button-text="Տեսնել">
+                </info-card>
+            </div>
+            <div class="column sm-2">
+                <info-card
+                    title="Առգրավված քարտեր"
+                    value="${generalData.taken_cards_count}"
+                    value-color="color-red"
+                    icon="icon icon-card"
+                    button-text="Տեսնել">
+                </info-card>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column sm-6">
+                <div class="container">
+                    <container-top icon="icon-trending-up" title="Գործարքների գումար" link-text="Մանրամասն" link-href="/details"> </container-top>
+                    <div class="infos">
+                        <info-card
+                            title="Այսօր կանխիկացված գումար"
+                            value="${transactionsData.total_dispense_amount}"
+                            value-currency="֏" value-color="color-green"
+                            trend="${transactionsData.dispense_amount_percent_change}"
+                            show-border="true">
+                        </info-card>
+                        <info-card
+                            title="Այսօր մուտքագրված գումար"
+                            value="${transactionsData.total_deposit_amount}"
+                            value-currency="֏"
+                            value-color="color-blue"
+                            trend="${transactionsData.deposit_amount_percent_change}"
+                            show-border="true">
+                        </info-card>
+                    </div>
+                    <chart-component
+                        id="line-chart"
+                        chart-type="line"
+                        chart-data='${JSON.stringify(transactionDaily || {})}'
+                        api-url="/dashboard/transactions-in-days"
+                        ${this.attrIf("city", this.state.selectedCity)}
+                        ${this.attrIf("region", this.state.selectedRegion)}></chart-component>
                 </div>
             </div>
-            <div class="row">
-                <div class="column sm-6">
-                    <div class="container">
-                        <container-top icon="icon-trending-up" title="Գործարքների գումար" link-text="Մանրամասն" link-href="/details"> </container-top>
-                        <div class="infos">
-                            <info-card
-                                title="Այսօր կանխիկացված գումար"
-                                value="${transactionsData.total_dispense_amount}"
-                                value-currency="֏" value-color="color-green"
-                                trend="${transactionsData.dispense_amount_percent_change}"
-                                show-border="true">
-                            </info-card>
-                            <info-card
-                                title="Այսօր մուտքագրված գումար"
-                                value="${transactionsData.total_deposit_amount}"
-                                value-currency="֏"
-                                value-color="color-blue"
-                                trend="${transactionsData.deposit_amount_percent_change}"
-                                show-border="true">
-                            </info-card>
-                        </div>
-                        <chart-component
-                            id="line-chart"
-                            chart-type="line"
-                            chart-data='${JSON.stringify(transactionDaily || {})}'
-                            api-url="/dashboard/transactions-in-days"
-                            ${this.attrIf("city", this.state.selectedCity)}
-                            ${this.attrIf("region", this.state.selectedRegion)}></chart-component>
-                    </div>
-                </div>
-                <div class="column sm-6">
-                    <div class="container">
-                        <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="/details"> </container-top>
-                        <chart-component
-                            id="pie-chart"
-                            chart-type="doughnut"
-                            api-url="/dashboard/transactions-in-days"
-                            chart-data='${JSON.stringify(transactionsData || {})}'
-                            ${this.attrIf("city", this.state.selectedCity)}
-                            ${this.attrIf("region", this.state.selectedRegion)}></chart-component>
-                    </div>
+            <div class="column sm-6">
+                <div class="container">
+                    <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="/details"> </container-top>
+                    <chart-component
+                        id="pie-chart"
+                        chart-type="doughnut"
+                        api-url="/dashboard/transactions-in-days"
+                        chart-data='${JSON.stringify(transactionsData || {})}'
+                        ${this.attrIf("city", this.state.selectedCity)}
+                        ${this.attrIf("region", this.state.selectedRegion)}></chart-component>
                 </div>
             </div>
-            <div class="row">
-                <div class="column sm-12">
-                    <div class="container">
-                        <container-top icon="icon-coins" title="Ինկասացիա"> </container-top>
-                        <div class="infos">
-                            <info-card
-                                title="Այսօրվա ինկասացիաներ"
-                                value="${encashmentData.total_encashments}"
-                                icon="icon icon-box"
-                                show-border="true">
-                            </info-card>
-                            <info-card
-                                title="Այսօր հետ բերված գումար"
-                                value="${encashmentData.total_collected_amount}"
-                                value-currency="֏"
-                                value-color="color-green"
-                                icon="icon icon-arrow-down-left"
-                                show-border="true">
-                            </info-card>
-                            <info-card
-                                title="Այսօրվա ինկասացիայի գումար"
-                                value="${encashmentData.total_added_amount}"
-                                value-currency="֏"
-                                value-color="color-blue"
-                                icon="icon icon-arrow-up-right"
-                                show-border="true">
-                            </info-card>
-                            <info-card
-                                title="Երեկ դատարկ բանկոմատներ"
-                                value="${encashmentData.yesterday_marked_as_empty}"
-                                value-color="color-red"
-                                icon="icon icon-box"
-                                message="2"
-                                message-endpoint='dashboard/comments'
-                                show-border="true">
-                            </info-card>
-                        </div>
-                        <chart-component
-                            id="line-chart-transit"
-                            api-url="/dashboard/encashments-in-days"
-                            chart-type="line"
-                            chart-data='${JSON.stringify(encashmentsDaily || {})}'></chart-component>
+        </div>
+        <div class="row">
+            <div class="column sm-12">
+                <div class="container">
+                    <container-top icon="icon-coins" title="Ինկասացիա"> </container-top>
+                    <div class="infos">
+                        <info-card
+                            title="Այսօրվա ինկասացիաներ"
+                            value="${encashmentData.total_encashments}"
+                            icon="icon icon-box"
+                            show-border="true">
+                        </info-card>
+                        <info-card
+                            title="Այսօր հետ բերված գումար"
+                            value="${encashmentData.total_collected_amount}"
+                            value-currency="֏"
+                            value-color="color-green"
+                            icon="icon icon-arrow-down-left"
+                            show-border="true">
+                        </info-card>
+                        <info-card
+                            title="Այսօրվա ինկասացիայի գումար"
+                            value="${encashmentData.total_added_amount}"
+                            value-currency="֏"
+                            value-color="color-blue"
+                            icon="icon icon-arrow-up-right"
+                            show-border="true">
+                        </info-card>
+                        <info-card
+                            title="Երեկ դատարկ բանկոմատներ"
+                            value="${encashmentData.yesterday_marked_as_empty}"
+                            value-color="color-red"
+                            icon="icon icon-box"
+                            message="2"
+                            message-endpoint='dashboard/comments'
+                            show-border="true">
+                        </info-card>
                     </div>
+                    <chart-component
+                        id="line-chart-transit"
+                        api-url="/dashboard/encashments-in-days"
+                        chart-type="line"
+                        chart-data='${JSON.stringify(encashmentsDaily || {})}'></chart-component>
                 </div>
             </div>
-            <div class="row">
-                <div class="column sm-6">
-                    <div class="container">
-                        <container-top icon="icon-trello" title="Բանկոմատի ցանցի արտադրողականություն"> </container-top>
-                        <div class="infos">
-                            <info-card
-                                title="Այսօր աշխատաժամանակ"
-                                value="${atmWorkHours.working_percent}"
-                                icon="icon icon-clock"
-                                show-border="true"
-                                duration="${atmWorkHours.total_working_time}">
-                            </info-card>
-                            <info-card
-                                title="Այսօր պարապուրդ"
-                                value="${atmWorkHours.non_working_percent}"
-                                icon="icon icon-clock"
-                                show-border="true"
-                                duration="${atmWorkHours.total_non_working_time}">
-                            </info-card>
-                        </div>
-                        <chart-component
-                            id="bar-chart"
-                            api-url="/dashboard/atm-worktime-in-days"
-                            chart-data='${JSON.stringify(atmPrductivityDaily || {})}'
-                            chart-type="bar"></chart-component>
+        </div>
+        <div class="row">
+            <div class="column sm-6">
+                <div class="container">
+                    <container-top icon="icon-trello" title="Բանկոմատի ցանցի արտադրողականություն"> </container-top>
+                    <div class="infos">
+                        <info-card
+                            title="Այսօր աշխատաժամանակ"
+                            value="${atmWorkHours.working_percent}"
+                            icon="icon icon-clock"
+                            show-border="true"
+                            duration="${atmWorkHours.total_working_time}">
+                        </info-card>
+                        <info-card
+                            title="Այսօր պարապուրդ"
+                            value="${atmWorkHours.non_working_percent}"
+                            icon="icon icon-clock"
+                            show-border="true"
+                            duration="${atmWorkHours.total_non_working_time}">
+                        </info-card>
                     </div>
+                    <chart-component
+                        id="bar-chart"
+                        api-url="/dashboard/atm-worktime-in-days"
+                        chart-data='${JSON.stringify(atmPrductivityDaily || {})}'
+                        chart-type="bar"></chart-component>
                 </div>
             </div>
-            <div class="row">
-                <div class="column sm-6">
-                    <div class="container">
-                        <div class="tabs-container">
-                            <div class="tabs">
-                                <custom-tab name="geo" active>Աշխարհագրական</custom-tab>
-                                <custom-tab name="atms">Բանկոմատներ</custom-tab>
-                            </div>
+        </div>
+        <div class="row">
+            <div class="column sm-6">
+                <div class="container">
+                    <div class="tabs-container">
+                        <div class="tabs">
+                            <custom-tab name="geo" active>Աշխարհագրական</custom-tab>
+                            <custom-tab name="atms">Բանկոմատներ</custom-tab>
                         </div>
-                        <div class="tab-content" data-tab="geo">
-                            <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>
-                        </div>
-                        <div class="tab-content" data-tab="atms" style="display: none;">
-                            <div class="checkboxes">
-                                <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
-                                <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
-                                <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
-                                <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
-                                <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
-                                <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
-                                <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
-                                <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
-                                <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
-                                <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
-                                <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
-                            </div>  
-                        </div>
+                    </div>
+                    <div class="tab-content" data-tab="geo">
+                        <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>
+                    </div>
+                    <div class="tab-content" data-tab="atms" style="display: none;">
+                        <div class="checkboxes">
+                            <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
+                            <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
+                            <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
+                            <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
+                            <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
+                            <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
+                            <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
+                            <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
+                            <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
+                            <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
+                            <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
+                        </div>  
                     </div>
                 </div>
             </div>
-        </div>`;
+        </div>
+            `;
     }
 }
 

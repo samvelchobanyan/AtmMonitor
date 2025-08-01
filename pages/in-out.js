@@ -96,46 +96,52 @@ class inOut extends DynamicElement {
     template() {
         if (!this.state.summary) {
             return /*html*/ `
-            <div class="main-container">
-                <div class="row">
-                    <div class="column sm-12">
-                        <div class="loading">
-                            <div class="loading__spinner spinner"></div>
-                            <div class="loading__text">Տվյալները բեռնվում են…</div>
-                        </div>
+            <div class="row">
+                <div class="column sm-12">
+                    <div class="loading">
+                        <div class="loading__spinner spinner"></div>
+                        <div class="loading__text">Տվյալները բեռնվում են…</div>
                     </div>
                 </div>
             </div>
             `;
         }
 
+        // Կանխիկացում
         const dispenseSummary = this.state.summary.dispense_summary;
         const safeDispenseData = JSON.stringify(dispenseSummary).replace(/"/g, "&quot;");
 
+        const dispenseTabs = {
+            with_without_card: "Քարտով / Անքարտ",
+            by_method: "Ըստ վճարային համակարգի",
+            own_other_card: "Սեփական քարտ / Այլ քարտ",
+        };
+        const safeDispenseTabsData = JSON.stringify(dispenseTabs).replace(/"/g, "&quot;");
+
+        // Մուտքագրում
         const depositSummary = this.state.summary.deposit_summary;
         const safeDepositData = JSON.stringify(depositSummary).replace(/"/g, "&quot;");
 
+        const depositTabs = {
+            deposit_with_without_card: "Քարտով / Անքարտ",
+            deposit_by_method: "Ըստ տեսակի",
+        };
+        const safeDepositTabsData = JSON.stringify(depositTabs).replace(/"/g, "&quot;");
+
         return /*html*/ `
-            <div class="main-container">
-                <div class="row">
-                    <div class="column sm-6">
-                        <div class="container">
-                             <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
-                             <tabs-doughnut-chart id="dispense" summary="${safeDispenseData}"></tabs-doughnut-chart>
-                          </div>      
+            <div class="row">
+                <div class="column sm-6">
+                    <div class="container">
+                        <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
+                        <tabs-doughnut-chart id="dispense" summary="${safeDispenseData}" tabsinfo="${safeDispenseTabsData}"></tabs-doughnut-chart>
+                        </div>      
+                </div>
+                <div class="column sm-6">
+                    <div class="container">
+                        <container-top icon="icon-arrow-up-right" title="Մուտքագրում"> </container-top>
+                        <tabs-doughnut-chart id="deposit" summary="${safeDepositData}" tabsinfo="${safeDepositTabsData}"></tabs-doughnut-chart>
                     </div>
-                    <div class="column sm-6">
-                        <div class="container">
-                             <container-top icon="icon-arrow-up-right" title="Մուտքագրում"> </container-top>
-                            <div class="radio-buttons">
-                                <custom-radio name="cash-in" value="1" checked>Քարտով / Անքարտ</custom-radio>
-                                <custom-radio name="cash-in" value="2">Ըստ տեսակի</custom-radio>
-                            </div> 
-                              <doughnut-chart id="deposit-amount" title='${depositSummary.deposit_amount}' percentChange=${depositSummary.deposit_amount_percent_change} initData="${safeDepositData}" type='amount'  activetab="with_without_card"></doughnut-chart>
-                              <doughnut-chart id="deposit-count" title='${depositSummary.deposit_count}' percentChange=${depositSummary.deposit_count_percent_change} initData="${safeDepositData}" type='count'  activetab="with_without_card"></doughnut-chart>
-                        </div>
-                    </div>
-              </div>
+                </div>
             </div>
         `;
     }

@@ -45,3 +45,33 @@ table {
         @include font(normal, 13, 1.2, inherit, 0, $fontPrimary);
     }
 }
+
+.datatable-bottom {
+    margin-top: rem(24);
+}
+
+.datatable-pagination {
+    ul {
+        @extend %flex;
+        @extend %align-middle;
+        @extend %align-center;
+        list-style: none;
+    }
+    .datatable-pagination-list-item {
+        @extend %flex;
+        @extend %align-middle;
+        @extend %align-center;
+        width: rem(16);
+        height: rem(16);
+
+        &:not(:last-child) {
+            margin-right: rem(4);
+        }
+        &:first-child {
+            font-size: rem(20);
+        }
+        &:last-child {
+            font-size: rem(20);
+        }
+    }
+}

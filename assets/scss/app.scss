@@ -14,6 +14,7 @@
 @import "components/_badge.scss";
 @import "components/_modal.scss";
 @import "components/_radio.scss";
+@import "components/_list.scss";
 
 .main-container {
     @extend %primary-transition;
@@ -201,6 +202,16 @@
         bottom: 0;
     }
     .tabs {
+        margin-bottom: 0;
+    }
+}
+
+.select-container {
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-between;
+    margin-bottom: rem(24);
+    .container__top {
         margin-bottom: 0;
     }
 }

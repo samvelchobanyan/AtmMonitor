@@ -7,7 +7,8 @@ class ListView extends DynamicElement {
             items: [],
             loading: false,
             error: false,
-            searchQuery: ""
+            searchQuery: "",
+            checkedValues: new Set(),
         };
         this.userTemplateHTML = null;
     }
@@ -48,7 +49,7 @@ class ListView extends DynamicElement {
 
     getSearchableFields() {
         const raw = this.getAttr("search-fields");
-        return raw ? raw.split(",").map(f => f.trim()) : null;
+        return raw ? raw.split(",").map((f) => f.trim()) : null;
     }
 
     renderTemplate(template, item) {
@@ -70,9 +71,9 @@ class ListView extends DynamicElement {
             return;
         }
 
-        container.innerHTML = filteredItems.map(item =>
-            this.renderTemplate(template, item)
-        ).join("");
+        container.innerHTML = filteredItems.map((item) => this.renderTemplate(template, item)).join("");
+
+        this.addCheckboxListeners();
     }
 
     template() {
@@ -85,14 +86,21 @@ class ListView extends DynamicElement {
         if (!rawTemplate) return `<div class="error">No <template> provided inside list-view.</div>`;
 
         return `
-      ${searchEnabled ? `
-        <div class="list__search"><input type="search"  placeholder="Փնտրել..." /></div> ` : ""}
-        <div class="list"></div>
-    `;
+            ${
+                searchEnabled
+                    ? `
+                <div class="list__search">
+                    <input type="search" placeholder="Փնտրել..." />
+                </div>
+            `
+                    : ""
+            }
+            <div class="list"></div>
+        `;
     }
 
     onAfterRender() {
-        this.renderItems(this.state.items); // initial render
+        this.renderItems(this.state.items);
     }
 
     addEventListeners() {
@@ -103,19 +111,39 @@ class ListView extends DynamicElement {
             this.addListener(input, "input", (e) => {
                 const q = e.target.value.trim().toLowerCase();
 
-                const filtered = this.state.items.filter(item => {
-                    const values = searchFields
-                        ? searchFields.map(k => item[k]).filter(v => v != null)
-                        : Object.values(item).filter(v => v != null);
+                const filtered = this.state.items.filter((item) => {
+                    const values = searchFields ? searchFields.map((k) => item[k]).filter((v) => v != null) : Object.values(item).filter((v) => v != null);
 
-                    return values.some(val =>
-                        String(val).toLowerCase().includes(q)
-                    );
+                    return values.some((val) => String(val).toLowerCase().includes(q));
                 });
 
                 this.renderItems(filtered);
             });
         }
+
+        this.addCheckboxListeners();
+    }
+
+    addCheckboxListeners() {
+        const checkboxes = this.$$(".list custom-checkbox");
+
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener("change", () => {
+                const val = checkbox.getAttribute("value");
+                if (checkbox.hasAttribute("checked")) {
+                    this.state.checkedValues.add(val);
+                } else {
+                    this.state.checkedValues.delete(val);
+                }
+            });
+
+            const val = checkbox.getAttribute("value");
+            if (this.state.checkedValues.has(val)) {
+                checkbox.setAttribute("checked", "");
+            } else {
+                checkbox.removeAttribute("checked");
+            }
+        });
     }
 }
 

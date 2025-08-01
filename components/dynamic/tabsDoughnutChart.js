@@ -55,7 +55,7 @@ class TabsDoughnutChartComponent extends DynamicElement {
 
         const data = this.summary;
         const safeData = JSON.stringify(data).replace(/"/g, "&quot;");
-
+        console.log('tabs',this.tabsInfo)
         const radiosHtml = Object.entries(this.tabsInfo).map(([key, label], index) => {
                 return /*html*/ `<custom-radio 
                                     name="cash-out" 
@@ -67,7 +67,7 @@ class TabsDoughnutChartComponent extends DynamicElement {
                                 `;
                 })
                 .join("");
-            
+        console.log('tabs html',radiosHtml)
         return /*html*/ `
             <div>
                 <div class="radio-buttons ">

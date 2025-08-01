@@ -40,7 +40,8 @@ class InfoCard extends DynamicElement {
       <div class="modal__title">Մեկնաբանություններ</div>
       <img class="modal__close"   src="assets/img/icons/x-circle.svg" alt="" />
     </div>
-      <div class="modal__messages">
+      <div class="modal__body">
+          <div class="modal__messages">
        ${
          messages.length
            ? messages
@@ -64,6 +65,8 @@ class InfoCard extends DynamicElement {
            : `<div class="modal__message-empty">Մեկնաբանություններ չկան</div>`
        }
       </div>
+      </div>
+    
    
     `);
 

@@ -128,22 +128,50 @@ class ListView extends DynamicElement {
         const checkboxes = this.$$(".list custom-checkbox");
 
         checkboxes.forEach((checkbox) => {
-            this.addListener(checkbox, "change", function () {
+            // Create new listener
+            const changeListener = () => {
                 const val = checkbox.getAttribute("value");
-                if (checkbox.hasAttribute("checked")) {
+                const input = checkbox.querySelector('input[type="checkbox"]');
+
+                if (input && input.checked) {
+                    checkbox.setAttribute("checked", "");
                     this.state.checkedValues.add(val);
                 } else {
+                    checkbox.removeAttribute("checked");
                     this.state.checkedValues.delete(val);
                 }
-            });
+            };
 
+            this.addListener(checkbox, "change", changeListener);
+
+            // Set initial state based on checkedValues
             const val = checkbox.getAttribute("value");
+            const input = checkbox.querySelector('input[type="checkbox"]');
+
             if (this.state.checkedValues.has(val)) {
                 checkbox.setAttribute("checked", "");
+                if (input) {
+                    input.checked = true;
+                }
             } else {
                 checkbox.removeAttribute("checked");
+                if (input) {
+                    input.checked = false;
+                }
             }
         });
+    }
+
+    // Method to programmatically set checked values
+    setCheckedValues(values) {
+        this.state.checkedValues.clear();
+        values.forEach((value) => this.state.checkedValues.add(value));
+        this.addCheckboxListeners(); // Update visual state
+    }
+
+    // Method to get current checked values
+    getCheckedValues() {
+        return Array.from(this.state.checkedValues);
     }
 }
 

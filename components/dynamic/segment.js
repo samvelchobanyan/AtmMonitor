@@ -4,14 +4,18 @@ import "./modal-popup.js";
 import "./list-view.js";
 
 class SegmentBlock extends DynamicElement {
-    static get properties() {
-        return ["title"];
-    }
-
     onConnected() {
         this.state = {};
         this.selectedSegments = [];
-        this._childNodes = Array.from(this.childNodes);
+        this.segmentItems = [
+            { text: "ՍԱՍ Սուպերմարկետ", value: "sas_supermarket" },
+            { text: "Առևտրի կենտրոն", value: "shopping_mall" },
+            { text: "Բենզալցակայաններ", value: "gas_stations" },
+            { text: "Օդանավակայան", value: "airport" },
+            { text: "Հյուրանոցներ", value: "hotels" },
+            { text: "Ռեստորաններ", value: "restaurants" },
+            { text: "Դեղատներ", value: "pharmacies" },
+        ];
     }
 
     template() {
@@ -19,8 +23,8 @@ class SegmentBlock extends DynamicElement {
 
         return `
             <div class="segment-block__container">
-                <div class="selected-values" style="display: none;"></div>
                 <pill-item text="Ավելացնել սեգմենտ" add></pill-item>
+                <div class="selected-values" style="display: none;"></div>
             </div>
         `;
     }
@@ -28,7 +32,7 @@ class SegmentBlock extends DynamicElement {
     onAfterRender() {
         const addPill = this.$("pill-item[add]");
         if (addPill) {
-            addPill.addEventListener("click", () => this._openSegmentPopup());
+            this.addListener(addPill, "click", this._openSegmentPopup);
         }
 
         this.selectedValuesContainer = this.$(".selected-values");
@@ -39,6 +43,8 @@ class SegmentBlock extends DynamicElement {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
 
+        const items = this.segmentItems;
+
         modal.setContent(`
             <div class="modal__header">
                 <div class="modal__title">Ավելացնել սեգմենտ</div>
@@ -48,49 +54,63 @@ class SegmentBlock extends DynamicElement {
                 <list-view
                     searchable
                     search-fields="text"
-                    items='[
-                        { "text": "ՍԱՍ Սուպերմարկետ", "value": "sas_supermarket" },
-                        { "text": "Առևտրի կենտրոն", "value": "shopping_mall" },
-                        { "text": "Բենզալցակայաններ", "value": "gas_stations" },
-                        { "text": "Օդանավակայան", "value": "airport" },
-                        { "text": "Հյուրանոցներ", "value": "hotels" },
-                        { "text": "Ռեստորաններ", "value": "restaurants" },
-                        { "text": "Դեղատներ", "value": "pharmacies" }
-                    ]'
+                    items='${JSON.stringify(items)}'
                     item-component="checkbox-item"
                 >
                     <template>
                         <custom-checkbox id="{{value}}" value="{{value}}">{{text}}</custom-checkbox>
                     </template>
                 </list-view>
-
-                <div class="modal__buttons">
-                    <button class="ok btn btn_md btn_blue btn_full"><span>Ընտրել</span></button>
-                </div>
+            </div>
+            <div class="modal__buttons">
+                <button class="ok btn btn_md btn_blue btn_full"><span>Ընտրել</span></button>
             </div>
         `);
 
+        const listView = modal.querySelector("list-view");
+
+        this._syncCheckboxesWithSelectedSegments(listView);
+
         const closeBtn = modal.querySelector(".modal__close");
-        closeBtn?.addEventListener("click", () => modal.remove());
+        if (closeBtn) {
+            this.addListener(closeBtn, "click", () => modal.remove());
+        }
 
         const okBtn = modal.querySelector(".ok");
-        okBtn?.addEventListener("click", () => {
-            const checkedBoxes = modal.querySelectorAll("custom-checkbox input[type='checkbox']:checked");
-            const selected = Array.from(checkedBoxes).map((cb) => {
-                const value = cb.value;
-                const label = cb.closest("custom-checkbox").textContent.trim();
-                return { value, label };
-            });
+        if (okBtn) {
+            this.addListener(okBtn, "click", () => {
+                const checkedValues = listView.getCheckedValues();
 
-            selected.forEach(({ value, label }) => {
-                if (!this.selectedSegments.find((seg) => seg.value === value)) {
-                    this.selectedSegments.push({ value, label });
-                    this._renderPill(label, value);
-                }
-            });
+                // Remove unchecked pills
+                this.selectedSegments = this.selectedSegments.filter((segment) => {
+                    if (!checkedValues.includes(segment.value)) {
+                        this._removePillByValue(segment.value);
+                        return false;
+                    }
+                    return true;
+                });
 
-            modal.remove();
-        });
+                // Add new pills
+                const itemsData = JSON.parse(listView.getAttribute("items"));
+                checkedValues.forEach((value) => {
+                    if (!this.selectedSegments.find((seg) => seg.value === value)) {
+                        const itemData = itemsData.find((item) => item.value === value);
+                        if (itemData) {
+                            this.selectedSegments.push({ value, label: itemData.text });
+                            this._renderPill(itemData.text, value);
+                        }
+                    }
+                });
+
+                this._updateSelectedValuesVisibility();
+                modal.remove();
+            });
+        }
+    }
+
+    _syncCheckboxesWithSelectedSegments(listView) {
+        const values = this.selectedSegments.map((seg) => seg.value);
+        listView.setCheckedValues(values);
     }
 
     _renderPill(label, value) {
@@ -108,7 +128,7 @@ class SegmentBlock extends DynamicElement {
         setTimeout(() => {
             const closeIcon = pill.querySelector(".icon-x");
             if (closeIcon) {
-                closeIcon.addEventListener("click", (e) => {
+                this.addListener(closeIcon, "click", (e) => {
                     e.stopPropagation();
                     pill.remove();
                     this.selectedSegments = this.selectedSegments.filter((seg) => seg.value !== value);
@@ -116,6 +136,13 @@ class SegmentBlock extends DynamicElement {
                 });
             }
         });
+    }
+
+    _removePillByValue(value) {
+        const pill = this.selectedValuesContainer?.querySelector(`pill-item[value="${value}"]`);
+        if (pill) {
+            pill.remove();
+        }
     }
 
     _updateSelectedValuesVisibility() {

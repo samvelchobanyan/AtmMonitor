@@ -68,12 +68,10 @@
             bottom: 0;
         }
     }
-
     &__close {
         @extend %user-cursor;
         width: rem(40);
     }
-
     &__messages {
         display: flex;
         flex-direction: column;
@@ -95,5 +93,11 @@
         color: #252525;
         font-size: rem(16);
         line-height: 1.4;
+    }
+    &__body {
+        .list {
+            max-height: rem(196);
+            overflow: auto;
+        }
     }
 }

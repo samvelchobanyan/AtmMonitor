@@ -16,10 +16,6 @@ class SelectBoxSearch extends DynamicElement {
         return ["value", "options", "placeholder"];
     }
 
-    onConnected() {
-        this.render();
-    }
-
     onAfterRender() {
         this.selectEl = this.$("select-box");
 
@@ -49,20 +45,12 @@ class SelectBoxSearch extends DynamicElement {
 
             this._updateAvailableOptions();
         }
-
-        this.addEventListeners();
     }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (oldValue === newValue) return;
-
+    onAttributeChange(name, oldValue, newValue) {
         if (name === "options" && this.selectEl) {
             this._parseOptions(newValue);
             this._updateAvailableOptions();
-        }
-
-        if (super.attributeChangedCallback) {
-            super.attributeChangedCallback(name, oldValue, newValue);
         }
     }
 
@@ -164,7 +152,7 @@ class SelectBoxSearch extends DynamicElement {
 
     addEventListeners() {
         if (this.selectEl) {
-            this.addListener(this.selectEl, "change", this.onSelectChange.bind(this));
+            this.addListener(this.selectEl, "change", this.onSelectChange);
         }
     }
 
@@ -263,6 +251,3 @@ class SelectBoxSearch extends DynamicElement {
 customElements.define("select-box-search", SelectBoxSearch);
 
 export { SelectBoxSearch };
-
-
-                            // <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>

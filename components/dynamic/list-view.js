@@ -60,7 +60,7 @@ class ListView extends DynamicElement {
 
     // Used to inject filtered items into the list container
     renderItems(filteredItems) {
-        const container = this.$(".list-view-items");
+        const container = this.$(".list");
         const template = this.userTemplateHTML;
 
         if (!container || !template) return;
@@ -85,8 +85,9 @@ class ListView extends DynamicElement {
         if (!rawTemplate) return `<div class="error">No <template> provided inside list-view.</div>`;
 
         return `
-      ${searchEnabled ? `<input type="search" class="list-search" placeholder="Փնտրել..." />` : ""}
-      <div class="list-view-items"></div>
+      ${searchEnabled ? `
+        <div class="list__search"><input type="search"  placeholder="Փնտրել..." /></div> ` : ""}
+        <div class="list"></div>
     `;
     }
 

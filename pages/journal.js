@@ -55,27 +55,30 @@ class journal extends DynamicElement {
                         <div class="container">
                         <div class="tabs-container">
                             <div class="tabs">
-                                <custom-tab name="geo" active>Աշխարհագրական</custom-tab>
-                                <custom-tab name="atms">Բանկոմատներ</custom-tab>
+                                <custom-tab name="geo" >Աշխարհագրական</custom-tab>
+                                <custom-tab name="atms" active>Բանկոմատներ</custom-tab>
                             </div>
                         </div>
-                        <div class="tab-content" data-tab="geo">
+                        <div class="tab-content" data-tab="geo" style="display: none;">
                             <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>
                         </div>
-                        <div class="tab-content" data-tab="atms" style="display: none;">
+                        <div class="tab-content" data-tab="atms" >
                             <list-view
                               searchable
                               search-fields="text"
                               items='[
-                                        { "text": "active" },
-                                        { "text": "offline" },
-                                        { "text": "asdast" },
-                                        { "text": "actual" }
+                                        { "text": "ՍԱՍ Սուպերմարկետ", "value": "sas_supermarket" },
+                                        { "text": "Առևտրի կենտրոն", "value": "shopping_mall" },
+                                        { "text": "Բենզալցակայաններ", "value": "gas_stations" },
+                                        { "text": "Օդանավակայան", "value": "airport" },
+                                        { "text": "Հյուրանոցներ", "value": "hotels" },
+                                        { "text": "Ռեստորաններ", "value": "restaurants" },
+                                        { "text": "Դեղատներ", "value": "pharmacies" }
                                       ]'
                               item-component="badge-item"
                             >
                               <template>
-                                <badge-item text="{{text}}" ></badge-item>
+                                 <custom-checkbox id="{{value}}" value="{{value}}">{{text}}</custom-checkbox> 
                               </template>
                             </list-view>
                         </div>

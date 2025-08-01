@@ -55,7 +55,7 @@ class TabsDoughnutChartComponent extends DynamicElement {
 
         const data = this.summary;
         const safeData = JSON.stringify(data).replace(/"/g, "&quot;");
-
+        console.log('tabs',this.tabsInfo)
         const radiosHtml = Object.entries(this.tabsInfo).map(([key, label], index) => {
                 return /*html*/ `<custom-radio 
                                     name="cash-out" 
@@ -67,7 +67,7 @@ class TabsDoughnutChartComponent extends DynamicElement {
                                 `;
                 })
                 .join("");
-            
+        console.log('tabs html',radiosHtml)
         return /*html*/ `
             <div>
                 <div class="radio-buttons ">
@@ -75,18 +75,21 @@ class TabsDoughnutChartComponent extends DynamicElement {
                    
                 </div> 
                 <div class="chart-container">
-                  <doughnut-chart id="${this.id}-amount" title="${
-            data[`${this.id}_amount`]
-        }"  percentChange="${
-            data[`${this.id}_amount_percent_change`]
-        }"  initData="${safeData}" type='amount' activetab="with_without_card"></doughnut-chart>
+                  <doughnut-chart 
+                    id="${this.id}-amount" 
+                    title="${ data[`${this.id}_amount`]}"  
+                    percentChange="${data[`${this.id}_amount_percent_change`]}"  
+                    initData="${safeData}" 
+                    type='amount' 
+                    activetab="with_without_card">
+                  </doughnut-chart>
                   <doughnut-chart 
                     id="${this.id}-count" title="${data[`${this.id}_count`]}"   
                     percentChange="${data[`${this.id}_count_percent_change`]}"  
                     initData="${safeData}" 
                     type='count' 
                     activetab="with_without_card">
-                    </doughnut-chart>
+                  </doughnut-chart>
                 </div>
               </div>      
                   

@@ -128,7 +128,7 @@ class ListView extends DynamicElement {
         const checkboxes = this.$$(".list custom-checkbox");
 
         checkboxes.forEach((checkbox) => {
-            checkbox.addEventListener("change", () => {
+            this.addListener(checkbox, "change", function () {
                 const val = checkbox.getAttribute("value");
                 if (checkbox.hasAttribute("checked")) {
                     this.state.checkedValues.add(val);

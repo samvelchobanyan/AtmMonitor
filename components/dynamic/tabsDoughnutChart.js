@@ -41,13 +41,11 @@ class TabsDoughnutChartComponent extends DynamicElement {
     template() {
         if (!this.summary) {
             return /*html*/ `
-            <div class="main-container">
-                <div class="row">
-                    <div class="column sm-12">
-                        <div class="loading">
-                            <div class="loading__spinner spinner"></div>
-                            <div class="loading__text">Տվյալները բեռնվում են…</div>
-                        </div>
+            <div class="row">
+                <div class="column sm-12">
+                    <div class="loading">
+                        <div class="loading__spinner spinner"></div>
+                        <div class="loading__text">Տվյալները բեռնվում են…</div>
                     </div>
                 </div>
             </div>

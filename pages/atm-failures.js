@@ -20,26 +20,24 @@ class AtmFailures extends DynamicElement {
     }
 
     template() {
-        return `
-            <div class="main-container">
-                <div class="row">
-                    <div class="column sm-12">
-                        <div class="container">
-                            <div class="select-container">
-                                <container-top icon="icon-x-octagon" title="Ամենահաճախ փչացող 10 բանկոմատները"> </container-top>
-                                <select-box-date
-                                    start-date="${this.getAttr("start-date")}"
-                                    end-date="${this.getAttr("end-date")}"
-                                ></select-box-date>
-                            </div>  
-                            <simple-table
-                              data-source="/device-faults/summary?startDate=2025-06-01"
-                              columns='["atm_and_address", "total_faults", "faults_summary"]'
-                              clickable-columns='["faults_summary"]'>
-                            </simple-table>
-                        </div>
+        return  /*html*/ `
+            <div class="row">
+                <div class="column sm-12">
+                    <div class="container">
+                        <div class="select-container">
+                            <container-top icon="icon-x-octagon" title="Ամենահաճախ փչացող 10 բանկոմատները"> </container-top>
+                            <select-box-date
+                                start-date="${this.getAttr("start-date")}"
+                                end-date="${this.getAttr("end-date")}"
+                            ></select-box-date>
+                        </div>  
+                        <simple-table
+                            data-source="/device-faults/summary?startDate=2025-06-01"
+                            columns='["atm_and_address", "total_faults", "faults_summary"]'
+                            clickable-columns='["faults_summary"]'>
+                        </simple-table>
                     </div>
-              </div>
+                </div>
             </div>
         `;
     }

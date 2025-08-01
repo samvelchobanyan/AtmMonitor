@@ -74,7 +74,6 @@ class inOut extends DynamicElement {
         <div class="row">
           <div class="column sm-6">
             <div class="container">
-              <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
               <doughnut-tabs id="dispense" data="${escapedData}"></doughnut-tabs>
             </div>
           </div>

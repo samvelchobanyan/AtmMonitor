@@ -104,6 +104,7 @@ export default class DoughnutTabs extends DynamicElement {
       console.warn("[doughnut-tabs] Invalid data attribute", err);
       this.rawData = null;
     }
+    console.log('rawData',this.rawData)
   }
 
   async fetchAndSetData() {
@@ -210,25 +211,19 @@ export default class DoughnutTabs extends DynamicElement {
     const countData = charts ? JSON.stringify(charts.count).replace(/"/g, "&quot;") : "";
 
     return `
-      <div class="row">
-        <div class="column sm-12">
-          <div class="container">
-            <div class="select-container">
-              <container-top icon="icon-x-octagon" title="\u053F\u0561\u0576\u056D\u056B\u056F\u0561\u0581\u0578\u0582\u0574"></container-top>
-              <select-box-date
-                start-date="${this.getAttr("start-date")}"
-                end-date="${this.getAttr("end-date")}"
-              ></select-box-date>
-            </div>
-            <div class="radio-buttons">
-              ${this._renderRadios()}
-            </div>
-            <div class="chart-container chart-container_between">
-              <doughnut-chart id="${this.getAttr("id")}-amount" data='${amountData}'></doughnut-chart>
-              <doughnut-chart id="${this.getAttr("id")}-count" data='${countData}'></doughnut-chart>
-            </div>
-          </div>
-        </div>
+      <div class="select-container">
+        <container-top icon="icon-arrow-down-left" title="\u053F\u0561\u0576\u056D\u056B\u056F\u0561\u0581\u0578\u0582\u0574"></container-top>
+        <select-box-date
+          start-date="${this.getAttr("start-date")}"
+          end-date="${this.getAttr("end-date")}"
+        ></select-box-date>
+      </div>
+      <div class="radio-buttons">
+        ${this._renderRadios()}
+      </div>
+      <div class="chart-container chart-container_between">
+        <doughnut-chart id="${this.getAttr("id")}-amount" data='${amountData}'></doughnut-chart>
+        <doughnut-chart id="${this.getAttr("id")}-count" data='${countData}'></doughnut-chart>
       </div>
     `;
   }

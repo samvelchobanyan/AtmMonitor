@@ -11,13 +11,18 @@ class DoughnutChartComponent extends DynamicElement {
         this.legendId = `legend-${baseId}`;
         this.chart = null;
 
-        this.chartData = {
-            labels: ["Անուն A", "Անուն B", "Անուն C"],
-            datasets: [
-                {
-                    data: [11, 100, 8],
-                },
-            ],
+        this.data = {
+            'total' : '190000',
+            'dailyAvg' : '2250000',
+            'transactionAvg' : '950000',
+            'chartData' : {
+                labels: ["Անուն A", "Անուն B", "Անուն C"],
+                datasets: [
+                    {
+                        data: [11, 100, 8],
+                    },
+                ],
+            }
         };
 
         this.total = 10000000;
@@ -25,25 +30,26 @@ class DoughnutChartComponent extends DynamicElement {
     }
 
     onAfterRender() {
-        this.chart = createDoughnutChart(this.canvasId, this.chartData, this.legendId);
+        this.chart = createDoughnutChart(this.canvasId, this.data.chartData, this.legendId);
 
-        updateDoughnutChart(this.chart, this.chartData, () => {
-            this.$("change-indicator").setAttribute("value", this.changeValue);
-        });
+        // updateDoughnutChart(this.chart, this.data.chartData, () => {
+        //     this.$("change-indicator").setAttribute("value", this.changeValue);
+        // });
     }
 
     template() {
+
         return `
         <div class="overview">
             <div class="overview-top">
                 <div class="overview-top__title">Կանխիկացված գումար</div>
                 <div class="overview-top__info">
                     <div class="overview-top__subtitle">
-                        236,150,456<span>֏</span>
+                        ${this.data.total}<span>֏</span>
                     </div>
                    <div class="badges">
-                        <badge-item text="Օրական միջին՝ 200.000.000֏"></badge-item>
-                        <badge-item text="Միջին գործարք 200.000.000֏"></badge-item>
+                        ${this.data.dailyAvg ? `<badge-item text="Օրական միջին՝ ${this.data.dailyAvg}֏"></badge-item>` : ''}    
+                        ${this.data.transactionAvg ? `<badge-item text="Օրական միջին՝ ${this.data.transactionAvg}֏"></badge-item>` : ''}    
                     </div>
                 </div>
             </div>

@@ -58,4 +58,8 @@
         background-color: map-get($color-scheme, "white");
         color: map-get($color-scheme, "blue");
     }
+
+    &_full {
+        width: 100%;
+    }
 }

@@ -6,6 +6,8 @@ import "../components/ui/customRadio.js";
 import "../components/dynamic/doughnutChart.js";
 import "../components/dynamic/select-box-search.js";
 import "../components/dynamic/list-view.js";
+import "../components/dynamic/segment.js";
+
 
 class journal extends DynamicElement {
     constructor() {
@@ -53,14 +55,14 @@ class journal extends DynamicElement {
                     <div class="container">
                     <div class="tabs-container">
                         <div class="tabs">
-                            <custom-tab name="geo" >Աշխարհագրական</custom-tab>
-                            <custom-tab name="atms" active>Բանկոմատներ</custom-tab>
+                            <custom-tab name="geo" active >Աշխարհագրական</custom-tab>
+                            <custom-tab name="atms">Բանկոմատներ</custom-tab>
                         </div>
                     </div>
-                    <div class="tab-content" data-tab="geo" style="display: none;">
-                        <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>
+                    <div class="tab-content" data-tab="geo">
+                        <segment-block></segment-block>
                     </div>
-                    <div class="tab-content" data-tab="atms" >
+                    <div class="tab-content" data-tab="atms" style="display: none">
                         <list-view
                             searchable
                             search-fields="text"

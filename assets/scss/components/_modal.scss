@@ -14,9 +14,13 @@
 .modal-content {
     background-color: map-get($color-scheme, "white");
     border-radius: rem(16);
-    box-shadow: 0px 4px 4px 0px #00000008 0px 8px 16px 0px #00000008;
+    box-shadow: 0px 4px 4px 0px #00000008, 0px 8px 16px 0px #00000008;
     max-width: fit-content;
     padding: rem(24);
+    min-width: rem(744);
+    &--sm {
+        min-width: auto;
+    }
 }
 
 .modal {
@@ -66,6 +70,7 @@
     }
 
     &__close {
+        @extend %user-cursor;
         width: rem(40);
     }
 

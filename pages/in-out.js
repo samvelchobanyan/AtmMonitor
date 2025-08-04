@@ -1,21 +1,18 @@
 import { DynamicElement } from "../core/dynamic-element.js";
-import "../components/dynamic/chartComponent.js";
-import "../components/dynamic/infoCard.js";
-import "../components/ui/customTab.js";
-import "../components/ui/customRadio.js";
-import "../components/dynamic/doughnutChart.js";
-import "../components/dynamic/tabsDoughnutChart.js";
+import { ContainerTop } from "../components/ui/containerTop.js";
+import "../components/dynamic/doughnutTabs.js";
 
 class inOut extends DynamicElement {
     constructor() {
         super();
 
         this.state = {
-            selectedRegion: null,
-            selectedCity: null,
             summary: null,
             atmId: null,
         };
+
+        this.currentRegion = null;
+        this.currentCity = null;
     }
 
     onConnected() {
@@ -36,10 +33,10 @@ class inOut extends DynamicElement {
 
         try {
             const response = await this.fetchData(`/analytics/summary?${queryString}`);
+            this.currentRegion = region;
+            this.currentCity = city;
             this.setState({
-                selectedRegion: region,
-                selectedCity: city,
-                summary: response.data,
+                summary: response,
                 atmId: atmId,
             });
         } catch (err) {
@@ -50,51 +47,15 @@ class inOut extends DynamicElement {
     onStoreChange(storeState) {
         const region = storeState.selectedRegion;
         const city = storeState.selectedCity;
-        if (region !== this.state.selectedRegion || city !== this.state.selectedCity) {
-            this.fetchSummary(region, city); // one API call → one render
+        if (region !== this.currentRegion || city !== this.currentCity) {
+            this.fetchSummary(region, city);
         }
     }
 
-    onConnected() {
-        this.fetchSummary();
-
-        this.addEventListener("change", (e) => {
-            if (e.target.matches('custom-radio[name="cash-in"]')) {
-                const selected = e.target.getAttribute("value");
-                this.updateDepositCharts(selected);
-            } else if (e.target.matches('custom-radio[name="cash-out"]')) {
-                console.log("click");
-
-                const selected = e.target.getAttribute("value");
-                this.updateDispenseCharts(selected);
-            }
-        });
-    }
-
-    updateDepositCharts(type) {
-        const chartAmount = this.querySelector("#deposit-amount");
-        const chartCount = this.querySelector("#deposit-count");
-
-        if (chartAmount && chartCount) {
-            chartAmount.setAttribute("activetab", type);
-            chartCount.setAttribute("activetab", type);
-        }
-    }
-
-    updateDispenseCharts(type) {
-        const chartAmount = this.querySelector("#dispence-amount");
-        const chartCount = this.querySelector("#dispence-count");
-
-        if (chartAmount && chartCount) {
-            console.log("new type", type);
-
-            chartAmount.setAttribute("activetab", type);
-            chartCount.setAttribute("activetab", type);
-        }
-    }
 
     template() {
-        if (!this.state.summary) {
+        const summary = this.state.summary;
+        if (!summary) {
             return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
@@ -107,42 +68,22 @@ class inOut extends DynamicElement {
             `;
         }
 
-        // Կանխիկացում
-        const dispenseSummary = this.state.summary.dispense_summary;
-        const safeDispenseData = JSON.stringify(dispenseSummary).replace(/"/g, "&quot;");
-
-        const dispenseTabs = {
-            with_without_card: "Քարտով / Անքարտ",
-            by_method: "Ըստ վճարային համակարգի",
-            own_other_card: "Սեփական քարտ / Այլ քարտ",
-        };
-        const safeDispenseTabsData = JSON.stringify(dispenseTabs).replace(/"/g, "&quot;");
-
-        // Մուտքագրում
-        const depositSummary = this.state.summary.deposit_summary;
-        const safeDepositData = JSON.stringify(depositSummary).replace(/"/g, "&quot;");
-
-        const depositTabs = {
-            deposit_with_without_card: "Քարտով / Անքարտ",
-            deposit_by_method: "Ըստ տեսակի",
-        };
-        const safeDepositTabsData = JSON.stringify(depositTabs).replace(/"/g, "&quot;");
+        const dispenseData = JSON.stringify(summary.data.dispense_summary).replace(/"/g, '&quot;');
+        const depositData = JSON.stringify(summary.data.deposit_summary).replace(/"/g, '&quot;');
 
         return /*html*/ `
-            <div class="row">
-                <div class="column sm-6">
-                    <div class="container">
-                        <container-top icon="icon-arrow-down-left" title="Կանխիկացում"> </container-top>
-                        <tabs-doughnut-chart id="dispense" summary="${safeDispenseData}" tabsinfo="${safeDispenseTabsData}"></tabs-doughnut-chart>
-                        </div>      
-                </div>
-                <div class="column sm-6">
-                    <div class="container">
-                        <container-top icon="icon-arrow-up-right" title="Մուտքագրում"> </container-top>
-                        <tabs-doughnut-chart id="deposit" summary="${safeDepositData}" tabsinfo="${safeDepositTabsData}"></tabs-doughnut-chart>
-                    </div>
-                </div>
+        <div class="row">
+          <div class="column sm-6">
+            <div class="container">
+              <doughnut-tabs id="dispense" data="${dispenseData}"></doughnut-tabs>
             </div>
+          </div>
+          <div class="column sm-6">
+            <div class="container">
+             <doughnut-tabs id="deposit" data="${depositData}"></doughnut-tabs>
+            </div>
+          </div>
+        </div>
         `;
     }
 }

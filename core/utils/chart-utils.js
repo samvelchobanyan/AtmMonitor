@@ -13,7 +13,9 @@ const htmlLegendPlugin = {
             const li = document.createElement("li");
             const circle = document.createElement("span");
 
-            const customLegendEl = $(chart.canvas).parents(".chart-container").children(".custom-legend");
+            const customLegendEl = $(chart.canvas)
+                .parents(".chart-container")
+                .children(".custom-legend");
 
             if (customLegendEl.hasClass("custom-legend_checkmark")) {
                 const checkbox = document.createElement("custom-checkbox");
@@ -33,7 +35,10 @@ const htmlLegendPlugin = {
                     if (type === "pie" || type === "doughnut") {
                         chart.toggleDataVisibility(item.index);
                     } else {
-                        chart.setDatasetVisibility(item.datasetIndex, !chart.isDatasetVisible(item.datasetIndex));
+                        chart.setDatasetVisibility(
+                            item.datasetIndex,
+                            !chart.isDatasetVisible(item.datasetIndex)
+                        );
                     }
                     chart.update();
                 });
@@ -249,6 +254,7 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
     if (useLabelLines) {
         plugins.push(doughnutLabelLinesPlugin);
     }
+    console.log("chartData", chartData);
 
     return new Chart(ctx, {
         type: "doughnut",

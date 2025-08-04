@@ -68,18 +68,19 @@ class inOut extends DynamicElement {
             `;
         }
 
-        const escapedData = JSON.stringify(summary.data.dispense_summary).replace(/"/g, '&quot;');
+        const dispenseData = JSON.stringify(summary.data.dispense_summary).replace(/"/g, '&quot;');
+        const depositData = JSON.stringify(summary.data.deposit_summary).replace(/"/g, '&quot;');
 
         return /*html*/ `
         <div class="row">
           <div class="column sm-6">
             <div class="container">
-              <doughnut-tabs id="dispense" data="${escapedData}"></doughnut-tabs>
+              <doughnut-tabs id="dispense" data="${dispenseData}"></doughnut-tabs>
             </div>
           </div>
           <div class="column sm-6">
             <div class="container">
-              <!-- Reserved for future use -->
+             <doughnut-tabs id="deposit" data="${depositData}"></doughnut-tabs>
             </div>
           </div>
         </div>

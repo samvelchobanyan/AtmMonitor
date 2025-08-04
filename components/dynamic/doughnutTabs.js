@@ -7,7 +7,7 @@ import "./select-box-date.js";
 const observedAttrs = ["data", "api-url", "start-date", "end-date"];
 const nonRenderAttrs = new Set(["start-date", "end-date"]);
 
-const TAB_LABELS = {
+const TAB_LABELS = { 
   card: "\u0554\u0561\u0580\u057f\u0578\u057e / \u0531\u0576\u0584\u0561\u0580\u057f",
   cardownership: "\u054d\u0565\u0583\u0561\u056f\u0561\u0576 / \u0531\u0575\u056c \u056f\u0561\u0580\u057f",
   payment_system: "\u054e\u0580\u0561\u0580\u0561\u0575\u056b\u0576 \u0570\u0561\u0574\u0561\u056f\u0561\u0580\u0563",
@@ -221,7 +221,7 @@ export default class DoughnutTabs extends DynamicElement {
       <div class="radio-buttons">
         ${this._renderRadios()}
       </div>
-      <div class="chart-container chart-container_between">
+      <div class="chart-container">
         <doughnut-chart id="${this.getAttr("id")}-amount" data='${amountData}'></doughnut-chart>
         <doughnut-chart id="${this.getAttr("id")}-count" data='${countData}'></doughnut-chart>
       </div>

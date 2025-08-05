@@ -1,5 +1,12 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
-import { createBarChart, updateBarChart, createDoughnutChart, updateDoughnutChart, createLineChart, updateLineChart } from "../../core/utils/chart-utils.js";
+import {
+    createBarChart,
+    updateBarChart,
+    createDoughnutChart,
+    updateDoughnutChart,
+    createLineChart,
+    updateLineChart,
+} from "../../core/utils/chart-utils.js";
 import chartDataTransformer from "../../core/utils/data-transformer.js";
 import { memoryStore } from "../../core/memory-store.js";
 import "./select-box-date.js";
@@ -24,6 +31,7 @@ class ChartComponent extends DynamicElement {
         this.selectBox = null;
         this.canvasId = `canvas-${this.getAttr("id", "line-chart")}`;
         this.legendId = `legend-${this.canvasId}`;
+        console.log(this.canvasId);
 
         this.chart = null;
         this.transformedData = null;
@@ -56,7 +64,8 @@ class ChartComponent extends DynamicElement {
                             this.transformedData = chartDataTransformer.transformData(parsed);
                             break;
                         case "doughnut":
-                            this.transformedData = chartDataTransformer.transformDoughnutData(parsed);
+                            this.transformedData =
+                                chartDataTransformer.transformDoughnutData(parsed);
                             break;
                         case "bar":
                             this.transformedData = chartDataTransformer.transformBarData(parsed);
@@ -150,11 +159,15 @@ class ChartComponent extends DynamicElement {
             // const chartData = this.transformData(response.data);
             switch (this.chartType) {
                 case "line":
-                    this.transformedData = chartDataTransformer.transformData(response.data[data_array_name]);
+                    this.transformedData = chartDataTransformer.transformData(
+                        response.data[data_array_name]
+                    );
                     this._updateChart();
                     break;
                 case "doughnut":
-                    this.transformedData = chartDataTransformer.transformDoughnutData(response.data);
+                    this.transformedData = chartDataTransformer.transformDoughnutData(
+                        response.data
+                    );
                     this._updateChart();
                     break;
                 case "bar":
@@ -174,8 +187,12 @@ class ChartComponent extends DynamicElement {
                 updateLineChart(this.chart, this.transformedData.chartData);
                 break;
             case "doughnut":
-                this.$(".chart-info__number").childNodes[0].textContent = this.transformedData.metaData.total.toLocaleString();
-                this.$("change-indicator").setAttribute("value", this.transformedData.metaData.percent);
+                this.$(".chart-info__number").childNodes[0].textContent =
+                    this.transformedData.metaData.total.toLocaleString();
+                this.$("change-indicator").setAttribute(
+                    "value",
+                    this.transformedData.metaData.percent
+                );
                 updateDoughnutChart(this.chart, this.transformedData.chartData);
                 break;
             case "bar":
@@ -196,14 +213,16 @@ class ChartComponent extends DynamicElement {
                 const dataAttr = this.getAttr("chart-data");
                 const parsed = JSON.parse(dataAttr);
                 this.transformedData = chartDataTransformer.transformDoughnutData(parsed);
-                
+
                 chartHTML = `
                   <div class="chart-container chart-container_between">
                       <div class="chart chart_280">
                           <canvas id="${this.canvasId}"></canvas>
                           <div class="chart-info">
                               <div class="chart-info__number">${this.transformedData.metaData.total.toLocaleString()}<span>֏</span></div>
-                              <change-indicator value="${this.transformedData.metaData.percent}"></change-indicator>
+                              <change-indicator value="${
+                                  this.transformedData.metaData.percent
+                              }"></change-indicator>
                           </div>
                       </div>
                       <div class="custom-legend custom-legend_center" id="${this.legendId}"></div>

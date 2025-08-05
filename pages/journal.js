@@ -8,21 +8,16 @@ import "../components/dynamic/select-box-search.js";
 import "../components/dynamic/list-view.js";
 import "../components/dynamic/segment.js";
 
-
 class journal extends DynamicElement {
     constructor() {
         super();
-
-        this.state = {
-            atmId: null,
-        };
     }
 
     onConnected() {
         // this.fetchSummary();
     }
 
-    async fetchSummary(region, city, atmId) {
+    async fetchSummary(region, city, searchText, cardnumber, pageNumber) {
         const queryString = new URLSearchParams();
         if (region) {
             queryString.append("district", region);
@@ -30,12 +25,17 @@ class journal extends DynamicElement {
         if (city) {
             queryString.append("city", city);
         }
-        if (atmId) {
-            queryString.append("atmId", atmId);
+        if (searchText) {
+            queryString.append("searchTerm", searchText);
         }
-
+        if (cardnumber) {
+            queryString.append("cardnumber", cardnumber);
+        }
+        if (pageNumber) {
+            queryString.append("pageNumber", pageNumber);
+        }
         try {
-            const response = await this.fetchData(`/analytics/summary?${queryString}`);
+            const response = await this.fetchData(`/journal/events-journal?${queryString}`);
             this.setState({
                 selectedRegion: region,
                 selectedCity: city,
@@ -55,8 +55,8 @@ class journal extends DynamicElement {
                     <div class="container">
                     <div class="tabs-container">
                         <div class="tabs">
-                            <custom-tab name="geo" active >Աշխարհագրական</custom-tab>
-                            <custom-tab name="atms">Բանկոմատներ</custom-tab>
+                            <custom-tab name="atms" active >Բանկոմատ</custom-tab>
+                            <custom-tab name="cards">Քարտ</custom-tab>
                         </div>
                     </div>
                     <div class="tab-content" data-tab="geo">
@@ -67,6 +67,7 @@ class journal extends DynamicElement {
                             searchable
                             search-fields="text"
                             items='[
+                            
                                     { "text": "ՍԱՍ Սուպերմարկետ", "value": "sas_supermarket" },
                                     { "text": "Առևտրի կենտրոն", "value": "shopping_mall" },
                                     { "text": "Բենզալցակայաններ", "value": "gas_stations" },

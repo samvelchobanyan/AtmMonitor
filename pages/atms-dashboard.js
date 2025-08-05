@@ -14,7 +14,6 @@ import "../components/ui/customTab.js";
 import "../components/dynamic/select-box-search.js";
 import "../components/ui/customCheck.js";
 
-
 class AtmsDashboard extends DynamicElement {
     constructor() {
         super();
@@ -73,14 +72,15 @@ class AtmsDashboard extends DynamicElement {
             `;
         }
 
-    const generalData = this.state.summary;
-    const transactionsData = this.state.summary.transactionsInfo;
-    const encashmentData = this.state.summary.encashmentInfo;
-    const atmWorkHours = this.state.summary.atmWorkHours;
+        const generalData = this.state.summary;
+        const transactionsData = this.state.summary.transactionsInfo;
+        const encashmentData = this.state.summary.encashmentInfo;
+        const atmWorkHours = this.state.summary.atmWorkHours;
 
-    const transactionDaily = this.state.summary.hourly_transactions;
-    const encashmentsDaily = this.state.summary.hourly_encashments;
-    const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
+        const transactionDaily = this.state.summary.hourly_transactions;
+        const encashmentsDaily = this.state.summary.hourly_encashments;
+        const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
+        console.log("transactionDaily", transactionDaily);
 
         return /* html */ `
         <div class="row">

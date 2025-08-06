@@ -150,6 +150,7 @@ class ChartComponent extends DynamicElement {
         const url = `${endpoint}?${params.toString()}`;
         try {
             const response = await this.fetchData(url);
+            console.log("response", response);
 
             const isValid = response && response.errors === null && response.data;
 

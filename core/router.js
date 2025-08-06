@@ -61,16 +61,10 @@ export function startRouter() {
 
 // — Geo Analytics Route
   page('/geo', async ctx => {
-    if (!customElements.get('atms-dashboard')) {
-      await import('../pages/atms-dashboard.js');
+    if (!customElements.get('geo-analythics')) {
+      await import('../pages/geo-analythics.js');
     }
-
-    // set default
-    // if (!ctx.query.region) {
-    //   ctx.query.region = 'Երևան'; // default fallback
-    // }
-
-    mountComponent('atm-analitic-geo', 'աշխարհագրական', ctx.query);
+    mountComponent('geo-analythics', 'Անալիտիկա | Աշխարհագրական', ctx.query);
   });
 
 // — Analytics Route

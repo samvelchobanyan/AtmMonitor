@@ -71,15 +71,15 @@ class inOut extends DynamicElement {
         const dispenseData = JSON.stringify(summary.data.dispense_summary).replace(/"/g, "&quot;");
         const depositData = JSON.stringify(summary.data.deposit_summary).replace(/"/g, "&quot;");
         const transactionsData = JSON.stringify(
-            summary.data.transaction_dynamics.exchange_dynamic.hourly
+            summary.data.transaction_dynamics.exchange_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
         const dispenseDynamicData = JSON.stringify(
-            summary.data.transaction_dynamics.dispense_dynamic.hourly
+            summary.data.transaction_dynamics.dispense_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
         const depositDynamicData = JSON.stringify(
-            summary.data.transaction_dynamics.deposit_dynamic.hourly
+            summary.data.transaction_dynamics.deposit_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
         const exchangeData = summary.data.exchange_summary.currency_details;
@@ -122,7 +122,7 @@ class inOut extends DynamicElement {
                     id="line-chart-transactions"
                     chart-type="line"
                     chart-data='${transactionsData}'
-                    api-url="/analytics/transactions-dynamic-in-days"
+                    api-url="/analytics/exchange-dynamic-in-days"
                     ${this.attrIf("city", this.state.currentCity)}
                     ${this.attrIf("region", this.state.currentRegion)}>
                 </chart-component>

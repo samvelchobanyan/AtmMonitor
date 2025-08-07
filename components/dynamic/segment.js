@@ -5,17 +5,25 @@ import "./list-view.js";
 
 class SegmentBlock extends DynamicElement {
     onConnected() {
-        this.state = {};
         this.selectedSegments = [];
-        this.segmentItems = [
-            { text: "ՍԱՍ Սուպերմարկետ", value: "sas_supermarket" },
-            { text: "Առևտրի կենտրոն", value: "shopping_mall" },
-            { text: "Բենզալցակայաններ", value: "gas_stations" },
-            { text: "Օդանավակայան", value: "airport" },
-            { text: "Հյուրանոցներ", value: "hotels" },
-            { text: "Ռեստորաններ", value: "restaurants" },
-            { text: "Դեղատներ", value: "pharmacies" },
-        ];
+        this.segmentItems = [];
+        this.loading = false;
+        this.fetchSegments();
+    }
+
+    async fetchSegments() {
+        try {
+            const response = await this.fetchData("/atm/segments");
+
+            this.segmentItems = response.data.map((item) => ({
+                value: item.id,
+                text: item.name,
+                atm_segment_id: item.atm_segment_id,
+            }));
+        } catch (err) {
+            console.error("❌ Error fetching segmentItems:", err);
+            this.segmentItems = [];
+        }
     }
 
     template() {
@@ -92,9 +100,10 @@ class SegmentBlock extends DynamicElement {
 
                 // Add new pills
                 const itemsData = JSON.parse(listView.getAttribute("items"));
+
                 checkedValues.forEach((value) => {
-                    if (!this.selectedSegments.find((seg) => seg.value === value)) {
-                        const itemData = itemsData.find((item) => item.value === value);
+                    if (!this.selectedSegments.find((seg) => seg.value == value)) {
+                        const itemData = itemsData.find((item) => item.value == value);
                         if (itemData) {
                             this.selectedSegments.push({ value, label: itemData.text });
                             this._renderPill(itemData.text, value);
@@ -131,7 +140,9 @@ class SegmentBlock extends DynamicElement {
                 this.addListener(closeIcon, "click", (e) => {
                     e.stopPropagation();
                     pill.remove();
-                    this.selectedSegments = this.selectedSegments.filter((seg) => seg.value !== value);
+                    this.selectedSegments = this.selectedSegments.filter(
+                        (seg) => seg.value !== value
+                    );
                     this._updateSelectedValuesVisibility();
                 });
             }

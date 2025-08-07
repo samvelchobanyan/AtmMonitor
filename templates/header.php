@@ -19,7 +19,7 @@
                                     </div>
                                     <div class="combo-option" data-option-value="1">
                                         <span>Գորիս</span>
-                                    </div>
+                                    </div> 
                                     <div class="combo-option" data-option-value="2">
                                         <span>Գյումրի</span>
                                     </div>
@@ -27,6 +27,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- todo make this hidden for geo page -->
                     <div class="custom-select">
                         <div class="combo-box" data-combo-name="single" data-combo-value="all">
                             <div class="combo-box-selected">

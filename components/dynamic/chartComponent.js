@@ -203,7 +203,6 @@ class ChartComponent extends DynamicElement {
     }
 
     template() {
-        if (this.getAttr("id") === "line-chart") console.log("template");
         if (this.isLoading()) {
             return `<div>Loading chart…</div>`;
         }

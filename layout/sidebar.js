@@ -27,7 +27,7 @@ class SideBar extends StaticElement {
                         <div class="sidebar__dropdown">
                             <a href="inout" class="active">Մուտք / Ելք</a>
                             <a href="geo" id="geo">Աշխարհագրական</a>
-                            <a href="">Կումուլատիվ</a>
+                            <a href="cumulative" id="cumulative">Կումուլատիվ</a>
                             <a href="">Ինկասացիա</a>
                         </div>
                     </div>

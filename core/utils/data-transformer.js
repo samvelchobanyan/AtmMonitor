@@ -128,7 +128,7 @@ class ChartDataTransformer {
 
     transformDoughnutData(apiResponse) {
         const data = apiResponse;
-        console.log("data", data);
+        // console.log("data", data);
 
         if (!data || typeof data !== "object") {
             throw new Error("Invalid data format: data must be an object");

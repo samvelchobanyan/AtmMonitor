@@ -120,7 +120,7 @@ class JournalPage extends DynamicElement {
             const response = await this.fetchData(`/journal/events-journal?${queryString}`);
             this.setState({ summary: response.data });
 
-            console.log("resopnse", response);
+            // console.log("resopnse", response);
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: [] });
@@ -130,7 +130,7 @@ class JournalPage extends DynamicElement {
     template() {
         if (this.state.summary.events === undefined) return;
 
-        console.log(this.state.summary.events);
+        // console.log(this.state.summary.events);
         let itemsData = JSON.stringify(this.state.summary.events).replace(/"/g, "&quot;");
         return /*html*/ `
             <div class="row">

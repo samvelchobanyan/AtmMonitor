@@ -31,7 +31,7 @@ class ChartComponent extends DynamicElement {
         this.selectBox = null;
         this.canvasId = `canvas-${this.getAttr("id", "line-chart")}`;
         this.legendId = `legend-${this.canvasId}`;
-        console.log(this.canvasId);
+        // console.log(this.canvasId);
 
         this.chart = null;
         this.transformedData = null;
@@ -150,7 +150,7 @@ class ChartComponent extends DynamicElement {
         const url = `${endpoint}?${params.toString()}`;
         try {
             const response = await this.fetchData(url);
-            console.log("response", response);
+            // console.log("response", response);
 
             const isValid = response && response.errors === null && response.data;
 

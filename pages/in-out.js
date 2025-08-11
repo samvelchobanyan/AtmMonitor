@@ -66,7 +66,7 @@ class inOut extends DynamicElement {
             </div>
             `;
         }
-        console.log("!!!!!!!!!!!!!", summary.data);
+        // console.log("!!!!!!!!!!!!!", summary.data);
 
         const dispenseData = JSON.stringify(summary.data.dispense_summary).replace(/"/g, "&quot;");
         const depositData = JSON.stringify(summary.data.deposit_summary).replace(/"/g, "&quot;");

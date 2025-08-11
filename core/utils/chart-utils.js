@@ -254,7 +254,6 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
     if (useLabelLines) {
         plugins.push(doughnutLabelLinesPlugin);
     }
-    console.log("chartData", chartData);
 
     return new Chart(ctx, {
         type: "doughnut",

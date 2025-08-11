@@ -174,7 +174,7 @@ class ListView extends DynamicElement {
         const tpl = this.querySelector("template");
         this.userTemplateHTML = tpl?.innerHTML?.trim() || null;
 
-        console.log('this.getAttr("items")', this.getAttr("items"));
+        // console.log('this.getAttr("items")', this.getAttr("items"));
 
         const parsed = JSON.parse(this.getAttr("items"));
 

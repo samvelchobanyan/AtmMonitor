@@ -1,5 +1,6 @@
 import { DynamicElement } from "../core/dynamic-element.js";
-import { ContainerTop } from "../components/ui/containerTop.js";
+import locationTransformer from "../core/utils/location-transformer.js";
+import { store } from "../core/store/store.js";
 import "../components/dynamic/doughnutTabs.js";
 import "../components/ui/customTab.js";
 import "../components/dynamic/select-box-search.js";
@@ -11,19 +12,83 @@ class GeoAnalythics extends DynamicElement {
         super();
 
         this.state = {
-            summary: null,
-            atmId: null,
+            firstSummary: null,
+            secondSummary: null,
         };
+        this.province = [];
+        this.cities = [];
+        this.currentRegion1 = null;
+        this.currentCity1 = null;
 
-        this.currentRegion = null;
-        this.currentCity = null;
+        this.currentRegion2 = null;
+        this.currentCity2 = null;
+        this.atmsList = [];
+
+        this.selectCityBox1 = null;
+        this.selectCityBox2 = null;
+        this.selectRegionBox1 = null;
+        this.selectRegionBox2 = null;
     }
 
+
+    // todo after on change fetch select resets
     onConnected() {
-        this.fetchSummary();
+        const state = store.getState();
+
+        this.province = state.regionsData.map((item) => ({
+            label: item.province,
+            value: item.province,
+        }));
+
+        this.cities = locationTransformer.getAllCityOptions(state.regionsData);
+
+        this.fetchFirstSummary();
+        this.fetchSecondSummary();
+        if (this.atmsList.length == 0) {
+            this.fetchAtms();
+        }
     }
 
-    async fetchSummary(region, city, atmId) {
+    onAfterRender() {
+        this.selectCityBox1 = this.$("#city-selector1");
+        this.selectCityBox2 = this.$("#city-selector2");
+        this.selectRegionBox1 = this.$("#province-selector1");
+        this.selectRegionBox2 = this.$("#province-selector2");
+    }
+
+    async fetchFirstSummary(region, city, atmId) {
+        console.log("currentRegion1", this.currentRegion1);
+        console.log("currentCity1", this.currentCity1);
+
+        const queryString = new URLSearchParams();
+        if (region) {
+            queryString.append("district", region);
+        }
+        if (city) {
+            queryString.append("city", city);
+        }
+        if (atmId) {
+            queryString.append("atmId", atmId);
+        }
+
+  
+        try {
+            const response = await this.fetchData(`/analytics/summary?${queryString}`);
+            this.currentRegion1 = region;
+            this.currentCity1 = city;
+
+            this.setState({
+                firstSummary: response.data,
+            });
+        } catch (err) {
+            console.error("❌ Error fetching summary:", err);
+            this.setState({
+                firstSummary: null,
+            });
+        }
+    }
+
+    async fetchSecondSummary(region, city, atmId) {
         const queryString = new URLSearchParams();
         if (region) {
             queryString.append("district", region);
@@ -37,28 +102,76 @@ class GeoAnalythics extends DynamicElement {
 
         try {
             const response = await this.fetchData(`/analytics/summary?${queryString}`);
-            this.currentRegion = region;
-            this.currentCity = city;
+            this.currentRegion2 = region;
+            this.currentCity2 = city;
+
             this.setState({
-                summary: response,
-                atmId: atmId,
+                secondSummary: response.data,
             });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
-            this.setState({ summary: null });
+            this.setState({
+                secondSummary: null,
+            });
         }
     }
-    onStoreChange(storeState) {
-        const region = storeState.selectedRegion;
-        const city = storeState.selectedCity;
-        if (region !== this.currentRegion || city !== this.currentCity) {
-            this.fetchSummary(region, city);
+
+    async fetchAtms(region, city, atmId) {
+        const queryString = new URLSearchParams();
+        if (region) {
+            queryString.append("district", region);
+        }
+        if (city) {
+            queryString.append("city", city);
+        }
+        if (atmId) {
+            queryString.append("atmId", atmId);
+        }
+
+        try {
+            const response = await this.fetchData(`/atm/getatms?${queryString}`);
+            // console.log("!!!!", response);
+
+            this.atmsList = response.data.atms.map((atm) => ({
+                value: atm.id,
+                label: atm.name,
+            }));
+        } catch (err) {
+            console.error("❌ Error fetching summary:", err);
+            this.atmsList = [];
+        }
+    }
+
+    // onStoreChange(storeState) {
+    //     const region = storeState.selectedRegion;
+    //     const city = storeState.selectedCity;
+    //     if (region !== this.currentRegion || city !== this.currentCity) {
+    //         this.fetchFirstSummary(region, city);
+    //         this.fetchSecondSummary(region, city);
+    //     }
+    // }
+
+    addEventListeners() {
+        if (this.selectCityBox1) {
+            this.addListener(this.selectCityBox1, "change", (e) => {
+                this.currentCity1 = e.target.value;
+                this.fetchFirstSummary(this.currentRegion1, this.currentCity1);
+            });
+        }
+
+        if (this.selectCityBox2) {
+            this.addListener(this.selectCityBox2, "change", (e) => {
+                this.currentCity2 = e.target.value;
+                this.fetchSecondSummary(this.currentRegion2, this.currentCity2);
+            });
         }
     }
 
     template() {
-        const summary = this.state.summary;
-        if (!summary) {
+        const firstSummary = this.state.firstSummary;
+        const secondSummary = this.state.secondSummary;
+
+        if (!firstSummary || !secondSummary || !this.atmsList) {
             return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
@@ -70,59 +183,90 @@ class GeoAnalythics extends DynamicElement {
             </div>
             `;
         }
-        console.log("!!!!!!!!!!!!!", summary.data);
 
-        const dispenseData = JSON.stringify(summary.data.dispense_summary).replace(/"/g, "&quot;");
-        const depositData = JSON.stringify(summary.data.deposit_summary).replace(/"/g, "&quot;");
-        const transactionsData = JSON.stringify(
-            summary.data.transaction_dynamics.exchange_dynamic.hourly_data
+        const firstDispenseData = JSON.stringify(firstSummary.dispense_summary).replace(
+            /"/g,
+            "&quot;"
+        );
+        const secondDispenseData = JSON.stringify(secondSummary.dispense_summary).replace(
+            /"/g,
+            "&quot;"
+        );
+
+        const firstDepositData = JSON.stringify(firstSummary.deposit_summary).replace(
+            /"/g,
+            "&quot;"
+        );
+        const secondDepositData = JSON.stringify(secondSummary.deposit_summary).replace(
+            /"/g,
+            "&quot;"
+        );
+
+        // const transactionsData = JSON.stringify(
+        //     summary.transaction_dynamics.exchange_dynamic.hourly_data
+        // ).replace(/"/g, "&quot;");
+
+        const firstDispenseDynamicData = JSON.stringify(
+            firstSummary.transaction_dynamics.dispense_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
-        const dispenseDynamicData = JSON.stringify(
-            summary.data.transaction_dynamics.dispense_dynamic.hourly_data
+        const secondDispenseDynamicData = JSON.stringify(
+            secondSummary.transaction_dynamics.dispense_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
-        const depositDynamicData = JSON.stringify(
-            summary.data.transaction_dynamics.deposit_dynamic.hourly_data
+        const firstDepositDynamicData = JSON.stringify(
+            firstSummary.transaction_dynamics.deposit_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
-        const exchangeData = summary.data.exchange_summary.currency_details;
+        const secondDepositDynamicData = JSON.stringify(
+            secondSummary.transaction_dynamics.deposit_dynamic.hourly_data
+        ).replace(/"/g, "&quot;");
 
+        const firstExchangeData = firstSummary.exchange_summary.currency_details;
+        const secondExchangeData = secondSummary.exchange_summary.currency_details;
+
+        const atmsList = JSON.stringify(this.atmsList).replace(/"/g, "&quot;");
         return /*html*/ `
+
+            
         <div class="row">
            <div class="column sm-6">
                 <div class="container">
                     <div class="tabs-container">
                         <div class="tabs">
-                            <custom-tab name="geo" active>Աշխարհագրական</custom-tab>
-                            <custom-tab name="atms">Բանկոմատներ</custom-tab>
+                            <custom-tab name="geo1" active>Աշխարհագրական</custom-tab>
+                            <custom-tab name="atms1">Բանկոմատներ</custom-tab>
                         </div>
                     </div>
-                    <div class="tab-content" data-tab="geo">
+                    <div class="tab-content" data-tab="geo1">
                        <div class="row"> 
-                            <select-box placeholder="Choose district" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box>
-                            <select-box placeholder="Choose city" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box>
-                            <select-box placeholder="Choose village" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box>
+                            <select-box id="city-selector1" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
+                                this.cities
+                            )}' value="${this.state.selectedCity1 || ""}"></select-box>
+                            <select-box id="province-selector1"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
+                                this.province
+                            )}' value="${this.state.selectedRegion1 || ""}"></select-box>
+                           
                         </div>
                         <div class="row"> <segment-block></segment-block></div>
                     </div>
-                    <div class="tab-content" data-tab="atms" style="display: none;">
-                        <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>
-                    <div class="tab-content" data-tab="atms" style="display: none;">
-                        <div class="checkboxes">
-                            <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
-                            <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
-                            <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
-                            <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
-                            <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
-                            <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
-                            <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
-                            <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
-                            <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
-                            <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
-                            <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
-                        </div>  
-                    </div>
+                    <div class="tab-content" data-tab="atms1" style="display: none;">
+                        <select-box-search placeholder="Որոնել ըստ բանկոմատի ID-ի կամ հասցեի" options='${atmsList}'></select-box-search>
+                        <div class="tab-content" data-tab="atms1" style="display: none;">
+                            <div class="checkboxes">
+                                <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
+                                <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
+                                <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
+                                <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
+                                <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
+                                <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
+                                <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
+                                <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
+                                <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
+                                <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
+                                <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
+                            </div>  
+                        </div>
                     </div>
                 </div>
             </div>
@@ -131,21 +275,23 @@ class GeoAnalythics extends DynamicElement {
                 <div class="container">
                     <div class="tabs-container">
                         <div class="tabs">
-                            <custom-tab name="geo" active>Աշխարհագրական</custom-tab>
-                            <custom-tab name="atms">Բանկոմատներ</custom-tab>
+                            <custom-tab name="geo2" active>Աշխարհագրական</custom-tab>
+                            <custom-tab name="atms2">Բանկոմատներ</custom-tab>
                         </div>
                     </div>
-                    <div class="tab-content" data-tab="geo">
+                    <div class="tab-content" data-tab="geo2">
                        <div class="row"> 
-                            <select-box placeholder="Choose district" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box>
-                            <select-box placeholder="Choose city" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box>
-                            <select-box placeholder="Choose village" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box>
-                        </div>
+                        <select-box id="city-selector2" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
+                            this.cities
+                        )}'></select-box>
+                            <select-box id="province-selector2"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
+                                this.province
+                            )}'></select-box>    </div>
                         <div class="row"> <segment-block></segment-block></div>
                     </div>
-                    <div class="tab-content" data-tab="atms" style="display: none;">
-                        <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>
-                    <div class="tab-content" data-tab="atms" style="display: none;">
+                    <div class="tab-content" data-tab="atms2" style="display: none;">
+                        <select-box-search placeholder="Որոնել ըստ բանկոմատի ID-ի կամ հասցեի" options='${atmsList}'></select-box-search>
+                    <div class="tab-content" data-tab="atms2" style="display: none;">
                         <div class="checkboxes">
                             <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
                             <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
@@ -168,13 +314,13 @@ class GeoAnalythics extends DynamicElement {
         <div class="row">
             <div class="column sm-6">
                 <div class="container">
-                    <doughnut-tabs id="dispense" data="${dispenseData}"></doughnut-tabs>
+                    <doughnut-tabs id="dispense1" data="${firstDispenseData}"></doughnut-tabs>
                 </div>
             </div>
 
             <div class="column sm-6">
                 <div class="container">
-                    <doughnut-tabs id="dispense" data="${dispenseData}"></doughnut-tabs>
+                    <doughnut-tabs id="dispense2" data="${secondDispenseData}"></doughnut-tabs>
                 </div>
             </div>
         </div>
@@ -182,13 +328,13 @@ class GeoAnalythics extends DynamicElement {
         <div class="row">
             <div class="column sm-6">
                 <div class="container">
-                    <doughnut-tabs id="deposit" data="${depositData}"></doughnut-tabs>
+                    <doughnut-tabs id="deposit1" data="${firstDepositData}"></doughnut-tabs>
                 </div>
             </div>
 
             <div class="column sm-6">
                 <div class="container">
-                    <doughnut-tabs id="deposit" data="${depositData}"></doughnut-tabs>
+                    <doughnut-tabs id="deposit2" data="${secondDepositData}"></doughnut-tabs>
                 </div>
             </div>
           </div>
@@ -198,7 +344,7 @@ class GeoAnalythics extends DynamicElement {
               <div class="container">
                   <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
                   <div class="infos">
-                      ${exchangeData
+                      ${firstExchangeData
                           .map((exchange) => {
                               return `
                           <info-card
@@ -219,7 +365,7 @@ class GeoAnalythics extends DynamicElement {
               <div class="container">
                   <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
                   <div class="infos">
-                      ${exchangeData
+                      ${secondExchangeData
                           .map((exchange) => {
                               return `
                           <info-card
@@ -242,12 +388,12 @@ class GeoAnalythics extends DynamicElement {
                   <div class="container">
                     <container-top icon="icon-trending-up" title="Կանխիկացումների դինամիկա"></container-top>
                     <chart-component
-                        id="line-chart-dispense-dynamics"
+                        id="line-chart-dispense-dynamics1"
                         chart-type="line"
-                        chart-data='${dispenseDynamicData}'
+                        chart-data='${firstDispenseDynamicData}'
                         api-url="/analytics/dispense-dynamic-in-days"
-                        ${this.attrIf("city", this.state.currentCity)}
-                        ${this.attrIf("region", this.state.currentRegion)}>
+                        ${this.attrIf("city", this.currentCity)}
+                        ${this.attrIf("region", this.currentRegion)}>
                     </chart-component>
                   </div>
                </div>
@@ -256,12 +402,12 @@ class GeoAnalythics extends DynamicElement {
                   <div class="container">
                     <container-top icon="icon-trending-up" title="Կանխիկացումների դինամիկա"></container-top>
                     <chart-component
-                        id="line-chart-dispense-dynamics"
+                        id="line-chart-dispense-dynamics2"
                         chart-type="line"
-                        chart-data='${dispenseDynamicData}'
+                        chart-data='${secondDispenseDynamicData}'
                         api-url="/analytics/dispense-dynamic-in-days"
-                        ${this.attrIf("city", this.state.currentCity)}
-                        ${this.attrIf("region", this.state.currentRegion)}>
+                        ${this.attrIf("city", this.currentCity)}
+                        ${this.attrIf("region", this.currentRegion)}>
                     </chart-component>
                   </div>
               </div>
@@ -272,12 +418,12 @@ class GeoAnalythics extends DynamicElement {
                   <div class="container">
                     <container-top icon="icon-trending-up" title="Մուտքագրված գումարների դինամիկա"></container-top>
                     <chart-component
-                        id="line-chart-deposit-dynamics"
+                        id="line-chart-deposit-dynamics1"
                         chart-type="line"
-                        chart-data='${depositDynamicData}'
+                        chart-data='${firstDepositDynamicData}'
                         api-url="/analytics/deposit-dynamic-in-days"
-                        ${this.attrIf("city", this.state.currentCity)}
-                        ${this.attrIf("region", this.state.currentRegion)}>
+                        ${this.attrIf("city", this.currentCity)}
+                        ${this.attrIf("region", this.currentRegion)}>
                     </chart-component>
                   </div>
               </div>
@@ -287,12 +433,12 @@ class GeoAnalythics extends DynamicElement {
                   <div class="container">
                     <container-top icon="icon-trending-up" title="Մուտքագրված գումարների դինամիկա"></container-top>
                     <chart-component
-                        id="line-chart-deposit-dynamics"
+                        id="line-chart-deposit-dynamics2"
                         chart-type="line"
-                        chart-data='${depositDynamicData}'
+                        chart-data='${secondDepositDynamicData}'
                         api-url="/analytics/deposit-dynamic-in-days"
-                        ${this.attrIf("city", this.state.currentCity)}
-                        ${this.attrIf("region", this.state.currentRegion)}>
+                        ${this.attrIf("city", this.currentCity)}
+                        ${this.attrIf("region", this.currentRegion)}>
                     </chart-component>
                   </div>
               </div>

@@ -59,12 +59,14 @@ class SelectBoxSearch extends DynamicElement {
             const optionsList = JSON.parse(options);
             this.optionsMap.clear();
             this.allOptions = optionsList;
+            console.log(optionsList);
 
             optionsList.forEach((opt) => {
                 if (typeof opt === "string") {
                     this.optionsMap.set(opt, opt);
                 } else {
-                    this.optionsMap.set(opt.value, opt.label || opt.text || opt.value);
+                    const valKey = String(opt.value);
+                    this.optionsMap.set(valKey, opt.label || opt.text || valKey);
                 }
             });
         } catch (e) {
@@ -75,30 +77,38 @@ class SelectBoxSearch extends DynamicElement {
     }
 
     _initializeSelectedValues(value) {
+        const normalize = (val) => String(val);
+
         try {
             const initialValues = JSON.parse(value);
 
             if (Array.isArray(initialValues)) {
-                this.selectedValues = initialValues.map((val) => ({
-                    value: val,
-                    displayText: this.optionsMap.get(val) || val,
-                }));
+                this.selectedValues = initialValues.map((val) => {
+                    const key = normalize(val);
+                    return {
+                        value: val,
+                        displayText: this.optionsMap.get(key) || val,
+                    };
+                });
             } else {
+                const key = normalize(value);
                 this.selectedValues = [
                     {
                         value: value,
-                        displayText: this.optionsMap.get(value) || value,
+                        displayText: this.optionsMap.get(key) || value,
                     },
                 ];
             }
         } catch {
+            const key = normalize(value);
             this.selectedValues = [
                 {
                     value: value,
-                    displayText: this.optionsMap.get(value) || value,
+                    displayText: this.optionsMap.get(key) || value,
                 },
             ];
         }
+
         this.renderSelectedValues();
     }
 
@@ -222,7 +232,9 @@ class SelectBoxSearch extends DynamicElement {
                 if (closeIcon) {
                     closeIcon.addEventListener("click", (e) => {
                         e.stopPropagation();
-                        this.selectedValues = this.selectedValues.filter((v) => v.value !== item.value);
+                        this.selectedValues = this.selectedValues.filter(
+                            (v) => v.value !== item.value
+                        );
                         this._updateValueAttribute();
                         this._updateAvailableOptions();
                         this._dispatchEvents(null);

@@ -6,31 +6,35 @@ import "../components/ui/customTab.js";
 import "../components/dynamic/select-box-search.js";
 import "../components/ui/customCheck.js";
 import "../components/dynamic/segment.js";
+import "../components/dynamic/simpleTable.js";
 
 class Cumulative extends DynamicElement {
     constructor() {
         super();
 
         this.state = {
-            firstSummary: null,
-            secondSummary: null,
+            summary: null,
         };
+
         this.province = [];
         this.cities = [];
-        this.currentRegion1 = null;
-        this.currentCity1 = null;
+        this.districts = [];
 
-        this.currentRegion2 = null;
-        this.currentCity2 = null;
+        this.currentRegion = null;
+        this.currentCity = null;
+
         this.atmsList = [];
+        this.segments = [];
 
-        this.selectCityBox1 = null;
-        this.selectCityBox2 = null;
-        this.selectRegionBox1 = null;
-        this.selectRegionBox2 = null;
+        // this.selectCityBox1 = null;
+        // this.selectCityBox2 = null;
+        // this.selectRegionBox1 = null;
+        // this.selectRegionBox2 = null;
     }
 
-    // todo after on change fetch select resets
+    // todo: design fix
+    // todo: does header locations should be here?
+
     onConnected() {
         const state = store.getState();
 
@@ -40,25 +44,33 @@ class Cumulative extends DynamicElement {
         }));
 
         this.cities = locationTransformer.getAllCityOptions(state.regionsData);
+        this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
 
-        this.fetchFirstSummary();
-        this.fetchSecondSummary();
+        this.fetchSummary();
+        if (this.segments.length == 0) {
+            this.fetchSegments();
+        }
         if (this.atmsList.length == 0) {
             this.fetchAtms();
         }
     }
 
-    onAfterRender() {
-        this.selectCityBox1 = this.$("#city-selector1");
-        this.selectCityBox2 = this.$("#city-selector2");
-        this.selectRegionBox1 = this.$("#province-selector1");
-        this.selectRegionBox2 = this.$("#province-selector2");
+    // onAfterRender() {
+    //     this.selectCityBox1 = this.$("#city-selector1");
+    //     this.selectCityBox2 = this.$("#city-selector2");
+    //     this.selectRegionBox1 = this.$("#province-selector1");
+    //     this.selectRegionBox2 = this.$("#province-selector2");
+    // }
+
+    onStoreChange(storeState) {
+        const region = storeState.selectedRegion;
+        const city = storeState.selectedCity;
+        if (region !== this.currentRegion || city !== this.currentCity) {
+            this.fetchSummary(region, city);
+        }
     }
 
-    async fetchFirstSummary(region, city, atmId) {
-        console.log("currentRegion1", this.currentRegion1);
-        console.log("currentCity1", this.currentCity1);
-
+    async fetchSummary(region, city, province, segmentId, atmId) {
         const queryString = new URLSearchParams();
         if (region) {
             queryString.append("district", region);
@@ -66,50 +78,32 @@ class Cumulative extends DynamicElement {
         if (city) {
             queryString.append("city", city);
         }
-        if (atmId) {
-            queryString.append("atmId", atmId);
+        if (province) {
+            queryString.append("province", province);
         }
-
-        try {
-            const response = await this.fetchData(`/analytics/summary?${queryString}`);
-            this.currentRegion1 = region;
-            this.currentCity1 = city;
-
-            this.setState({
-                firstSummary: response.data,
-            });
-        } catch (err) {
-            console.error("❌ Error fetching summary:", err);
-            this.setState({
-                firstSummary: null,
-            });
-        }
-    }
-
-    async fetchSecondSummary(region, city, atmId) {
-        const queryString = new URLSearchParams();
-        if (region) {
-            queryString.append("district", region);
-        }
-        if (city) {
-            queryString.append("city", city);
+        if (segmentId) {
+            queryString.append("segmentId", segmentId);
         }
         if (atmId) {
             queryString.append("atmId", atmId);
         }
+        // for test to get data
+        queryString.append("startDate", "2025-06-27");
+        queryString.append("startDate", "2025-08-11");
 
         try {
-            const response = await this.fetchData(`/analytics/summary?${queryString}`);
-            this.currentRegion2 = region;
-            this.currentCity2 = city;
+            const response = await this.fetchData(`/analytics/cumulative-summary?${queryString}`);
+            this.currentRegion = region;
+            this.currentCity = city;
+            console.log(response);
 
             this.setState({
-                secondSummary: response.data,
+                summary: response.data,
             });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({
-                secondSummary: null,
+                summary: null,
             });
         }
     }
@@ -128,8 +122,6 @@ class Cumulative extends DynamicElement {
 
         try {
             const response = await this.fetchData(`/atm/getatms?${queryString}`);
-            // console.log("!!!!", response);
-
             this.atmsList = response.data.atms.map((atm) => ({
                 value: atm.id,
                 label: atm.name,
@@ -139,15 +131,19 @@ class Cumulative extends DynamicElement {
             this.atmsList = [];
         }
     }
+    async fetchSegments() {
+        try {
+            const response = await this.fetchData("/atm/segments");
 
-    // onStoreChange(storeState) {
-    //     const region = storeState.selectedRegion;
-    //     const city = storeState.selectedCity;
-    //     if (region !== this.currentRegion || city !== this.currentCity) {
-    //         this.fetchFirstSummary(region, city);
-    //         this.fetchSecondSummary(region, city);
-    //     }
-    // }
+            this.segments = response.data.map((item) => ({
+                value: item.id,
+                text: item.name,
+            }));
+        } catch (err) {
+            console.error("❌ Error fetching segmentItems:", err);
+            this.segments = [];
+        }
+    }
 
     addEventListeners() {
         if (this.selectCityBox1) {
@@ -166,10 +162,13 @@ class Cumulative extends DynamicElement {
     }
 
     template() {
-        const firstSummary = this.state.firstSummary;
-        const secondSummary = this.state.secondSummary;
+        // const firstSummary = this.state.firstSummary;
+        // const secondSummary = this.state.secondSummary;
+        console.log("1", this.state.summary);
+        console.log(this.atmsList);
+        console.log(this.segments);
 
-        if (!firstSummary || !secondSummary || !this.atmsList) {
+        if (!this.state.summary || !this.atmsList || !this.segments) {
             return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
@@ -182,48 +181,13 @@ class Cumulative extends DynamicElement {
             `;
         }
 
-        const firstDispenseData = JSON.stringify(firstSummary.dispense_summary).replace(
-            /"/g,
-            "&quot;"
-        );
-        const secondDispenseData = JSON.stringify(secondSummary.dispense_summary).replace(
-            /"/g,
-            "&quot;"
-        );
-
-        const firstDepositData = JSON.stringify(firstSummary.deposit_summary).replace(
-            /"/g,
-            "&quot;"
-        );
-        const secondDepositData = JSON.stringify(secondSummary.deposit_summary).replace(
-            /"/g,
-            "&quot;"
-        );
-
-        // const transactionsData = JSON.stringify(
-        //     summary.transaction_dynamics.exchange_dynamic.hourly_data
-        // ).replace(/"/g, "&quot;");
-
-        const firstDispenseDynamicData = JSON.stringify(
-            firstSummary.transaction_dynamics.dispense_dynamic.hourly_data
-        ).replace(/"/g, "&quot;");
-
-        const secondDispenseDynamicData = JSON.stringify(
-            secondSummary.transaction_dynamics.dispense_dynamic.hourly_data
-        ).replace(/"/g, "&quot;");
-
-        const firstDepositDynamicData = JSON.stringify(
-            firstSummary.transaction_dynamics.deposit_dynamic.hourly_data
-        ).replace(/"/g, "&quot;");
-
-        const secondDepositDynamicData = JSON.stringify(
-            secondSummary.transaction_dynamics.deposit_dynamic.hourly_data
-        ).replace(/"/g, "&quot;");
-
-        const firstExchangeData = firstSummary.exchange_summary.currency_details;
-        const secondExchangeData = secondSummary.exchange_summary.currency_details;
-
         const atmsList = JSON.stringify(this.atmsList).replace(/"/g, "&quot;");
+        const cities = JSON.stringify(this.cities).replace(/"/g, "&quot;");
+        const districts = JSON.stringify(this.districts).replace(/"/g, "&quot;");
+        const segments = JSON.stringify(this.segments).replace(/"/g, "&quot;");
+
+        console.log("this.segments", this.segments);
+
         return /*html*/ `
 
             
@@ -241,91 +205,29 @@ class Cumulative extends DynamicElement {
                     </div>
                     <div class="tab-content column sm-6" data-tab="region">
                       <div class="checkboxes">
-                            <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
-                            <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
-                            <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
-                            <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
-                            <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
-                            <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
-                            <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
-                            <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
-                            <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
-                            <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
-                            <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
+                            ${this.province
+                                .map(
+                                    (el) =>
+                                        `<custom-checkbox id="${el.value}" value="${el.value}" checked>${el.label}</custom-checkbox>`
+                                )
+                                .join("")}
                         </div>  
+                        <div class="row"> <segment-block></segment-block></div>
                     </div>
                     <div class="tab-content" data-tab="city" style="display:none">
-                        <select-box-search placeholder="Որոնել Քաղաք" options='${atmsList}'></select-box-search>
-                        <div class="tab-content" data-tab="city">
-                            <div class="checkboxes">
-                                <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
-                                <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
-                                <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
-                                <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
-                                <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
-                                <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
-                                <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
-                                <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
-                                <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
-                                <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
-                                <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
-                            </div>  
-                        </div>
+                        <select-box-search placeholder="Որոնել Քաղաք" options='${cities}'></select-box-search>
+                        <div class="row"> <segment-block></segment-block></div>
                     </div>
                     <div class="tab-content" data-tab="province" style="display:none">
-                        <select-box-search placeholder="Որոնել Համայնք" options='${atmsList}'></select-box-search>
-                        <div class="tab-content" data-tab="province">
-                            <div class="checkboxes">
-                                <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
-                                <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
-                                <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
-                                <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
-                                <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
-                                <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
-                                <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
-                                <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
-                                <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
-                                <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
-                                <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
-                            </div>  
-                        </div>
+                        <select-box-search placeholder="Որոնել Համայնք" options='${districts}'></select-box-search>
+                        <div class="row"> <segment-block></segment-block></div>
                     </div>
                     <div class="tab-content" data-tab="segment" style="display:none">
-                        <select-box-search placeholder="Որոնել Սեգմենտ" options='${atmsList}'></select-box-search>
-                        <div class="tab-content" data-tab="segment" style="display: none;">
-                            <div class="checkboxes">
-                                <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
-                                <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
-                                <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
-                                <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
-                                <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
-                                <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
-                                <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
-                                <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
-                                <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
-                                <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
-                                <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
-                            </div>  
-                        </div>
+                        <select-box-search placeholder="Որոնել Սեգմենտ" options='${segments}'></select-box-search>
                     </div>
 
                        <div class="tab-content" data-tab="atm" style="display:none">
                         <select-box-search placeholder="Որոնել ըստ բանկոմատի ID-ի կամ հասցեի" options='${atmsList}'></select-box-search>
-                        <div class="tab-content" data-tab="atm" style="display: none;">
-                            <div class="checkboxes">
-                                <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
-                                <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
-                                <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
-                                <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
-                                <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
-                                <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
-                                <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
-                                <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
-                                <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
-                                <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
-                                <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
-                            </div>  
-                        </div>
                     </div>
                 </div>
             </div>
@@ -333,7 +235,10 @@ class Cumulative extends DynamicElement {
            
         </div>
 
- 
+                         <simple-table
+                            data-source="/analytics/cumulative-summary?startDate=2025-06-01"
+                            columns='["province","deposit_amount", "deposit_count", "dispense_amount", "dispense_count", "exchange_eur_amount", "exchange_rub_amount", "exchange_usd_amount"]'
+                        </simple-table>
           </div>
             
         `;

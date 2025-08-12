@@ -59,7 +59,6 @@ class SelectBoxSearch extends DynamicElement {
             const optionsList = JSON.parse(options);
             this.optionsMap.clear();
             this.allOptions = optionsList;
-            console.log(optionsList);
 
             optionsList.forEach((opt) => {
                 if (typeof opt === "string") {

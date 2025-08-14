@@ -52,6 +52,7 @@
     &_blue {
         background-color: map-get($color-scheme, "blue");
         color: map-get($color-scheme, "white");
+        border-radius: 8px;
     }
 
     &_white {

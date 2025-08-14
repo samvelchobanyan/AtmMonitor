@@ -6,6 +6,9 @@ import locationTransformer from "../core/utils/location-transformer.js";
 class HeaderCustom extends DynamicElement {
     constructor() {
         super();
+        this.state = {
+            hideClass: "",
+        };
         this.title = ""; // current known title
         this.province = [];
         this.cities = [];
@@ -30,6 +33,30 @@ class HeaderCustom extends DynamicElement {
             if (newTitle !== this.title) {
                 this.title = newTitle;
                 this._applyTitle();
+            }
+        });
+
+        this.addListener(document, "route-title", (e) => {
+            const newTitle = e.detail?.title || "";
+            const currentPath = window.location.pathname;
+
+            const pathsToHide = ["/ATM_monitor/geo", "/ATM_monitor/cumulative"];
+            const newHideClass = pathsToHide.includes(currentPath) ? "hide" : "";
+
+            let shouldRerender = false;
+
+            if (newTitle !== this.title) {
+                this.title = newTitle;
+                shouldRerender = true;
+            }
+
+            if (newHideClass !== this.state.hideClass) {
+                this.state.hideClass = newHideClass;
+                shouldRerender = true;
+            }
+
+            if (shouldRerender) {
+                this.render(); // re-run template with updated state
             }
         });
     }
@@ -60,8 +87,11 @@ class HeaderCustom extends DynamicElement {
     }
 
     template() {
-        const path = window.location.pathname;
+        // const path = window.location.pathname;
+        // console.log(path);
 
+        // const pathsToHide = ["/ATM_monitor/geo", "/ATM_monitor/cumulative"];
+        // const hideClass = pathsToHide.includes(path) ? "hide" : "";
         return /* html */ `
             <div class="main-container">
                 <div class="row">
@@ -70,7 +100,7 @@ class HeaderCustom extends DynamicElement {
                             <div class="header__title">
                                 <div id="title-text" class="h1-font"></div>
                             </div>
-                            <div class="header__right ${path == "/ATM_monitor/geo" ? "hide" : ""}">
+                            <div class="header__right ${this.state.hideClass}">
                                 <select-box   id="city-selector" placeholder="Ընտրել քաղաքը"
                 
                                 options='${JSON.stringify(this.cities)}'></select-box>

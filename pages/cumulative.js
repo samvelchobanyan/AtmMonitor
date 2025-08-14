@@ -14,6 +14,7 @@ class Cumulative extends DynamicElement {
 
         this.state = {
             summary: null,
+            link: "/analytics/cumulative-summary",
         };
 
         this.province = [];
@@ -21,15 +22,21 @@ class Cumulative extends DynamicElement {
         this.districts = [];
 
         this.currentRegion = null;
+
         this.currentCity = null;
 
         this.atmsList = [];
         this.segments = [];
 
-        // this.selectCityBox1 = null;
-        // this.selectCityBox2 = null;
-        // this.selectRegionBox1 = null;
-        // this.selectRegionBox2 = null;
+        this.activeTab = "";
+
+        this.submitButton = null;
+        // this.link = "/analytics/cumulative-summary?startDate=2025-06-01";
+        this.checkedValues = new Set();
+        this.selectCityBox = null;
+        this.selectDistrictBox = null;
+        this.selectSegmentBox = null;
+        this.selectAtmsBox = null;
     }
 
     // todo: design fix
@@ -46,22 +53,40 @@ class Cumulative extends DynamicElement {
         this.cities = locationTransformer.getAllCityOptions(state.regionsData);
         this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
 
+        this.fetchSegments();
+        this.fetchAtms();
         this.fetchSummary();
-        if (this.segments.length == 0) {
-            this.fetchSegments();
-        }
-        if (this.atmsList.length == 0) {
-            this.fetchAtms();
-        }
     }
 
-    // onAfterRender() {
-    //     this.selectCityBox1 = this.$("#city-selector1");
-    //     this.selectCityBox2 = this.$("#city-selector2");
-    //     this.selectRegionBox1 = this.$("#province-selector1");
-    //     this.selectRegionBox2 = this.$("#province-selector2");
-    // }
+    onAfterRender() {
+        this.submitButton = this.$(".btn_blue");
+        this.selectCityBox = this.$("#city-search");
+        this.selectDistrictBox = this.$("#districts-search");
+        this.selectSegmentBox = this.$("#segments-search");
+        this.selectAtmsBox = this.$("#atms-search");
 
+        // to avoid reset of activet tab
+        if (this.activeTab && this.activeTab.trim() !== "") {
+            const matchingTab = this.$(`custom-tab[name="${this.activeTab}"]`);
+            if (matchingTab) {
+                // Remove active from all tabs
+                this.$$("custom-tab").forEach((t) => t.removeAttribute("active"));
+                // Set active to the matching one
+                matchingTab.setAttribute("active", "");
+                // Optionally show correct content and hide others
+                this.showTabContent(this.activeTab);
+            }
+        }
+    }
+    showTabContent(tabName) {
+        this.$$(".tab-content").forEach((content) => {
+            if (content.dataset.tab === tabName) {
+                content.style.display = "";
+            } else {
+                content.style.display = "none";
+            }
+        });
+    }
     onStoreChange(storeState) {
         const region = storeState.selectedRegion;
         const city = storeState.selectedCity;
@@ -93,6 +118,10 @@ class Cumulative extends DynamicElement {
 
         try {
             const response = await this.fetchData(`/analytics/cumulative-summary?${queryString}`);
+            this.setState({
+                link: `/analytics/cumulative-summary?${queryString}`,
+            });
+
             this.currentRegion = region;
             this.currentCity = city;
             console.log(response);
@@ -144,30 +173,98 @@ class Cumulative extends DynamicElement {
             this.segments = [];
         }
     }
-
     addEventListeners() {
-        if (this.selectCityBox1) {
-            this.addListener(this.selectCityBox1, "change", (e) => {
-                this.currentCity1 = e.target.value;
-                this.fetchFirstSummary(this.currentRegion1, this.currentCity1);
-            });
+        this.submitButtonListener();
+        this.checkboxesListener();
+        this.tabsListener();
+    }
+
+    checkboxesListener() {
+        const checkboxes = this.$$("custom-checkbox");
+        if (this.activeTab == "") {
+            this.activeTab = "province";
         }
 
-        if (this.selectCityBox2) {
-            this.addListener(this.selectCityBox2, "change", (e) => {
-                this.currentCity2 = e.target.value;
-                this.fetchSecondSummary(this.currentRegion2, this.currentCity2);
+        checkboxes.forEach((checkbox) => {
+            const val = checkbox.getAttribute("value");
+
+            this.addListener(checkbox, "change", () => {
+                const input = checkbox.querySelector('input[type="checkbox"]');
+
+                if (input && input.checked) {
+                    this.checkedValues.add(val); // Add without clearing
+                } else {
+                    this.checkedValues.delete(val); // Remove if unchecked
+                }
+            });
+
+            // Restore state if needed
+            if (this.checkedValues.has(val)) {
+                checkbox.setAttribute("checked", "");
+                const input = checkbox.querySelector('input[type="checkbox"]');
+                if (input) input.checked = true;
+            }
+        });
+    }
+
+    submitButtonListener() {
+        if (this.submitButton) {
+            this.addListener(this.submitButton, "click", () => {
+                const queryString = new URLSearchParams();
+
+                console.log("this.activeTab", this.activeTab);
+
+                if (this.activeTab == "province") {
+                    const checkedValues = Array.from(this.checkedValues);
+                    console.log("!!checkedValues", checkedValues);
+
+                    if (checkedValues[0]) {
+                        queryString.append("region", checkedValues[0]); // only one value
+                    }
+                } else if (this.activeTab == "city") {
+                    const searchValues = this.selectCityBox.getAttribute("value");
+                    queryString.append("city", searchValues);
+                } else if (this.activeTab == "district") {
+                    const searchValues = this.selectDistrictBox.getAttribute("value");
+
+                    // if (searchValues[0]) {
+                    queryString.append("district", searchValues);
+                    // }
+                } else if (this.activeTab == "segment") {
+                    const searchValues = this.selectSegmentBox.getAttribute("value");
+                    console.log("searchValues", searchValues);
+                    if (searchValues[0]) {
+                        queryString.append("segmentId", searchValues);
+                    }
+                }
+
+                // for test to get data
+                queryString.append("startDate", "2025-06-27");
+                queryString.append("startDate", "2025-08-11");
+                this.setState({
+                    link: `/analytics/cumulative-summary?${queryString}`,
+                });
             });
         }
     }
 
-    template() {
-        // const firstSummary = this.state.firstSummary;
-        // const secondSummary = this.state.secondSummary;
-        console.log("1", this.state.summary);
-        console.log(this.atmsList);
-        console.log(this.segments);
+    tabsListener() {
+        const tabs = this.$$("custom-tab");
 
+        tabs.forEach((tab) => {
+            this.addListener(tab, "click", () => {
+                const selectedTabName = tab.getAttribute("name");
+                console.log("Selected tab:", selectedTabName);
+
+                // Store active tab so submitButtonListener knows which one is active
+                this.activeTab = selectedTabName;
+
+                // Reset other tab values but DON'T change this.state.link yet
+                // this.resetTabValues(selectedTabName);
+            });
+        });
+    }
+    template() {
         if (!this.state.summary || !this.atmsList || !this.segments) {
             return /*html*/ `
             <div class="row">
@@ -186,8 +283,6 @@ class Cumulative extends DynamicElement {
         const districts = JSON.stringify(this.districts).replace(/"/g, "&quot;");
         const segments = JSON.stringify(this.segments).replace(/"/g, "&quot;");
 
-        console.log("this.segments", this.segments);
-
         return /*html*/ `
 
             
@@ -196,50 +291,60 @@ class Cumulative extends DynamicElement {
                 <div class="container">
                     <div class="tabs-container">
                         <div class="tabs">
-                            <custom-tab name="region" active>Մարզ</custom-tab>
+                            <custom-tab name="province" active>Մարզ</custom-tab>
                             <custom-tab name="city">Քաղաք</custom-tab>
-                            <custom-tab name="province">Համայնք</custom-tab>
+                            <custom-tab name="district">Համայնք</custom-tab>
                             <custom-tab name="segment">Սեգմենտ</custom-tab>
                             <custom-tab name="atm">Բանկոմատ</custom-tab>
                         </div>
                     </div>
-                    <div class="tab-content column sm-6" data-tab="region">
+                    <div class="tab-content column sm-6" data-tab="province">
                       <div class="checkboxes">
                             ${this.province
                                 .map(
                                     (el) =>
-                                        `<custom-checkbox id="${el.value}" value="${el.value}" checked>${el.label}</custom-checkbox>`
+                                        `<custom-checkbox id="${el.value}" value="${el.value}">${el.label}</custom-checkbox>`
                                 )
                                 .join("")}
                         </div>  
                         <div class="row"> <segment-block></segment-block></div>
                     </div>
                     <div class="tab-content" data-tab="city" style="display:none">
-                        <select-box-search placeholder="Որոնել Քաղաք" options='${cities}'></select-box-search>
+                        <select-box-search placeholder="Որոնել Քաղաք" options='${cities}' id='city-search'></select-box-search>
                         <div class="row"> <segment-block></segment-block></div>
                     </div>
-                    <div class="tab-content" data-tab="province" style="display:none">
-                        <select-box-search placeholder="Որոնել Համայնք" options='${districts}'></select-box-search>
+                    <div class="tab-content" data-tab="district" style="display:none">
+                        <select-box-search placeholder="Որոնել Համայնք" options='${districts}' id='districts-search'></select-box-search>
                         <div class="row"> <segment-block></segment-block></div>
                     </div>
                     <div class="tab-content" data-tab="segment" style="display:none">
-                        <select-box-search placeholder="Որոնել Սեգմենտ" options='${segments}'></select-box-search>
+                        <select-box-search placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
                     </div>
 
                        <div class="tab-content" data-tab="atm" style="display:none">
-                        <select-box-search placeholder="Որոնել ըստ բանկոմատի ID-ի կամ հասցեի" options='${atmsList}'></select-box-search>
+                        <select-box-search placeholder="Որոնել ըստ բանկոմատի ID-ի կամ հասցեի" options='${atmsList}' id='atms-search'></select-box-search>
+                    </div>
+                    <div class="column sm-3">
+                        <button type="submit" class="btn_blue btn_md">Հաստատել</button>
                     </div>
                 </div>
+
             </div>
 
            
         </div>
 
-                         <simple-table
-                            data-source="/analytics/cumulative-summary?startDate=2025-06-01"
-                            columns='["province","deposit_amount", "deposit_count", "dispense_amount", "dispense_count", "exchange_eur_amount", "exchange_rub_amount", "exchange_usd_amount"]'
-                        </simple-table>
+        <div class="row">
+           <div class="column">
+                <div class="container">
+                    <simple-table
+                        data-source=${this.state.link}
+                        columns='["province","deposit_amount", "deposit_count", "dispense_amount", "dispense_count", "exchange_eur_amount", "exchange_rub_amount", "exchange_usd_amount"]'
+                    </simple-table>
+                </div>
+            </div>
           </div>
+        </div>
             
         `;
     }

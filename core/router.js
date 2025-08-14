@@ -29,7 +29,7 @@ export function startRouter() {
     page.base("/ATM_monitor");
 
     // — Home Route
-    page("/", async (ctx) => {
+    page("/home", async (ctx) => {
         // console.log('router home route');
         if (!customElements.get("atms-dashboard")) {
             await import("../pages/atms-dashboard.js");

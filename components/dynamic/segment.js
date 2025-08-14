@@ -88,6 +88,7 @@ class SegmentBlock extends DynamicElement {
         if (okBtn) {
             this.addListener(okBtn, "click", () => {
                 const checkedValues = listView.getCheckedValues();
+                console.log("checkedValues", checkedValues);
 
                 // Remove unchecked pills
                 this.selectedSegments = this.selectedSegments.filter((segment) => {

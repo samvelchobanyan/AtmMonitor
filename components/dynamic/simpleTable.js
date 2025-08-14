@@ -82,11 +82,7 @@ export class SimpleTable extends DynamicElement {
 
         try {
             const raw = await this.fetchData(url);
-
-            console.log("raw", raw);
-
             const transformed = tableTransformer.transformFaultTableData(raw);
-            console.log("transformed", transformed);
 
             const definedColumns = this.parseColumnsAttr();
             const columns = definedColumns.length

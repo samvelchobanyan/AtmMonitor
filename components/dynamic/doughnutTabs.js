@@ -56,11 +56,7 @@ export default class DoughnutTabs extends DynamicElement {
             this._parseDataAttr(dataAttr);
         }
 
-        if (!this.rawData && this.getAttr("api-url")) {
-            this.fetchAndSetData();
-        } else {
-            this.transformData();
-        }
+        this.transformData();
     }
 
     onAttributeChange(name, oldValue, newValue) {
@@ -109,7 +105,7 @@ export default class DoughnutTabs extends DynamicElement {
     }
 
     async fetchAndSetData() {
-        const endpoint = this.getAttr("api-url");
+        const endpoint = this.getAttribute("api-url");
         if (!endpoint) return;
 
         const params = new URLSearchParams();

@@ -29,10 +29,10 @@ class Cumulative extends DynamicElement {
         this.segments = [];
 
         this.activeTab = "";
+        this.checkedValues = new Set();
+        this.actualValue = "";
 
         this.submitButton = null;
-        // this.link = "/analytics/cumulative-summary?startDate=2025-06-01";
-        this.checkedValues = new Set();
         this.selectCityBox = null;
         this.selectDistrictBox = null;
         this.selectSegmentBox = null;
@@ -66,8 +66,10 @@ class Cumulative extends DynamicElement {
         this.selectAtmsBox = this.$("#atms-search");
 
         // to avoid reset of activet tab
+
         if (this.activeTab && this.activeTab.trim() !== "") {
             const matchingTab = this.$(`custom-tab[name="${this.activeTab}"]`);
+
             if (matchingTab) {
                 // Remove active from all tabs
                 this.$$("custom-tab").forEach((t) => t.removeAttribute("active"));
@@ -77,6 +79,20 @@ class Cumulative extends DynamicElement {
                 this.showTabContent(this.activeTab);
             }
         }
+
+        if (this.activeTab && this.actualValue != "") {
+            const matchingTab = this.$(`custom-tab[name="${this.activeTab}"]`);
+            if (matchingTab) {
+                // Remove active from all tabs
+                // this.$$("custom-tab").forEach((t) => t.removeAttribute("active"));
+                // Set active to the matching one
+                matchingTab.setAttribute("value", "");
+                // Optionally show correct content and hide others
+                this.showTabContent(this.activeTab);
+            }
+        }
+
+        console.log(" this.actualValue ", this.actualValue);
     }
     showTabContent(tabName) {
         this.$$(".tab-content").forEach((content) => {
@@ -85,6 +101,8 @@ class Cumulative extends DynamicElement {
             } else {
                 content.style.display = "none";
             }
+
+            
         });
     }
     onStoreChange(storeState) {
@@ -217,25 +235,38 @@ class Cumulative extends DynamicElement {
                 if (this.activeTab == "province") {
                     const checkedValues = Array.from(this.checkedValues);
                     console.log("!!checkedValues", checkedValues);
-
-                    if (checkedValues[0]) {
-                        queryString.append("region", checkedValues[0]); // only one value
+                    this.actualValue = checkedValues;
+                    if (checkedValues) {
+                        checkedValues.forEach((v) => queryString.append("provinces", v));
                     }
                 } else if (this.activeTab == "city") {
-                    const searchValues = this.selectCityBox.getAttribute("value");
-                    queryString.append("city", searchValues);
+                    // const searchValues = this.selectCityBox.getAttribute("value");
+                    // queryString.append("city", searchValues);
+
+                    const searchValues = this.selectCityBox.getAttribute("value")?.split(",") || [];
+                    this.actualValue = searchValues;
+                    searchValues.forEach((v) => queryString.append("cities", v));
                 } else if (this.activeTab == "district") {
-                    const searchValues = this.selectDistrictBox.getAttribute("value");
+                    // const searchValues = this.selectDistrictBox.getAttribute("value");
 
                     // if (searchValues[0]) {
-                    queryString.append("district", searchValues);
+                    // queryString.append("district", searchValues);
                     // }
+
+                    const searchValues =
+                        this.selectDistrictBox.getAttribute("value")?.split(",") || [];
+                    searchValues.forEach((v) => queryString.append("districts", v));
                 } else if (this.activeTab == "segment") {
-                    const searchValues = this.selectSegmentBox.getAttribute("value");
-                    console.log("searchValues", searchValues);
-                    if (searchValues[0]) {
-                        queryString.append("segmentId", searchValues);
-                    }
+                    // const searchValues = this.selectSegmentBox.getAttribute("value");
+                    // console.log("searchValues", searchValues);
+                    // if (searchValues[0]) {
+                    //     queryString.append("segmentId", searchValues);
+                    // }
+                    const searchValues =
+                        this.selectSegmentBox.getAttribute("value")?.split(",") || [];
+                    console.log(searchValues);
+
+                    searchValues.forEach((v) => queryString.append("segmentIds", v));
                 }
 
                 // for test to get data

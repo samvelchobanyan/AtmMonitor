@@ -16,7 +16,7 @@ class SideBar extends StaticElement {
                     </div>
                 </div>
                 <div class="sidebar__nav">
-                    <a href="./" class="sidebar__item active"> <i class="icon icon-grid"></i><span>Ակնարկ</span> </a>
+                    <a href="./home" class="sidebar__item active"> <i class="icon icon-grid"></i><span>Ակնարկ</span> </a>
                     <div class="sidebar__section">
                         <div class="sidebar__item sidebar__item-has-dropdown">
                             <i class="icon icon-activity"></i><span>Անալիտիկա</span>

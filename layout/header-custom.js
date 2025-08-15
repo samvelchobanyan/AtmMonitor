@@ -87,11 +87,6 @@ class HeaderCustom extends DynamicElement {
     }
 
     template() {
-        // const path = window.location.pathname;
-        // console.log(path);
-
-        // const pathsToHide = ["/ATM_monitor/geo", "/ATM_monitor/cumulative"];
-        // const hideClass = pathsToHide.includes(path) ? "hide" : "";
         return /* html */ `
             <div class="main-container">
                 <div class="row">

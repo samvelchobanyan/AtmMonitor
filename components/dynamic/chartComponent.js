@@ -239,11 +239,11 @@ class ChartComponent extends DynamicElement {
                 break;
             case "line":
                 chartHTML = `
-          <div class="chart chart_252">
-            <canvas id="${this.canvasId}"></canvas>
-          </div>
-          <div class="custom-legend custom-legend_checkmark" id="${this.legendId}"></div>
-          `;
+                  <div class="chart chart_252">
+                    <canvas id="${this.canvasId}"></canvas>
+                  </div>
+                  <div class="custom-legend custom-legend_checkmark" id="${this.legendId}"></div>
+                  `;
             default:
                 break;
         }

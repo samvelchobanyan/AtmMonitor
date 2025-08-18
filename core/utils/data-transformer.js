@@ -20,6 +20,13 @@ const CHART_CONFIG = {
         own_card: "Անձնական քարտ",
         other_card: "Ուրիշի քարտ",
     },
+    DEFAULT_DEPOSIT_TYPES : [
+        "Անձնական հաշվի համալրում",
+        "Կազմակերպության հաշվի համալրում",
+        "Մուտքագրում քարտին",
+        "Վարկի մարում",
+        "Փոխանցում քարտին"
+    ],
 
     // Define which fields to include and their order
     fieldsToInclude: ["deposit_amount", "dispense_amount"],
@@ -51,7 +58,7 @@ class ChartDataTransformer {
 
         const labels = this.extractLabels(daily_data);
         const datasets = this.extractDatasets(daily_data);
-
+        console.log('transformed',datasets);
         return {
             metaData: {},
             chartData: {
@@ -59,6 +66,35 @@ class ChartDataTransformer {
                 datasets,
             },
         };
+    }
+
+    transformDepositDynamic(depositDynamic) {
+        return depositDynamic.map(row => {
+            const out = {
+                hour: row?.hour ?? 0,
+                with_card_count: row?.with_card_count ?? 0,
+                with_card_amount: row?.with_card_amount ?? 0,
+                without_card_count: row?.without_card_count ?? 0,
+                without_card_amount: row?.without_card_amount ?? 0,
+            };
+
+            // Seed all default types with zeros
+            for (const typeName of this.config.DEFAULT_DEPOSIT_TYPES) {
+                out[`${typeName}_amount`] = 0;
+                out[`${typeName}_count`] = 0;
+            }
+
+            // If deposit_types exist, overwrite the seeded zeros with actual values
+            const types = Array.isArray(row?.deposit_types) ? row.deposit_types : [];
+            for (const t of types) {
+                const name = (t?.deposit_type_name || "").trim();
+                if (!name) continue;
+                out[`${name}_amount`] = t?.total_amount ?? 0;
+                out[`${name}_count`]  = t?.count ?? 0;
+            }
+
+            return out;
+        });
     }
 
     // === BarChart transformation ===
@@ -90,6 +126,7 @@ class ChartDataTransformer {
     }
 
     extractLabels(dailyData) {
+        console.log('extractLabels',dailyData);
         // return dailyData.map((item) => this.formatDate(item.date));
         return dailyData.map((item) => {
             // Prefer date, fallback hour
@@ -107,12 +144,14 @@ class ChartDataTransformer {
     }
 
     extractDatasets(dailyData) {
-        const { fieldLabels, encashmentFieldsToInclude, fieldsToInclude } = this.config;
+        const { fieldLabels, encashmentFieldsToInclude, fieldsToInclude, DEFAULT_DEPOSIT_TYPES } = this.config;
 
         // handle encashment chart and other one
         let fields;
         if (dailyData[0].hasOwnProperty("encashment_count")) {
             fields = encashmentFieldsToInclude;
+        } else if(daylyData[0].hasOwnProperty("Անձնական հաշվի համալրում")){
+            fields = DEFAULT_DEPOSIT_TYPES;
         } else {
             fields = fieldsToInclude;
         }

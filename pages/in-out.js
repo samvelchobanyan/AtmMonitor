@@ -1,6 +1,7 @@
 import { DynamicElement } from "../core/dynamic-element.js";
 import { ContainerTop } from "../components/ui/containerTop.js";
 import "../components/dynamic/doughnutTabs.js";
+import dataTransformer from '../core/utils/data-transformer.js';
 
 class inOut extends DynamicElement {
     constructor() {
@@ -78,9 +79,11 @@ class inOut extends DynamicElement {
             summary.data.transaction_dynamics.dispense_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
-        const depositDynamicData = JSON.stringify(
-            summary.data.transaction_dynamics.deposit_dynamic.hourly_data
-        ).replace(/"/g, "&quot;");
+        // const depositDynamicData = JSON.stringify(
+        //     summary.data.transaction_dynamics.deposit_dynamic.hourly_data
+        // ).replace(/"/g, "&quot;");
+        const depositDynamicData = dataTransformer.transformDepositDynamic(summary.data.transaction_dynamics.deposit_dynamic.hourly_data);
+        console.log('depositDynamicData',depositDynamicData);
 
         const exchangeData = summary.data.exchange_summary.currency_details;
 

@@ -25,7 +25,7 @@ export class LineChart extends HTMLElement {
             <div class="chart chart_252">
                 <canvas id="${chartId}"></canvas>
             </div>
-            <div class="custom-legend custom-legend_checkmark" id="${legendId}"></div>
+            <div class="custom-legend custom-legend_wrap custom-legend_checkmark" id="${legendId}"></div>
         `;
     }
 }

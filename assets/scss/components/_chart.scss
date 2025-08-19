@@ -45,6 +45,15 @@
             }
         }
     }
+    &_wrap {
+        ul {
+            flex-wrap: wrap;
+            margin-bottom: rem(-12);
+            li {
+                margin-bottom: rem(12);
+            }
+        }
+    }
     &_center {
         ul {
             @extend %align-center;

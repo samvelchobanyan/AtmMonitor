@@ -5,6 +5,7 @@
     width: rem(112);
     padding: rem(32);
     background-color: map-get($color-scheme, "white");
+    z-index: 2;
 
     &__logo {
         margin-bottom: rem(32);

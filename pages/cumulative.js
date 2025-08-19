@@ -7,6 +7,7 @@ import "../components/dynamic/select-box-search.js";
 import "../components/ui/customCheck.js";
 import "../components/dynamic/segment.js";
 import "../components/dynamic/simpleTable.js";
+import "../components/dynamic/select-box-date.js";
 
 class Cumulative extends DynamicElement {
     constructor() {
@@ -33,6 +34,7 @@ class Cumulative extends DynamicElement {
         this.selectDistrictBox = null;
         this.selectSegmentBox = null;
         this.selectAtmsBox = null;
+        this.dateSelectBox = null;
     }
 
     // todo: design fix
@@ -63,6 +65,7 @@ class Cumulative extends DynamicElement {
         this.selectDistrictBox = this.$("#districts-search");
         this.selectSegmentBox = this.$("#segments-search");
         this.selectAtmsBox = this.$("#atms-search");
+        this.dateSelectBox = this.$("select-box-date");
     }
 
     async fetchSummary(region, city, province, segmentId, atmId) {
@@ -145,6 +148,24 @@ class Cumulative extends DynamicElement {
         this.submitButtonListener();
         this.checkboxesListener();
         this.tabsListener();
+
+        if (this.dateSelectBox) {
+            this.addListener(this.dateSelectBox, "date-range-change", (e) => {
+                const { startDate, endDate } = e.detail || {};
+                if (!startDate || !endDate) return;
+
+                this.setAttribute("start-date", startDate);
+                this.setAttribute("end-date", endDate);
+
+                const queryString = this.buildQueryString(startDate, endDate);
+
+                this.tableLink = `/analytics/cumulative-summary?${queryString}`;
+                const tableContainer = this.$(".table-container");
+                if (tableContainer) {
+                    tableContainer.innerHTML = this.renderTable(this.tableLink);
+                }
+            });
+        }
     }
 
     checkboxesListener() {
@@ -169,50 +190,21 @@ class Cumulative extends DynamicElement {
     }
 
     submitButtonListener() {
-        if (this.submitButton) {
-            this.addListener(this.submitButton, "click", () => {
-                const queryString = new URLSearchParams();
+        if (!this.submitButton) return;
 
-                if (this.activeTab == "province") {
-                    const checkedValues = Array.from(this.checkedValues);
-                    if (checkedValues) {
-                        checkedValues.forEach((v) => queryString.append("provinces", v));
-                    }
-                } else if (this.activeTab == "city") {
-                    const searchValues = this.selectCityBox.getAttribute("value")?.split(",") || [];
-                    searchValues.forEach((v) => queryString.append("cities", v));
-                } else if (this.activeTab == "district") {
-                    const searchValues =
-                        this.selectDistrictBox.getAttribute("value")?.split(",") || [];
-                    searchValues.forEach((v) => queryString.append("districts", v));
-                } else if (this.activeTab == "segment") {
-                    const rawVal = this.selectSegmentBox.getAttribute("value") || "";
-                    const parsed = JSON.parse(rawVal);
+        this.addListener(this.submitButton, "click", () => {
+            const dateComponent = this.querySelector("select-box-date");
+            const startDate = dateComponent?.startDate || null;
+            const endDate = dateComponent?.endDate || null;
 
-                    parsed.forEach((v) => {
-                        queryString.append("segmentIds", Number(v));
-                    });
-                } else if (this.activeTab === "atm") {
-                    const rawVal = this.selectAtmsBox.getAttribute("value") || "[]";
-                    const parsed = JSON.parse(rawVal);
+            const queryString = this.buildQueryString(startDate, endDate);
 
-                    parsed.forEach((v) => {
-                        queryString.append("atmIds", String(v));
-                    });
-                }
-
-                // for test to get data
-                queryString.append("startDate", "2025-06-27");
-                queryString.append("startDate", "2025-08-11");
-
-                this.tableLink = `/analytics/cumulative-summary?${queryString}`;
-
-                const tableContainer = this.$(".table-container");
-                if (tableContainer) {
-                    tableContainer.innerHTML = this.renderTable(this.tableLink);
-                }
-            });
-        }
+            this.tableLink = `/analytics/cumulative-summary?${queryString}`;
+            const tableContainer = this.$(".table-container");
+            if (tableContainer) {
+                tableContainer.innerHTML = this.renderTable(this.tableLink);
+            }
+        });
     }
 
     tabsListener() {
@@ -238,6 +230,43 @@ class Cumulative extends DynamicElement {
            
           </div>
         </div>`;
+    }
+
+    buildQueryString(startDate = null, endDate = null) {
+        const queryString = new URLSearchParams();
+
+        // Add tab-specific filters
+        if (this.activeTab === "province") {
+            const checkedValues = Array.from(this.checkedValues);
+            const segments = this.querySelector("segment-block[name='province-segments']");
+            checkedValues.forEach((v) => queryString.append("provinces", v));
+            if (segments?.values?.length)
+                segments.values.forEach((v) => queryString.append("segmentIds", v));
+        } else if (this.activeTab === "city") {
+            const values = this.selectCityBox.getAttribute("value")?.split(",") || [];
+            values.forEach((v) => queryString.append("cities", v));
+            const segments = this.querySelector("segment-block[name='city-segments']");
+            if (segments?.values?.length)
+                segments.values.forEach((v) => queryString.append("segmentIds", v));
+        } else if (this.activeTab === "district") {
+            const values = this.selectDistrictBox.getAttribute("value")?.split(",") || [];
+            values.forEach((v) => queryString.append("districts", v));
+            const segments = this.querySelector("segment-block[name='district-segments']");
+            if (segments?.values?.length)
+                segments.values.forEach((v) => queryString.append("segmentIds", v));
+        } else if (this.activeTab === "segment") {
+            const rawVal = this.selectSegmentBox.getAttribute("value") || "[]";
+            JSON.parse(rawVal).forEach((v) => queryString.append("segmentIds", Number(v)));
+        } else if (this.activeTab === "atm") {
+            const rawVal = this.selectAtmsBox.getAttribute("value") || "[]";
+            JSON.parse(rawVal).forEach((v) => queryString.append("atmIds", String(v)));
+        }
+
+        // Add date filters if provided
+        if (startDate) queryString.append("startDate", startDate);
+        if (endDate) queryString.append("endDate", endDate);
+
+        return queryString;
     }
 
     template() {
@@ -270,6 +299,10 @@ class Cumulative extends DynamicElement {
                             <custom-tab name="segment">Սեգմենտ</custom-tab>
                             <custom-tab name="atm">Բանկոմատ</custom-tab>
                         </div>
+                           <select-box-date
+                                start-date="${this.getAttr("start-date")}"
+                                end-date="${this.getAttr("end-date")}"
+                            ></select-box-date>
                     </div>
                     <div class="tab-content column sm-6" data-tab="province">
                       <div class="checkboxes">
@@ -280,15 +313,15 @@ class Cumulative extends DynamicElement {
                                 )
                                 .join("")}
                         </div>  
-                       <segment-block></segment-block>
+                       <segment-block name='province-segments'></segment-block>
                     </div>
                     <div class="tab-content" data-tab="city" style="display:none">
                         <select-box-search placeholder="Որոնել Քաղաք" options='${cities}' id='city-search'></select-box-search>
-                       <segment-block></segment-block>
+                       <segment-block name='city-segments'></segment-block>
                     </div>
                     <div class="tab-content" data-tab="district" style="display:none">
                         <select-box-search placeholder="Որոնել Համայնք" options='${districts}' id='districts-search'></select-box-search>
-                       <segment-block></segment-block>
+                       <segment-block name='district-segments'></segment-block>
                     </div>
                     <div class="tab-content" data-tab="segment" style="display:none">
                         <select-box-search placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>

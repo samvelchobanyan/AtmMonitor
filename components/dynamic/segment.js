@@ -11,6 +11,10 @@ class SegmentBlock extends DynamicElement {
         this.fetchSegments();
     }
 
+    get values() {
+        return this.selectedSegments.map((s) => s.value);
+    }
+
     async fetchSegments() {
         try {
             const response = await this.fetchData("/atm/segments");

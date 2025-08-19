@@ -32,6 +32,17 @@
     // }
 }
 
+.combo-box-items {
+    margin-bottom: rem(24);
+    @extend %flex;
+    @extend %align-middle;
+    .combo-box {
+        &:not(:last-child) {
+            margin-right: rem(12);
+        }
+    }
+}
+
 .combo-box-placeholder {
     color: map-get($color-scheme, "neutral");
 }

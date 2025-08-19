@@ -239,7 +239,7 @@ class GeoAnalythics extends DynamicElement {
                         </div>
                     </div>
                     <div class="tab-content" data-tab="geo1">
-                       <div class="row"> 
+                       <div class="combo-box-items"> 
                             <select-box id="city-selector1" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
                                 this.cities
                             )}' value="${this.state.selectedCity1 || ""}"></select-box>
@@ -248,7 +248,7 @@ class GeoAnalythics extends DynamicElement {
                             )}' value="${this.state.selectedRegion1 || ""}"></select-box>
                            
                         </div>
-                        <div class="row"> <segment-block></segment-block></div>
+                        <segment-block></segment-block>
                     </div>
                     <div class="tab-content" data-tab="atms1" style="display: none;">
                         <select-box-search placeholder="Որոնել ըստ բանկոմատի ID-ի կամ հասցեի" options='${atmsList}'></select-box-search>
@@ -280,14 +280,15 @@ class GeoAnalythics extends DynamicElement {
                         </div>
                     </div>
                     <div class="tab-content" data-tab="geo2">
-                       <div class="row"> 
-                        <select-box id="city-selector2" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
-                            this.cities
-                        )}'></select-box>
+                       <div class="combo-box-items"> 
+                            <select-box id="city-selector2" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
+                                this.cities
+                            )}'></select-box>
                             <select-box id="province-selector2"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
                                 this.province
-                            )}'></select-box>    </div>
-                        <div class="row"> <segment-block></segment-block></div>
+                            )}'></select-box>    
+                        </div>
+                        <segment-block></segment-block>
                     </div>
                     <div class="tab-content" data-tab="atms2" style="display: none;">
                         <select-box-search placeholder="Որոնել ըստ բանկոմատի ID-ի կամ հասցեի" options='${atmsList}'></select-box-search>

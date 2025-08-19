@@ -83,7 +83,7 @@ class inOut extends DynamicElement {
             summary.data.transaction_dynamics.deposit_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
-        const dispenseDynamicData = dataTransformer.transformDepositDynamic(summary.data.transaction_dynamics.deposit_dynamic.hourly_data);
+        const dispenseDynamicData = summary.data.transaction_dynamics.dispense_dynamic.hourly_data;
         const exchangeData = summary.data.exchange_summary.currency_details;
 
         return /*html*/ `
@@ -102,17 +102,16 @@ class inOut extends DynamicElement {
                     <div class="container">
                         <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
                         <div class="infos">
-                            ${exchangeData
-                                                .map((exchange) => {
-                                                    return `
-                                                    <info-card
-                                                        title="${exchange.currency_code}"
-                            value="${exchange.total_amount}"
-                            value-currency="$"
-                            trend="${exchange.total_amount_percent_change}"
-                            icon="icon icon-box"
-                            show-border="true">
-                            </info-card>`;
+                            ${exchangeData.map((exchange) => {
+                                return `
+                                <info-card
+                                    title="${exchange.currency_code}"
+                                    value="${exchange.total_amount}"
+                                    value-currency="$"
+                                    trend="${exchange.total_amount_percent_change}"
+                                    icon="icon icon-box"
+                                    show-border="true">
+                                </info-card>`;
                             })
                             .join("")}
                         </div>
@@ -121,19 +120,37 @@ class inOut extends DynamicElement {
                 <div class="column sm-12">
                     <div class="container">
                         <container-top icon="icon-chart" title="Գործարքների դինամիկա"></container-top>
-                        <chart-component id="line-chart-transactions" chart-type="line" chart-data='${transactionsData}' api-url="/analytics/exchange-dynamic-in-days" ${this.attrIf("city", this.state.currentCity)} ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
+                        <chart-component 
+                            id="line-chart-transactions" 
+                            chart-type="line" 
+                            chart-data='${transactionsData}' 
+                            api-url="/analytics/exchange-dynamic-in-days" 
+                            ${this.attrIf("city", this.state.currentCity)} 
+                            ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
                     </div>
                 </div>
                 <div class="column sm-6">
                     <div class="container">
                         <container-top icon="icon-trending-up" title="Կանխիկացումների դինամիկա"></container-top>
-                        <chart-component id="line-chart-dispense-dynamics" chart-type="line" chart-data='${JSON.stringify(dispenseDynamicData)}' api-url="/analytics/dispense-dynamic-in-days" ${this.attrIf("city", this.state.currentCity)} ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
+                        <chart-component 
+                            id="line-chart-dispense-dynamics" 
+                            chart-type="line" 
+                            chart-data='${JSON.stringify(dispenseDynamicData)}' 
+                            api-url="/analytics/dispense-dynamic-in-days" 
+                            ${this.attrIf("city", this.state.currentCity)} 
+                            ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
                     </div>
                 </div>
                 <div class="column sm-6">
                     <div class="container">
                         <container-top icon="icon-trending-up" title="Մուտքագրված գումարների դինամիկա"></container-top>
-                        <chart-component id="line-chart-deposit-dynamics" chart-type="line" chart-data='${depositDynamicData}' api-url="/analytics/deposit-dynamic-in-days" ${this.attrIf("city", this.state.currentCity)} ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
+                        <chart-component 
+                            id="line-chart-deposit-dynamics" 
+                            chart-type="line" 
+                            chart-data='${depositDynamicData}' 
+                            api-url="/analytics/deposit-dynamic-in-days" 
+                            ${this.attrIf("city", this.state.currentCity)} 
+                            ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
                     </div>
                 </div>
             </div>

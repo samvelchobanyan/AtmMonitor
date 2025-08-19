@@ -21,6 +21,7 @@ const CHART_CONFIG = {
         other_card: "Ուրիշի քարտ",
     },
     inout_dispenseDynamicsToInclude : ["Մուտքագրում քարտին","Փոխանցում քարտին","Անձնական հաշվի համալրում","Կազմակերպության հաշվի համալրում","Ավանդի համալրում","Վարկի մարում"],
+    inout_depositDynamicsToInclude : ["with_card_amount","without_card_amount"],
 
     // Define which fields to include and their order
     fieldsToInclude: ["deposit_amount", "dispense_amount"],
@@ -140,14 +141,16 @@ class ChartDataTransformer {
     }
 
     extractDatasets(dailyData) {
-        const { fieldLabels, encashmentFieldsToInclude, fieldsToInclude, inout_dispenseDynamicsToInclude } = this.config;
+        const { fieldLabels, encashmentFieldsToInclude, fieldsToInclude, inout_dispenseDynamicsToInclude, inout_depositDynamicsToInclude } = this.config;
         // handle encashment chart and other one
         let fields;
         if (dailyData[0].hasOwnProperty("encashment_count")) {
             fields = encashmentFieldsToInclude;
         } else if(dailyData[0].hasOwnProperty("Անձնական հաշվի համալրում")){
             fields = inout_dispenseDynamicsToInclude;
-        } else {
+        } else if(dailyData[0].hasOwnProperty("with_card_amount")) {
+            fields = inout_depositDynamicsToInclude;
+        }else {
             fields = fieldsToInclude;
         }
 

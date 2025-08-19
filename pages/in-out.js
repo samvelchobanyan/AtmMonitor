@@ -118,7 +118,7 @@ class inOut extends DynamicElement {
                         .join("")}
                 </div>
 
-                <!--div class="container">
+                <div class="container">
                     <container-top icon="icon-chart" title="Գործարքների դինամիկա"></container-top>
                     <chart-component
                         id="line-chart-transactions"
@@ -128,7 +128,7 @@ class inOut extends DynamicElement {
                         ${this.attrIf("city", this.state.currentCity)}
                         ${this.attrIf("region", this.state.currentRegion)}>
                     </chart-component>
-                </div-->
+                </div>
             </div>
 
             <div class="column sm-6">
@@ -145,7 +145,7 @@ class inOut extends DynamicElement {
                 </div>
             </div>
 
-            <!--div class="column sm-6">
+            <div class="column sm-6">
                 <div class="container">
                 <container-top icon="icon-trending-up" title="Մուտքագրված գումարների դինամիկա"></container-top>
                 <chart-component
@@ -157,7 +157,7 @@ class inOut extends DynamicElement {
                     ${this.attrIf("region", this.state.currentRegion)}>
                 </chart-component>
                 </div>
-            </div-->
+            </div>
             </div>
             
         `;

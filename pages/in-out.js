@@ -75,16 +75,15 @@ class inOut extends DynamicElement {
             summary.data.transaction_dynamics.exchange_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
-        const dispenseDynamicData = JSON.stringify(
-            summary.data.transaction_dynamics.dispense_dynamic.hourly_data
+        // const dispenseDynamicData = JSON.stringify(
+        //     summary.data.transaction_dynamics.dispense_dynamic.hourly_data
+        // ).replace(/"/g, "&quot;");
+
+        const depositDynamicData = JSON.stringify(
+            summary.data.transaction_dynamics.deposit_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
-        // const depositDynamicData = JSON.stringify(
-        //     summary.data.transaction_dynamics.deposit_dynamic.hourly_data
-        // ).replace(/"/g, "&quot;");
-        const depositDynamicData = dataTransformer.transformDepositDynamic(summary.data.transaction_dynamics.deposit_dynamic.hourly_data);
-        console.log('depositDynamicData',depositDynamicData);
-
+        const dispenseDynamicData = dataTransformer.transformDepositDynamic(summary.data.transaction_dynamics.deposit_dynamic.hourly_data);
         const exchangeData = summary.data.exchange_summary.currency_details;
 
         return /*html*/ `
@@ -119,17 +118,17 @@ class inOut extends DynamicElement {
                         .join("")}
                 </div>
 
-                <div class="container">
-                <container-top icon="icon-chart" title="Գործարքների դինամիկա"></container-top>
-                <chart-component
-                    id="line-chart-transactions"
-                    chart-type="line"
-                    chart-data='${transactionsData}'
-                    api-url="/analytics/exchange-dynamic-in-days"
-                    ${this.attrIf("city", this.state.currentCity)}
-                    ${this.attrIf("region", this.state.currentRegion)}>
-                </chart-component>
-                </div>
+                <!--div class="container">
+                    <container-top icon="icon-chart" title="Գործարքների դինամիկա"></container-top>
+                    <chart-component
+                        id="line-chart-transactions"
+                        chart-type="line"
+                        chart-data='${transactionsData}'
+                        api-url="/analytics/exchange-dynamic-in-days"
+                        ${this.attrIf("city", this.state.currentCity)}
+                        ${this.attrIf("region", this.state.currentRegion)}>
+                    </chart-component>
+                </div-->
             </div>
 
             <div class="column sm-6">
@@ -138,7 +137,7 @@ class inOut extends DynamicElement {
                 <chart-component
                     id="line-chart-dispense-dynamics"
                     chart-type="line"
-                    chart-data='${dispenseDynamicData}'
+                    chart-data='${JSON.stringify(dispenseDynamicData)}'
                     api-url="/analytics/dispense-dynamic-in-days"
                     ${this.attrIf("city", this.state.currentCity)}
                     ${this.attrIf("region", this.state.currentRegion)}>
@@ -146,7 +145,7 @@ class inOut extends DynamicElement {
                 </div>
             </div>
 
-            <div class="column sm-6">
+            <!--div class="column sm-6">
                 <div class="container">
                 <container-top icon="icon-trending-up" title="Մուտքագրված գումարների դինամիկա"></container-top>
                 <chart-component
@@ -158,7 +157,7 @@ class inOut extends DynamicElement {
                     ${this.attrIf("region", this.state.currentRegion)}>
                 </chart-component>
                 </div>
-            </div>
+            </div-->
             </div>
             
         `;

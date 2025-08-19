@@ -11,6 +11,10 @@ import "../components/dynamic/simpleTable.js";
 class Cumulative extends DynamicElement {
     constructor() {
         super();
+        this.state = {
+            atmsList: [],
+            segments: [],
+        };
         // change link to get new data
         this.tableLink = "/analytics/cumulative-summary";
         this.province = [];
@@ -21,12 +25,8 @@ class Cumulative extends DynamicElement {
 
         this.currentCity = null;
 
-        this.atmsList = [];
-        this.segments = [];
-
         this.activeTab = "";
         this.checkedValues = new Set();
-        this.actualValue = "";
 
         this.submitButton = null;
         this.selectCityBox = null;
@@ -47,7 +47,6 @@ class Cumulative extends DynamicElement {
 
         this.cities = locationTransformer.getAllCityOptions(state.regionsData);
         this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
-
         this.fetchSegments();
         this.fetchAtms();
         this.fetchSummary();
@@ -59,7 +58,6 @@ class Cumulative extends DynamicElement {
             tableContainer.innerHTML = this.renderTable(this.tableLink);
         }
 
-        this.renderTable(this.tableLink);
         this.submitButton = this.$(".btn_blue");
         this.selectCityBox = this.$("#city-search");
         this.selectDistrictBox = this.$("#districts-search");
@@ -112,28 +110,37 @@ class Cumulative extends DynamicElement {
 
         try {
             const response = await this.fetchData(`/atm/getatms?${queryString}`);
-            this.atmsList = response.data.atms.map((atm) => ({
-                value: atm.id,
-                label: atm.name,
-            }));
+            this.setState({
+                atmsList: response.data.atms.map((atm) => ({
+                    value: atm.id,
+                    label: atm.name,
+                })),
+            });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
-            this.atmsList = [];
+            this.setState({
+                atmsList: [],
+            });
         }
     }
+
     async fetchSegments() {
         try {
             const response = await this.fetchData("/atm/segments");
-
-            this.segments = response.data.map((item) => ({
-                value: item.id,
-                text: item.name,
-            }));
+            this.setState({
+                segments: response.data.map((item) => ({
+                    value: item.id,
+                    text: item.name,
+                })),
+            });
         } catch (err) {
             console.error("❌ Error fetching segmentItems:", err);
-            this.segments = [];
+            this.setState({
+                segments: [],
+            });
         }
     }
+
     addEventListeners() {
         this.submitButtonListener();
         this.checkboxesListener();
@@ -153,18 +160,11 @@ class Cumulative extends DynamicElement {
                 const input = checkbox.querySelector('input[type="checkbox"]');
 
                 if (input && input.checked) {
-                    this.checkedValues.add(val); // Add without clearing
+                    this.checkedValues.add(val);
                 } else {
-                    this.checkedValues.delete(val); // Remove if unchecked
+                    this.checkedValues.delete(val);
                 }
             });
-
-            // Restore state if needed
-            if (this.checkedValues.has(val)) {
-                checkbox.setAttribute("checked", "");
-                const input = checkbox.querySelector('input[type="checkbox"]');
-                if (input) input.checked = true;
-            }
         });
     }
 
@@ -175,24 +175,30 @@ class Cumulative extends DynamicElement {
 
                 if (this.activeTab == "province") {
                     const checkedValues = Array.from(this.checkedValues);
-                    this.actualValue = checkedValues;
                     if (checkedValues) {
                         checkedValues.forEach((v) => queryString.append("provinces", v));
                     }
                 } else if (this.activeTab == "city") {
                     const searchValues = this.selectCityBox.getAttribute("value")?.split(",") || [];
-                    this.actualValue = searchValues;
                     searchValues.forEach((v) => queryString.append("cities", v));
                 } else if (this.activeTab == "district") {
                     const searchValues =
                         this.selectDistrictBox.getAttribute("value")?.split(",") || [];
                     searchValues.forEach((v) => queryString.append("districts", v));
                 } else if (this.activeTab == "segment") {
-                    const searchValues =
-                        this.selectSegmentBox.getAttribute("value")?.split(",") || [];
-                    console.log(searchValues);
+                    const rawVal = this.selectSegmentBox.getAttribute("value") || "";
+                    const parsed = JSON.parse(rawVal);
 
-                    searchValues.forEach((v) => queryString.append("segmentIds", v));
+                    parsed.forEach((v) => {
+                        queryString.append("segmentIds", Number(v));
+                    });
+                } else if (this.activeTab === "atm") {
+                    const rawVal = this.selectAtmsBox.getAttribute("value") || "[]";
+                    const parsed = JSON.parse(rawVal);
+
+                    parsed.forEach((v) => {
+                        queryString.append("atmIds", String(v));
+                    });
                 }
 
                 // for test to get data
@@ -215,6 +221,7 @@ class Cumulative extends DynamicElement {
         tabs.forEach((tab) => {
             this.addListener(tab, "click", () => {
                 const selectedTabName = tab.getAttribute("name");
+
                 // Store active tab so submitButtonListener knows which one is active
                 this.activeTab = selectedTabName;
             });
@@ -234,7 +241,7 @@ class Cumulative extends DynamicElement {
     }
 
     template() {
-        if (!this.atmsList || !this.segments) {
+        if (this.state.atmsList.length == 0 || this.state.segments.length == 0) {
             return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
@@ -247,10 +254,10 @@ class Cumulative extends DynamicElement {
             `;
         }
 
-        const atmsList = JSON.stringify(this.atmsList).replace(/"/g, "&quot;");
+        const atmsList = JSON.stringify(this.state.atmsList).replace(/"/g, "&quot;");
         const cities = JSON.stringify(this.cities).replace(/"/g, "&quot;");
         const districts = JSON.stringify(this.districts).replace(/"/g, "&quot;");
-        const segments = JSON.stringify(this.segments).replace(/"/g, "&quot;");
+        const segments = JSON.stringify(this.state.segments).replace(/"/g, "&quot;");
 
         return /*html*/ `
            <div class="column">

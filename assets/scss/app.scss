@@ -17,7 +17,6 @@
 @import "components/_list.scss";
 @import "components/_segment.scss";
 
-
 .main-container {
     @extend %primary-transition;
     margin-left: rem(112);
@@ -120,12 +119,6 @@
     padding: rem(24);
     border-radius: rem(8);
     border: 1px solid map-get($color-scheme, "gray-100");
-}
-
-.chart-container {
-    display: flex;
-    flex-direction: column;
-    gap: rem(20);
 }
 
 .overview-top {

@@ -62,7 +62,6 @@
     &_data {
         flex: 1;
         ul {
-            flex: 1;
             flex-direction: column;
             li {
                 &:not(:last-child) {
@@ -79,15 +78,17 @@
 }
 
 .chart-container {
+    @extend %flex;
+    flex-direction: column;
+    gap: rem(20);
     &_between {
-        @extend %flex;
         @extend %align-between;
         flex-direction: column;
         height: 100%;
     }
     &_column {
-        @extend %flex;
         @extend %align-between;
+        flex-direction: row;
         .chart {
             margin: 0 0 0 rem(24);
         }

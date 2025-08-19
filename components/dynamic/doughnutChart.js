@@ -41,7 +41,7 @@ class DoughnutChartComponent extends DynamicElement {
     onAfterRender() {
         if (!this.chartData) return;
         if (!this.chart) {
-            this.chart = createDoughnutChart(this.canvasId, this.chartData, this.legendId);
+            this.chart = createDoughnutChart(this.canvasId, this.chartData, this.legendId, false);
         } else {
             updateDoughnutChart(this.chart, this.chartData);
         }

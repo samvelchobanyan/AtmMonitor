@@ -31,7 +31,7 @@ class SideBar extends StaticElement {
                             <a href="">Ինկասացիա</a>
                         </div>
                     </div>
-                    <a href="geo" class="sidebar__item"> <i class="icon icon-box"></i><span>Բանկոմատներ</span> </a>
+                    <a href="atms" class="sidebar__item"> <i class="icon icon-box"></i><span>Բանկոմատներ</span> </a>
                     <a href="failures" class="sidebar__item"> <i class="icon icon-x-octagon"></i><span>Անսարքություններ</span> </a>
                     <a href="journal" class="sidebar__item"> <i class="icon icon-clipboard"></i><span>Մատյան</span> </a>
                 </div>

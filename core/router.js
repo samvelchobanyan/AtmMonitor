@@ -85,5 +85,13 @@ export function startRouter() {
         mountComponent("cumulative-analythics", "Անալիտիկա | Կումուլատիվ", ctx.query);
     });
 
+    // — Atms listing Route
+    page("/atms", async (ctx) => {
+        if (!customElements.get("atm-list")) {
+            await import("../pages/atm-list.js");
+        }
+        mountComponent("atm-list", "ԲԱնկոմատներ", ctx.query);
+    });
+
     page();
 }

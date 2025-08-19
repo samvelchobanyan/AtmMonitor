@@ -13,6 +13,9 @@ import "../components/dynamic/doughnutChart.js";
 import "../components/ui/customTab.js";
 import "../components/dynamic/select-box-search.js";
 import "../components/ui/customCheck.js";
+import "../components/dynamic/list-view.js";
+import "../components/ui/atmItem.js";
+
 
 class AtmsDashboard extends DynamicElement {
     constructor() {
@@ -82,6 +85,29 @@ class AtmsDashboard extends DynamicElement {
         const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
 
         return /* html */ `
+        <div class="row">
+            <div class="column sm-6">
+                <list-view
+                    white
+                    searchable
+                    search-fields="id,city,district,address"
+                    items='[
+                        {"id":455884,"city":"Երևան","district":"Արաբկիր","address":"Կոմիտաս 4","isWorking":true},
+                        {"id":455882,"city":"Գյումրի","district":"Անի","address":"Շիրակ 10","isWorking":false}
+                    ]'
+                >
+                    <template>
+                        <atm-item 
+                            id="{{id}}" 
+                            city="{{city}}" 
+                            district="{{district}}" 
+                            address="{{address}}"
+                            data-working="{{isWorking}}">
+                        </atm-item>
+                    </template>
+                </list-view>
+            </div>
+        </div>
         <div class="row">
             <div class="column sm-2">
                 <info-card

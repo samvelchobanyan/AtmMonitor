@@ -219,9 +219,7 @@ class ListView extends DynamicElement {
             return;
         }
 
-        container.innerHTML = filteredItems
-            .map((item) => this.renderTemplate(template, item))
-            .join("");
+        container.innerHTML = filteredItems.map((item) => this.renderTemplate(template, item)).join("");
 
         this.addCheckboxListeners();
     }
@@ -236,18 +234,21 @@ class ListView extends DynamicElement {
         if (error) return `<div class="error">Failed to load list items.</div>`;
         if (!rawTemplate) return `<div class="error">No template provided inside list-view.</div>`;
 
+        // Check if white variant is set
+        const searchClass = this.hasAttribute("white") ? "list-search list-search_white" : "list-search";
+
         return `
-            ${
-                searchEnabled
-                    ? `
-                <div class="list__search">
-                    <input type="search" placeholder="Փնտրել..." />
-                </div>
-            `
-                    : ""
-            }
-            <div class="list"></div>
-        `;
+        ${
+            searchEnabled
+                ? `
+            <div class="${searchClass}">
+                <input type="search" placeholder="Փնտրել..." />
+            </div>
+        `
+                : ""
+        }
+        <div class="list"></div>
+    `;
     }
 
     onAfterRender() {
@@ -264,11 +265,13 @@ class ListView extends DynamicElement {
                 const q = e.target.value.trim().toLowerCase();
 
                 const filtered = this.state.items.filter((item) => {
-                    const values = searchFields
-                        ? searchFields.map((k) => item[k]).filter((v) => v != null)
-                        : Object.values(item).filter((v) => v != null);
+                    const values = searchFields ? searchFields.map((k) => item[k]).filter((v) => v != null) : Object.values(item).filter((v) => v != null);
 
-                    return values.some((val) => String(val).toLowerCase().includes(q));
+                    return values.some((val) =>
+                        String(val)
+                            .toLowerCase()
+                            .includes(q)
+                    );
                 });
 
                 this.renderItems(filtered);

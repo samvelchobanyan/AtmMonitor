@@ -22,6 +22,10 @@
             }
         }
     }
+    &_scroll {
+        max-height: calc(100vh - #{rem(196)});
+        overflow: auto;
+    }
 }
 
 .list-search {

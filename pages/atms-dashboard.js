@@ -86,29 +86,6 @@ class AtmsDashboard extends DynamicElement {
 
         return /* html */ `
         <div class="row">
-            <div class="column sm-6">
-                <list-view
-                    white
-                    searchable
-                    search-fields="id,city,district,address"
-                    items='[
-                        {"id":455884,"city":"Երևան","district":"Արաբկիր","address":"Կոմիտաս 4","isWorking":true},
-                        {"id":455882,"city":"Գյումրի","district":"Անի","address":"Շիրակ 10","isWorking":false}
-                    ]'
-                >
-                    <template>
-                        <atm-item 
-                            id="{{id}}" 
-                            city="{{city}}" 
-                            district="{{district}}" 
-                            address="{{address}}"
-                            data-working="{{isWorking}}">
-                        </atm-item>
-                    </template>
-                </list-view>
-            </div>
-        </div>
-        <div class="row">
             <div class="column sm-2">
                 <info-card
                     title="Առկա գումար"

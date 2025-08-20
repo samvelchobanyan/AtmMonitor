@@ -60,6 +60,7 @@ class AtmList extends DynamicElement {
             <div class="row">
                 <div class="column sm-6">
                     <list-view
+                      scroll
                       white
                       searchable
                       search-fields="id,city,district,address"

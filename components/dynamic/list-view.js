@@ -234,8 +234,8 @@ class ListView extends DynamicElement {
         if (error) return `<div class="error">Failed to load list items.</div>`;
         if (!rawTemplate) return `<div class="error">No template provided inside list-view.</div>`;
 
-        // Check if white variant is set
         const searchClass = this.hasAttribute("white") ? "list-search list-search_white" : "list-search";
+        const scroll = this.hasAttribute("scroll") ? "list list_scroll" : "list";
 
         return `
         ${
@@ -247,7 +247,7 @@ class ListView extends DynamicElement {
         `
                 : ""
         }
-        <div class="list"></div>
+        <div class="${scroll}"></div>
     `;
     }
 

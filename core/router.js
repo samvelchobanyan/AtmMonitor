@@ -28,6 +28,11 @@ function mountComponent(tagName, title = null, query = {}) {
 export function startRouter() {
     page.base("/ATM_monitor");
 
+    // — Default Route - redirect to home
+    page("/", () => {
+        page.redirect("/home");
+    });
+
     // — Home Route
     page("/home", async (ctx) => {
         // console.log('router home route');
@@ -35,6 +40,16 @@ export function startRouter() {
             await import("../pages/atms-dashboard.js");
         }
         mountComponent("atms-dashboard", "Ակնարկ", ctx.query);
+        
+        // Dispatch route change event for sidebar highlighting
+        console.log('Router: Dispatching route-changed event for /home');
+        document.dispatchEvent(
+            new CustomEvent("route-changed", {
+                detail: { route: "/home" },
+                bubbles: true,
+                composed: true,
+            })
+        );
     });
 
     // — Input-output page Route
@@ -43,6 +58,15 @@ export function startRouter() {
             await import("../pages/in-out.js");
         }
         mountComponent("in-out", "Մուտք/Ելք", ctx.query);
+        
+        // Dispatch route change event for sidebar highlighting
+        document.dispatchEvent(
+            new CustomEvent("route-changed", {
+                detail: { route: "/inout" },
+                bubbles: true,
+                composed: true,
+            })
+        );
     });
 
     // — Atm failures page Route
@@ -51,6 +75,15 @@ export function startRouter() {
             await import("../pages/atm-failures.js");
         }
         mountComponent("atm-failures", "Անսարքություններ", ctx.query);
+        
+        // Dispatch route change event for sidebar highlighting
+        document.dispatchEvent(
+            new CustomEvent("route-changed", {
+                detail: { route: "/failures" },
+                bubbles: true,
+                composed: true,
+            })
+        );
     });
 
     // — Journal page Route
@@ -59,6 +92,15 @@ export function startRouter() {
             await import("../pages/journal.js");
         }
         mountComponent("journal-page", "Մատյան", ctx.query);
+        
+        // Dispatch route change event for sidebar highlighting
+        document.dispatchEvent(
+            new CustomEvent("route-changed", {
+                detail: { route: "/journal" },
+                bubbles: true,
+                composed: true,
+            })
+        );
     });
 
     // — Analytics Route
@@ -67,6 +109,15 @@ export function startRouter() {
             await import("../pages/analytics.js");
         }
         mountComponent("analytics-view", "Վերլուծություն", ctx.query);
+        
+        // Dispatch route change event for sidebar highlighting
+        document.dispatchEvent(
+            new CustomEvent("route-changed", {
+                detail: { route: "/analytics" },
+                bubbles: true,
+                composed: true,
+            })
+        );
     });
 
     // — Geo Analytics Route
@@ -75,6 +126,15 @@ export function startRouter() {
             await import("../pages/geo-analythics.js");
         }
         mountComponent("geo-analythics", "Անալիտիկա | Աշխարհագրական", ctx.query);
+        
+        // Dispatch route change event for sidebar highlighting
+        document.dispatchEvent(
+            new CustomEvent("route-changed", {
+                detail: { route: "/geo" },
+                bubbles: true,
+                composed: true,
+            })
+        );
     });
 
     // — Cumulative Analytics Route
@@ -83,6 +143,15 @@ export function startRouter() {
             await import("../pages/cumulative.js");
         }
         mountComponent("cumulative-analythics", "Անալիտիկա | Կումուլատիվ", ctx.query);
+        
+        // Dispatch route change event for sidebar highlighting
+        document.dispatchEvent(
+            new CustomEvent("route-changed", {
+                detail: { route: "/cumulative" },
+                bubbles: true,
+                composed: true,
+            })
+        );
     });
 
     // — Atms listing Route
@@ -91,6 +160,15 @@ export function startRouter() {
             await import("../pages/atm-list.js");
         }
         mountComponent("atm-list", "ԲԱնկոմատներ", ctx.query);
+        
+        // Dispatch route change event for sidebar highlighting
+        document.dispatchEvent(
+            new CustomEvent("route-changed", {
+                detail: { route: "/atms" },
+                bubbles: true,
+                composed: true,
+            })
+        );
     });
 
     page();

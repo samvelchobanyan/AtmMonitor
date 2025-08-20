@@ -4,6 +4,7 @@ const CHART_CONFIG = {
         // dashboard page
         deposit_amount: "Մուտքագրված գումար",
         dispense_amount: "Կանխիկացված գումար",
+        exchange_amount: "Փոխանակում",
         total_dispense_count: "Կանխիկացում",
         total_deposit_count: "Մուտքագրում",
         non_working_percent: "Պարապուրդ",
@@ -22,6 +23,7 @@ const CHART_CONFIG = {
     },
     inout_dispenseDynamicsToInclude : ["Մուտքագրում քարտին","Փոխանցում քարտին","Անձնական հաշվի համալրում","Կազմակերպության հաշվի համալրում","Ավանդի համալրում","Վարկի մարում"],
     inout_depositDynamicsToInclude : ["with_card_amount","without_card_amount"],
+    inout_transactionDynamicsToInclude : ["deposit_amount", "dispense_amount", "exchange_amount"],
 
     // Define which fields to include and their order
     fieldsToInclude: ["deposit_amount", "dispense_amount"],
@@ -61,38 +63,6 @@ class ChartDataTransformer {
                 datasets,
             },
         };
-    }
-
-    transformDepositDynamic(depositDynamic) {
-        console.log("transformDepositDynamic",depositDynamic);
-        return depositDynamic.map(row => {
-            const out = {
-                hour: row?.hour ?? 0,
-                with_card_count: row?.with_card_count ?? 0,
-                with_card_amount: row?.with_card_amount ?? 0,
-                without_card_count: row?.without_card_count ?? 0,
-                without_card_amount: row?.without_card_amount ?? 0,
-            };
-
-            // Seed all default types with zeros
-            for (const typeName of this.config.inout_dispenseDynamicsToInclude) {
-                out[`${typeName}`] = 0;
-                // out[`${typeName}`] = 0;
-            }
-
-            // If deposit_types exist, overwrite the seeded zeros with actual values
-            const types = Array.isArray(row?.deposit_types) ? row.deposit_types : [];
-            console.log('trasforming',types);
-            for (const t of types) {
-                const name = (t?.deposit_type_name || "").trim();
-                if (!name) continue;
-                console.log('transfomation',t,name,t?.total_amount);
-                out[`${name}`] = t?.total_amount ?? 0;
-                // out[`${name}`]  = t?.count ?? 0;
-            }
-
-            return out;
-        });
     }
 
     // === BarChart transformation ===
@@ -141,7 +111,13 @@ class ChartDataTransformer {
     }
 
     extractDatasets(dailyData) {
-        const { fieldLabels, encashmentFieldsToInclude, fieldsToInclude, inout_dispenseDynamicsToInclude, inout_depositDynamicsToInclude } = this.config;
+        const { 
+            fieldLabels, 
+            encashmentFieldsToInclude, 
+            fieldsToInclude, 
+            inout_dispenseDynamicsToInclude, 
+            inout_depositDynamicsToInclude,
+            inout_transactionDynamicsToInclude } = this.config;
         // handle encashment chart and other one
         let fields;
         if (dailyData[0].hasOwnProperty("encashment_count")) {
@@ -150,7 +126,9 @@ class ChartDataTransformer {
             fields = inout_dispenseDynamicsToInclude;
         } else if(dailyData[0].hasOwnProperty("with_card_amount")) {
             fields = inout_depositDynamicsToInclude;
-        }else {
+        } else if(dailyData[0].hasOwnProperty("exchange_amount")){
+            fields = inout_transactionDynamicsToInclude;
+        } else {
             fields = fieldsToInclude;
         }
 

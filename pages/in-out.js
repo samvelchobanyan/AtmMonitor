@@ -53,6 +53,34 @@ class inOut extends DynamicElement {
         }
     }
 
+    _transformToTransactionDynamics(data) {
+        const { dispense_dynamic, deposit_dynamic, exchange_dynamic } = data;
+
+        // Create the transactionDynamics array by mapping over exchange_dynamic.hourly_data
+        const transactionDynamics = exchange_dynamic.hourly_data.map(exchangeItem => {
+            const hour = exchangeItem.hour;
+
+            // Find corresponding to dispense data for this hour
+            const dispenseItem = dispense_dynamic.hourly_data.find(item => item.hour === hour);
+            const dispenseAmount = dispenseItem ?
+                (dispenseItem.with_card_amount + dispenseItem.without_card_amount) : 0;
+
+            // Find the corresponding deposit data for this hour
+            const depositItem = deposit_dynamic.hourly_data.find(item => item.hour === hour);
+            const depositAmount = depositItem ?
+                (depositItem.with_card_amount + depositItem.without_card_amount) : 0;
+
+            return {
+                hour: hour,
+                dispense_amount: dispenseAmount,
+                deposit_amount: depositAmount,
+                exchange_amount: exchangeItem.amount
+            };
+        });
+
+        return transactionDynamics;
+    }
+
     template() {
         const summary = this.state.summary;
         if (!summary) {
@@ -71,20 +99,15 @@ class inOut extends DynamicElement {
 
         const dispenseData = JSON.stringify(summary.data.dispense_summary).replace(/"/g, "&quot;");
         const depositData = JSON.stringify(summary.data.deposit_summary).replace(/"/g, "&quot;");
-        const transactionsData = JSON.stringify(
-            summary.data.transaction_dynamics.exchange_dynamic.hourly_data
-        ).replace(/"/g, "&quot;");
-
-        // const dispenseDynamicData = JSON.stringify(
-        //     summary.data.transaction_dynamics.dispense_dynamic.hourly_data
-        // ).replace(/"/g, "&quot;");
+        const exchangeData = summary.data.exchange_summary.currency_details;
 
         const depositDynamicData = JSON.stringify(
             summary.data.transaction_dynamics.deposit_dynamic.hourly_data
         ).replace(/"/g, "&quot;");
 
-        const dispenseDynamicData = summary.data.transaction_dynamics.dispense_dynamic.hourly_data;
-        const exchangeData = summary.data.exchange_summary.currency_details;
+        const dispenseDynamicData = JSON.stringify(summary.data.transaction_dynamics.dispense_dynamic.hourly_data);
+        const transactionDynamicsData = JSON.stringify(this._transformToTransactionDynamics(summary.data.transaction_dynamics));
+
 
         return /*html*/ `
             <div class="row">
@@ -123,7 +146,7 @@ class inOut extends DynamicElement {
                         <chart-component 
                             id="line-chart-transactions" 
                             chart-type="line" 
-                            chart-data='${transactionsData}' 
+                            chart-data='${transactionDynamicsData}' 
                             api-url="/analytics/exchange-dynamic-in-days" 
                             ${this.attrIf("city", this.state.currentCity)} 
                             ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
@@ -135,7 +158,7 @@ class inOut extends DynamicElement {
                         <chart-component 
                             id="line-chart-dispense-dynamics" 
                             chart-type="line" 
-                            chart-data='${JSON.stringify(dispenseDynamicData)}' 
+                            chart-data='${dispenseDynamicData}' 
                             api-url="/analytics/dispense-dynamic-in-days" 
                             ${this.attrIf("city", this.state.currentCity)} 
                             ${this.attrIf("region", this.state.currentRegion)}> </chart-component>

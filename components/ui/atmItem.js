@@ -9,6 +9,19 @@ export class AtmItem extends HTMLElement {
 
     connectedCallback() {
         this.render();
+        
+        // Add click event listener and dispatch custom event
+        this.addEventListener('click', () => {
+            this.dispatchEvent(new CustomEvent('atm-item-clicked', {
+                detail: {
+                    id: this.getAttribute('id'),
+                    latitude: this.getAttribute('data-lat'),
+                    longitude: this.getAttribute('data-lng')
+                },
+                bubbles: true,
+                composed: true
+            }));
+        });
     }
 
     attributeChangedCallback() {

@@ -15,7 +15,7 @@ import "../components/dynamic/select-box-search.js";
 import "../components/ui/customCheck.js";
 import "../components/dynamic/list-view.js";
 import "../components/ui/atmItem.js";
-
+import "../components/ui/infoItem.js";
 
 class AtmsDashboard extends DynamicElement {
     constructor() {
@@ -85,6 +85,33 @@ class AtmsDashboard extends DynamicElement {
         const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
 
         return /* html */ `
+        <div class="row">
+            <div class="column sm-6">
+                <div class="container">
+                    <container-top icon="icon-cpu" title="Սարքավորումներ"> </container-top>
+                    <div class="info-items">
+                        <info-item text="Dispenser" data-working="true"></info-item>
+                        <info-item text="Cash-In" data-working="false"></info-item>
+                        <info-item text="Receipt printer" data-working="false"></info-item>
+                        <info-item text="Card reader" data-working="true"></info-item>
+                    </div>
+                </div>
+            </div>
+            <div class="column sm-6">
+                <div class="container">
+                    <container-top icon="icon-trello" title="Արտադրողականություն"> </container-top>
+                    <div class="info-items-container">
+                        <div class="info-items info-items_col">
+                            <info-item text="Վերջին connect" value="15 Feb, 2025 | 15:15"></info-item>
+                            <info-item text="Վերջին connect" value="15 Feb, 2025 | 15:15"></info-item>
+                        </div>
+                        <div class="info-items">
+                            <info-item text="Վերջին ստատուսի տևողություն" value="1 Ժամ"></info-item>
+                        </div>
+                    </div>  
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="column sm-2">
                 <info-card

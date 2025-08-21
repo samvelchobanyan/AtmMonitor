@@ -87,12 +87,12 @@ class YandexMap extends DynamicElement {
             {
               balloonContentHeader: `ATM #${atm.name}`,
               balloonContentBody: `
-                <div style="padding: 8px;">
-                  <div><strong>ID:</strong> ${atm.id}</div>
-                  <div><strong>City:</strong> ${atm.city}</div>
-                  <div><strong>District:</strong> ${atm.district}</div>
-                  <div><strong>Address:</strong> ${atm.address}</div>
-                  <div><strong>Status:</strong> ${atm.connection_status_id === 1 ? 'Working' : 'Not Working'}</div>
+                <div class="balloon__body">
+                  <div class="balloon__item"><div>ATM ID:</div> <div>${atm.id}</div></div>
+                  <div class="balloon__item"><div>City:</div> <div>${atm.city}</div></div>
+                  <div class="balloon__item"><div>District:</div> <div>${atm.district}</div></div>
+                  <div class="balloon__item"><div>Address:</div> <div>${atm.address}</div></div>
+                  <div class="balloon__item"><div>Status:</div> <div>${atm.connection_status_id === 1 ? 'Working' : 'Not Working'}</div></div>
                 </div>
               `,
               hintContent: `ATM #${atm.name}`
@@ -102,6 +102,11 @@ class YandexMap extends DynamicElement {
               iconColor: atm.connection_status_id === 1 ? '#28a745' : '#dc3545'
             }
           );
+
+          // Change marker icon to a custom image
+          marker.options.set('iconLayout', 'default#image');
+          marker.options.set('iconImageHref', 'assets/img/pin.svg');
+          marker.options.set('iconImageSize', [32, 32]); 
 
           // Store ATM data with the marker for navigation
           marker.atmData = atm;
@@ -147,15 +152,15 @@ class YandexMap extends DynamicElement {
         
         // Open the balloon above the marker to show ATM details
         this.map.balloon.open([balloonLat, longitude], {
-          contentHeader: `ATM #${marker.atmData.name}`,
-          contentBody: `
-            <div style="padding: 8px;">
-              <div><strong>ID:</strong> ${marker.atmData.name}</div>
-              <div><strong>City:</strong> ${marker.atmData.city}</div>
-              <div><strong>District:</strong> ${marker.atmData.district}</div>
-              <div><strong>Address:</strong> ${marker.atmData.address}</div>
-              <div><strong>Status:</strong> ${marker.atmData.connection_status_id === 1 ? 'Working' : 'Not Working'}</div>
-            </div>
+             balloonContentHeader: `ATM #${atm.name}`,
+              balloonContentBody: `
+                <div class="balloon__body">
+                  <div class="balloon__item"><div>ATM ID:</div> <div>${atm.id}</div></div>
+                  <div class="balloon__item"><div>City:</div> <div>${atm.city}</div></div>
+                  <div class="balloon__item"><div>District:</div> <div>${atm.district}</div></div>
+                  <div class="balloon__item"><div>Address:</div> <div>${atm.address}</div></div>
+                  <div class="balloon__item"><div>Status:</div> <div>${atm.connection_status_id === 1 ? 'Working' : 'Not Working'}</div></div>
+                </div>
           `,
           // Ensure balloon opens above the marker
           autoPan: true,
@@ -237,7 +242,7 @@ class YandexMap extends DynamicElement {
     }
 
     return `
-      <div style="width: 100%; height: 70vh; min-height: 400px; max-height: 800px; border: 2px solid #ccc; background: #f0f0f0; border-radius: 8px; overflow: hidden;">
+      <div style="width: 100%; height: 100%;">
         <div id="simple-map" style="width: 100%; height: 100%; position: relative;"></div>
       </div>
     `;

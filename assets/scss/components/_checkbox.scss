@@ -35,7 +35,7 @@
 
         &::after {
             @include center-absolute(both);
-            @include font-icon("\e903");
+            @include font-icon("\e904");
             color: inherit;
             @extend %hidden;
             font-size: rem(14);

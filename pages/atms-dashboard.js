@@ -185,7 +185,7 @@ class AtmsDashboard extends DynamicElement {
         <div class="row">
             <div class="column sm-12">
                 <div class="container">
-                    <container-top icon="icon-coins" title="Ինկասացիա"> </container-top>
+                    <container-top icon="icon-coins" title="Ինկասացիա"> </container-top> 
                     <div class="infos">
                         <info-card
                             title="Այսօրվա ինկասացիաներ"

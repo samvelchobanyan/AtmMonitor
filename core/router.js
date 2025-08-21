@@ -85,6 +85,14 @@ export function startRouter() {
         mountComponent("cumulative-analythics", "Անալիտիկա | Կումուլատիվ", ctx.query);
     });
 
+    // — Incashment listing Route
+    page("/incassate", async (ctx) => {
+        if (!customElements.get("incassate-analythics")) {
+            await import("../pages/incassate.js");
+        }
+        mountComponent("incassate-analythics", "Անալիտիկա | Ինկասացիա", ctx.query);
+    });
+
     // — Atms listing Route
     page("/atms", async (ctx) => {
         if (!customElements.get("atm-list")) {

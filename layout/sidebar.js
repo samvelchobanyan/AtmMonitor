@@ -28,7 +28,7 @@ class SideBar extends StaticElement {
                             <a href="inout" class="active">Մուտք / Ելք</a>
                             <a href="geo" id="geo">Աշխարհագրական</a>
                             <a href="cumulative" id="cumulative">Կումուլատիվ</a>
-                            <a href="">Ինկասացիա</a>
+                            <a href="incassate" id="incassate" >Ինկասացիա</a>
                         </div>
                     </div>
                     <a href="atms" class="sidebar__item"> <i class="icon icon-box"></i><span>Բանկոմատներ</span> </a>

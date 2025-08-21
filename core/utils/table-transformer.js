@@ -8,6 +8,14 @@ function transformFaultTableData(apiResponse) {
                 .map((df) => `${df.device_type}(${df.fault_count})`)
                 .join(", "),
         }));
+    } else if (apiResponse.data.encashments) {
+        return apiResponse.data.encashments.map((item) => ({
+            date_time: item.date_time,
+            atm_address: `${item.atm_id} / ${item.address}`,
+            added_amount: item.added_amount,
+            collected_amount: item.collected_amount,
+            marked_as_empty: item.marked_as_empty,
+        }));
     } else if (Array.isArray(apiResponse.data)) {
         return apiResponse.data.map((item) => ({
             province: item.province,

@@ -8,6 +8,7 @@ import "../components/ui/customCheck.js";
 import "../components/dynamic/segment.js";
 import "../components/dynamic/simpleTable.js";
 import "../components/dynamic/select-box-date.js";
+import encode from "../assets/js/utils/encode.js";
 
 class Cumulative extends DynamicElement {
     constructor() {
@@ -283,10 +284,10 @@ class Cumulative extends DynamicElement {
             `;
         }
 
-        const atmsList = JSON.stringify(this.state.atmsList).replace(/"/g, "&quot;");
-        const cities = JSON.stringify(this.cities).replace(/"/g, "&quot;");
-        const districts = JSON.stringify(this.districts).replace(/"/g, "&quot;");
-        const segments = JSON.stringify(this.state.segments).replace(/"/g, "&quot;");
+        const atmsList = encode(this.state.atmsList);
+        const cities = encode(this.cities);
+        const districts = encode(this.districts);
+        const segments = encode(this.state.segments);
 
         return /*html*/ `
            <div class="column">

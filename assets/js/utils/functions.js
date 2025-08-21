@@ -113,11 +113,15 @@ function dynamicAppendInit() {
     const dataAppendElements = document.querySelectorAll("[data-append]");
     if (dataAppendElements.length) {
         dataAppendElements.forEach((dataAppendElement) => {
-            let [mediaSize, appendBlockClass] = dataAppendElement.getAttribute("data-append").split(", ");
+            let [mediaSize, appendBlockClass] = dataAppendElement
+                .getAttribute("data-append")
+                .split(", ");
 
             if (window.innerWidth < mediaSize) {
                 const appendBlockElement = document.querySelector(appendBlockClass);
-                const isElementAppended = appendBlockElement && !!appendBlockElement.querySelector(dataAppendElement.getAttribute("class"));
+                const isElementAppended =
+                    appendBlockElement &&
+                    !!appendBlockElement.querySelector(dataAppendElement.getAttribute("class"));
 
                 console.log(dataAppendElement);
                 if (appendBlockElement && !isElementAppended) {
@@ -130,7 +134,9 @@ function dynamicAppendInit() {
 
 function splitText(element) {
     let wordsList = element.textContent.trim().split(" ");
-    let wrappedWords = wordsList.filter((word) => (word ? word : null)).map((word) => `<span class="split-word"><span>${word}</span></span>`);
+    let wrappedWords = wordsList
+        .filter((word) => (word ? word : null))
+        .map((word) => `<span class="split-word"><span>${word}</span></span>`);
 
     return wrappedWords.join(" ");
 }
@@ -237,13 +243,13 @@ function autoRemoveToast(id) {
     const thisToast = document.querySelector(`[data-toast-id="${id}"]`);
 
     if (thisToast) {
-        new Promise(function (resolve, reject) {
-            setTimeout(function () {
+        new Promise(function(resolve, reject) {
+            setTimeout(function() {
                 thisToast.classList.add("toast-message_hidden");
                 resolve();
             }, 4000);
-        }).then(function () {
-            setTimeout(function () {
+        }).then(function() {
+            setTimeout(function() {
                 thisToast.remove();
                 const toastMessageElements = document.querySelectorAll(".toast-message");
 
@@ -265,7 +271,7 @@ function removeToast(closeElement, id) {
 
         toast.classList.add("toast-message_hidden");
 
-        setTimeout(function () {
+        setTimeout(function() {
             toast.remove();
         }, 500);
     } else {
@@ -273,7 +279,7 @@ function removeToast(closeElement, id) {
 
         thisToast.classList.add("toast-message_hidden");
 
-        setTimeout(function () {
+        setTimeout(function() {
             thisToast.remove();
         }, 500);
     }
@@ -332,7 +338,10 @@ function popoverSlideInit(target) {
         targetWrap.classList.remove("dragging");
         target.removeAttribute("style");
         let targetHeightHalf = target.offsetHeight / 2;
-        const targetWrapHeight = targetWrap.clientHeight - parseFloat(getStyle(targetWrap, "padding-top")) - parseFloat(getStyle(targetWrap, "padding-bottom"));
+        const targetWrapHeight =
+            targetWrap.clientHeight -
+            parseFloat(getStyle(targetWrap, "padding-top")) -
+            parseFloat(getStyle(targetWrap, "padding-bottom"));
 
         if (target.offsetHeight > targetWrapHeight) {
             if (distance > targetWrapHeight / 2) {
@@ -361,7 +370,14 @@ function headerFixed() {
 }
 
 function getDocumentVisibleWidth() {
-    return Math.max(document.body.scrollWidth, document.documentElement.scrollWidth, document.body.offsetWidth, document.documentElement.offsetWidth, document.body.clientWidth, document.documentElement.clientWidth);
+    return Math.max(
+        document.body.scrollWidth,
+        document.documentElement.scrollWidth,
+        document.body.offsetWidth,
+        document.documentElement.offsetWidth,
+        document.body.clientWidth,
+        document.documentElement.clientWidth
+    );
 }
 
 function disableIntro() {
@@ -380,7 +396,8 @@ function scrollNone() {
     const headerActive = document.querySelector(".header.active");
     const shiftElements = document.querySelectorAll(".shift-element");
 
-    let lockBody = activeModal || activeProductModal || activeFilterModal || activePopover || headerActive;
+    let lockBody =
+        activeModal || activeProductModal || activeFilterModal || activePopover || headerActive;
     let scrollWidthBeforeFreeze = getDocumentVisibleWidth();
 
     if (lockBody) {

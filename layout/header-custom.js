@@ -39,7 +39,7 @@ class HeaderCustom extends DynamicElement {
         this.addListener(document, "route-title", (e) => {
             const newTitle = e.detail?.title || "";
             const currentPath = window.location.pathname;
-
+            // todo check here, not hiding correctly
             const pathsToHide = ["/ATM_monitor/geo", "/ATM_monitor/cumulative"];
             const newHideClass = pathsToHide.includes(currentPath) ? "hide" : "";
 

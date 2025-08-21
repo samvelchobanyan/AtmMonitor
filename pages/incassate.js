@@ -8,6 +8,7 @@ import "../components/ui/customCheck.js";
 import "../components/dynamic/segment.js";
 import "../components/dynamic/simpleTable.js";
 import "../components/dynamic/select-box-date.js";
+import encode from "../assets/js/utils/encode.js";
 
 class Incassate extends DynamicElement {
     constructor() {
@@ -15,16 +16,14 @@ class Incassate extends DynamicElement {
         this.state = {
             summary: null,
             segments: [],
+            infoCardsSummary: [],
         };
         // change link to get new data
         this.tableLink = "/encashment/summary";
+        this.chosenAtms = [];
         this.province = [];
         this.cities = [];
         this.districts = [];
-
-        this.currentRegion = null;
-
-        this.currentCity = null;
 
         this.activeTab = "";
         this.checkedValues = new Set();
@@ -66,7 +65,17 @@ class Incassate extends DynamicElement {
         this.dateSelectBox = this.$("select-box-date");
     }
 
-    fetchInfoCardData() {}
+    async fetchInfoCardData(queryString) {
+        try {
+            const response = await this.fetchData(
+                `/encashment/failed-transactions?${queryString.toString()}`
+            );
+            this.setState({ infoCardsSummary: response.data });
+        } catch (err) {
+            console.error("❌ Error fetching summary:", err);
+            this.setState({ infoCardsSummary: [] });
+        }
+    }
 
     async fetchSummary(region, city, province, segmentId) {
         const queryString = new URLSearchParams();
@@ -87,11 +96,9 @@ class Incassate extends DynamicElement {
         queryString.append("startDate", "2025-06-27");
         queryString.append("startDate", "2025-08-11");
 
+        this.fetchInfoCardData(queryString);
         try {
             this.tableLink = `/encashment/summary?${queryString}`;
-
-            this.currentRegion = region;
-            this.currentCity = city;
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
         }
@@ -128,8 +135,9 @@ class Incassate extends DynamicElement {
                 this.setAttribute("end-date", endDate);
 
                 const queryString = this.buildQueryString(startDate, endDate);
-
+                this.fetchInfoCardData(queryString);
                 this.tableLink = `/encashment/summary?${queryString}`;
+
                 const tableContainer = this.$(".table-container");
                 if (tableContainer) {
                     tableContainer.innerHTML = this.renderTable(this.tableLink);
@@ -168,6 +176,7 @@ class Incassate extends DynamicElement {
             const endDate = dateComponent?.endDate || null;
 
             const queryString = this.buildQueryString(startDate, endDate);
+            this.fetchInfoCardData(queryString);
 
             this.tableLink = `/encashment/summary?${queryString}`;
             const tableContainer = this.$(".table-container");
@@ -249,9 +258,9 @@ class Incassate extends DynamicElement {
             `;
         }
 
-        const cities = JSON.stringify(this.cities).replace(/"/g, "&quot;");
-        const districts = JSON.stringify(this.districts).replace(/"/g, "&quot;");
-        const segments = JSON.stringify(this.state.segments).replace(/"/g, "&quot;");
+        const cities = encode(this.cities);
+        const districts = encode(this.districts);
+        const segments = encode(this.state.segments);
 
         return /*html*/ `
            <div class="column">
@@ -273,7 +282,9 @@ class Incassate extends DynamicElement {
                             ${this.province
                                 .map(
                                     (el) =>
-                                        `<custom-checkbox id="${el.value}" value="${el.value}">${el.label}</custom-checkbox>`
+                                        `<custom-checkbox id="${el.value}" value="${el.value}"   ${
+                                            this.checkedValues.has(el.value) ? "checked" : ""
+                                        }>${el.label} </custom-checkbox>`
                                 )
                                 .join("")}
                         </div>  
@@ -295,21 +306,21 @@ class Incassate extends DynamicElement {
                     </div>
                 </div>
 
-                <div class="container">
+                    <div class="container">
                       <div class="select-container">
                             <container-top icon="icon-coins" title="Ինկասացիաներ"> </container-top>
                         </div>  
                      
-    <info-card
+                        <info-card
                             title="Այսօրվա ինկասացիաներ"
-                            value="${infoData.failed_transactions_count}"
+                            value="${this.state.infoCardsSummary.failed_transactions_count}"
                             value-color="color-blue"
                             icon="icon icon-box"
                             show-border="true">
                         </info-card>
                         <info-card
                             title="Այսօր հետ բերված գումար"
-                            value="${infoData.failed_transactions_amount}"
+                            value="${this.state.infoCardsSummary.failed_transactions_amount}"
                             value-currency="֏"
                             value-color="color-blue"
                             icon="icon icon-arrow-down-left"

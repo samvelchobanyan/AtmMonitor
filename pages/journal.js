@@ -95,6 +95,7 @@
 
 import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/list-view.js";
+import encode from "../assets/js/utils/encode.js";
 
 class JournalPage extends DynamicElement {
     constructor() {
@@ -130,8 +131,8 @@ class JournalPage extends DynamicElement {
     template() {
         if (this.state.summary.events === undefined) return;
 
-        // console.log(this.state.summary.events);
-        let itemsData = JSON.stringify(this.state.summary.events).replace(/"/g, "&quot;");
+        let itemsData = encode(this.state.summary.events);
+        
         return /*html*/ `
             <div class="row">
                 <div class="column sm-12">

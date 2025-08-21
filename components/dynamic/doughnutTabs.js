@@ -3,8 +3,9 @@ import { memoryStore } from "../../core/memory-store.js";
 import "./doughnutChart.js";
 import "../ui/customRadio.js";
 import "./select-box-date.js";
+import encode from "../../assets/js/utils/encode.js";
 
-const observedAttrs = ["data", "api-url", "start-date", "end-date"];
+const observedAttrs = ["data", "api-url", "start-date", "end-date", "show-date"];
 const nonRenderAttrs = new Set(["start-date", "end-date"]);
 
 const TAB_LABELS = {
@@ -210,16 +211,22 @@ export default class DoughnutTabs extends DynamicElement {
         }
 
         const charts = this.transformedTabData[this.state.selectedTab];
-        const amountData = charts ? JSON.stringify(charts.amount).replace(/"/g, "&quot;") : "";
-        const countData = charts ? JSON.stringify(charts.count).replace(/"/g, "&quot;") : "";
-
+        const amountData = charts ? encode(charts.amount) : "";
+        const countData = charts ? encode(charts.count) : "";
+        const showDate = this.getAttribute("show-date") !== "false"; // default true
         return `
       <div class="select-container">
         <container-top icon="icon-arrow-down-left" title="\u053F\u0561\u0576\u056D\u056B\u056F\u0561\u0581\u0578\u0582\u0574"></container-top>
-        <select-box-date
-          start-date="${this.getAttr("start-date")}"
-          end-date="${this.getAttr("end-date")}"
-        ></select-box-date>
+          ${
+              showDate
+                  ? `
+          <select-box-date
+            start-date="${this.getAttr("start-date")}"
+            end-date="${this.getAttr("end-date")}"
+          ></select-box-date>
+        `
+                  : ""
+          }
       </div>
       <div class="radio-buttons">
         ${this._renderRadios()}

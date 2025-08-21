@@ -1,6 +1,7 @@
 import "./doughnutChart.js";
 import "../ui/customRadio.js";
 import { DynamicElement } from "../../core/dynamic-element.js";
+import encode from "../../assets/js/utils/encode.js";
 
 class TabsDoughnutChartComponent extends DynamicElement {
     constructor() {
@@ -52,11 +53,10 @@ class TabsDoughnutChartComponent extends DynamicElement {
             `;
         }
 
-
         const data = this.summary;
-        const safeData = JSON.stringify(data).replace(/"/g, "&quot;");
-        // console.log('tabs',this.tabsInfo)
-        const radiosHtml = Object.entries(this.tabsInfo).map(([key, label], index) => {
+        const safeData = encode(data);
+        const radiosHtml = Object.entries(this.tabsInfo)
+            .map(([key, label], index) => {
                 return /*html*/ `<custom-radio 
                                     name="cash-out" 
                                     value="${key}" 
@@ -65,9 +65,8 @@ class TabsDoughnutChartComponent extends DynamicElement {
                                     ${label}
                                  </custom-radio>
                                 `;
-                })
-                .join("");
-        // console.log('tabs html',radiosHtml)
+            })
+            .join("");
         return /*html*/ `
             <div>
                 <div class="radio-buttons ">
@@ -77,7 +76,7 @@ class TabsDoughnutChartComponent extends DynamicElement {
                 <div class="chart-container">
                   <doughnut-chart 
                     id="${this.id}-amount" 
-                    title="${ data[`${this.id}_amount`]}"  
+                    title="${data[`${this.id}_amount`]}"  
                     percentChange="${data[`${this.id}_amount_percent_change`]}"  
                     initData="${safeData}" 
                     type='amount' 

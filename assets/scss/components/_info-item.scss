@@ -1,0 +1,69 @@
+.info-item {
+    @extend %flex;
+    @extend %align-middle;
+    @extend %align-between;
+    height: rem(38);
+    background-color: map-get($color-scheme, "gray");
+    border-radius: rem(6);
+    padding: 0 rem(12);
+    margin-bottom: rem(20);
+    span {
+        &:first-child {
+            @include font(500, 16, 1.25, inherit, 0, $fontPrimary);
+        }
+    }
+    &__status {
+        position: relative;
+        &::before {
+            content: "";
+            @include center-absolute("vertical");
+            height: rem(8);
+            width: rem(8);
+            border-radius: 100%;
+            left: rem(-16);
+        }
+        &_working {
+            color: map-get($color-scheme, "green");
+            &::before {
+                background-color: map-get($color-scheme, "green");
+            }
+        }
+        &_not-working {
+            color: map-get($color-scheme, "red");
+            &::before {
+                background-color: map-get($color-scheme, "red");
+            }
+        }
+        span {
+            @include font(500, 12, 1.8, inherit, 0, $fontPrimary);
+        }
+    }
+    &__value {
+        @include font(900, 14, 1.6, inherit, 0, $fontPrimary);
+    }
+}
+
+.info-items {
+    margin-bottom: rem(-20);
+    @extend %flex;
+    flex-direction: column;
+    &_col {
+        flex-direction: row;
+        flex-wrap: wrap;
+        .info-item {
+            @include flex(0, 0, calc(50% - #{rem(8)}));
+            max-width: calc(50% - #{rem(8)});
+            &:nth-child(odd) {
+                margin-right: rem(16);
+            }
+        }
+    }
+}
+
+.info-items-container {
+    .info-items {
+        &:not(:last-child) {
+           margin-bottom: 0;
+        }
+    }
+}

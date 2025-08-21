@@ -36,7 +36,7 @@
                 &::after {
                     @include center-absolute("vertical");
                     right: rem(-32);
-                    @include font-icon("\e91e");
+                    @include font-icon("\e91f");
                     color: inherit;
                     font-size: rem(16);
                 }

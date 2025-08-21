@@ -40,7 +40,7 @@
     position: relative;
     &::after {
         @include center-absolute("vertical");
-        @include font-icon("\e900");
+        @include font-icon("\e901");
         right: rem(12);
         color: map-get($color-scheme, "text-black");
         font-size: rem(20);

@@ -27,36 +27,22 @@ class HeaderCustom extends DynamicElement {
     }
 
     addGlobalEventListeners() {
-        this.addListener(document, "route-title", (e) => {
-            const newTitle = e.detail?.title || "";
-
-            if (newTitle !== this.title) {
-                this.title = newTitle;
+        this.addListener(document, "route-changed", (e) => {
+            const { title, route } = e.detail;
+            
+            // Update title
+            if (title !== this.title) {
+                this.title = title;
                 this._applyTitle();
             }
-        });
-
-        this.addListener(document, "route-title", (e) => {
-            const newTitle = e.detail?.title || "";
-            const currentPath = window.location.pathname;
-            // todo check here, not hiding correctly
+            
+            // Update visibility based on route
             const pathsToHide = ["/ATM_monitor/geo", "/ATM_monitor/cumulative"];
-            const newHideClass = pathsToHide.includes(currentPath) ? "hide" : "";
-
-            let shouldRerender = false;
-
-            if (newTitle !== this.title) {
-                this.title = newTitle;
-                shouldRerender = true;
-            }
-
+            const newHideClass = pathsToHide.includes(route) ? "hide" : "";
+            
             if (newHideClass !== this.state.hideClass) {
                 this.state.hideClass = newHideClass;
-                shouldRerender = true;
-            }
-
-            if (shouldRerender) {
-                this.render(); // re-run template with updated state
+                this.render();
             }
         });
     }

@@ -2,7 +2,7 @@ import page from "https://unpkg.com/page/page.mjs";
 
 const mount = document.querySelector("main");
 
-function mountComponent(tagName, title = null, query = {}) {
+function mountComponent(tagName, title = null, query = {}, route = null) {
     mount.innerHTML = "";
     const pageComponent = document.createElement(tagName);
 
@@ -12,29 +12,35 @@ function mountComponent(tagName, title = null, query = {}) {
 
     mount.appendChild(pageComponent);
 
-    //dispatch route-title event
-    if (title) {
-        // console.log('router mount component - dispatching',tagName, title);
-        document.dispatchEvent(
-            new CustomEvent("route-title", {
-                detail: { title },
-                bubbles: true,
-                composed: true,
-            })
-        );
-    }
+    // Single consolidated event with all route information
+    document.dispatchEvent(
+        new CustomEvent("route-changed", {
+            detail: { 
+                route: route,
+                title: title || "",
+                component: tagName,
+                query: query
+            },
+            bubbles: true,
+            composed: true,
+        })
+    );
 }
 
 export function startRouter() {
     page.base("/ATM_monitor");
 
+    // — Default Route - redirect to home
+    page("/", () => {
+        page.redirect("/home");
+    });
+
     // — Home Route
     page("/home", async (ctx) => {
-        // console.log('router home route');
         if (!customElements.get("atms-dashboard")) {
             await import("../pages/atms-dashboard.js");
         }
-        mountComponent("atms-dashboard", "Ակնարկ", ctx.query);
+        mountComponent("atms-dashboard", "Ակնարկ", ctx.query, "/home");
     });
 
     // — Input-output page Route
@@ -42,7 +48,7 @@ export function startRouter() {
         if (!customElements.get("in-out")) {
             await import("../pages/in-out.js");
         }
-        mountComponent("in-out", "Մուտք/Ելք", ctx.query);
+        mountComponent("in-out", "Մուտք/Ելք", ctx.query, "/inout");
     });
 
     // — Atm failures page Route
@@ -50,7 +56,7 @@ export function startRouter() {
         if (!customElements.get("atm-failures")) {
             await import("../pages/atm-failures.js");
         }
-        mountComponent("atm-failures", "Անսարքություններ", ctx.query);
+        mountComponent("atm-failures", "Անսարքություններ", ctx.query, "/failures");
     });
 
     // — Journal page Route
@@ -58,7 +64,7 @@ export function startRouter() {
         if (!customElements.get("journal-page")) {
             await import("../pages/journal.js");
         }
-        mountComponent("journal-page", "Մատյան", ctx.query);
+        mountComponent("journal-page", "Մատյան", ctx.query, "/journal");
     });
 
     // — Analytics Route
@@ -66,7 +72,7 @@ export function startRouter() {
         if (!customElements.get("analytics-view")) {
             await import("../pages/analytics.js");
         }
-        mountComponent("analytics-view", "Վերլուծություն", ctx.query);
+        mountComponent("analytics-view", "Վերլուծություն", ctx.query, "/analytics");
     });
 
     // — Geo Analytics Route
@@ -74,7 +80,7 @@ export function startRouter() {
         if (!customElements.get("geo-analythics")) {
             await import("../pages/geo-analythics.js");
         }
-        mountComponent("geo-analythics", "Անալիտիկա | Աշխարհագրական", ctx.query);
+        mountComponent("geo-analythics", "Անալիտիկա | Աշխարհագրական", ctx.query, "/geo");
     });
 
     // — Cumulative Analytics Route
@@ -82,7 +88,7 @@ export function startRouter() {
         if (!customElements.get("cumulative-analythics")) {
             await import("../pages/cumulative.js");
         }
-        mountComponent("cumulative-analythics", "Անալիտիկա | Կումուլատիվ", ctx.query);
+        mountComponent("cumulative-analythics", "Անալիտիկա | Կումուլատիվ", ctx.query, "/cumulative");
     });
 
     // — Incashment listing Route
@@ -98,7 +104,7 @@ export function startRouter() {
         if (!customElements.get("atm-list")) {
             await import("../pages/atm-list.js");
         }
-        mountComponent("atm-list", "ԲԱնկոմատներ", ctx.query);
+        mountComponent("atm-list", "ԲԱնկոմատներ", ctx.query, "/atms");
     });
 
     page();

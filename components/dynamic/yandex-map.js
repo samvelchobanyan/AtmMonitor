@@ -103,6 +103,11 @@ class YandexMap extends DynamicElement {
             }
           );
 
+          // Change marker icon to a custom image
+          marker.options.set('iconLayout', 'default#image');
+          marker.options.set('iconImageHref', 'assets/img/pin.svg');
+          marker.options.set('iconImageSize', [32, 32]); 
+
           // Store ATM data with the marker for navigation
           marker.atmData = atm;
 
@@ -237,7 +242,7 @@ class YandexMap extends DynamicElement {
     }
 
     return `
-      <div style="width: 100%; height: 70vh; min-height: 400px; max-height: 800px; border: 2px solid #ccc; background: #f0f0f0; border-radius: 8px; overflow: hidden;">
+      <div style="width: 100%; height: 100%;">
         <div id="simple-map" style="width: 100%; height: 100%; position: relative;"></div>
       </div>
     `;

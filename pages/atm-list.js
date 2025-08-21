@@ -111,7 +111,7 @@ class AtmList extends DynamicElement {
                     </div>
                 </div>
                 <div class="column sm-6">
-                    <div class="atm-map-container">
+                    <div class="atm-map">
                         <yandex-map
                           atms='${JSON.stringify(this.state.atms)}'
                           center-lat="40.1872"

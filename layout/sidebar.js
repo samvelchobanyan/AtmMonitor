@@ -1,35 +1,35 @@
-import { StaticElement } from "../core/static-element.js";
+import { DynamicElement } from "../core/dynamic-element.js";
 
-class SideBar extends StaticElement {
+class SideBar extends DynamicElement {
     constructor() {
         super();
-        this.currentRoute = '/home'; // Default route
-        this.init();
+        this.state = { currentRoute: '/home' };
     }
 
-    init() {
-        // Listen for route changes
-        document.addEventListener('route-changed', (event) => {
-            console.log('Sidebar: Route changed to:', event.detail.route);
-            this.currentRoute = event.detail.route;
-            this.updateActiveState();
-        });
-
-        // Set initial active state based on current URL
-        this.currentRoute = window.location.pathname.replace('/ATM_monitor', '') || '/home';
-        console.log('Sidebar: Initial route:', this.currentRoute);
+    onConnected() {
+        // Set initial route
+        this.state.currentRoute = window.location.pathname.replace('/ATM_monitor', '') || '/home';
         this.updateActiveState();
     }
 
+    addGlobalEventListeners() {
+        // Listen for route changes using the proper DynamicElement pattern
+        this.addListener(document, 'route-changed', (event) => {
+            console.log('Sidebar: Route changed to:', event.detail.route);
+            this.state.currentRoute = event.detail.route;
+            this.updateActiveState();
+        });
+    }
+
     updateActiveState() {
-        console.log('Sidebar: Updating active state for route:', this.currentRoute);
+        console.log('Sidebar: Updating active state for route:', this.state.currentRoute);
         
         // Remove all active classes
         const allItems = this.querySelectorAll('.sidebar__item, .sidebar__dropdown a');
         allItems.forEach(item => item.classList.remove('active'));
 
         // Add active class based on current route
-        switch (this.currentRoute) {
+        switch (this.state.currentRoute) {
             case '/home':
                 const homeItem = this.querySelector('a[href="./home"]');
                 if (homeItem) {
@@ -82,7 +82,7 @@ class SideBar extends StaticElement {
         }
     }
 
-    render() {
+    template() {
         return /* html */ `
             <aside class="sidebar">
                 <div class="sidebar__toggle sidebar-toggle"><i class="icon icon-chevrons-right"></i></div>

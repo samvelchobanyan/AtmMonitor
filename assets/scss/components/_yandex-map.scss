@@ -1,3 +1,77 @@
 .atm-map {
     height: 100%;
 }
+
+.balloon {
+    &__item {
+        @extend %flex;
+        @extend %align-between;
+        &:not(:last-child) {
+            margin-bottom: rem(12);
+            padding-bottom: rem(12);
+            @include horizontal-decor("../img/decor/horizontal-gray.svg");
+            &:after {
+                bottom: 0;
+            }
+        }
+        div {
+            &:first-child {
+                @include font(bold, 16, 1.25, inherit, 0, $fontPrimary);
+                margin-right: rem(16);
+            }
+            &:last-child {
+                @include font(normal, 16, 1.25, inherit, 0, $fontPrimary);
+            }
+        }
+    }
+}
+
+.ymaps-2-1-79-balloon {
+    box-shadow: none !important;
+    &__content {
+        margin-right: 0 !important;
+        padding: rem(24) !important;
+    }
+    &__layout {
+        box-shadow: 0 rem(4) rem(3) 0 #00000008, 0 rem(12) rem(24) 0 #00000014;
+        border-radius: rem(8);
+    }
+    &__close {
+        margin-bottom: 0 !important;
+        position: absolute !important;
+        top: rem(24);
+        right: rem(24);
+    }
+    &__close-button {
+        opacity: 1 !important;
+        background: url(../img/icons/x-circle.svg) !important;
+        width: rem(32) !important;
+        height: rem(32) !important;
+        background-repeat: no-repeat !important;
+        background-size: contain !important;
+    }
+    &__header {
+        @extend %flex;
+        @extend %align-middle;
+        height: rem(24);
+    }
+    &-content__header {
+        display: flex !important;
+        align-items: center;
+        height: rem(32);
+        margin-bottom: rem(16) !important;
+        padding-bottom: rem(16) !important;
+        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        &:after {
+            bottom: 0;
+        }
+    }
+    &__tail {
+        background: transparent !important;
+        box-shadow: none !important;
+        &::after {
+            width: rem(20);
+            height: rem(20);
+        }
+    }
+}

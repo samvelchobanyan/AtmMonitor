@@ -59,10 +59,12 @@
 }
 
 .atm-item {
+    @extend %flex;
+    @extend %primary-transition;
+    @extend %user-cursor;
     border-radius: rem(12);
     padding: rem(16);
     background-color: map-get($color-scheme, "white");
-    @extend %flex;
     margin-bottom: rem(16);
     &__icon {
         margin-right: rem(16);
@@ -144,5 +146,8 @@
                 margin-bottom: rem(3);
             }
         }
+    }
+    &:hover {
+        background-color: map-get($color-scheme, "gray-100");
     }
 }

@@ -30,12 +30,56 @@ function mountComponent(tagName, title = null, query = {}, route = null) {
 export function startRouter() {
     page.base("/ATM_monitor");
 
+    // ——— Auth helpers and global guard ———
+    function isAuthenticated() {
+        try {
+            return Boolean(sessionStorage.getItem('auth_token'));
+        } catch (e) {
+            return false;
+        }
+    }
+
+    const PUBLIC = new Set(["/signin"]);
+
+    // Global guard: runs before specific routes
+    page("*", (ctx, next) => {
+        const pathname = (typeof ctx.path === "string")
+            ? ctx.path.split("?")[0]
+            : "/";
+
+        if (PUBLIC.has(pathname)) return next();
+
+        if (!isAuthenticated()) {
+            const target = pathname + (ctx.querystring ? `?${ctx.querystring}` : "");
+            return page.redirect(`/signin?next=${encodeURIComponent(target)}`);
+        }
+
+        next();
+    });
+
     // — Default Route - redirect to home
     page("/", () => {
         page.redirect("/home");
     });
 
-    // — Home Route
+    // — Public: Sign in Route
+    page("/signin", async (ctx) => {
+        // If already authenticated, redirect to next or home
+        if (isAuthenticated()) {
+            const nextUrl = (ctx.query && ctx.query.next) ? ctx.query.next : "/home";
+            return page.redirect(nextUrl);
+        }
+
+        if (!customElements.get("login-page")) {
+            await import("../pages/login-page.js");
+        }
+
+        const params = {};
+        if (ctx.query && ctx.query.next) params.next = ctx.query.next;
+        mountComponent("login-page", "Մուտք", params, "/signin");
+    });
+
+    // — Home Route (private by guard)
     page("/home", async (ctx) => {
         if (!customElements.get("atms-dashboard")) {
             await import("../pages/atms-dashboard.js");
@@ -124,7 +168,7 @@ export function startRouter() {
             "atm-detail",
             `ATM #${ctx.params.id}`,
             { id: ctx.params.id, ...ctx.query },
-            `/atm/${ctx.params.id}`
+            `/atms/${ctx.params.id}`
         );
     });
 

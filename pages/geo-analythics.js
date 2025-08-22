@@ -20,13 +20,9 @@ class GeoAnalythics extends DynamicElement {
             currentRegion2: null,
             currentCity2: null,
         };
+        
         this.province = [];
         this.cities = [];
-        // this.currentRegion1 = null;
-        // this.currentCity1 = null;
-
-        // this.currentRegion2 = null;
-        // this.currentCity2 = null;
         this.atmsList = [];
 
         this.selectCityBox1 = null;
@@ -62,8 +58,6 @@ class GeoAnalythics extends DynamicElement {
     }
 
     async fetchFirstSummary(region, city, atmId) {
-        console.log(region, city, atmId);
-
         const queryString = new URLSearchParams();
         if (region != null) queryString.append("district", region);
         if (city != null) queryString.append("city", city);
@@ -72,12 +66,11 @@ class GeoAnalythics extends DynamicElement {
         try {
             const response = await this.fetchData(`/analytics/summary?${queryString}`);
 
-            const newState = { firstSummary: response.data };
-
-            if (region != null) newState.currentRegion1 = region;
-            if (city != null) newState.currentCity1 = city;
-
-            this.setState(newState);
+            this.setState({
+                currentRegion1: region,
+                currentCity1: city,
+                firstSummary: response.data,
+            });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ firstSummary: null });
@@ -93,12 +86,11 @@ class GeoAnalythics extends DynamicElement {
         try {
             const response = await this.fetchData(`/analytics/summary?${queryString}`);
 
-            const newState = { secondSummary: response.data };
-
-            if (region != null) newState.currentRegion2 = region;
-            if (city != null) newState.currentCity2 = city;
-
-            this.setState(newState);
+            this.setState({
+                currentRegion2: region,
+                currentCity2: city,
+                secondSummary: response.data,
+            });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ secondSummary: null });
@@ -134,56 +126,33 @@ class GeoAnalythics extends DynamicElement {
     addEventListeners() {
         if (this.selectCityBox1) {
             this.addListener(this.selectCityBox1, "change", (e) => {
-                this.setState({
-                    currentCity1: e.target.value,
-                });
-
-                const args = [this.state.currentRegion1, this.state.currentCity1].filter(
-                    (v) => v !== null && v !== undefined
-                );
-
-                this.fetchFirstSummary(...args);
+                const city = e.target.value;
+                const region = this.state.currentRegion1;
+                this.fetchFirstSummary(region, city);
             });
         }
+
         if (this.selectRegionBox1) {
             this.addListener(this.selectRegionBox1, "change", (e) => {
-                this.setState({
-                    currentRegion1: e.target.value,
-                });
-
-                const args = [this.state.currentRegion1, this.state.currentCity1].filter(
-                    (v) => v !== null && v !== undefined
-                );
-                console.log("args", ...args);
-
-                this.fetchFirstSummary(...args);
+                const region = e.target.value;
+                const city = this.state.currentCity1;
+                this.fetchFirstSummary(region, city);
             });
         }
 
         if (this.selectCityBox2) {
             this.addListener(this.selectCityBox2, "change", (e) => {
-                this.setState({
-                    currentCity2: e.target.value,
-                });
-
-                const args = [this.state.currentRegion2, this.state.currentCity2].filter(
-                    (v) => v !== null && v !== undefined
-                );
-
-                this.fetchSecondSummary(...args);
+                const city = e.target.value;
+                const region = this.state.currentRegion2;
+                this.fetchSecondSummary(region, city);
             });
         }
+
         if (this.selectRegionBox2) {
             this.addListener(this.selectRegionBox2, "change", (e) => {
-                this.setState({
-                    currentRegion2: e.target.value,
-                });
-
-                const args = [this.state.currentRegion2, this.state.currentCity2].filter(
-                    (v) => v !== null && v !== undefined
-                );
-
-                this.fetchSecondSummary(...args);
+                const region = e.target.value;
+                const city = this.state.currentCity2;
+                this.fetchSecondSummary(region, city);
             });
         }
     }
@@ -229,6 +198,7 @@ class GeoAnalythics extends DynamicElement {
         const secondExchangeData = secondSummary.exchange_summary.currency_details;
 
         const atmsList = encode(this.atmsList);
+        console.log("this.state.currentCity1", this.state.currentCity1);
 
         return /*html*/ `       
         <div class="row">
@@ -270,10 +240,10 @@ class GeoAnalythics extends DynamicElement {
                        <div class="combo-box-items"> 
                             <select-box id="city-selector2" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
                                 this.cities
-                            )}'></select-box>
+                            )}'  value="${this.state.currentCity2 || ""}"></select-box>
                             <select-box id="province-selector2"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
                                 this.province
-                            )}'></select-box>    
+                            )}'  value="${this.state.currentRegion2 || ""}"></select-box>    
                         </div>
                         <segment-block></segment-block>
                     </div>

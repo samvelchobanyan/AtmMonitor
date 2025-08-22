@@ -86,6 +86,49 @@ class AtmsDashboard extends DynamicElement {
 
         return /* html */ `
         <div class="row">
+            <div class="column sm-16">
+                <div class="container">
+                    <container-top icon="icon-bar-chart" title="Բանկոմատում առկա գումար"> </container-top>
+                    <div class="row">
+                        <div class="column sm-6">
+                        <div class="infos infos_margin">
+                            <info-card
+                                title="Վերջին ինկասացիա (10/06/2025 11:41)"
+                                value="250108500"
+                                value-currency="֏" value-color="color-green"
+                                trend="7"
+                                show-border="true">
+                            </info-card>
+                        </div>
+                            <chart-component
+                                id="bar-chart-1"
+                                api-url="/dashboard/atm-worktime-in-days"
+                                chart-data='${JSON.stringify(atmPrductivityDaily || {})}'
+                                chart-type="bar"
+                                stacked></chart-component>
+                        </div>
+                        <div class="column sm-6">
+                            <div class="infos infos_margin">
+                                <info-card
+                                    title="Մնացորդ"
+                                    value="30108500"
+                                    value-currency="֏" value-color="color-blue"
+                                    show-border="true"
+                                    button-text="Մանրամասն">
+                                </info-card>
+                            </div>
+                            <chart-component
+                                id="bar-chart-2"
+                                api-url="/dashboard/atm-worktime-in-days"
+                                chart-data='${JSON.stringify(atmPrductivityDaily || {})}'
+                                chart-type="bar"
+                                stacked></chart-component>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="column sm-6">
                 <div class="container">
                     <container-top icon="icon-cpu" title="Սարքավորումներ"> </container-top>
@@ -170,7 +213,7 @@ class AtmsDashboard extends DynamicElement {
             <div class="column sm-6">
                 <div class="container">
                     <container-top icon="icon-trending-up" title="Գործարքների գումար" link-text="Մանրամասն" link-href="/details"> </container-top>
-                    <div class="infos">
+                    <div class="infos infos_margin">
                         <info-card
                             title="Այսօր կանխիկացված գումար"
                             value="${transactionsData.total_dispense_amount}"
@@ -213,7 +256,7 @@ class AtmsDashboard extends DynamicElement {
             <div class="column sm-12">
                 <div class="container">
                     <container-top icon="icon-coins" title="Ինկասացիա"> </container-top> 
-                    <div class="infos">
+                    <div class="infos infos_margin">
                         <info-card
                             title="Այսօրվա ինկասացիաներ"
                             value="${encashmentData.total_encashments}"
@@ -258,7 +301,7 @@ class AtmsDashboard extends DynamicElement {
             <div class="column sm-6">
                 <div class="container">
                     <container-top icon="icon-trello" title="Բանկոմատի ցանցի արտադրողականություն"> </container-top>
-                    <div class="infos">
+                    <div class="infos infos_margin">
                         <info-card
                             title="Այսօր աշխատաժամանակ"
                             value="${atmWorkHours.working_percent}"

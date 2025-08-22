@@ -35,10 +35,7 @@ const htmlLegendPlugin = {
                     if (type === "pie" || type === "doughnut") {
                         chart.toggleDataVisibility(item.index);
                     } else {
-                        chart.setDatasetVisibility(
-                            item.datasetIndex,
-                            !chart.isDatasetVisible(item.datasetIndex)
-                        );
+                        chart.setDatasetVisibility(item.datasetIndex, !chart.isDatasetVisible(item.datasetIndex));
                     }
                     chart.update();
                 });
@@ -296,7 +293,7 @@ export function updateDoughnutChart(chart, chartData) {
 
 /* ====== BarChart ====== */
 
-export function createBarChart(ctxId, chartData, containerID) {
+export function createBarChart(ctxId, chartData, containerID, stacked = false) {
     const ctx = document.getElementById(ctxId).getContext("2d");
     const datasetsWithColors = chartData ? prepareBarChart(chartData) : null;
 
@@ -322,11 +319,13 @@ export function createBarChart(ctxId, chartData, containerID) {
                     ticks: { maxTicksLimit: 6, autoSkip: true },
                     grid: { display: true, color: "#D9D9DD" },
                     border: { dash: [2, 4] },
+                    stacked: stacked,
                 },
                 x: {
                     grid: { display: true, color: "#D9D9DD" },
                     border: { dash: [2, 4] },
                     ticks: { display: false },
+                    stacked: stacked,
                 },
             },
         },

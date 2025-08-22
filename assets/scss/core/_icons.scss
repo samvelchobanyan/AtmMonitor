@@ -23,6 +23,9 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-bar-chart:before {
+    content: "\e920";
+}
 .icon-cpu:before {
     content: "\e900";
 }

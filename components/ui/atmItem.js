@@ -1,3 +1,5 @@
+import page from "https://unpkg.com/page/page.mjs";
+
 export class AtmItem extends HTMLElement {
     static get observedAttributes() {
         return ["id", "city", "district", "address", "status", "icon", "data-working"];
@@ -9,19 +11,26 @@ export class AtmItem extends HTMLElement {
 
     connectedCallback() {
         this.render();
-        
-        // Add click event listener and dispatch custom event
-        this.addEventListener('click', () => {
-            this.dispatchEvent(new CustomEvent('atm-item-clicked', {
-                detail: {
-                    id: this.getAttribute('id'),
-                    latitude: this.getAttribute('data-lat'),
-                    longitude: this.getAttribute('data-lng')
-                },
-                bubbles: true,
-                composed: true
-            }));
-        });
+
+        // Add click event listener and dispatch custom event to show atm on map
+        // this.addEventListener("click", () => {
+        //     this.dispatchEvent(
+        //         new CustomEvent("atm-item-clicked", {
+        //             detail: {
+        //                 id: this.getAttribute("id"),
+        //                 latitude: this.getAttribute("data-lat"),
+        //                 longitude: this.getAttribute("data-lng"),
+        //             },
+        //             bubbles: true,
+        //             composed: true,
+        //         })
+        //     );
+        // });
+
+        const link = this.querySelector("a[data-link], .atm-item__link");
+        if (link) {
+            page(href);
+        }
     }
 
     attributeChangedCallback() {
@@ -33,7 +42,7 @@ export class AtmItem extends HTMLElement {
         const city = this.getAttribute("city") || "";
         const district = this.getAttribute("district") || "";
         const address = this.getAttribute("address") || "";
-        
+
         const isWorking = this.getAttribute("data-working") === "true";
         const status = isWorking ? "Աշխատող" : "Չաշխատող";
         const statusClass = isWorking ? "atm-item__status_working" : "atm-item__status_not-working";
@@ -41,6 +50,7 @@ export class AtmItem extends HTMLElement {
         this.classList.add("atm-item");
 
         this.innerHTML = `
+          <a href="atms/${id}" class="atm-item__link">
             <div class="atm-item__icon">
                 <img src="assets/img/atm-icon.svg" alt="ATM Icon"/>
             </div>
@@ -57,6 +67,7 @@ export class AtmItem extends HTMLElement {
             <div class="atm-item__status ${statusClass}">
                 <span>${status}</span>
             </div>
+              </a>
         `;
     }
 }

@@ -163,7 +163,7 @@ class Incassate extends DynamicElement {
                 } else {
                     this.checkedValues.delete(val);
                 }
-            });
+            }); 
         });
     }
 

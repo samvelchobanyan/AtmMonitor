@@ -147,6 +147,10 @@
             }
         }
     }
+    &__link {
+        @extend %flex;
+        width: 100%;
+    }
     &:hover {
         background-color: map-get($color-scheme, "gray-100");
     }

@@ -15,11 +15,11 @@ function mountComponent(tagName, title = null, query = {}, route = null) {
     // Single consolidated event with all route information
     document.dispatchEvent(
         new CustomEvent("route-changed", {
-            detail: { 
+            detail: {
                 route: route,
                 title: title || "",
                 component: tagName,
-                query: query
+                query: query,
             },
             bubbles: true,
             composed: true,
@@ -88,7 +88,12 @@ export function startRouter() {
         if (!customElements.get("cumulative-analythics")) {
             await import("../pages/cumulative.js");
         }
-        mountComponent("cumulative-analythics", "Անալիտիկա | Կումուլատիվ", ctx.query, "/cumulative");
+        mountComponent(
+            "cumulative-analythics",
+            "Անալիտիկա | Կումուլատիվ",
+            ctx.query,
+            "/cumulative"
+        );
     });
 
     // — Incashment listing Route
@@ -105,6 +110,22 @@ export function startRouter() {
             await import("../pages/atm-list.js");
         }
         mountComponent("atm-list", "ԲԱնկոմատներ", ctx.query, "/atms");
+    });
+
+    // — Single ATM detail page Route
+    page("/atms/:id", async (ctx) => {
+        if (!customElements.get("atm-detail")) {
+            await import("../pages/atm-details.js"); // <- create this page
+        }
+        console.log("Full path:", ctx.path);
+        console.log("ctx.params:", ctx.params);
+
+        mountComponent(
+            "atm-detail",
+            `ATM #${ctx.params.id}`,
+            { id: ctx.params.id, ...ctx.query },
+            `/atm/${ctx.params.id}`
+        );
     });
 
     page();

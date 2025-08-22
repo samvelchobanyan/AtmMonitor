@@ -7,7 +7,9 @@ function mountComponent(tagName, title = null, query = {}, route = null) {
     const pageComponent = document.createElement(tagName);
 
     for (const [k, v] of Object.entries(query)) {
-        pageComponent.setAttribute(k, v);
+        if (v !== undefined && v !== null) {
+            pageComponent.setAttribute(k, typeof v === "string" ? v : JSON.stringify(v));
+        }
     }
 
     mount.appendChild(pageComponent);
@@ -153,21 +155,19 @@ export function startRouter() {
         if (!customElements.get("atm-list")) {
             await import("../pages/atm-list.js");
         }
-        mountComponent("atm-list", "ԲԱնկոմատներ", ctx.query, "/atms");
+        mountComponent("atm-list", "Բանկոմատներ", ctx.query, "/atms");
     });
 
     // — Single ATM detail page Route
     page("/atms/:id", async (ctx) => {
-        if (!customElements.get("atm-detail")) {
-            await import("../pages/atm-details.js"); // <- create this page
+        if (!customElements.get("atm-details")) {
+            await import("../pages/atm-details.js");
         }
-        console.log("Full path:", ctx.path);
-        console.log("ctx.params:", ctx.params);
 
         mountComponent(
-            "atm-detail",
+            "atm-details",
             `ATM #${ctx.params.id}`,
-            { id: ctx.params.id, ...ctx.query },
+            { id: ctx.params.id },
             `/atms/${ctx.params.id}`
         );
     });

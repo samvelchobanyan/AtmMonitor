@@ -20,7 +20,7 @@ class GeoAnalythics extends DynamicElement {
             currentRegion2: null,
             currentCity2: null,
         };
-        
+
         this.province = [];
         this.cities = [];
         this.atmsList = [];
@@ -200,7 +200,7 @@ class GeoAnalythics extends DynamicElement {
         const atmsList = encode(this.atmsList);
         console.log("this.state.currentCity1", this.state.currentCity1);
 
-        return /*html*/ `       
+        return /*html*/ `
         <div class="row">
            <div class="column sm-6">
                 <div class="container">
@@ -211,14 +211,14 @@ class GeoAnalythics extends DynamicElement {
                         </div>
                     </div>
                     <div class="tab-content" data-tab="geo1">
-                       <div class="combo-box-items"> 
+                       <div class="combo-box-items">
                             <select-box id="city-selector1" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
                                 this.cities
                             )}' value="${this.state.currentCity1 || ""}"></select-box>
                             <select-box id="province-selector1"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
                                 this.province
                             )}' value="${this.state.currentRegion1 || ""}"></select-box>
-                           
+
                         </div>
                         <segment-block></segment-block>
                     </div>
@@ -237,13 +237,13 @@ class GeoAnalythics extends DynamicElement {
                         </div>
                     </div>
                     <div class="tab-content" data-tab="geo2">
-                       <div class="combo-box-items"> 
+                       <div class="combo-box-items">
                             <select-box id="city-selector2" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
                                 this.cities
                             )}'  value="${this.state.currentCity2 || ""}"></select-box>
                             <select-box id="province-selector2"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
                                 this.province
-                            )}'  value="${this.state.currentRegion2 || ""}"></select-box>    
+                            )}'  value="${this.state.currentRegion2 || ""}"></select-box>
                         </div>
                         <segment-block></segment-block>
                     </div>
@@ -371,7 +371,6 @@ class GeoAnalythics extends DynamicElement {
                   </div>
               </div>
 
-
               <div class="column sm-6">
                   <div class="container">
                     <container-top icon="icon-trending-up" title="Մուտքագրված գումարների դինամիկա"></container-top>
@@ -387,7 +386,7 @@ class GeoAnalythics extends DynamicElement {
               </div>
             </div>
           </div>
-            
+
         `;
     }
 }

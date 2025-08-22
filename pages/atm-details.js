@@ -1,4 +1,7 @@
 import { DynamicElement } from "../core/dynamic-element.js";
+import "../components/ui/infoItem.js";
+import "../components/dynamic/chartComponent.js";
+import encode from "../assets/js/utils/encode.js";
 
 class AtmDetails extends DynamicElement {
     constructor() {
@@ -7,61 +10,24 @@ class AtmDetails extends DynamicElement {
         this.state = {
             summary: null,
         };
-
-        //store selected region and city to compare when store changed
-        // this.selectedRegion = null;
-        // this.selectedCity = null;
-        this.id = "";
-        // take id from path not attributer
+        this.atmId = "";
     }
 
     onConnected() {
-        this.fetchAtm();
         const pathParts = window.location.pathname.split("/").filter(Boolean);
-        this.id = pathParts[pathParts.length - 1];
-        console.log("this.id", this.id);
+        this.atmId = pathParts[pathParts.length - 1];
+
+        this.fetchAtm();
     }
 
-    onAfterRender() {
-        console.log("details page");
+    onAfterRender() {}
 
-        // Override in child classes for post-render logic
-    }
-
-    addEventListeners() {
-        // Listen for the custom event from atm-item components
-        // this.addEventListener("atm-item-clicked", this.handleAtmItemClick);
-    }
-
-    // handleAtmItemClick(event) {
-    //     const { id, latitude, longitude } = event.detail;
-
-    //     // Convert string values to numbers
-    //     const atmId = parseInt(id, 10);
-    //     const lat = parseFloat(latitude);
-    //     const lng = parseFloat(longitude);
-
-    //     this.navigateToMarker(atmId, lat, lng);
-    // }
-
-    // onStoreChange(state) {
-    //     if (
-    //         this.selectedRegion !== state.selectedRegion ||
-    //         this.selectedCity !== state.selectedCity
-    //     ) {
-    //         this.selectedCity = state.selectedCity;
-    //         this.selectedRegion = state.selectedRegion;
-    //         this.fetchAtms(); // one API call → one render
-    //     }
-    // }
+    addEventListeners() {}
 
     async fetchAtm() {
-        const queryString = new URLSearchParams();
-
-        queryString.append("id", this.id);
-
+        const id = parseInt(this.atmId, 10);
         try {
-            const response = await this.fetchData(`/atm/getatms?${queryString}`);
+            const response = await this.fetchData(`/atm/my-profile?atmId=${id}`);
             this.setState({
                 summary: response.data,
             });
@@ -71,14 +37,18 @@ class AtmDetails extends DynamicElement {
         }
     }
 
-    // navigateToMarker(atmId, latitude, longitude) {
-    //     // Find the yandex-map component and navigate to the marker
-    //     const mapComponent = this.querySelector("yandex-map");
+    formatDate(dateString) {
+        const date = new Date(dateString); // parse ISO
 
-    //     if (mapComponent && mapComponent.navigateToMarker) {
-    //         mapComponent.navigateToMarker(atmId, latitude, longitude);
-    //     }
-    // }
+        const day = String(date.getDate()).padStart(2, "0");
+        const month = String(date.getMonth() + 1).padStart(2, "0"); // months start at 0
+        const year = date.getFullYear();
+
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+    }
 
     template() {
         console.log(this.state.summary);
@@ -96,10 +66,89 @@ class AtmDetails extends DynamicElement {
             `;
         }
 
+        const data = this.state.summary;
+
+        const dispenseData = encode(data.transactions_summary.dispense_summary);
+        const depositData = encode(data.transactions_summary.deposit_summary);
+        const exchangeData = data.transactions_summary.exchange_summary.currency_details;
+
+        // contunue here, fix chart data
+        // todo change charts info and apis
         return /*html*/ `
             <div class="row">
+                <div class="column">
+                   <div class="container">
+                    <container-top icon="icon-bar-chart" title="Բանկոմատում առկա գումար"> </container-top>
+                    <div class="row">
+                        <div class="column sm-6">
+                        <div class="infos infos_margin">
+                            <info-card
+                                title="Մնացորդ"
+                                value="250108500"
+                                value-currency="֏" value-color="color-green"
+                                trend="7"
+                                show-border="true">
+                            </info-card>
+                        </div>
+                            <chart-component
+                                id="bar-chart-1"
+                                api-url="/dashboard/atm-worktime-in-days"
+                                chart-data='${JSON.stringify(data.balance_info.cassettes || {})}'
+                                chart-type="bar"
+                                stacked></chart-component>
+                        </div>
+                        <div class="column sm-6">
+                            <div class="infos infos_margin">
+                                <info-card
+                                    title="Վերջին ինկասացիա (${this.formatDate(
+                                        data.balance_info.last_encashment_date
+                                    )})"
+                                    value=${data.balance_info.last_encashment_amount}
+                                    value-currency="֏" value-color="color-blue"
+                                    show-border="true"
+                                    button-text="Մանրամասն">
+                                </info-card>
+                            </div>
+                            <chart-component
+                                id="bar-chart-2"
+                                api-url="/dashboard/atm-worktime-in-days"
+                                  chart-data='${JSON.stringify(data.balance_info.cassettes || {})}' 
+                                chart-type="bar"
+                                stacked></chart-component>
+                        </div>
+                    </div>
+                </div>
+
+                  <div class="column sm-6">
+                    <div class="container">
+                        <doughnut-tabs id="dispense" api-url="/analytics/dispense-summary-in-days" data="${dispenseData}"></doughnut-tabs>
+                    </div>
+                </div>
                 <div class="column sm-6">
-                     <p>aaaaaaaaaaaaaa</p>
+                    <div class="container">
+                        <doughnut-tabs id="deposit" api-url="/analytics/deposit-summary-in-days" data="${depositData}"></doughnut-tabs>
+                    </div>
+                </div>
+                <div class="column sm-12">
+                    <div class="container">
+                        <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
+                        <div class="infos">
+                            ${exchangeData
+                                .map((exchange) => {
+                                    return `
+                                <info-card
+                                    title="${exchange.currency_code}"
+                                    value="${exchange.total_amount}"
+                                    value-currency="$"
+                                    trend="${exchange.total_amount_percent_change}"
+                                    icon="icon icon-box"
+                                    show-border="true">
+                                </info-card>`;
+                                })
+                                .join("")}
+                        </div>
+                    </div>
+                </div>
                 </div>
                 
             </div>
@@ -107,4 +156,4 @@ class AtmDetails extends DynamicElement {
     }
 }
 
-customElements.define("atm-detail", AtmDetails);
+customElements.define("atm-details", AtmDetails);

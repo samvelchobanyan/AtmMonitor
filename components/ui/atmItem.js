@@ -27,10 +27,10 @@ export class AtmItem extends HTMLElement {
         //     );
         // });
 
-        const link = this.querySelector("a[data-link], .atm-item__link");
-        if (link) {
-            page(href);
-        }
+        // const link = this.querySelector("a[data-link], .atm-item__link");
+        // if (link) {
+        //     page(href);
+        // }
     }
 
     attributeChangedCallback() {

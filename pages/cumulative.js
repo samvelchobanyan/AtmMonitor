@@ -8,6 +8,7 @@ import "../components/ui/customCheck.js";
 import "../components/dynamic/segment.js";
 import "../components/dynamic/simpleTable.js";
 import "../components/dynamic/select-box-date.js";
+import "../pages/atm-details.js";
 import encode from "../assets/js/utils/encode.js";
 
 class Cumulative extends DynamicElement {
@@ -337,6 +338,7 @@ class Cumulative extends DynamicElement {
                 </div>
       
                     <div class="table-container"></div>
+                    <atm-details id='1621'></atm-details>
         </div>
 
         `;

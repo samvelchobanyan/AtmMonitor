@@ -56,12 +56,18 @@ class SideBar extends DynamicElement {
 
         // Toggle sidebar active class
         this.classList.toggle('active');
-        
-        // Toggle main container active class  
-        const mainContainer = document.querySelector('.main-container');
-        if (mainContainer) {
-            mainContainer.classList.toggle('active');
+
+        // Toggle active class for the sidebar element inside the template
+        const sidebarEl = this.querySelector('.sidebar');
+        if (sidebarEl) {
+            sidebarEl.classList.toggle('active');
         }
+
+        // Toggle active class for all main-container elements
+        const mainContainers = document.querySelectorAll('.main-container');
+        mainContainers.forEach(container => {
+            container.classList.toggle('active');
+        });
 
         // Handle dropdown visibility based on sidebar state (matching jQuery logic)
         if (this.classList.contains('active')) {
@@ -84,21 +90,24 @@ class SideBar extends DynamicElement {
     }
 
     handleDropdownClick(event) {
-        // Toggle section active state (equivalent to jQuery: $(this).parents(".sidebar__section").toggleClass("active"))
         const section = event.currentTarget.closest('.sidebar__section');
         if (!section) return;
-        
-        section.classList.toggle('active');
 
-        // Handle dropdown visibility based on sidebar state
+        section.classList.toggle('active');
+        const dropdown = event.currentTarget.nextElementSibling;
+        if (!dropdown || !dropdown.classList.contains('sidebar__dropdown')) return;
+
         if (this.classList.contains('active')) {
-            // When sidebar is expanded: use slide animation (equivalent to jQuery: slideToggle(300))
-            const dropdown = event.currentTarget.nextElementSibling;
-            if (dropdown && dropdown.classList.contains('sidebar__dropdown')) {
-                this.slideToggle(dropdown, 300);
+            // Sidebar expanded: use slide animation
+            this.slideToggle(dropdown, 300);
+        } else {
+            // Sidebar collapsed: toggle dropdown visibility directly
+            if (section.classList.contains('active')) {
+                dropdown.style.display = 'block';
+            } else {
+                dropdown.style.display = 'none';
             }
         }
-        // Note: When collapsed, dropdowns are controlled by CSS (.sidebar__section.active .sidebar__dropdown)
     }
 
     // Helper method to replicate jQuery's slideToggle functionality  

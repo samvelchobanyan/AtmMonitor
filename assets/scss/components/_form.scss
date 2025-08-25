@@ -22,18 +22,3 @@
         }
     }
 }
-
-.login {
-    background-color: map-get($color-scheme, "white");
-    box-shadow: 0 rem(4) rem(3) 0 #00000008, 0 rem(12) rem(24) 0 #00000014;
-    padding: rem(56) rem(115);
-    border-radius: rem(32);
-
-    &__logo {
-        text-align: center;
-        margin-bottom: rem(32);
-        img {
-            height: rem(40);
-        }
-    }
-}

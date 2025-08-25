@@ -3,6 +3,22 @@ import page from "https://unpkg.com/page/page.mjs";
 const mount = document.querySelector("main");
 
 function mountComponent(tagName, title = null, query = {}, route = null) {
+    const sidebar = document.querySelector("side-bar");
+    const header = document.querySelector("header-custom");
+    const mainContainer = document.querySelector("main");
+
+    if (tagName === "login-page") {
+        if (sidebar) sidebar.style.display = "none";
+        if (header) header.style.display = "none";
+        if (mainContainer) mainContainer.classList.remove("main-container");
+    } else {
+        if (sidebar) sidebar.style.display = "";
+        if (header) header.style.display = "";
+        if (mainContainer && !mainContainer.classList.contains("main-container")) {
+            mainContainer.classList.add("main-container");
+        }
+    }
+
     mount.innerHTML = "";
     const pageComponent = document.createElement(tagName);
 
@@ -14,7 +30,6 @@ function mountComponent(tagName, title = null, query = {}, route = null) {
 
     mount.appendChild(pageComponent);
 
-    // Single consolidated event with all route information
     document.dispatchEvent(
         new CustomEvent("route-changed", {
             detail: {
@@ -35,7 +50,7 @@ export function startRouter() {
     // ——— Auth helpers and global guard ———
     function isAuthenticated() {
         try {
-            return Boolean(sessionStorage.getItem('auth_token'));
+            return Boolean(sessionStorage.getItem("auth_token"));
         } catch (e) {
             return false;
         }
@@ -45,9 +60,7 @@ export function startRouter() {
 
     // Global guard: runs before specific routes
     page("*", (ctx, next) => {
-        const pathname = (typeof ctx.path === "string")
-            ? ctx.path.split("?")[0]
-            : "/";
+        const pathname = typeof ctx.path === "string" ? ctx.path.split("?")[0] : "/";
 
         if (PUBLIC.has(pathname)) return next();
 
@@ -68,7 +81,7 @@ export function startRouter() {
     page("/signin", async (ctx) => {
         // If already authenticated, redirect to next or home
         if (isAuthenticated()) {
-            const nextUrl = (ctx.query && ctx.query.next) ? ctx.query.next : "/home";
+            const nextUrl = ctx.query && ctx.query.next ? ctx.query.next : "/home";
             return page.redirect(nextUrl);
         }
 
@@ -134,12 +147,7 @@ export function startRouter() {
         if (!customElements.get("cumulative-analythics")) {
             await import("../pages/cumulative.js");
         }
-        mountComponent(
-            "cumulative-analythics",
-            "Անալիտիկա | Կումուլատիվ",
-            ctx.query,
-            "/cumulative"
-        );
+        mountComponent("cumulative-analythics", "Անալիտիկա | Կումուլատիվ", ctx.query, "/cumulative");
     });
 
     // — Incashment listing Route
@@ -164,12 +172,7 @@ export function startRouter() {
             await import("../pages/atm-details.js");
         }
 
-        mountComponent(
-            "atm-details",
-            `ATM #${ctx.params.id}`,
-            { id: ctx.params.id },
-            `/atms/${ctx.params.id}`
-        );
+        mountComponent("atm-details", `ATM #${ctx.params.id}`, { id: ctx.params.id }, `/atms/${ctx.params.id}`);
     });
 
     page();

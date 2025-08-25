@@ -83,7 +83,6 @@ class AtmsDashboard extends DynamicElement {
         const transactionDaily = this.state.summary.hourly_transactions;
         const encashmentsDaily = this.state.summary.hourly_encashments;
         const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
-        console.log("atmPrductivityDaily", atmPrductivityDaily);
 
         return /* html */ `
         <div class="row">

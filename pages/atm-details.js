@@ -52,8 +52,6 @@ class AtmDetails extends DynamicElement {
     }
 
     template() {
-        console.log(this.state.summary);
-
         if (!this.state.summary) {
             return /*html*/ `
             <div class="row">
@@ -138,6 +136,8 @@ class AtmDetails extends DynamicElement {
                            <div class="infos">
                                ${exchangeData
                                    .map((exchange) => {
+                                       console.log("exchange", exchange);
+
                                        return `
                                    <info-card
                                        title="${exchange.currency_code}"
@@ -145,7 +145,7 @@ class AtmDetails extends DynamicElement {
                                           value-currency="$"
                                           trend="${exchange.total_amount_percent_change}"
                                        icon="icon icon-box"
-                                       show-border="true"/>`;
+                                       show-border="true"></info-card>`;
                                    })
                                    .join("")}
                            </div>

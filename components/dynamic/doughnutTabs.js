@@ -209,14 +209,15 @@ export default class DoughnutTabs extends DynamicElement {
         if (!this.rawData || !Object.keys(this.transformedTabData).length) {
             return `<div class="loading">No data available</div>`;
         }
-
+        const title = this.getAttribute("title");
         const charts = this.transformedTabData[this.state.selectedTab];
         const amountData = charts ? encode(charts.amount) : "";
         const countData = charts ? encode(charts.count) : "";
         const showDate = this.getAttribute("show-date") !== "false"; // default true
+
         return `
       <div class="select-container">
-        <container-top icon="icon-arrow-down-left" title="\u053F\u0561\u0576\u056D\u056B\u056F\u0561\u0581\u0578\u0582\u0574"></container-top>
+        <container-top icon="icon-arrow-down-left" title="${title}></container-top>
           ${
               showDate
                   ? `

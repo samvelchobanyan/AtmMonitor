@@ -1,6 +1,7 @@
 import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/ui/infoItem.js";
 import "../components/dynamic/chartComponent.js";
+import "../components/dynamic/doughnutTabs.js";
 import encode from "../assets/js/utils/encode.js";
 
 class AtmDetails extends DynamicElement {
@@ -71,9 +72,9 @@ class AtmDetails extends DynamicElement {
         const dispenseData = encode(data.transactions_summary.dispense_summary);
         const depositData = encode(data.transactions_summary.deposit_summary);
         const exchangeData = data.transactions_summary.exchange_summary.currency_details;
+        const nominalList = data.balance_info.cassettes.filter((c) => c.nominal === 0);
+        const modelList = data.balance_info.cassettes.filter((c) => c.nominal !== 0);
 
-        // contunue here, fix chart data
-        // todo change charts info and apis
         return /*html*/ `
             <div class="row">
                 <div class="column">
@@ -81,21 +82,21 @@ class AtmDetails extends DynamicElement {
                     <container-top icon="icon-bar-chart" title="Բանկոմատում առկա գումար"> </container-top>
                     <div class="row">
                         <div class="column sm-6">
-                        <div class="infos infos_margin">
-                            <info-card
-                                title="Մնացորդ"
-                                value="250108500"
-                                value-currency="֏" value-color="color-green"
-                                trend="7"
-                                show-border="true">
-                            </info-card>
-                        </div>
-                            <chart-component
-                                id="bar-chart-1"
-                                api-url="/dashboard/atm-worktime-in-days"
-                                chart-data='${JSON.stringify(data.balance_info.cassettes || {})}'
-                                chart-type="bar"
-                                stacked></chart-component>
+                            <div class="infos infos_margin">
+                                <info-card
+                                    title="Մնացորդ"
+                                    value="250108500"
+                                    value-currency="֏" value-color="color-green"
+                                    trend="7"
+                                    show-border="true">
+                                </info-card>
+                            </div>
+                                <chart-component
+                                    id="bar-chart-1"
+                                    chart-data='${encode(nominalList)}'
+                                    chart-type="bar"
+                                    show-date-selector='false'
+                                    stacked></chart-component>
                         </div>
                         <div class="column sm-6">
                             <div class="infos infos_margin">
@@ -103,7 +104,7 @@ class AtmDetails extends DynamicElement {
                                     title="Վերջին ինկասացիա (${this.formatDate(
                                         data.balance_info.last_encashment_date
                                     )})"
-                                    value=${data.balance_info.last_encashment_amount}
+                                    value="${data.balance_info.last_encashment_amount}"
                                     value-currency="֏" value-color="color-blue"
                                     show-border="true"
                                     button-text="Մանրամասն">
@@ -111,45 +112,47 @@ class AtmDetails extends DynamicElement {
                             </div>
                             <chart-component
                                 id="bar-chart-2"
-                                api-url="/dashboard/atm-worktime-in-days"
-                                  chart-data='${JSON.stringify(data.balance_info.cassettes || {})}' 
+                                chart-data='${encode(modelList)}' 
                                 chart-type="bar"
+                                show-date-selector='false'
                                 stacked></chart-component>
                         </div>
                     </div>
-                </div>
 
-                  <div class="column sm-6">
-                    <div class="container">
-                        <doughnut-tabs id="dispense" api-url="/analytics/dispense-summary-in-days" data="${dispenseData}"></doughnut-tabs>
                     </div>
-                </div>
-                <div class="column sm-6">
-                    <div class="container">
-                        <doughnut-tabs id="deposit" api-url="/analytics/deposit-summary-in-days" data="${depositData}"></doughnut-tabs>
+                    <div class='row'>
+                    <div class="column sm-6">
+                       <div class="container">
+                           <doughnut-tabs id="dispense" data="${dispenseData}" show-date="false" title="Կանխիկացում"></doughnut-tabs>
+                       </div>
+                   </div>
+                   <div class="column sm-6">
+                   <div class="container">
+                   <doughnut-tabs id="deposit" data="${depositData}" show-date="false"  title="Մուտքագրում"></doughnut-tabs>
+                   </div>
+                   </div>
+                   </div>
+                   <div class="column sm-12">
+                       <div class="container">
+                           <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
+                           <div class="infos">
+                               ${exchangeData
+                                   .map((exchange) => {
+                                       return `
+                                   <info-card
+                                       title="${exchange.currency_code}"
+                                       value="${exchange.total_amount}"
+                                          value-currency="$"
+                                          trend="${exchange.total_amount_percent_change}"
+                                       icon="icon icon-box"
+                                       show-border="true"/>`;
+                                   })
+                                   .join("")}
+                           </div>
+                         </div>
                     </div>
-                </div>
-                <div class="column sm-12">
-                    <div class="container">
-                        <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
-                        <div class="infos">
-                            ${exchangeData
-                                .map((exchange) => {
-                                    return `
-                                <info-card
-                                    title="${exchange.currency_code}"
-                                    value="${exchange.total_amount}"
-                                    value-currency="$"
-                                    trend="${exchange.total_amount_percent_change}"
-                                    icon="icon icon-box"
-                                    show-border="true">
-                                </info-card>`;
-                                })
-                                .join("")}
-                        </div>
-                    </div>
-                </div>
-                </div>
+
+                 
                 
             </div>
         `;

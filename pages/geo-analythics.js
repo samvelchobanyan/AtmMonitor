@@ -257,13 +257,13 @@ class GeoAnalythics extends DynamicElement {
         <div class="row">
             <div class="column sm-6">
                 <div class="container">
-                    <doughnut-tabs id="dispense1" data="${firstDispenseData}" show-date="false"></doughnut-tabs>
+                    <doughnut-tabs id="dispense1" data="${firstDispenseData}" show-date="false"  title="Մուտքագրում"></doughnut-tabs>
                 </div>
             </div>
 
             <div class="column sm-6">
                 <div class="container">
-                    <doughnut-tabs id="dispense2" data="${secondDispenseData}" show-date="false"></doughnut-tabs>
+                    <doughnut-tabs id="dispense2" data="${secondDispenseData}" show-date="false"  title="Կանխիկացում"></doughnut-tabs>
                 </div>
             </div>
         </div>
@@ -271,13 +271,13 @@ class GeoAnalythics extends DynamicElement {
         <div class="row">
             <div class="column sm-6">
                 <div class="container">
-                    <doughnut-tabs id="deposit1" data="${firstDepositData}" show-date="false"></doughnut-tabs>
+                    <doughnut-tabs id="deposit1" data="${firstDepositData}" show-date="false" title="Մուտքագրում"></doughnut-tabs>
                 </div>
             </div>
 
             <div class="column sm-6">
                 <div class="container">
-                    <doughnut-tabs id="deposit2" data="${secondDepositData}" show-date="false"></doughnut-tabs>
+                    <doughnut-tabs id="deposit2" data="${secondDepositData}" show-date="false" title="Մուտքագրում"></doughnut-tabs>
                 </div>
             </div>
           </div>

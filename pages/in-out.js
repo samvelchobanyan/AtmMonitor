@@ -119,12 +119,12 @@ class inOut extends DynamicElement {
             <div class="row">
                 <div class="column sm-6">
                     <div class="container">
-                        <doughnut-tabs id="dispense" api-url="/analytics/dispense-summary-in-days" data="${dispenseData}"></doughnut-tabs>
+                        <doughnut-tabs id="dispense" api-url="/analytics/dispense-summary-in-days" data="${dispenseData}" title="Կանխիկացում"></doughnut-tabs>
                     </div>
                 </div>
                 <div class="column sm-6">
                     <div class="container">
-                        <doughnut-tabs id="deposit" api-url="/analytics/deposit-summary-in-days" data="${depositData}"></doughnut-tabs>
+                        <doughnut-tabs id="deposit" api-url="/analytics/deposit-summary-in-days" data="${depositData}" title="Մուտքագրում "></doughnut-tabs>
                     </div>
                 </div>
                 <div class="column sm-12">

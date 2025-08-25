@@ -267,6 +267,12 @@ class SideBar extends DynamicElement {
                     <a href="failures" class="sidebar__item"> <i class="icon icon-x-octagon"></i><span>Անսարքություններ</span> </a>
                     <a href="journal" class="sidebar__item"> <i class="icon icon-clipboard"></i><span>Մատյան</span> </a>
                 </div>
+                <div class="sidebar__bottom">
+                    <button id="logout-btn" class="btn btn_logout">
+                        <i class="icon icon-log-out"></i>
+                        <span>Դուրս գալ</span>
+                    </button>
+                </div>
             </aside>
         `;
     }

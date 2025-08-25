@@ -23,6 +23,9 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-log-out:before {
+    content: "\e921";
+}
 .icon-bar-chart:before {
     content: "\e920";
 }

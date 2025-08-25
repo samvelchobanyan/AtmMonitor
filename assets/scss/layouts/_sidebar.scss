@@ -1,4 +1,6 @@
 .sidebar {
+    @extend %flex;
+    flex-direction: column;
     position: fixed;
     left: 0;
     height: 100%;
@@ -157,6 +159,10 @@
                 @extend %show;
             }
         }
+    }
+
+    &__bottom {
+        margin-top: auto;
     }
 
     &.active {

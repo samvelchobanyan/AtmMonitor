@@ -63,4 +63,13 @@
     &_full {
         width: 100%;
     }
+
+    &_logout {
+        height: rem(48);
+        padding: 0 rem(12);
+        color: rgba(map-get($color-scheme, "blue-900"), 0.6);
+        .icon {
+            font-size: rem(24);
+        }
+    }
 }

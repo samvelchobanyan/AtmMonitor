@@ -111,7 +111,6 @@ class GeoAnalythics extends DynamicElement {
 
         try {
             const response = await this.fetchData(`/atm/getatms?${queryString}`);
-            // console.log("!!!!", response);
 
             this.atmsList = response.data.atms.map((atm) => ({
                 value: atm.id,
@@ -198,7 +197,6 @@ class GeoAnalythics extends DynamicElement {
         const secondExchangeData = secondSummary.exchange_summary.currency_details;
 
         const atmsList = encode(this.atmsList);
-        console.log("this.state.currentCity1", this.state.currentCity1);
 
         return /*html*/ `
         <div class="row">

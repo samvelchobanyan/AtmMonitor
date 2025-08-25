@@ -72,7 +72,17 @@ class ChartComponent extends DynamicElement {
                             );
                             break;
                         case "bar":
-                            this.transformedData = chartDataTransformer.transformBarData(parsed);
+                            const isStack = this.getAttribute("stacked");
+
+                            if (isStack != null) {
+                                this.transformedData = chartDataTransformer.transformStackBarData(
+                                    parsed
+                                );
+                            } else {
+                                this.transformedData = chartDataTransformer.transformBarData(
+                                    parsed
+                                );
+                            }
                             break;
                     }
                 } catch (err) {
@@ -164,7 +174,6 @@ class ChartComponent extends DynamicElement {
             if (!isValid) throw new Error("Invalid API response format");
             const data_array_name = startDate === endDate ? "hourly_data" : "daily_data";
 
-            // const chartData = this.transformData(response.data);
             switch (this.chartType) {
                 case "line":
                     this.transformedData = chartDataTransformer.transformData(
@@ -179,7 +188,15 @@ class ChartComponent extends DynamicElement {
                     this._updateChart();
                     break;
                 case "bar":
-                    this.transformedData = chartDataTransformer.transformBarData(response.data);
+                    const isStack = this.getAttribute("stacked");
+
+                    if (isStack != null) {
+                        this.transformedData = chartDataTransformer.transformStackBarData(
+                            response.data
+                        );
+                    } else {
+                        this.transformedData = chartDataTransformer.transformBarData(response.data);
+                    }
                     this._updateChart();
                     break;
             }

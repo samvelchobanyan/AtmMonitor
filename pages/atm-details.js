@@ -3,6 +3,8 @@ import "../components/ui/infoItem.js";
 import "../components/dynamic/chartComponent.js";
 import "../components/dynamic/doughnutTabs.js";
 import encode from "../assets/js/utils/encode.js";
+import "../components/ui/atmItem.js";
+import "../components/ui/infoItem.js";
 
 class AtmDetails extends DynamicElement {
     constructor() {
@@ -51,6 +53,36 @@ class AtmDetails extends DynamicElement {
         return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
 
+    // todo fix refresh error
+    _transformToTransactionDynamics(data) {
+        const { dispense_dynamic, deposit_dynamic, exchange_dynamic } = data;
+
+        // Create the transactionDynamics array by mapping over exchange_dynamic.hourly_data
+        const transactionDynamics = exchange_dynamic.hourly_data.map((exchangeItem) => {
+            const hour = exchangeItem.hour;
+
+            // Find corresponding to dispense data for this hour
+            const dispenseItem = dispense_dynamic.hourly_data.find((item) => item.hour === hour);
+            const dispenseAmount = dispenseItem
+                ? dispenseItem.with_card_amount + dispenseItem.without_card_amount
+                : 0;
+
+            // Find the corresponding deposit data for this hour
+            const depositItem = deposit_dynamic.hourly_data.find((item) => item.hour === hour);
+            const depositAmount = depositItem
+                ? depositItem.with_card_amount + depositItem.without_card_amount
+                : 0;
+
+            return {
+                hour: hour,
+                dispense_amount: dispenseAmount,
+                deposit_amount: depositAmount,
+                exchange_amount: exchangeItem.amount,
+            };
+        });
+
+        return transactionDynamics;
+    }
     template() {
         if (!this.state.summary) {
             return /*html*/ `
@@ -72,6 +104,14 @@ class AtmDetails extends DynamicElement {
         const exchangeData = data.transactions_summary.exchange_summary.currency_details;
         const nominalList = data.balance_info.cassettes.filter((c) => c.nominal === 0);
         const modelList = data.balance_info.cassettes.filter((c) => c.nominal !== 0);
+
+        const transactionDynamics = encode(
+            this._transformToTransactionDynamics(data.transactions_summary.transaction_dynamics)
+        );
+
+        console.log("nominalList", nominalList);
+
+        const devicesData = data.devices;
 
         return /*html*/ `
             <div class="row">
@@ -152,8 +192,50 @@ class AtmDetails extends DynamicElement {
                          </div>
                     </div>
 
+                      <div class="column sm-12">
+                    <div class="container">
+                        <container-top icon="icon-chart" title="Գործարքների դինամիկա"></container-top>
+                        <chart-component 
+                            id="line-chart-transactions" 
+                            chart-type="line" 
+                            chart-data='${transactionDynamics}' 
+                            api-url="/analytics/exchange-dynamic-in-days" 
+                            ${this.attrIf("city", this.state.currentCity)} 
+                            ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
+                    </div>
+                </div>
+
                  
-                
+                 <div class="row">
+            <div class="column sm-6">
+                <div class="container">
+                    <container-top icon="icon-cpu" title="Սարքավորումներ"> </container-top>
+                    <div class="info-items">
+                    ${devicesData
+                        .map((device) => {
+                            return `<info-item text="${device.device_type}" data-working="${
+                                device.status == 1 ? true : false
+                            }"></info-item>`;
+                        })
+                        .join("")}}
+                    </div>
+                </div>
+            </div>
+            <div class="column sm-6">
+                <div class="container">
+                    <container-top icon="icon-trello" title="Արտադրողականություն"> </container-top>
+                    <div class="info-items-container">
+                        <div class="info-items info-items_col">
+                            <info-item text="Վերջին connect" value="15 Feb, 2025 | 15:15"></info-item>
+                            <info-item text="Վերջին connect" value="15 Feb, 2025 | 15:15"></info-item>
+                        </div>
+                        <div class="info-items">
+                            <info-item text="Վերջին ստատուսի տևողություն" value="1 Ժամ"></info-item>
+                        </div>
+                    </div>  
+                </div>
+            </div>
+        </div>
             </div>
         `;
     }

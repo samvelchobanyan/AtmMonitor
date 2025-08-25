@@ -76,7 +76,7 @@ class AtmsDashboard extends DynamicElement {
         }
 
         const generalData = this.state.summary;
-        const transactionsData = this.state.summary.transactionsInfo;
+        const transactionsData = this.state.summary.transactionsInfo; 
         const encashmentData = this.state.summary.encashmentInfo;
         const atmWorkHours = this.state.summary.atmWorkHours;
 

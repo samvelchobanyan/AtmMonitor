@@ -1,0 +1,39 @@
+.form {
+    &__item {
+        margin-bottom: rem(32);
+        position: relative;
+        input {
+            height: rem(48);
+            border: 1px solid #ccc;
+            border-radius: rem(8);
+            padding: rem(12) rem(16);
+        }
+        label {
+            @extend %flex;
+            @extend %align-middle;
+            @include font(bold, 11, 1.5, map-get($color-scheme, "gray-700"), uppercase, $fontPrimary);
+            letter-spacing: 0.02em;
+            top: rem(-10);
+            position: absolute;
+            height: rem(20);
+            padding: 0 rem(4);
+            left: rem(12);
+            background-color: map-get($color-scheme, "white");
+        }
+    }
+}
+
+.login {
+    background-color: map-get($color-scheme, "white");
+    box-shadow: 0 rem(4) rem(3) 0 #00000008, 0 rem(12) rem(24) 0 #00000014;
+    padding: rem(56) rem(115);
+    border-radius: rem(32);
+
+    &__logo {
+        text-align: center;
+        margin-bottom: rem(32);
+        img {
+            height: rem(40);
+        }
+    }
+}

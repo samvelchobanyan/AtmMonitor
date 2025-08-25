@@ -18,24 +18,23 @@ class LoginPage extends DynamicElement {
 
     template() {
         return /* html */ `
-            <div class="row">
-                <div class="column sm-4"></div>
-                <div class="column sm-4">
-                    <div class="container">
-                        <div class="auth__header">
-                            <h2>Մուտք</h2>
+            <div class="row align-center">
+                <div class="column sm-6">
+                    <div class="login">
+                        <div class="login__logo">
+                           <img src="assets/img/logo.png" alt="Logo" />
                         </div>
-                        ${this.state.error ? `<div class="error color-red" style="margin-bottom:10px;">${this.state.error}</div>` : ''}
-                        <form id="login-form">
-                            <div class="field">
+                        <form id="login-form" class="form">
+                            <div class="form__item">
                                 <label for="username">Օգտանուն</label>
                                 <input id="username" class="w-100" name="username" type="text" autocomplete="username" required />
                             </div>
-                            <div class="field" style="margin-top:10px;">
+                            <div class="form__item">
                                 <label for="password">Գաղտնաբառ</label>
                                 <input id="password" class="w-100" name="password" type="password" autocomplete="current-password" required />
                             </div>
-                            <div style="margin-top:16px;">
+                            ${this.state.error ? `<div class="error color-red" style="margin-bottom:10px;">${this.state.error}</div>` : ''}
+                            <div class="form__btn">
                                 <button id="login-btn" type="submit" class="btn btn_md btn_blue btn_full" ${this.state.isLoading ? 'disabled' : ''}>
                                     <span>${this.state.isLoading ? 'Մուտք է կատարվում…' : 'Մուտք'}</span>
                                 </button>
@@ -43,7 +42,6 @@ class LoginPage extends DynamicElement {
                         </form>
                     </div>
                 </div>
-                <div class="column sm-4"></div>
             </div>
         `;
     }

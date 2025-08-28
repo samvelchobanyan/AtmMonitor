@@ -63,17 +63,51 @@ table {
     @extend %flex;
     @extend %align-middle;
     @extend %align-center;
-    width: rem(16);
-    height: rem(16);
+    width: rem(24);
+    height: rem(24);
 
-    &:not(:last-child) {
-        margin-right: rem(4);
+    &:not(:last-child) &:not(:last-child) {
+        margin-right: rem(8);
     }
+
+    &:first-child,
+    &:last-child {
+        .datatable-pagination-list-item-link {
+            font-size: 0;
+            line-height: 0;
+        }
+    }
+
     &:first-child {
-        font-size: rem(20);
+        .datatable-pagination-list-item-link {
+            &:after {
+                @include font-icon("\e911");
+            }
+        }
     }
     &:last-child {
-        font-size: rem(20);
+        .datatable-pagination-list-item-link {
+            &:after {
+                @include font-icon("\e912");
+            }
+        }
+    }
+
+    &.datatable-active {
+        .datatable-pagination-list-item-link {
+            color: map-get($color-scheme, "blue");
+        }
+    }
+}
+
+.datatable-pagination-list-item-link {
+    @extend %user-cursor;
+    @include font(normal, 16, 1, map-get($color-scheme, "gray-800"), 0, $fontPrimary);
+    &::after {
+        @extend %flex;
+        @extend %align-middle;
+        @extend %align-center;
+        font-size: rem(16);
     }
 }
 

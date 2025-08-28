@@ -297,6 +297,8 @@ export function createBarChart(ctxId, chartData, containerID, stacked = false) {
     const ctx = document.getElementById(ctxId).getContext("2d");
     const datasetsWithColors = chartData ? prepareBarChart(chartData) : null;
 
+    console.log(chartData);
+
     return new Chart(ctx, {
         type: "bar",
         data: chartData
@@ -324,7 +326,7 @@ export function createBarChart(ctxId, chartData, containerID, stacked = false) {
                 x: {
                     grid: { display: true, color: "#D9D9DD" },
                     border: { dash: [2, 4] },
-                    ticks: { display: false },
+                    ticks: { display: stacked },
                     stacked: stacked,
                 },
             },

@@ -1,6 +1,7 @@
 import { ContainerTop } from "../components/ui/containerTop.js";
 import { LineChart } from "../components/ui/lineChart.js";
 import { DynamicElement } from "../core/dynamic-element.js";
+import { pollingService } from "../core/polling-service.js";
 import "../components/dynamic/chartComponent.js";
 import "../components/dynamic/modal-popup.js";
 import "../components/static/changeIndicator.js";
@@ -29,6 +30,33 @@ class AtmsDashboard extends DynamicElement {
 
     onConnected() {
         this.fetchSummary();
+        this.setupPolling();
+    }
+
+    setupPolling() {
+        // Register top-stats polling endpoint
+        pollingService.register('topStats', '/dashboard/top-stats', 2000);
+        
+        // Subscribe to polling updates
+        this.unsubscribeTopStats = pollingService.subscribe('topStats', (data, error) => {
+            if (error) {
+                console.error('Top stats polling error:', error);
+                return;
+            }
+            
+            if (data) {
+                console.log('Received top stats data:', data);
+                // You can handle the data here - update attributes, call methods, etc.
+                // For now, just logging so you can see it's working
+            }
+        });
+    }
+
+    onDisconnected() {
+        // Clean up polling subscription
+        if (this.unsubscribeTopStats) {
+            this.unsubscribeTopStats();
+        }
     }
 
     onStoreChange(storeState) {

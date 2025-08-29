@@ -32,9 +32,16 @@ class SegmentBlock extends DynamicElement {
 
     template() {
         this.classList.add("segment-block");
+        const containerClass = this.hasAttribute("decor")
+            ? "segment-block__container segment-block__container_decor"
+            : "segment-block__container";
+
+        if (this.hasAttribute("decor")) {
+            this.classList.add("segment-block_decor");
+        }
 
         return `
-            <div class="segment-block__container">
+            <div class="${containerClass}">
                 <pill-item text="Ավելացնել սեգմենտ" add></pill-item>
                 <div class="selected-values" style="display: none;"></div>
             </div>

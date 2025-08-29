@@ -315,15 +315,15 @@ class Cumulative extends DynamicElement {
                                 )
                                 .join("")}
                         </div>  
-                       <segment-block name='province-segments'></segment-block>
+                       <segment-block decor name='province-segments'></segment-block>
                     </div>
                     <div class="tab-content" data-tab="city" style="display:none">
                         <select-box-search placeholder="Որոնել Քաղաք" options='${cities}' id='city-search'></select-box-search>
-                       <segment-block name='city-segments'></segment-block>
+                       <segment-block decor name='city-segments'></segment-block>
                     </div>
                     <div class="tab-content" data-tab="district" style="display:none">
                         <select-box-search placeholder="Որոնել Համայնք" options='${districts}' id='districts-search'></select-box-search>
-                       <segment-block name='district-segments'></segment-block>
+                       <segment-block decor name='district-segments'></segment-block>
                     </div>
                     <div class="tab-content" data-tab="segment" style="display:none">
                         <select-box-search placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
@@ -332,9 +332,7 @@ class Cumulative extends DynamicElement {
                        <div class="tab-content" data-tab="atm" style="display:none">
                         <select-box-search placeholder="Որոնել ըստ բանկոմատի ID-ի կամ հասցեի" options='${atmsList}' id='atms-search'></select-box-search>
                     </div>
-                    <div class="column sm-3">
-                        <button type="submit" class="btn_blue btn_md">Հաստատել</button>
-                    </div>
+                    <button type="submit" class="btn_blue btn_md btn_fit">Հաստատել</button>
                 </div>
       
                     <div class="table-container"></div>

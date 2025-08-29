@@ -222,25 +222,27 @@ class AtmDetails extends DynamicElement {
             <div class="column sm-6">
                 <div class="container">
                     <container-top icon="icon-trello" title="Արտադրողականություն"> </container-top>
+                    <div class="infos infos_margin">
+                       <info-card
+                            title="Աշխատաժամանակ"
+                            value="${atmWorkHours.work_hours_per_day[0].working_percent}%"
+                            icon="icon icon-clock"
+                            show-border="true"></info-card>
+                        <info-card
+                            title="Խափանում"
+                            value="${atmWorkHours.work_hours_per_day[0].non_working_percent}%"
+                            icon="icon icon-clock"
+                            show-border="true"></info-card>
+                    </div>
                     <div class="info-items-container">
                         <div class="info-items info-items_col">
-                            <info-card
-                                title="Աշխատաժամանակ"
-                                value="${atmWorkHours.work_hours_per_day[0].working_percent}%"
-                                icon="icon icon-clock"
-                                show-border="true"></info-card>
-                                 <info-card
-                                title="Խափանում"
-                                value="${atmWorkHours.work_hours_per_day[0].non_working_percent}%"
-                                icon="icon icon-clock"
-                                show-border="true"></info-card>
-                            <info-item text="Վերջին Disconnect" value="${this.formatDate(
+                         <info-item text="Վերջին Disconnect" value="${this.formatDate(
                                 atmWorkHours.last_disconnect
                             )}"></info-item>
                             <info-item text="Վերջին Connect"  value="${this.formatDate(
                                 atmWorkHours.last_connect
                             )}"></info-item>
-                        </div>
+                        </div> 
                         <div class="info-items">
                             <info-item text="Վերջին ստատուսի տևողություն" value="1 Ժամ"></info-item>
                         </div>
@@ -248,7 +250,6 @@ class AtmDetails extends DynamicElement {
                 </div>
             </div>
         </div>
-      
         </div>
         `;
     }

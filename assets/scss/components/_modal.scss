@@ -57,7 +57,7 @@
         }
     }
     &__header {
-        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        @include horizontal-decor-after("../img/decor/horizontal-gray.svg");
         @extend %flex;
         @extend %align-middle;
         @extend %align-between;

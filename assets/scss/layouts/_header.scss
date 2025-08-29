@@ -5,7 +5,7 @@
     position: relative;
     margin: rem(30) 0;
     padding-bottom: rem(32);
-    @include horizontal-decor("../img/decor/horizontal-gray.svg");
+    @include horizontal-decor-after("../img/decor/horizontal-gray.svg");
     &::after {
         bottom: 0;
     }

@@ -9,7 +9,7 @@
         &:not(:last-child) {
             margin-bottom: rem(12);
             padding-bottom: rem(12);
-            @include horizontal-decor("../img/decor/horizontal-gray.svg");
+            @include horizontal-decor-after("../img/decor/horizontal-gray.svg");
             &:after {
                 bottom: 0;
             }
@@ -61,7 +61,7 @@
         height: rem(32);
         margin-bottom: rem(16) !important;
         padding-bottom: rem(16) !important;
-        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        @include horizontal-decor-after("../img/decor/horizontal-gray.svg");
         &:after {
             bottom: 0;
         }

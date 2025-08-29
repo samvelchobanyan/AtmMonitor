@@ -217,7 +217,7 @@ export default class DoughnutTabs extends DynamicElement {
 
         return `
       <div class="select-container">
-        <container-top icon="icon-arrow-down-left" title="${title}></container-top>
+        <container-top icon="icon-arrow-down-left" title="${title}"></container-top>
           ${
               showDate
                   ? `

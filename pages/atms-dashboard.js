@@ -6,17 +6,7 @@ import "../components/dynamic/chartComponent.js";
 import "../components/dynamic/modal-popup.js";
 import "../components/static/changeIndicator.js";
 import "../components/dynamic/infoCard.js";
-// import { ChartComponent } from "../components/dynamic/chartComponent.js";
 import "../components/dynamic/doughnutChart.js";
-// import '../components/static/badge.js';
-
-// new components
-import "../components/ui/customTab.js";
-import "../components/dynamic/select-box-search.js";
-import "../components/ui/customCheck.js";
-import "../components/dynamic/list-view.js";
-import "../components/ui/atmItem.js";
-import "../components/ui/infoItem.js";
 
 class AtmsDashboard extends DynamicElement {
     constructor() {
@@ -123,76 +113,6 @@ class AtmsDashboard extends DynamicElement {
         const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
 
         return /* html */ `
-        <div class="row">
-            <div class="column sm-16">
-                <div class="container">
-                    <container-top icon="icon-bar-chart" title="Բանկոմատում առկա գումար"> </container-top>
-                    <div class="row">
-                        <div class="column sm-6">
-                        <div class="infos infos_margin">
-                            <info-card
-                                title="Վերջին ինկասացիա (10/06/2025 11:41)"
-                                value="250108500"
-                                value-currency="֏" value-color="color-green"
-                                trend="7"
-                                show-border="true">
-                            </info-card>
-                        </div>
-                            <chart-component
-                                id="bar-chart-1"
-                                api-url="/dashboard/atm-worktime-in-days"
-                                chart-data='${JSON.stringify(atmPrductivityDaily || {})}'
-                                chart-type="bar"
-                                stacked></chart-component>
-                        </div>
-                        <div class="column sm-6">
-                            <div class="infos infos_margin">
-                                <info-card
-                                    title="Մնացորդ"
-                                    value="30108500"
-                                    value-currency="֏" value-color="color-blue"
-                                    show-border="true"
-                                    button-text="Մանրամասն">
-                                </info-card>
-                            </div>
-                            <chart-component
-                                id="bar-chart-2"
-                                api-url="/dashboard/atm-worktime-in-days"
-                                chart-data='${JSON.stringify(atmPrductivityDaily || {})}'
-                                chart-type="bar"
-                                stacked></chart-component>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="column sm-6">
-                <div class="container">
-                    <container-top icon="icon-cpu" title="Սարքավորումներ"> </container-top>
-                    <div class="info-items">
-                        <info-item text="Dispenser" data-working="true"></info-item>
-                        <info-item text="Cash-In" data-working="false"></info-item>
-                        <info-item text="Receipt printer" data-working="false"></info-item>
-                        <info-item text="Card reader" data-working="true"></info-item>
-                    </div>
-                </div>
-            </div>
-            <div class="column sm-6">
-                <div class="container">
-                    <container-top icon="icon-trello" title="Արտադրողականություն"> </container-top>
-                    <div class="info-items-container">
-                        <div class="info-items info-items_col">
-                            <info-item text="Վերջին connect" value="15 Feb, 2025 | 15:15"></info-item>
-                            <info-item text="Վերջին connect" value="15 Feb, 2025 | 15:15"></info-item>
-                        </div>
-                        <div class="info-items">
-                            <info-item text="Վերջին ստատուսի տևողություն" value="1 Ժամ"></info-item>
-                        </div>
-                    </div>  
-                </div>
-            </div>
-        </div>
         <div class="row">
             <div class="column sm-2">
                 <info-card
@@ -366,36 +286,6 @@ class AtmsDashboard extends DynamicElement {
                         api-url="/dashboard/atm-worktime-in-days"
                         chart-data='${JSON.stringify(atmPrductivityDaily || {})}'
                         chart-type="bar"></chart-component>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="column sm-6">
-                <div class="container">
-                    <div class="tabs-container">
-                        <div class="tabs">
-                            <custom-tab name="geo" active>Աշխարհագրական</custom-tab>
-                            <custom-tab name="atms">Բանկոմատներ</custom-tab>
-                        </div>
-                    </div>
-                    <div class="tab-content" data-tab="geo">
-                        <select-box-search placeholder="Choose your fruit" options='[ {"value":"s","label":"Apple"}, {"value":"banana","label":"Banana"}, {"value":"cherry","label":"Cherry"} ]'> </select-box-search>
-                    </div>
-                    <div class="tab-content" data-tab="atms" style="display: none;">
-                        <div class="checkboxes">
-                            <custom-checkbox id="yerevan" value="yerevan" checked>Երևան</custom-checkbox> 
-                            <custom-checkbox id="armavir" value="armavir">Արմավիր</custom-checkbox> 
-                            <custom-checkbox id="lori" value="lori">Լոռի</custom-checkbox> 
-                            <custom-checkbox id="tavush" value="tavush">Տավուշ</custom-checkbox> 
-                            <custom-checkbox id="aragatsotn" value="aragatsotn">Արագածոտն</custom-checkbox> 
-                            <custom-checkbox id="gegharkunik" value="gegharkunik">Գեղարքունիք</custom-checkbox> 
-                            <custom-checkbox id="shirak" value="shirak">Շիրակ</custom-checkbox> 
-                            <custom-checkbox id="vayots-dzor" value="vayots-dzor">Վայոց ձոր</custom-checkbox> 
-                            <custom-checkbox id="ararat" value="ararat">Արարատ</custom-checkbox> 
-                            <custom-checkbox id="kotayk" value="kotayk">Կոտայք</custom-checkbox> 
-                            <custom-checkbox id="syunik" value="syunik">Սյունիք</custom-checkbox> 
-                        </div>  
-                    </div>
                 </div>
             </div>
         </div>

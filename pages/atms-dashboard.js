@@ -46,10 +46,20 @@ class AtmsDashboard extends DynamicElement {
             
             if (data) {
                 console.log('Received top stats data:', data);
+                this.updateTopStats(data.data);
                 // You can handle the data here - update attributes, call methods, etc.
                 // For now, just logging so you can see it's working
             }
         });
+    }
+
+    updateTopStats(data) {        
+        this.$('#total-balance').setAttribute('value', data.total_atm_balance);
+        this.$('#total-atms').setAttribute('value', data.total_atms);
+        this.$('#not-working-atms').setAttribute('value', data.not_working_atm_count);
+        this.$('#empty-cassettes').setAttribute('value', data.empty_cassettes_count);
+        this.$('#almost-empty-cassettes').setAttribute('value', data.almost_empty_cassettes_count);
+        this.$('#taken-cards').setAttribute('value', data.taken_cards_count);
     }
 
     onDisconnected() {
@@ -186,6 +196,7 @@ class AtmsDashboard extends DynamicElement {
         <div class="row">
             <div class="column sm-2">
                 <info-card
+                    id="total-balance"
                     title="Առկա գումար"
                     value="${generalData.total_atm_balance}"
                     value-currency="֏"
@@ -195,6 +206,7 @@ class AtmsDashboard extends DynamicElement {
             </div>
             <div class="column sm-2">
                 <info-card
+                    id="total-atms"
                     title="Բանկոմատների թիվ"
                     value="${generalData.total_atms}"
                     icon="icon icon-box">
@@ -202,6 +214,7 @@ class AtmsDashboard extends DynamicElement {
             </div>
             <div class="column sm-2">
                 <info-card
+                    id="not-working-atms"
                     title="Չաշխատող"
                     value="${generalData.not_working_atm_count}"
                     value-color="color-red"
@@ -211,6 +224,7 @@ class AtmsDashboard extends DynamicElement {
             </div>
             <div class="column sm-2">
                 <info-card
+                    id="empty-cassettes"
                     title="Դատարկ"
                     value="${generalData.empty_cassettes_count}"
                     value-color="color-red"
@@ -220,6 +234,7 @@ class AtmsDashboard extends DynamicElement {
             </div>
             <div class="column sm-2">
                 <info-card
+                    id="almost-empty-cassettes"
                     title="Վերջացող"
                     value="${generalData.almost_empty_cassettes_count}"
                     icon="icon icon-box"
@@ -229,6 +244,7 @@ class AtmsDashboard extends DynamicElement {
             </div>
             <div class="column sm-2">
                 <info-card
+                    id="taken-cards"
                     title="Առգրավված քարտեր"
                     value="${generalData.taken_cards_count}"
                     value-color="color-red"

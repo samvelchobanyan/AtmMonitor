@@ -1,6 +1,7 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
 import { api } from "../../core/api-client.js";
 
+const observedAttrs = ["value"];
 class InfoCard extends DynamicElement {
   static get properties() {
     return [
@@ -19,6 +20,9 @@ class InfoCard extends DynamicElement {
       "message-endpoint",
     ];
   }
+  static get observedAttributes() {
+    return observedAttrs;
+}
 
   onConnected() {
     this.state = { isLoading: false, error: false, modalContent: "" };
@@ -122,6 +126,21 @@ class InfoCard extends DynamicElement {
       console.error("Failed to fetch messages:", err);
     } finally {
       this.setState({ isLoading: false });
+    }
+  }
+
+  onAttributeChange(name, oldValue, newValue) {    
+    if (name === 'value' && oldValue !== newValue) {
+      this.updateValue(newValue);
+    }
+  }
+
+  updateValue(newValue) {
+    const valueEl = this.querySelector('.info__text');
+    if (valueEl) {
+      const formattedValue = isNaN(newValue) ? newValue : Number(newValue).toLocaleString();
+      const valueCurrency = this.getAttr("value-currency");
+      valueEl.innerHTML = `${formattedValue}${valueCurrency ? `<span>${valueCurrency}</span>` : ""}`;
     }
   }
 

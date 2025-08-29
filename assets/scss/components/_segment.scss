@@ -1,16 +1,12 @@
 .segment-block {
     &__container {
         &_decor {
-            @include horizontal-decor-after("../img/decor/horizontal-gray.svg");
-            @include horizontal-decor-before("../img/decor/horizontal-gray.svg");
+            @include horizontal-decor("../img/decor/horizontal-gray.svg");
             &:after {
-                bottom: 0;
-            }
-            &::before {
                 top: 0;
             }
-            margin: rem(20) 0;
-            padding: rem(20) 0;
+            margin-top: rem(20);
+            padding-top: rem(20);
         }
     }
 }

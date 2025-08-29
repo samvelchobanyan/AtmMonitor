@@ -281,30 +281,10 @@
     line-height: 1;
 }
 
-@mixin horizontal-decor-after($path) {
+@mixin horizontal-decor($path) {
     position: relative;
 
     &::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background-image: url($path);
-        background-repeat: repeat-x;
-        background-size: contain;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        pointer-events: none;
-    }
-}
-
-@mixin horizontal-decor-before($path) {
-    position: relative;
-
-    &::before {
         content: "";
         position: absolute;
         left: 0;

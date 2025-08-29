@@ -190,7 +190,7 @@
     &:not(:last-child) {
         padding-bottom: rem(12);
         margin-bottom: rem(12);
-        @include horizontal-decor-after("../img/decor/horizontal-gray.svg");
+        @include horizontal-decor("../img/decor/horizontal-gray.svg");
         &:after {
             bottom: 0;
         }

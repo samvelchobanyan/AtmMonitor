@@ -128,7 +128,7 @@
 .overview-top {
     margin-bottom: rem(16);
     padding-bottom: rem(16);
-    @include horizontal-decor-after("../img/decor/horizontal-gray.svg");
+    @include horizontal-decor("../img/decor/horizontal-gray.svg");
     &:after {
         bottom: 0;
     }
@@ -196,7 +196,7 @@
     @extend %align-between;
     padding-bottom: rem(20);
     margin-bottom: rem(20);
-    @include horizontal-decor-after("../img/decor/horizontal-gray.svg");
+    @include horizontal-decor("../img/decor/horizontal-gray.svg");
     &::after {
         bottom: 0;
     }

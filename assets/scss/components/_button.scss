@@ -72,8 +72,19 @@
             font-size: rem(24);
         }
     }
-    
+
     &_fit {
         max-width: fit-content;
+    }
+}
+
+.btn-container {
+    margin-top: rem(20);
+    &_decor {
+        padding-top: rem(20);
+        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        &:after {
+            top: 0;
+        }
     }
 }

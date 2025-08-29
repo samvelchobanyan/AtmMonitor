@@ -291,7 +291,8 @@ class Cumulative extends DynamicElement {
         const segments = encode(this.state.segments);
 
         return /*html*/ `
-           <div class="column">
+          <div class="row">
+            <div class="column sm-12">
                 <div class="container">
                     <div class="tabs-container">
                         <div class="tabs">
@@ -305,9 +306,9 @@ class Cumulative extends DynamicElement {
                                 start-date="${this.getAttr("start-date")}"
                                 end-date="${this.getAttr("end-date")}"
                             ></select-box-date>
-                    </div>
-                    <div class="tab-content column sm-6" data-tab="province">
-                      <div class="checkboxes">
+                        </div>
+                        <div class="tab-content" data-tab="province">
+                         <div class="checkboxes">
                             ${this.province
                                 .map(
                                     (el) =>
@@ -319,26 +320,30 @@ class Cumulative extends DynamicElement {
                     </div>
                     <div class="tab-content" data-tab="city" style="display:none">
                         <select-box-search placeholder="Որոնել Քաղաք" options='${cities}' id='city-search'></select-box-search>
-                       <segment-block decor name='city-segments'></segment-block>
+                        <segment-block decor name='city-segments'></segment-block>
                     </div>
                     <div class="tab-content" data-tab="district" style="display:none">
-                        <select-box-search placeholder="Որոնել Համայնք" options='${districts}' id='districts-search'></select-box-search>
+                       <select-box-search placeholder="Որոնել Համայնք" options='${districts}' id='districts-search'></select-box-search>
                        <segment-block decor name='district-segments'></segment-block>
                     </div>
                     <div class="tab-content" data-tab="segment" style="display:none">
                         <select-box-search placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
                     </div>
-
-                       <div class="tab-content" data-tab="atm" style="display:none">
+                    <div class="tab-content" data-tab="atm" style="display:none">
                         <select-box-search placeholder="Որոնել ըստ բանկոմատի ID-ի կամ հասցեի" options='${atmsList}' id='atms-search'></select-box-search>
                     </div>
-                    <button type="submit" class="btn_blue btn_md btn_fit">Հաստատել</button>
+                    <div class="btn-container btn-container_decor">
+                        <button type="submit" class="btn btn_fit btn_blue btn_md">Հաստատել</button>
+                    </div>
+                    </div>
                 </div>
-      
+            </div>
+            <div class="row">
+                <div class="column sm-12">
                     <div class="table-container"></div>
                     <atm-details id='1621'></atm-details>
-        </div>
-
+                </div>
+            </div>
         `;
     }
 }

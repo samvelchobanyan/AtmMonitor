@@ -1,5 +1,32 @@
-<div class="container">
-   
+<!-- <div class="column">
+                <div class="container">
+                    
+                   
+                    
+                    <div class="column sm-3">
+                       
+                    </div>
+                </div>
+      
+                 
+        </div> -->
 
-   
+<div class="row">
+    <div class="column sm-12">
+        <div class="container">
+            <div class="tabs-container">
+                        <div class="tabs">
+                            <custom-tab name="province" active>Մարզ</custom-tab>
+                            <custom-tab name="city">Քաղաք</custom-tab>
+                            <custom-tab name="district">Համայնք</custom-tab>
+                            <custom-tab name="segment">Սեգմենտ</custom-tab>
+                            <custom-tab name="atm">Բանկոմատ</custom-tab>
+                        </div>
+                           <select-box-date
+                                start-date="${this.getAttr("start-date")}"
+                                end-date="${this.getAttr("end-date")}"
+                            ></select-box-date>
+                    </div>
+        </div>
+    </div>
 </div>

@@ -289,7 +289,9 @@ class Incassate extends DynamicElement {
                     <div class="tab-content" data-tab="segment" style="display:none">
                         <select-box-search placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
                     </div>
-                    <button type="submit" class="btn btn_fit btn_blue btn_md">Հաստատել</button>
+                   <div class="btn-container btn-container_decor">
+                        <button type="submit" class="btn btn_fit btn_blue btn_md">Հաստատել</button>
+                    </div>
                 </div>
             </div>
         </div>

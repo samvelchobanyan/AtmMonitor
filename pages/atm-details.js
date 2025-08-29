@@ -31,6 +31,9 @@ class AtmDetails extends DynamicElement {
         const id = parseInt(this.atmId, 10);
         try {
             const response = await this.fetchData(`/atm/my-profile?atmId=${id}`);
+
+            console.log("res", response);
+
             this.setState({
                 summary: response.data,
             });
@@ -83,6 +86,7 @@ class AtmDetails extends DynamicElement {
 
         return transactionDynamics;
     }
+
     template() {
         if (!this.state.summary) {
             return /*html*/ `
@@ -109,28 +113,34 @@ class AtmDetails extends DynamicElement {
             this._transformToTransactionDynamics(data.transactions_summary.transaction_dynamics)
         );
 
-        console.log("nominalList", nominalList);
+        console.log("data", data);
 
         const devicesData = data.devices;
 
+        const atmWorkHours = data.atm_work_hours;
+
+        console.log("atmWorkHours", atmWorkHours);
+
         return /*html*/ `
-        <div class="row">
-            <div class="column sm-12">
-                <div class="container">
+            <div class="row">
+                <div class="column sm-12">
+                   <div class="container">
                     <container-top icon="icon-bar-chart" title="Բանկոմատում առկա գումար"> </container-top>
                     <div class="row">
                         <div class="column sm-6">
                             <div class="infos infos_margin">
                                 <info-card title="Մնացորդ" value="250108500" value-currency="֏" value-color="color-green" trend="7" show-border="true"> </info-card>
                             </div>
-                            <chart-component id="bar-chart-1" chart-data="${encode(nominalList)}" chart-type="bar" show-date-selector="false" stacked></chart-component>
+                            <chart-component id="bar-chart-1" chart-data="${encode(
+                                nominalList
+                            )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
                         </div>
                         <div class="column sm-6">
                             <div class="infos infos_margin">
                                 <info-card
                                     title="Վերջին ինկասացիա (${this.formatDate(
-                                                data.balance_info.last_encashment_date
-                                            )})"
+                                        data.balance_info.last_encashment_date
+                                    )})"
                                     value="${data.balance_info.last_encashment_amount}"
                                     value-currency="֏"
                                     value-color="color-blue"
@@ -139,74 +149,106 @@ class AtmDetails extends DynamicElement {
                                 >
                                 </info-card>
                             </div>
-                            <chart-component id="bar-chart-2" chart-data="${encode(modelList)}" chart-type="bar" show-date-selector="false" stacked></chart-component>
+                            <chart-component id="bar-chart-2" chart-data="${encode(
+                                modelList
+                            )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
                         </div>
                     </div>
+
+                    </div>
+                    </div>
+                <div class="column sm-12">
+                    <div class='row'>
+                    <div class="column sm-6">
+                       <div class="container">
+                           <doughnut-tabs id="dispense" data="${dispenseData}" show-date="false" title="Կանխիկացում"></doughnut-tabs>
+                       </div>
+                   </div>
+                   <div class="column sm-6">
+                   <div class="container">
+                   <doughnut-tabs id="deposit" data="${depositData}" show-date="false"  title="Մուտքագրում"></doughnut-tabs>
+                   </div>
+                   </div>
+                   </div>
+                   <div class="column sm-12">
+                       <div class="container">
+                           <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
+                           <div class="infos">
+                               ${exchangeData
+                                   .map((exchange) => {
+                                       return `
+                                   <info-card
+                                       title="${exchange.currency_code}"
+                                       value="${exchange.total_amount}"
+                                          value-currency="$"
+                                          trend="${exchange.total_amount_percent_change}"
+                                       icon="icon icon-box"
+                                       show-border="true"></info-card>`;
+                                   })
+                                   .join("")}
+                           </div>
+                         </div>
+                    </div>
+
+                      <div class="column sm-12">
+                    <div class="container">
+                        <container-top icon="icon-chart" title="Գործարքների դինամիկա"></container-top>
+                        <chart-component 
+                            id="line-chart-transactions" 
+                            chart-type="line" 
+                            chart-data='${transactionDynamics}' 
+                            api-url="/analytics/exchange-dynamic-in-days" 
+                            ${this.attrIf("city", this.state.currentCity)} 
+                            ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="row">
+
+                 
+                 <div class="row">
             <div class="column sm-6">
                 <div class="container">
-                    <doughnut-tabs id="dispense" data="${dispenseData}" show-date="false" title="Կանխիկացում"></doughnut-tabs>
+                    <container-top icon="icon-cpu" title="Սարքավորումներ"> </container-top>
+                    <div class="info-items">
+                    ${devicesData
+                        .map((device) => {
+                            return `<info-item text="${device.device_type}" data-working="${
+                                device.status == 1 ? true : false
+                            }"></info-item>`;
+                        })
+                        .join("")}
+                    </div>
                 </div>
             </div>
             <div class="column sm-6">
                 <div class="container">
-                    <doughnut-tabs id="deposit" data="${depositData}" show-date="false" title="Մուտքագրում"></doughnut-tabs>
+                    <container-top icon="icon-trello" title="Արտադրողականություն"> </container-top>
+                    <div class="info-items-container">
+                        <div class="info-items info-items_col">
+                            <info-card
+                                title="Աշխատաժամանակ"
+                                value="${atmWorkHours.work_hours_per_day[0].working_percent}%"
+                                icon="icon icon-clock"
+                                show-border="true"></info-card>
+                                 <info-card
+                                title="Խափանում"
+                                value="${atmWorkHours.work_hours_per_day[0].non_working_percent}%"
+                                icon="icon icon-clock"
+                                show-border="true"></info-card>
+                            <info-item text="Վերջին Disconnect" value="${this.formatDate(
+                                atmWorkHours.last_disconnect
+                            )}"></info-item>
+                            <info-item text="Վերջին Connect"  value="${this.formatDate(
+                                atmWorkHours.last_connect
+                            )}"></info-item>
+                        </div>
+                        <div class="info-items">
+                            <info-item text="Վերջին ստատուսի տևողություն" value="1 Ժամ"></info-item>
+                        </div>
+                    </div>  
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="column sm-12">
-                <div class="container">
-                    <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
-                    <div class="infos">
-                        ${exchangeData .map((exchange) => { console.log("exchange", exchange); return `
-                        <info-card title="${exchange.currency_code}" value="${exchange.total_amount}" value-currency="$" trend="${exchange.total_amount_percent_change}" icon="icon icon-box" show-border="true"></info-card>`; }) .join("")}
-                    </div>
-                </div>
-            </div>
-            <div class="column sm-12">
-                <div class="container">
-                    <container-top icon="icon-chart" title="Գործարքների դինամիկա"></container-top>
-                    <chart-component 
-                                    id="line-chart-transactions" 
-                                    chart-type="line" 
-                                    chart-data='${transactionDynamics}' 
-                                    api-url="/analytics/exchange-dynamic-in-days" 
-                                    ${this.attrIf("city", this.state.currentCity)} 
-                                    ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-           <div class="column sm-6">
-                <div class="container">
-                    <div class="info-items">
-                        ${devicesData.map(device => `
-                            <info-item
-                                text="${device.device_type}"
-                                data-working="${device.status === 1}"
-                            ></info-item>
-                        `).join("")}
-                    </div>
-                </div>
-           </div>
-           <div class="column sm-6">
-               <div class="container">
-                   <container-top icon="icon-trello" title="Արտադրողականություն"> </container-top>
-                   <div class="info-items-container">
-                   <div class="info-items info-items_col">
-                        <info-item text="Վերջին connect" value="15 Feb, 2025 | 15:15"></info-item>
-                        <info-item text="Վերջին connect" value="15 Feb, 2025 | 15:15"></info-item>
-                    </div>
-                    <div class="info-items">
-                        <info-item text="Վերջին ստատուսի տևողություն" value="1 Ժամ"></info-item>
-                    </div>
-                </div>
-               </div>
-           </div>
+      
         </div>
         `;
     }

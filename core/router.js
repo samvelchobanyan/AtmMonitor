@@ -147,7 +147,12 @@ export function startRouter() {
         if (!customElements.get("cumulative-analythics")) {
             await import("../pages/cumulative.js");
         }
-        mountComponent("cumulative-analythics", "Անալիտիկա | Կումուլատիվ", ctx.query, "/cumulative");
+        mountComponent(
+            "cumulative-analythics",
+            "Անալիտիկա | Կումուլատիվ",
+            ctx.query,
+            "/cumulative"
+        );
     });
 
     // — Incashment listing Route
@@ -172,7 +177,12 @@ export function startRouter() {
             await import("../pages/atm-details.js");
         }
 
-        mountComponent("atm-details", `ATM #${ctx.params.id}`, { id: ctx.params.id }, `/atms/${ctx.params.id}`);
+        mountComponent(
+            "atm-details",
+            `ATM #${ctx.params.id}`,
+            { id: ctx.params.id },
+            `/atms/${ctx.params.id}`
+        );
     });
 
     page();

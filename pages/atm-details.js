@@ -5,6 +5,7 @@ import "../components/dynamic/doughnutTabs.js";
 import encode from "../assets/js/utils/encode.js";
 import "../components/ui/atmItem.js";
 import "../components/ui/infoItem.js";
+import "../components/dynamic/simpleTable.js";
 
 class AtmDetails extends DynamicElement {
     constructor() {
@@ -56,7 +57,6 @@ class AtmDetails extends DynamicElement {
         return `${day}/${month}/${year} ${hours}:${minutes}`;
     }
 
-    // todo fix refresh error
     _transformToTransactionDynamics(data) {
         const { dispense_dynamic, deposit_dynamic, exchange_dynamic } = data;
 
@@ -118,6 +118,8 @@ class AtmDetails extends DynamicElement {
         const devicesData = data.devices;
 
         const atmWorkHours = data.atm_work_hours;
+
+        const productivityChart = encode(atmWorkHours.work_hours_per_day);
 
         console.log("atmWorkHours", atmWorkHours);
 
@@ -237,18 +239,60 @@ class AtmDetails extends DynamicElement {
                     <div class="info-items-container">
                         <div class="info-items info-items_col">
                          <info-item text="Վերջին Disconnect" value="${this.formatDate(
-                                atmWorkHours.last_disconnect
-                            )}"></info-item>
+                             atmWorkHours.last_disconnect
+                         )}"></info-item>
                             <info-item text="Վերջին Connect"  value="${this.formatDate(
                                 atmWorkHours.last_connect
                             )}"></info-item>
                         </div> 
                         <div class="info-items">
-                            <info-item text="Վերջին ստատուսի տևողություն" value="1 Ժամ"></info-item>
+                            <info-item text="Վերջին ստատուսի տևողություն" value="${
+                                atmWorkHours.last_status_duration
+                            }"></info-item>
                         </div>
+
+                        continue here with chart data
+                         <chart-component 
+                            id="line-chart-productivity" 
+                            chart-type="line" 
+                            chart-data='${productivityChart}' 
+                            show-date-selector="false"
+                       > </chart-component>
+                    </div>
+
                     </div>  
                 </div>
             </div>
+
+            <div class="column sm-12">
+                    <div class="container">
+                        <div class="select-container">
+                            <container-top icon="icon-x-octagon" title="Ինկասացիաներ"> </container-top>
+                            <select-box-date
+                                start-date="${this.getAttr("start-date")}"
+                                end-date="${this.getAttr("end-date")}"
+                            ></select-box-date>
+                        </div>  
+                        <div>
+                         <info-card
+                            title="Չկատարված գործարքների գումար"
+                            value="250,108,500֏"
+                            show-border="true"></info-card>
+                             <info-card
+                            title="Չկատարված գործարքների քանակ"
+                            value="410"
+                            show-border="true"></info-card>
+                    </div>
+
+                        <simple-table
+                            data-source="/encashment/summary?startDate=2025-06-01&&atmId=${
+                                this.atmId
+                            }"
+                            columns='["date_time", "atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+                            clickable-columns='["added_amount"]'>
+                        </simple-table>
+                    </div>
+                </div>
         </div>
         </div>
         `;

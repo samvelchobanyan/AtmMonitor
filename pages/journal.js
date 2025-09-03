@@ -95,6 +95,7 @@
 
 import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/list-view.js";
+import "../components/dynamic/simpleTable.js";  // ADD THIS LINE
 import encode from "../assets/js/utils/encode.js";
 
 class JournalPage extends DynamicElement {
@@ -129,25 +130,20 @@ class JournalPage extends DynamicElement {
     }
 
     template() {
-        if (this.state.summary.events === undefined) return;
-
-        let itemsData = encode(this.state.summary.events);
         
+console.log('template journal');
+
         return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
                     <div class="container">
-                        <list-view
-                            id="journal"
-                            searchable
-                            search-fields="date,server_date,event_description,card_number,code"
-                            items="${itemsData}"
-                            item-component="badge-item"
-                        >
-                            <template>
-                             <custom-checkbox id="{{value}}" value="{{value}}">{{text}}</custom-checkbox>
-                            </template>
-                        </list-view>
+                        <simple-table
+                            data-source="/journal/events-journal"
+                            columns='["server_date", "code", "card_number", "event_description"]'
+                            clickable-columns='["code"]'
+                            pagination-mode="server"
+                            per-page="10">
+                        </simple-table>
                     </div>
                 </div>
             </div>

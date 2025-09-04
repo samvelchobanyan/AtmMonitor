@@ -249,13 +249,13 @@ export class SimpleGrid extends DynamicElement {
 
             // Add event listeners after grid is ready
             this.gridInstance.on('ready', () => {
-                this.attachClickHandlers();
+                this.addEventListeners();
                 this.setState({ loading: false });
             });
 
             // Re-attach click handlers after any update
             this.gridInstance.on('load', () => {
-                setTimeout(() => this.attachClickHandlers(), 100);
+                setTimeout(() => this.addEventListeners(), 100);
             });
 
         } catch (err) {
@@ -264,10 +264,14 @@ export class SimpleGrid extends DynamicElement {
         }
     }
 
-    attachClickHandlers() {
+    addEventListeners() {
+        // Clear previous listeners first
         this.clearEventListeners();
         
+        // Find all clickable cells in the grid
         const clickableCells = this.$$(".clickable-cell");
+        
+        // Attach click handlers to each clickable cell
         clickableCells.forEach(cell => {
             this.addListener(cell, "click", (event) => {
                 event.preventDefault();
@@ -288,6 +292,7 @@ export class SimpleGrid extends DynamicElement {
                     
                     const cellValue = cell.textContent;
                     
+                    // Dispatch the cell-click event with all relevant data
                     this.dispatch("cell-click", { 
                         column, 
                         cellValue, 

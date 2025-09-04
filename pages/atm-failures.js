@@ -2,7 +2,7 @@ import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/chartComponent.js";
 import "../components/dynamic/infoCard.js";
 import "../components/ui/customTab.js";
-import "../components/dynamic/simpleTable.js";
+import "../components/dynamic/simpleGrid.js";
 import "../components/dynamic/select-box.js";
 import "../components/dynamic/select-box-date.js";
 
@@ -12,7 +12,7 @@ class AtmFailures extends DynamicElement {
     }
 
     addEventListeners() {
-        this.$("simple-table")?.addEventListener("cell-click", (e) => {
+        this.$("simple-grid")?.addEventListener("cell-click", (e) => {
             const { column, cellValue, rowData } = e.detail;
             // Open popup or do something with the data
             console.log("cellValue", column, cellValue, rowData);
@@ -31,11 +31,13 @@ class AtmFailures extends DynamicElement {
                                 end-date="${this.getAttr("end-date")}"
                             ></select-box-date>
                         </div>  
-                        <simple-table
+                        <simple-grid
                             data-source="/device-faults/summary?startDate=2025-06-01"
                             columns='["atm_and_address", "total_faults", "faults_summary"]'
-                            clickable-columns='["faults_summary"]'>
-                        </simple-table>
+                            clickable-columns='["faults_summary"]'
+                            mode="client"
+                            per-page="10">
+                        </simple-grid>
                     </div>
                 </div>
             </div>

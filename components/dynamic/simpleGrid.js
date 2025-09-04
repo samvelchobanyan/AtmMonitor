@@ -33,6 +33,8 @@ export class SimpleGrid extends DynamicElement {
         this.gridInstance = null;
         this.clickableColumns = [];
         this.endpoint = null;
+        this.initializationPending = false;
+        this.isConnected = false;
     }
 
     static get observedAttributes() {
@@ -40,31 +42,46 @@ export class SimpleGrid extends DynamicElement {
     }
 
     async onConnected() {
-        const url = this.getAttr("data-source");
-        if (url) {
-            this.endpoint = url;
-            await this.initializeGrid();
-        }
+        this.isConnected = true;
+        
+        // Parse all attributes first
+        this.endpoint = this.getAttr("data-source");
+        this.clickableColumns = this.parseClickableColumnsAttr();
+        const mode = this.getAttr("mode") || 'client';
+        this.setState({ mode });
     }
 
     async onAttributeChange(name, oldVal, newVal) {
+        // During initial setup, attributes are set before onConnected
+        // We should wait until connected to initialize
+        if (!this.isConnected) {
+            return;
+        }
+
+        let shouldReinitialize = false;
+
         if (name === "data-source" && oldVal !== newVal) {
             this.endpoint = newVal;
-            await this.initializeGrid();
+            shouldReinitialize = true;
         }
         if (name === "columns" && oldVal !== newVal) {
             const parsed = this.parseColumnsAttr();
             if (parsed) {
                 this.setState({ columns: parsed });
-                await this.initializeGrid();
+                shouldReinitialize = true;
             }
         }
         if (name === "mode" && oldVal !== newVal) {
             this.setState({ mode: newVal || 'client' });
-            await this.initializeGrid();
+            shouldReinitialize = true;
         }
         if (name === "clickable-columns" && oldVal !== newVal) {
             this.clickableColumns = this.parseClickableColumnsAttr();
+            shouldReinitialize = true;
+        }
+
+        // Only reinitialize if something actually changed and we're not already initializing
+        if (shouldReinitialize && !this.initializationPending) {
             await this.initializeGrid();
         }
     }
@@ -106,6 +123,12 @@ export class SimpleGrid extends DynamicElement {
     }
 
     async initializeGrid() {
+        // Prevent multiple simultaneous initializations
+        if (this.initializationPending) {
+            return;
+        }
+
+        this.initializationPending = true;
         this.setState({ loading: true, error: false });
 
         try {
@@ -122,6 +145,7 @@ export class SimpleGrid extends DynamicElement {
             const container = this.$(".grid-container");
             if (!container) {
                 this.setState({ loading: false });
+                this.initializationPending = false;
                 return;
             }
 
@@ -249,25 +273,37 @@ export class SimpleGrid extends DynamicElement {
 
             // Add event listeners after grid is ready
             this.gridInstance.on('ready', () => {
-                this.addEventListeners();
+                this.addGridEventListeners();
                 this.setState({ loading: false });
+                this.initializationPending = false;
             });
 
             // Re-attach click handlers after any update
             this.gridInstance.on('load', () => {
                 // Wait for Grid.js to finish updating the DOM
                 setTimeout(() => {
-                    this.addEventListeners();
+                    this.addGridEventListeners();
                 }, 100);
             });
 
         } catch (err) {
             console.error("Failed to initialize Grid.js", err);
             this.setState({ loading: false, error: true });
+            this.initializationPending = false;
         }
     }
 
+    // Override parent's addEventListeners to initialize grid after render
     addEventListeners() {
+        super.addEventListeners();
+        
+        // Initialize grid after first render
+        if (this.endpoint && !this.initializationPending && !this.gridInstance) {
+            this.initializeGrid();
+        }
+    }
+
+    addGridEventListeners() {
         // Clear previous listeners first
         this.clearEventListeners();
         

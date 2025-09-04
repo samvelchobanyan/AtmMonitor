@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+        }
+        .info {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>SimpleGrid Component Test</h1>
+        
+        <div class="info">
+            <p>Testing grid with local server data from http://localhost:3000/device-faults/summary</p>
+        </div>
+        
+        <simple-grid
+            data-source="http://localhost:3000/device-faults/summary"
+            columns='["atm_and_address", "total_faults", "faults_summary"]'
+            clickable-columns='["faults_summary"]'
+            mode="client"
+            per-page="5"
+            sort="true"
+            search="true">
+        </simple-grid>
+        
+        <div class="info" id="click-info" style="display: none;">
+            <h3>Last Clicked Cell:</h3>
+            <pre id="click-details"></pre>
+        </div>
+    </div>
+    
+    <script type="module">
+        // Import the grid component
+        import "./components/dynamic/simpleGrid.js";
+        
+        // Listen for cell clicks
+        document.querySelector('simple-grid').addEventListener('cell-click', (e) => {
+            const info = document.getElementById('click-info');
+            const details = document.getElementById('click-details');
+            
+            info.style.display = 'block';
+            details.textContent = JSON.stringify(e.detail, null, 2);
+            
+            console.log('Cell clicked:', e.detail);
+        });
+    </script>
+</body>
+</html>

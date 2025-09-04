@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimpleGrid Test - Final</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            margin: 0;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .controls {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+        }
+        .controls label {
+            display: inline-block;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        .controls select {
+            padding: 6px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .grid-section {
+            margin-bottom: 40px;
+        }
+        .grid-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #444;
+        }
+        .event-log {
+            background: #f0f7ff;
+            border: 1px solid #d0e5ff;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .event-log h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        .event-log pre {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0 0 0;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+        .error {
+            color: #dc3545;
+            padding: 10px;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SimpleGrid Component Test</h1>
+        <p class="subtitle">Testing the SimpleGrid component with various configurations</p>
+        
+        <div class="controls">
+            <label>
+                Mode:
+                <select id="mode-selector">
+                    <option value="client">Client-side</option>
+                    <option value="server">Server-side</option>
+                </select>
+            </label>
+            <label>
+                Items per page:
+                <select id="perpage-selector">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                </select>
+            </label>
+        </div>
+        
+        <div class="grid-section">
+            <h2 class="grid-title">Test Grid</h2>
+            <div id="grid-container"></div>
+        </div>
+        
+        <div class="event-log" id="event-log" style="display: none;">
+            <h3>Last Cell Click Event</h3>
+            <pre id="event-details"></pre>
+        </div>
+    </div>
+    
+    <script type="module">
+        import "./components/dynamic/simpleGrid.js";
+        
+        // Test data
+        const testData = [
+            { id: 1, name: "John Doe", email: "john@example.com", department: "Engineering", status: "Active" },
+            { id: 2, name: "Jane Smith", email: "jane@example.com", department: "Marketing", status: "Active" },
+            { id: 3, name: "Bob Johnson", email: "bob@example.com", department: "Sales", status: "Inactive" },
+            { id: 4, name: "Alice Brown", email: "alice@example.com", department: "Engineering", status: "Active" },
+            { id: 5, name: "Charlie Wilson", email: "charlie@example.com", department: "HR", status: "Active" },
+            { id: 6, name: "Eva Martinez", email: "eva@example.com", department: "Finance", status: "Active" },
+            { id: 7, name: "Frank Davis", email: "frank@example.com", department: "Engineering", status: "Inactive" },
+            { id: 8, name: "Grace Lee", email: "grace@example.com", department: "Marketing", status: "Active" },
+            { id: 9, name: "Henry Taylor", email: "henry@example.com", department: "Sales", status: "Active" },
+            { id: 10, name: "Iris Chen", email: "iris@example.com", department: "Engineering", status: "Active" },
+            { id: 11, name: "Jack White", email: "jack@example.com", department: "HR", status: "Active" },
+            { id: 12, name: "Karen Green", email: "karen@example.com", department: "Finance", status: "Inactive" }
+        ];
+        
+        // Create a simple test server endpoint
+        window.testDataEndpoint = function(url) {
+            const urlObj = new URL(url, window.location.origin);
+            const page = parseInt(urlObj.searchParams.get('page')) || 1;
+            const limit = parseInt(urlObj.searchParams.get('limit')) || 10;
+            const search = urlObj.searchParams.get('search') || '';
+            const sortBy = urlObj.searchParams.get('sortBy');
+            const sortOrder = urlObj.searchParams.get('sortOrder') || 'asc';
+            
+            // Filter
+            let filtered = testData;
+            if (search) {
+                filtered = testData.filter(item => 
+                    Object.values(item).some(val => 
+                        val.toString().toLowerCase().includes(search.toLowerCase())
+                    )
+                );
+            }
+            
+            // Sort
+            if (sortBy && filtered[0] && sortBy in filtered[0]) {
+                filtered = [...filtered].sort((a, b) => {
+                    const aVal = a[sortBy];
+                    const bVal = b[sortBy];
+                    const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+                    return sortOrder === 'asc' ? comparison : -comparison;
+                });
+            }
+            
+            // Paginate
+            const start = (page - 1) * limit;
+            const paginated = filtered.slice(start, start + limit);
+            
+            return Promise.resolve({
+                data: paginated,
+                total: filtered.length
+            });
+        };
+        
+        function createGrid(mode, perPage) {
+            const container = document.getElementById('grid-container');
+            container.innerHTML = '';
+            
+            const grid = document.createElement('simple-grid');
+            
+            // For demo, use local data for client mode and fake endpoint for server mode
+            if (mode === 'client') {
+                // For client mode, we'll set data directly (would need to modify component to support this)
+                grid.setAttribute('data-source', 'data:application/json,' + encodeURIComponent(JSON.stringify(testData)));
+            } else {
+                grid.setAttribute('data-source', 'http://localhost:3000/device-faults/summary');
+            }
+            
+            grid.setAttribute('columns', JSON.stringify(['id', 'name', 'email', 'department', 'status']));
+            grid.setAttribute('clickable-columns', JSON.stringify(['name', 'email']));
+            grid.setAttribute('mode', mode);
+            grid.setAttribute('per-page', perPage);
+            grid.setAttribute('sort', 'true');
+            grid.setAttribute('search', 'true');
+            
+            // Add event listener
+            grid.addEventListener('cell-click', (e) => {
+                const log = document.getElementById('event-log');
+                const details = document.getElementById('event-details');
+                
+                log.style.display = 'block';
+                details.textContent = JSON.stringify(e.detail, null, 2);
+                
+                console.log('Cell clicked:', e.detail);
+            });
+            
+            container.appendChild(grid);
+        }
+        
+        // Initialize
+        createGrid('client', '10');
+        
+        // Mode selector
+        document.getElementById('mode-selector').addEventListener('change', (e) => {
+            const perPage = document.getElementById('perpage-selector').value;
+            createGrid(e.target.value, perPage);
+        });
+        
+        // Per page selector
+        document.getElementById('perpage-selector').addEventListener('change', (e) => {
+            const mode = document.getElementById('mode-selector').value;
+            createGrid(mode, e.target.value);
+        });
+    </script>
+</body>
+</html>

@@ -255,13 +255,10 @@ export class SimpleGrid extends DynamicElement {
 
             // Re-attach click handlers after any update
             this.gridInstance.on('load', () => {
-                // Use requestAnimationFrame to ensure DOM is updated
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        // Double RAF ensures the browser has completed rendering
-                        this.addEventListeners();
-                    });
-                });
+                // Wait for Grid.js to finish updating the DOM
+                setTimeout(() => {
+                    this.addEventListeners();
+                }, 100);
             });
 
         } catch (err) {

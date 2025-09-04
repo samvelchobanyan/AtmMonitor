@@ -95,7 +95,7 @@
 
 import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/list-view.js";
-import "../components/dynamic/simpleTable.js";  // ADD THIS LINE
+import "../components/dynamic/simpleGrid.js";  // switch to simple grid
 import encode from "../assets/js/utils/encode.js";
 
 class JournalPage extends DynamicElement {
@@ -137,13 +137,13 @@ console.log('template journal');
             <div class="row">
                 <div class="column sm-12">
                     <div class="container">
-                        <simple-table
+                        <simple-grid
                             data-source="/journal/events-journal"
                             columns='["server_date", "code", "card_number", "event_description"]'
                             clickable-columns='["code"]'
-                            pagination-mode="server"
+                            mode="server"
                             per-page="10">
-                        </simple-table>
+                        </simple-grid>
                     </div>
                 </div>
             </div>

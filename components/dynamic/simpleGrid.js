@@ -247,6 +247,7 @@ export class SimpleGrid extends DynamicElement {
                         },
                         total: (resp) => {
                             // Try common fields for total records
+                            if (typeof resp?.data?.total_count === "number") return resp.data.total_count;
                             if (typeof resp?.total === "number") return resp.total;
                             if (typeof resp?.data?.total === "number") return resp.data.total;
                             if (Array.isArray(resp?.data)) return resp.data.length;
@@ -259,9 +260,9 @@ export class SimpleGrid extends DynamicElement {
                         limit: this.state.perPage,
                         server: {
                             url: (prev, page, limit) => {
-                                const offset = page * limit;
                                 const join = prev.includes("?") ? "&" : "?";
-                                return `${prev}${join}limit=${limit}&offset=${offset}`;
+                                // API expects pageSize and 1-based pageNumber
+                                return `${prev}${join}pageSize=${limit}&pageNumber=${page + 1}`;
                             }
                         }
                     },

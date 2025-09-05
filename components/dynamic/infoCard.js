@@ -35,7 +35,6 @@ class InfoCard extends DynamicElement {
     }
   }
 
-  // todo : move to dynamic if needed
   _openMessagesPopup(messages) {
     const modal = document.createElement("modal-popup");
     document.body.appendChild(modal);

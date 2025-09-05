@@ -1,246 +1,259 @@
-import { DynamicElement } from "../core/dynamic-element.js";
-import locationTransformer from "../core/utils/location-transformer.js";
-import { store } from "../core/store/store.js";
-import "../components/dynamic/doughnutTabs.js";
-import "../components/ui/customTab.js";
-import "../components/dynamic/select-box-search.js";
-import "../components/ui/customCheck.js";
-import "../components/dynamic/segment.js";
-import "../components/dynamic/simpleTable.js";
-import "../components/dynamic/select-box-date.js";
-import encode from "../assets/js/utils/encode.js";
+import { DynamicElement } from '../core/dynamic-element.js';
+import locationTransformer from '../core/utils/location-transformer.js';
+import { store } from '../core/store/store.js';
+import '../components/dynamic/doughnutTabs.js';
+import '../components/ui/customTab.js';
+import '../components/dynamic/select-box-search.js';
+import '../components/ui/customCheck.js';
+import '../components/dynamic/segment.js';
+import '../components/dynamic/simpleTable.js';
+import '../components/dynamic/select-box-date.js';
+import encode from '../assets/js/utils/encode.js';
 
 class Incassate extends DynamicElement {
-    constructor() {
-        super();
-        this.state = {
-            summary: null,
-            segments: [],
-            infoCardsSummary: [],
-        };
-        // change link to get new data
-        this.tableLink = "/encashment/summary";
-        this.chosenAtms = [];
-        this.province = [];
-        this.cities = [];
-        this.districts = [];
+  constructor() {
+    super();
+    this.state = {
+      summary: null,
+      segments: [],
+      infoCardsSummary: [],
+    };
+    // change link to get new data
+    this.tableLink = '/encashment/summary';
+    this.chosenAtms = [];
+    this.province = [];
+    this.cities = [];
+    this.districts = [];
 
-        this.activeTab = "";
-        this.checkedValues = new Set();
+    this.activeTab = '';
+    this.checkedValues = new Set();
 
-        this.submitButton = null;
-        this.selectCityBox = null;
-        this.selectDistrictBox = null;
-        this.selectSegmentBox = null;
-        this.dateSelectBox = null;
+    this.submitButton = null;
+    this.selectCityBox = null;
+    this.selectDistrictBox = null;
+    this.selectSegmentBox = null;
+    this.dateSelectBox = null;
+  }
+
+  onConnected() {
+    const state = store.getState();
+
+    this.province = state.regionsData.map((item) => ({
+      label: item.province,
+      value: item.province,
+    }));
+
+    this.cities = locationTransformer.getAllCityOptions(state.regionsData);
+    this.districts = locationTransformer.getAllDistrictOptions(
+      state.regionsData
+    );
+
+    if (this.state.segments.length == 0) this.fetchSegments();
+    this.fetchSummary();
+    this.fetchInfoCardData();
+  }
+
+  onAfterRender() {
+    const tableContainer = this.$('.table-container');
+    if (tableContainer) {
+      tableContainer.innerHTML = this.renderTable(this.tableLink);
     }
 
-    // todo: design fix
+    this.submitButton = this.$('.btn_blue');
+    this.selectCityBox = this.$('#city-search');
+    this.selectDistrictBox = this.$('#districts-search');
+    this.selectSegmentBox = this.$('#segments-search');
+    this.dateSelectBox = this.$('select-box-date');
+  }
 
-    onConnected() {
-        const state = store.getState();
+  async fetchInfoCardData(queryString) {
+    try {
+      const response = await this.fetchData(
+        `/encashment/failed-transactions?${queryString.toString()}`
+      );
+      this.setState({ infoCardsSummary: response.data });
+    } catch (err) {
+      console.error('❌ Error fetching summary:', err);
+      this.setState({ infoCardsSummary: [] });
+    }
+  }
 
-        this.province = state.regionsData.map((item) => ({
-            label: item.province,
-            value: item.province,
-        }));
-
-        this.cities = locationTransformer.getAllCityOptions(state.regionsData);
-        this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
-        this.fetchSegments();
-        this.fetchSummary();
-        this.fetchInfoCardData();
+  async fetchSummary(region, city, province, segmentId) {
+    const queryString = new URLSearchParams();
+    if (region) {
+      queryString.append('district', region);
+    }
+    if (city) {
+      queryString.append('city', city);
+    }
+    if (province) {
+      queryString.append('province', province);
+    }
+    if (segmentId) {
+      queryString.append('segmentId', segmentId);
     }
 
-    onAfterRender() {
-        const tableContainer = this.$(".table-container");
-        if (tableContainer) {
-            tableContainer.innerHTML = this.renderTable(this.tableLink);
-        }
+    // for test to get data
+    queryString.append('startDate', '2025-06-27');
+    queryString.append('startDate', '2025-08-11');
 
-        console.log(tableContainer);
-
-        this.submitButton = this.$(".btn_blue");
-        this.selectCityBox = this.$("#city-search");
-        this.selectDistrictBox = this.$("#districts-search");
-        this.selectSegmentBox = this.$("#segments-search");
-        this.dateSelectBox = this.$("select-box-date");
+    this.fetchInfoCardData(queryString);
+    try {
+      this.tableLink = `/encashment/summary?${queryString}`;
+    } catch (err) {
+      console.error('❌ Error fetching summary:', err);
     }
+  }
 
-    async fetchInfoCardData(queryString) {
-        try {
-            const response = await this.fetchData(`/encashment/failed-transactions?${queryString.toString()}`);
-            this.setState({ infoCardsSummary: response.data });
-        } catch (err) {
-            console.error("❌ Error fetching summary:", err);
-            this.setState({ infoCardsSummary: [] });
-        }
+  async fetchSegments() {
+    try {
+      const response = await this.fetchData('/atm/segments');
+      this.setState({
+        segments: response.data.map((item) => ({
+          value: item.id,
+          text: item.name,
+        })),
+      });
+    } catch (err) {
+      console.error('❌ Error fetching segmentItems:', err);
+      this.setState({
+        segments: [],
+      });
     }
+  }
 
-    async fetchSummary(region, city, province, segmentId) {
-        const queryString = new URLSearchParams();
-        if (region) {
-            queryString.append("district", region);
-        }
-        if (city) {
-            queryString.append("city", city);
-        }
-        if (province) {
-            queryString.append("province", province);
-        }
-        if (segmentId) {
-            queryString.append("segmentId", segmentId);
-        }
+  addEventListeners() {
+    this.submitButtonListener();
+    this.checkboxesListener();
+    this.tabsListener();
 
-        // for test to get data
-        queryString.append("startDate", "2025-06-27");
-        queryString.append("startDate", "2025-08-11");
+    if (this.dateSelectBox) {
+      this.addListener(this.dateSelectBox, 'date-range-change', (e) => {
+        const { startDate, endDate } = e.detail || {};
+        if (!startDate || !endDate) return;
 
+        this.setAttribute('start-date', startDate);
+        this.setAttribute('end-date', endDate);
+
+        const queryString = this.buildQueryString(startDate, endDate);
         this.fetchInfoCardData(queryString);
-        try {
-            this.tableLink = `/encashment/summary?${queryString}`;
-        } catch (err) {
-            console.error("❌ Error fetching summary:", err);
+        this.tableLink = `/encashment/summary?${queryString}`;
+
+        const tableContainer = this.$('.table-container');
+        if (tableContainer) {
+          tableContainer.innerHTML = this.renderTable(this.tableLink);
         }
+      });
+    }
+  }
+
+  checkboxesListener() {
+    const checkboxes = this.$$('custom-checkbox');
+    if (this.activeTab == '') {
+      this.activeTab = 'province';
     }
 
-    async fetchSegments() {
-        try {
-            const response = await this.fetchData("/atm/segments");
-            this.setState({
-                segments: response.data.map((item) => ({
-                    value: item.id,
-                    text: item.name,
-                })),
-            });
-        } catch (err) {
-            console.error("❌ Error fetching segmentItems:", err);
-            this.setState({
-                segments: [],
-            });
+    checkboxes.forEach((checkbox) => {
+      const val = checkbox.getAttribute('value');
+
+      this.addListener(checkbox, 'change', () => {
+        const input = checkbox.querySelector('input[type="checkbox"]');
+
+        if (input && input.checked) {
+          this.checkedValues.add(val);
+        } else {
+          this.checkedValues.delete(val);
         }
-    }
+      });
+    });
+  }
 
-    addEventListeners() {
-        this.submitButtonListener();
-        this.checkboxesListener();
-        this.tabsListener();
+  submitButtonListener() {
+    if (!this.submitButton) return;
 
-        if (this.dateSelectBox) {
-            this.addListener(this.dateSelectBox, "date-range-change", (e) => {
-                const { startDate, endDate } = e.detail || {};
-                if (!startDate || !endDate) return;
+    this.addListener(this.submitButton, 'click', () => {
+      const dateComponent = this.querySelector('select-box-date');
+      const startDate = dateComponent?.startDate || null;
+      const endDate = dateComponent?.endDate || null;
 
-                this.setAttribute("start-date", startDate);
-                this.setAttribute("end-date", endDate);
+      const queryString = this.buildQueryString(startDate, endDate);
+      this.fetchInfoCardData(queryString);
 
-                const queryString = this.buildQueryString(startDate, endDate);
-                this.fetchInfoCardData(queryString);
-                this.tableLink = `/encashment/summary?${queryString}`;
+      this.tableLink = `/encashment/summary?${queryString}`;
+      const tableContainer = this.$('.table-container');
+      if (tableContainer) {
+        tableContainer.innerHTML = this.renderTable(this.tableLink);
+      }
+    });
+  }
 
-                const tableContainer = this.$(".table-container");
-                if (tableContainer) {
-                    tableContainer.innerHTML = this.renderTable(this.tableLink);
-                }
-            });
-        }
-    }
+  tabsListener() {
+    const tabs = this.$$('custom-tab');
 
-    checkboxesListener() {
-        const checkboxes = this.$$("custom-checkbox");
-        if (this.activeTab == "") {
-            this.activeTab = "province";
-        }
+    tabs.forEach((tab) => {
+      this.addListener(tab, 'click', () => {
+        const selectedTabName = tab.getAttribute('name');
 
-        checkboxes.forEach((checkbox) => {
-            const val = checkbox.getAttribute("value");
+        // Store active tab so submitButtonListener knows which one is active
+        this.activeTab = selectedTabName;
+      });
+    });
+  }
 
-            this.addListener(checkbox, "change", () => {
-                const input = checkbox.querySelector('input[type="checkbox"]');
-
-                if (input && input.checked) {
-                    this.checkedValues.add(val);
-                } else {
-                    this.checkedValues.delete(val);
-                }
-            });
-        });
-    }
-
-    submitButtonListener() {
-        if (!this.submitButton) return;
-
-        this.addListener(this.submitButton, "click", () => {
-            const dateComponent = this.querySelector("select-box-date");
-            const startDate = dateComponent?.startDate || null;
-            const endDate = dateComponent?.endDate || null;
-
-            const queryString = this.buildQueryString(startDate, endDate);
-            this.fetchInfoCardData(queryString);
-
-            this.tableLink = `/encashment/summary?${queryString}`;
-            const tableContainer = this.$(".table-container");
-            if (tableContainer) {
-                tableContainer.innerHTML = this.renderTable(this.tableLink);
-            }
-        });
-    }
-
-    tabsListener() {
-        const tabs = this.$$("custom-tab");
-
-        tabs.forEach((tab) => {
-            this.addListener(tab, "click", () => {
-                const selectedTabName = tab.getAttribute("name");
-
-                // Store active tab so submitButtonListener knows which one is active
-                this.activeTab = selectedTabName;
-            });
-        });
-    }
-
-    renderTable(link) {
-        return /*html*/ `
+  renderTable(link) {
+    return /*html*/ `
             <simple-table
                 data-source=${link}
                 columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'>
             </simple-table>
-        </div>`;
+        `;
+  }
+
+  buildQueryString(startDate = null, endDate = null) {
+    const queryString = new URLSearchParams();
+
+    // Add tab-specific filters
+    if (this.activeTab === 'province') {
+      const checkedValues = Array.from(this.checkedValues);
+      const segments = this.querySelector(
+        "segment-block[name='province-segments']"
+      );
+      checkedValues.forEach((v) => queryString.append('provinces', v));
+      if (segments?.values?.length)
+        segments.values.forEach((v) => queryString.append('segmentIds', v));
+    } else if (this.activeTab === 'city') {
+      const values = this.selectCityBox.getAttribute('value')?.split(',') || [];
+      values.forEach((v) => queryString.append('cities', v));
+      const segments = this.querySelector(
+        "segment-block[name='city-segments']"
+      );
+      if (segments?.values?.length)
+        segments.values.forEach((v) => queryString.append('segmentIds', v));
+    } else if (this.activeTab === 'district') {
+      const values =
+        this.selectDistrictBox.getAttribute('value')?.split(',') || [];
+      values.forEach((v) => queryString.append('districts', v));
+      const segments = this.querySelector(
+        "segment-block[name='district-segments']"
+      );
+      if (segments?.values?.length)
+        segments.values.forEach((v) => queryString.append('segmentIds', v));
+    } else if (this.activeTab === 'segment') {
+      const rawVal = this.selectSegmentBox.getAttribute('value') || '[]';
+      JSON.parse(rawVal).forEach((v) =>
+        queryString.append('segmentIds', Number(v))
+      );
     }
+    // Add date filters if provided
+    if (startDate) queryString.append('startDate', startDate);
+    if (endDate) queryString.append('endDate', endDate);
 
-    buildQueryString(startDate = null, endDate = null) {
-        const queryString = new URLSearchParams();
+    return queryString;
+  }
 
-        // Add tab-specific filters
-        if (this.activeTab === "province") {
-            const checkedValues = Array.from(this.checkedValues);
-            const segments = this.querySelector("segment-block[name='province-segments']");
-            checkedValues.forEach((v) => queryString.append("provinces", v));
-            if (segments?.values?.length) segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "city") {
-            const values = this.selectCityBox.getAttribute("value")?.split(",") || [];
-            values.forEach((v) => queryString.append("cities", v));
-            const segments = this.querySelector("segment-block[name='city-segments']");
-            if (segments?.values?.length) segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "district") {
-            const values = this.selectDistrictBox.getAttribute("value")?.split(",") || [];
-            values.forEach((v) => queryString.append("districts", v));
-            const segments = this.querySelector("segment-block[name='district-segments']");
-            if (segments?.values?.length) segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "segment") {
-            const rawVal = this.selectSegmentBox.getAttribute("value") || "[]";
-            JSON.parse(rawVal).forEach((v) => queryString.append("segmentIds", Number(v)));
-        }
-        // Add date filters if provided
-        if (startDate) queryString.append("startDate", startDate);
-        if (endDate) queryString.append("endDate", endDate);
-
-        return queryString;
-    }
-
-    template() {
-        if (this.state.segments.length == 0) {
-            return /*html*/ `
+  template() {
+    if (this.state.segments.length == 0) {
+      return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
                     <div class="loading">
@@ -250,13 +263,13 @@ class Incassate extends DynamicElement {
                 </div>
             </div>
             `;
-        }
+    }
 
-        const cities = encode(this.cities);
-        const districts = encode(this.districts);
-        const segments = encode(this.state.segments);
+    const cities = encode(this.cities);
+    const districts = encode(this.districts);
+    const segments = encode(this.state.segments);
 
-        return /*html*/ `
+    return /*html*/ `
         <div class="row">
             <div class="column sm-12">
                 <div class="container">
@@ -268,13 +281,24 @@ class Incassate extends DynamicElement {
                             <custom-tab name="segment">Սեգմենտ</custom-tab>
                         </div>
                         <select-box-date
-                            start-date="${this.getAttr("start-date")}"
-                            end-date="${this.getAttr("end-date")}"
+                            start-date="${this.getAttr('start-date')}"
+                            end-date="${this.getAttr('end-date')}"
                         ></select-box-date>
                     </div>
                     <div class="tab-content" data-tab="province">
                     <div class="checkboxes">
-                            ${this.province.map((el) => `<custom-checkbox id="${el.value}" value="${el.value}"   ${this.checkedValues.has(el.value) ? "checked" : ""}>${el.label} </custom-checkbox>`).join("")}
+                            ${this.province
+                              .map(
+                                (el) =>
+                                  `<custom-checkbox id="${el.value}" value="${
+                                    el.value
+                                  }"   ${
+                                    this.checkedValues.has(el.value)
+                                      ? 'checked'
+                                      : ''
+                                  }>${el.label} </custom-checkbox>`
+                              )
+                              .join('')}
                     </div>  
                     <segment-block decor name='province-segments'></segment-block>
                 </div>
@@ -304,8 +328,14 @@ class Incassate extends DynamicElement {
                 <div class="row">
                     <div class="column sm-6">
                         <div class="infos infos_margin">
-                            <info-card title="Այսօրվա ինկասացիաներ" value="${this.state.infoCardsSummary.failed_transactions_count}" value-color="color-blue" icon="icon icon-box" show-border="true"> </info-card>
-                            <info-card title="Այսօր հետ բերված գումար" value="${this.state.infoCardsSummary.failed_transactions_amount}" value-currency="֏" value-color="color-blue" icon="icon icon-arrow-down-left" show-border="true"> </info-card>
+                            <info-card title="Այսօրվա ինկասացիաներ" value="${
+                              this.state.infoCardsSummary
+                                .failed_transactions_count
+                            }" value-color="color-blue" icon="icon icon-box" show-border="true"> </info-card>
+                            <info-card title="Այսօր հետ բերված գումար" value="${
+                              this.state.infoCardsSummary
+                                .failed_transactions_amount
+                            }" value-currency="֏" value-color="color-blue" icon="icon icon-arrow-down-left" show-border="true"> </info-card>
                         </div>
                     </div>
                 </div>
@@ -315,7 +345,7 @@ class Incassate extends DynamicElement {
 
 
         `;
-    }
+  }
 }
 
-customElements.define("incassate-analythics", Incassate);
+customElements.define('incassate-analythics', Incassate);

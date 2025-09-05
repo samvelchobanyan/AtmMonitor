@@ -105,7 +105,7 @@ class PollingService {
   setupVisibilityListener() {
     document.addEventListener('visibilitychange', () => {
       this.isTabVisible = !document.hidden;
-      console.log(`[PollingService] Tab visibility changed: ${this.isTabVisible ? 'visible' : 'hidden'}`);
+      // console.log(`[PollingService] Tab visibility changed: ${this.isTabVisible ? 'visible' : 'hidden'}`);
       
       // Resume/pause all active pollers
       this.pollers.forEach((poller, pollerId) => {

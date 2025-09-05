@@ -129,7 +129,7 @@ class inOut extends DynamicElement {
                 </div>
                 <div class="column sm-12">
                     <div class="container">
-                        <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
+                        <container-top icon="icon-dollar-sign" title="Արտարժույթի փոխանակում"></container-top>
                         <div class="infos">
                             ${exchangeData
                                 .map((exchange) => {

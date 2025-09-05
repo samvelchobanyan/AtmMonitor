@@ -1,6 +1,9 @@
-import { DynamicElement } from "../../core/dynamic-element.js";
-import "./select-box.js";
-import { openDateRangePopup, resolvePeriodToDates } from "../../core/utils/date-utils.js";
+import { DynamicElement } from '../../core/dynamic-element.js';
+import './select-box.js';
+import {
+  openDateRangePopup,
+  resolvePeriodToDates,
+} from '../../core/utils/date-utils.js';
 
 class SelectBoxDate extends DynamicElement {
   constructor() {
@@ -8,11 +11,11 @@ class SelectBoxDate extends DynamicElement {
     this.selectEl = null;
     this.startDate = null;
     this.endDate = null;
-    this.period = "today";
+    this.period = 'today';
   }
 
   static get observedAttributes() {
-    return ["start-date", "end-date"];
+    return ['start-date', 'end-date'];
   }
 
   onConnected() {
@@ -21,11 +24,11 @@ class SelectBoxDate extends DynamicElement {
   }
 
   onAttributeChange(name, oldValue, newValue) {
-    if (name === "start-date" || name === "end-date") {
+    if (name === 'start-date' || name === 'end-date') {
       this._updateFromAttributes();
       if (this.selectEl) {
         this.selectEl.value = this.period;
-        if (this.period === "custom") {
+        if (this.period === 'custom') {
           this._setCustomLabel(this.startDate, this.endDate);
         }
       }
@@ -33,10 +36,10 @@ class SelectBoxDate extends DynamicElement {
   }
 
   onAfterRender() {
-    this.selectEl = this.$("select-box");
+    this.selectEl = this.$('select-box');
     if (this.selectEl) {
       this.selectEl.value = this.period;
-      if (this.period === "custom") {
+      if (this.period === 'custom') {
         this._setCustomLabel(this.startDate, this.endDate);
       }
     }
@@ -44,23 +47,25 @@ class SelectBoxDate extends DynamicElement {
 
   addEventListeners() {
     if (this.selectEl) {
-      this.addListener(this.selectEl, "change", this.onSelectChange);
+      this.addListener(this.selectEl, 'change', this.onSelectChange);
+      this.addListener(this.selectEl, 'click', this.onSelectClick);
     }
   }
 
   onSelectChange(e) {
     const val = e.target.value;
-    if (val === "custom") {
+
+    if (val === 'custom') {
       openDateRangePopup().then((range) => {
         if (range && range.startDate && range.endDate) {
           this.startDate = range.startDate;
           this.endDate = range.endDate;
-          this.period = "custom";
+          this.period = 'custom';
           this._setCustomLabel(this.startDate, this.endDate);
-          this.dispatch("date-range-change", {
+          this.dispatch('date-range-change', {
             startDate: this.startDate,
             endDate: this.endDate,
-            period: "custom",
+            period: 'custom',
           });
         }
       });
@@ -70,7 +75,8 @@ class SelectBoxDate extends DynamicElement {
         this.startDate = range.startDate;
         this.endDate = range.endDate;
         this.period = val;
-        this.dispatch("date-range-change", {
+
+        this.dispatch('date-range-change', {
           startDate: this.startDate,
           endDate: this.endDate,
           period: val,
@@ -79,14 +85,21 @@ class SelectBoxDate extends DynamicElement {
     }
   }
 
+  onSelectClick(e) {
+    if (this.selectEl.value === 'custom') {
+      // force open custom date picker again
+      this.onSelectChange({ target: { value: 'custom' } });
+    }
+  }
+
   _updateFromAttributes() {
-    this.startDate = this.getAttr("start-date") || null;
-    this.endDate = this.getAttr("end-date") || null;
+    this.startDate = this.getAttr('start-date') || null;
+    this.endDate = this.getAttr('end-date') || null;
     this.period = this._datesToPeriod(this.startDate, this.endDate);
   }
 
   _datesToPeriod(start, end) {
-    if (!start || !end) return "today";
+    if (!start || !end) return 'today';
     const today = new Date();
     const todayStr = today.toISOString().slice(0, 10);
     const weekEnd = new Date(today);
@@ -94,23 +107,23 @@ class SelectBoxDate extends DynamicElement {
     const weekEndStr = weekEnd.toISOString().slice(0, 10);
 
     if (start === todayStr && end === todayStr) {
-      return "today";
+      return 'today';
     }
     if (start === todayStr && end === weekEndStr) {
-      return "week";
+      return 'week';
     }
-    return "custom";
+    return 'custom';
   }
 
   _setCustomLabel(start, end) {
     if (!this.selectEl) return;
-    const wrap = this.selectEl.querySelector(".combo-box-selected-wrap");
+    const wrap = this.selectEl.querySelector('.combo-box-selected-wrap');
     if (wrap) wrap.textContent = `${start} – ${end}`;
-    this.selectEl.value = "custom";
+    this.selectEl.value = 'custom';
   }
 
   template() {
-    return /* html */`
+    return /* html */ `
       <select-box
         value="${this.period}"
         options='[
@@ -124,4 +137,4 @@ class SelectBoxDate extends DynamicElement {
 }
 
 export { SelectBoxDate };
-customElements.define("select-box-date", SelectBoxDate);
+customElements.define('select-box-date', SelectBoxDate);

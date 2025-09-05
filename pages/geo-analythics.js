@@ -283,7 +283,7 @@ class GeoAnalythics extends DynamicElement {
         <div class="row">
            <div class="column sm-6">
               <div class="container">
-                  <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
+                  <container-top icon="icon-dollar-sign" title="Արտարժույթի փոխանակում"></container-top>
                   <div class="infos">
                       ${firstExchangeData
                           .map((exchange) => {
@@ -304,7 +304,7 @@ class GeoAnalythics extends DynamicElement {
 
             <div class="column sm-6">
               <div class="container">
-                  <container-top icon="icon-coins" title="Արտարժույթի փոխանակում"></container-top>
+                  <container-top icon-dollar-sign title="Արտարժույթի փոխանակում"></container-top>
                   <div class="infos">
                       ${secondExchangeData
                           .map((exchange) => {

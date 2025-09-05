@@ -16,6 +16,16 @@ function transformFaultTableData(apiResponse) {
             collected_amount: item.collected_amount,
             marked_as_empty: item.marked_as_empty,
         }));
+    }else if (apiResponse.data.events) {
+        return apiResponse.data.events.map((item) => ({
+            date: item.date,
+            server_date: item.server_date,
+            code: item.code,
+            card_number: item.card_number,
+            event_description: item.event_description,
+            atm_id: item.atm_id,
+            transaction_id: item.transaction_id,
+        }));
     } else if (Array.isArray(apiResponse.data)) {
         return apiResponse.data.map((item) => ({
             province: item.province,

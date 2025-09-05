@@ -1,6 +1,7 @@
 // components/dynamic/simpleGrid.js
 import { DynamicElement } from "../../core/dynamic-element.js";
 import tableTransformer from "../../core/utils/table-transformer.js";
+import { api } from "../../core/api-client.js";
 
 // Lazy-load Grid.js once for all instances
 let gridJsModulePromise = null;
@@ -38,7 +39,6 @@ export class SimpleGrid extends DynamicElement {
             perPage: 10,
         };
         this.grid = null;
-        this.latestServerUrl = null;
     }
 
     static get observedAttributes() {
@@ -102,6 +102,8 @@ export class SimpleGrid extends DynamicElement {
         const val = parseInt(raw, 10);
         return isNaN(val) ? 10 : val;
     }
+
+    
 
     async loadData() {
         const mode = this.getModeOption();
@@ -207,7 +209,8 @@ export class SimpleGrid extends DynamicElement {
             };
 
             const mode = this.state.mode;
-            const endpoint = this.getAttr("data-source");
+            let endpoint = this.getAttr("data-source");
+            
 
             if (mode === "client") {
                 const dataArray = this.state.data.map(row => this.state.columns.map(c => row[c] ?? ""));
@@ -217,11 +220,11 @@ export class SimpleGrid extends DynamicElement {
                 });
             } else {
                 // Server mode
-                this.latestServerUrl = endpoint;
+                const absoluteUrl = api.buildUrl(endpoint);
                 this.grid = new Grid({
                     ...baseConfig,
                     server: {
-                        url: endpoint,
+                        url: absoluteUrl,
                         then: (resp) => {
                             // Expect API similar to existing transformer structures.
                             // We reuse transformer for mapping shape. If the server already returns sliced data,

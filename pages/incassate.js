@@ -24,7 +24,7 @@ class Incassate extends DynamicElement {
         this.cities = [];
         this.districts = [];
 
-        this.activeTab = "";
+        this.activeTab = "province";
         this.checkedValues = new Set();
 
         this.submitButton = null;
@@ -61,6 +61,8 @@ class Incassate extends DynamicElement {
         this.selectDistrictBox = this.$("#districts-search");
         this.selectSegmentBox = this.$("#segments-search");
         this.dateSelectBox = this.$("select-box-date");
+
+        this.tabsListener();
     }
 
     async fetchInfoCardData(queryString) {
@@ -112,7 +114,6 @@ class Incassate extends DynamicElement {
     addEventListeners() {
         this.submitButtonListener();
         this.checkboxesListener();
-        this.tabsListener();
 
         if (this.dateSelectBox) {
             this.addListener(this.dateSelectBox, "date-range-change", (e) => {
@@ -136,9 +137,6 @@ class Incassate extends DynamicElement {
 
     checkboxesListener() {
         const checkboxes = this.$$("custom-checkbox");
-        if (this.activeTab == "") {
-            this.activeTab = "province";
-        }
 
         checkboxes.forEach((checkbox) => {
             const val = checkbox.getAttribute("value");
@@ -278,7 +276,7 @@ class Incassate extends DynamicElement {
                         <button type="submit" class="btn btn_fit btn_blue btn_md">Հաստատել</button>
                     </div>
                 </div>
-            </div>
+            </div> 
         </div>
         <div class="row">
             <div class="column sm-12">

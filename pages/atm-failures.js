@@ -1,118 +1,373 @@
-import { DynamicElement } from '../core/dynamic-element.js';
-import '../components/dynamic/chartComponent.js';
-import '../components/dynamic/infoCard.js';
-import '../components/ui/customTab.js';
-import '../components/dynamic/simpleTable.js';
-import '../components/dynamic/select-box.js';
-import '../components/dynamic/select-box-date.js';
+import { DynamicElement } from "../core/dynamic-element.js";
+import "../components/dynamic/chartComponent.js";
+import "../components/dynamic/infoCard.js";
+import "../components/ui/customTab.js";
+import "../components/dynamic/simpleTable.js";
+import "../components/dynamic/select-box.js";
+import "../components/dynamic/select-box-date.js";
+import "../components/ui/customTab.js";
+import "../components/dynamic/select-box-search.js";
+import "../components/ui/customCheck.js";
+import "../components/dynamic/segment.js";
+import { store } from "../core/store/store.js";
+import locationTransformer from "../core/utils/location-transformer.js";
+import encode from "../assets/js/utils/encode.js";
 
 class AtmFailures extends DynamicElement {
-  constructor() {
-    super();
-    const today = new Date().toISOString().split('T')[0];
+    constructor() {
+        super();
+        this.state = {
+            topSummary: null,
+            devicesTypeSummary: null,
+            chartData: null,
+        };
 
-    this.selectedCity = null;
-    this.selectedRegion = null;
-    this.startDate = today;
-    this.endDate = null;
+        this.selectedCity = null;
+        this.selectedRegion = null;
+        this.startDate = null;
+        this.endDate = null;
+        this.province = [];
+        this.cities = [];
+        this.districts = [];
+        this.activeTab = "province";
+        this.checkedValues = new Set();
+        this.submitButton = null;
+        this.selectCityBox = null;
+        this.selectDistrictBox = null;
+        this.selectSegmentBox = null;
+        this.dateSelectBox = null;
+        this.segments = null;
 
-    this.tableLink = `/device-faults/summary?startDate=${today}`;
-  }
-
-  onAfterRender() {
-    const tableContainer = this.$('.table-container');
-    if (tableContainer) {
-      tableContainer.innerHTML = this.renderTable(this.tableLink);
+        this.tableLink = `/device-faults/summary`;
     }
-  }
 
-  buildQuery() {
-    const queryString = new URLSearchParams();
+    onConnected() {
+        const state = store.getState();
 
-    if (this.selectedRegion)
-      queryString.append('district', this.selectedRegion);
-    if (this.selectedCity) queryString.append('city', this.selectedCity);
-    if (this.startDate) queryString.append('startDate', this.startDate);
-    if (this.endDate) queryString.append('endDate', this.endDate);
+        this.province = state.regionsData.map((item) => ({
+            label: item.province,
+            value: item.province,
+        }));
 
-    return `/device-faults/summary?${queryString.toString()}`;
-  }
+        this.cities = locationTransformer.getAllCityOptions(state.regionsData);
+        this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
+        this.fetchSummary();
+    }
 
-  updateTableSource() {
-    const table = this.$('simple-table');
-    if (table) {
-      const newSource = this.buildQuery();
-      if (table.getAttribute('data-source') !== newSource) {
-        this.tableLink = newSource;
-        const tableContainer = this.$('.table-container');
+    onStoreChange(storeState) {
+        this.segments = storeState.segments.map((item) => ({
+            value: item.id,
+            text: item.name,
+        }));
+    }
 
-        if (tableContainer) {
-          tableContainer.innerHTML = this.renderTable(this.tableLink);
+    async fetchTopSummary() {
+        // const queryString = this.buildQueryString(this.startDate, this.endDate);
+        // for test hardcoded dates
+        const queryString = this.buildQueryString("2025-02-10", "2025-06-10");
+
+        try {
+            const response = await this.fetchData(`/device-faults/summary?${queryString}`);
+
+            this.setState({
+                topSummary: response.data.top_faulting_atms,
+            });
+        } catch (err) {
+            console.error("❌ Error fetching summary:", err);
+            this.setState({ summary: null });
         }
-      }
-    }
-  }
-
-  onStoreChange(storeState) {
-    const region = storeState.selectedRegion;
-    const city = storeState.selectedCity;
-
-    if (region !== this.selectedRegion || city !== this.selectedCity) {
-      this.selectedRegion = region;
-      this.selectedCity = city;
-      this.updateTableSource();
-    }
-  }
-
-  addEventListeners() {
-    const dateSelector = this.$('select-box-date');
-    const table = this.$('simple-table');
-    if (dateSelector) {
-      this.addListener(dateSelector, 'date-range-change', (e) => {
-        const { startDate, endDate } = e.detail;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.updateTableSource();
-      });
     }
 
-    table?.addEventListener('cell-click', (e) => {
-      const { column, cellValue, rowData } = e.detail;
-    });
-  }
+    async fetchChartSummary() {
+        // const queryString = this.buildQueryString(this.startDate, this.endDate);
+        // for test hardcoded dates
+        const queryString = this.buildQueryString("2025-02-10", "2025-06-10");
 
-  renderTable(link) {
-    return /*html*/ `
-            <div class="container">
-              <simple-table
-                data-source=${link}
-                columns='["atm_and_address", "total_faults", "faults_summary"]'
-                clickable-columns='["faults_summary"]'>
-              </simple-table>
-          </div>
-        </div>`;
-  }
+        try {
+            const chartResponse = await this.fetchData(`/device-faults/summary?${queryString}`);
+            const tableResponse = await this.fetchData(`/device-faults/by-device-type?${queryString}`);
+            console.log("response.data", chartResponse.data);
 
-  template() {
-    return /*html*/ `
+            this.setState({
+                devicesTypeSummary: tableResponse.data,
+                chartData: chartResponse.data.faults_by_device_type,
+            });
+        } catch (err) {
+            console.error("❌ Error fetching summary:", err);
+            this.setState({ summary: null });
+        }
+    }
+
+    submitButtonListener() {
+        if (!this.submitButton) return;
+
+        this.addListener(this.submitButton, "click", () => {
+            const dateComponent = this.querySelector("select-box-date");
+            const startDate = dateComponent?.startDate || null;
+            const endDate = dateComponent?.endDate || null;
+
+            const queryString = this.buildQueryString(startDate, endDate);
+
+            console.log("queryString", queryString);
+
+            // this.fetchInfoCardData(queryString);
+
+            // this.tableLink = `/device-faults/summary?${queryString}`;
+            // const tableContainer = this.$(".table-container");
+            // if (tableContainer) {
+            //     tableContainer.innerHTML = this.renderTable(this.tableLink);
+            // }
+        });
+    }
+
+    tabsListener() {
+        const tabs = this.$$("custom-tab");
+        tabs.forEach((tab) => {
+            this.addListener(tab, "click", () => {
+                const selectedTabName = tab.getAttribute("name");
+                // Store active tab so submitButtonListener knows which one is active
+                this.activeTab = selectedTabName;
+            });
+        });
+    }
+
+    buildQueryString(startDate = null, endDate = null) {
+        const queryString = new URLSearchParams();
+
+        // Add tab-specific filters
+        if (this.activeTab === "province") {
+            const checkedValues = Array.from(this.checkedValues);
+            const segments = this.querySelector("segment-block[name='province-segments']");
+            checkedValues.forEach((v) => queryString.append("provinces", v));
+            if (segments?.values?.length)
+                segments.values.forEach((v) => queryString.append("segmentIds", v));
+        } else if (this.activeTab === "city") {
+            const values = this.selectCityBox.getAttribute("value")?.split(",") || [];
+            values.forEach((v) => queryString.append("cities", v));
+            const segments = this.querySelector("segment-block[name='city-segments']");
+            if (segments?.values?.length)
+                segments.values.forEach((v) => queryString.append("segmentIds", v));
+        } else if (this.activeTab === "district") {
+            const values = this.selectDistrictBox.getAttribute("value")?.split(",") || [];
+            values.forEach((v) => queryString.append("districts", v));
+            const segments = this.querySelector("segment-block[name='district-segments']");
+            if (segments?.values?.length)
+                segments.values.forEach((v) => queryString.append("segmentIds", v));
+        } else if (this.activeTab === "segment") {
+            const rawVal = this.selectSegmentBox.getAttribute("value") || "[]";
+            JSON.parse(rawVal).forEach((v) => queryString.append("segmentIds", Number(v)));
+        }
+        // Add date filters if provided
+        if (startDate) queryString.append("startDate", startDate);
+        if (endDate) queryString.append("endDate", endDate);
+
+        return queryString;
+    }
+
+    onAfterRender() {
+        // const tableContainer = this.$(".table-container");
+        // if (tableContainer) {
+        //     tableContainer.innerHTML = this.renderTable(this.tableLink);
+        // }
+
+        this.submitButton = this.$(".btn_blue");
+        this.selectCityBox = this.$("#city-search");
+        this.selectDistrictBox = this.$("#districts-search");
+        this.selectSegmentBox = this.$("#segments-search");
+        this.dateSelectBox = this.$("select-box-date");
+        this.tabsListener();
+    }
+
+    buildQuery() {
+        const queryString = new URLSearchParams();
+
+        if (this.selectedRegion) queryString.append("district", this.selectedRegion);
+        if (this.selectedCity) queryString.append("city", this.selectedCity);
+        if (this.startDate) queryString.append("startDate", this.startDate);
+        if (this.endDate) queryString.append("endDate", this.endDate);
+
+        return `/device-faults/summary?${queryString.toString()}`;
+    }
+
+    // updateTableSource() {
+    //     const table = this.$("simple-table");
+    //     if (table) {
+    //         const newSource = this.buildQuery();
+    //         if (table.getAttribute("data-source") !== newSource) {
+    //             this.tableLink = newSource;
+    //             const tableContainer = this.$(".table-container");
+
+    //             if (tableContainer) {
+    //                 tableContainer.innerHTML = this.renderTable(this.tableLink);
+    //             }
+    //         }
+    //     }
+    // }
+
+    onStoreChange(storeState) {
+        const region = storeState.selectedRegion;
+        const city = storeState.selectedCity;
+
+        if (region !== this.selectedRegion || city !== this.selectedCity) {
+            this.selectedRegion = region;
+            this.selectedCity = city;
+            // this.updateTableSource();
+        }
+    }
+
+    addEventListeners() {
+        this.submitButtonListener();
+        this.checkboxesListener();
+
+        const dateSelector = this.$("select-box-date");
+        const table = this.$("simple-table");
+        if (dateSelector) {
+            this.addListener(dateSelector, "date-range-change", (e) => {
+                const { startDate, endDate } = e.detail;
+                this.startDate = startDate;
+                this.endDate = endDate;
+                // this.updateTableSource();
+            });
+        }
+
+        table?.addEventListener("cell-click", (e) => {
+            const { column, cellValue, rowData } = e.detail;
+        });
+    }
+
+    checkboxesListener() {
+        const checkboxes = this.$$("custom-checkbox");
+
+        checkboxes.forEach((checkbox) => {
+            const val = checkbox.getAttribute("value");
+
+            this.addListener(checkbox, "change", () => {
+                const input = checkbox.querySelector('input[type="checkbox"]');
+
+                if (input && input.checked) {
+                    this.checkedValues.add(val);
+                } else {
+                    this.checkedValues.delete(val);
+                }
+            });
+        });
+    }
+
+    // renderTable(link) {
+    //     return /*html*/ `
+    //         <div class="container">
+    //           <simple-table
+    //             data-source=${link}
+    //             columns='["atm_and_address", "total_faults", "faults_summary"]'
+    //             clickable-columns='["faults_summary"]'>
+    //           </simple-table>
+    //       </div>
+    //     </div>`;
+    // }
+
+    template() {
+        const cities = encode(this.cities);
+        const districts = encode(this.districts);
+        const segments = encode(this.segments);
+        console.log("state", this.state);
+
+        const topFailures = encode({
+            top_faulting_atms: this.state.topSummary,
+        });
+
+        const faultsByDevice = encode({
+            faults_by_device_type: this.state.devicesTypeSummary,
+        });
+        if (!this.state.topSummary || !this.state.devicesTypeSummary) {
+            return /*html*/ `
+            <div class="row">
+                <div class="column sm-12">
+                    <div class="loading">
+                        <div class="loading__spinner spinner"></div>
+                        <div class="loading__text">Տվյալները բեռնվում են…</div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
                     <div class="container">
                         <div class="select-container">
                             <container-top icon="icon-x-octagon" title="Ամենահաճախ փչացող 10 բանկոմատները"> </container-top>
                              <select-box-date
-                                start-date="${
-                                  this.startDate ? this.startDate : ''
-                                }"
-                                end-date="${this.endDate ? this.endDate : ''}"
+                                start-date="${this.startDate ? this.startDate : ""}"
+                                end-date="${this.endDate ? this.endDate : ""}"
                             ></select-box-date>
-                        </div>  
-                          <div class="table-container"></div>
+                         </div>  
+                        
+                    <div class="container">
+                        <simple-table
+                          data='${topFailures}'
+                          columns='["atm_and_address", "total_faults", "faults_summary"]'
+                          clickable-columns='["faults_summary"]'>
+                        </simple-table>
+                    </div>  
+                    </div>
+                  </div>
+
+              <div class="column sm-12">
+                <div class="container">
+                    <div class="tabs-container">
+                        <div class="tabs">
+                            <custom-tab name="province" active>Մարզ</custom-tab>
+                            <custom-tab name="city">Քաղաք</custom-tab>
+                            <custom-tab name="district">Համայնք</custom-tab>
+                            <custom-tab name="segment">Սեգմենտ</custom-tab>
                         </div>
-                        </div>
-                        </div>
-                        `;
-  }
+                        <select-box-date
+                            start-date="${this.getAttr("start-date")}"
+                            end-date="${this.getAttr("end-date")}"
+                        ></select-box-date>
+                    </div>
+                    <div class="tab-content" data-tab="province">
+                    <div class="checkboxes">
+                            ${this.province
+                                .map(
+                                    (el) =>
+                                        `<custom-checkbox id="${el.value}" value="${el.value}"   ${
+                                            this.checkedValues.has(el.value) ? "checked" : ""
+                                        }>${el.label} </custom-checkbox>`
+                                )
+                                .join("")}
+                    </div>  
+                    <segment-block decor name='province-segments'></segment-block>
+                </div>
+                  <div class="tab-content" data-tab="city" style="display:none">
+                       <select-box-search placeholder="Որոնել Քաղաք" options='${cities}' id='city-search'></select-box-search>
+                       <segment-block decor name='city-segments'></segment-block>
+                    </div>
+                    <div class="tab-content" data-tab="district" style="display:none">
+                       <select-box-search placeholder="Որոնել Համայնք" options='${districts}' id='districts-search'></select-box-search>
+                       <segment-block decor name='district-segments'></segment-block>
+                    </div>
+                    <div class="tab-content" data-tab="segment" style="display:none">
+                        <select-box-search placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
+                    </div>
+                   <div class="btn-container btn-container_decor">
+                        <button type="submit" class="btn btn_fit btn_blue btn_md">Հաստատել</button>
+                    </div>
+                </div>
+            </div>
+
+                  <simple-table
+                    data='${faultsByDevice}'
+                    columns='["atm_and_address", "total_faults", "faults_duration"]'>
+                  </simple-table>
+            </div>
+            `;
+    }
 }
 
-customElements.define('atm-failures', AtmFailures);
+//  <doughnut-chart id="${this.getAttr(
+//      "id"
+//  )}-amount" data='${amountData}'></doughnut-chart>
+
+customElements.define("atm-failures", AtmFailures);

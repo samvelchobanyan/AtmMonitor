@@ -8,26 +8,18 @@ class SegmentBlock extends DynamicElement {
         this.selectedSegments = [];
         this.segmentItems = [];
         this.loading = false;
-        this.fetchSegments();
     }
 
     get values() {
         return this.selectedSegments.map((s) => s.value);
     }
 
-    async fetchSegments() {
-        try {
-            const response = await this.fetchData("/atm/segments");
-
-            this.segmentItems = response.data.map((item) => ({
-                value: item.id,
-                text: item.name,
-                atm_segment_id: item.atm_segment_id,
-            }));
-        } catch (err) {
-            console.error("❌ Error fetching segmentItems:", err);
-            this.segmentItems = [];
-        }
+    onStoreChange(storeState) {
+        this.segmentItems = storeState.segments.map((item) => ({
+            value: item.id,
+            text: item.name,
+            atm_segment_id: item.atm_segment_id,
+        }));
     }
 
     template() {
@@ -61,7 +53,6 @@ class SegmentBlock extends DynamicElement {
     _openSegmentPopup() {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
-
         const items = this.segmentItems;
 
         modal.setContent(`

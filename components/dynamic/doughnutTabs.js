@@ -41,6 +41,8 @@ export default class DoughnutTabs extends DynamicElement {
     }
 
     onConnected() {
+        console.log(this.rawData);
+        
         const savedDates = memoryStore.get(this.chartMemoryKey);
         if (savedDates) {
             if (savedDates.startDate) this.setAttribute("start-date", savedDates.startDate);
@@ -214,6 +216,8 @@ export default class DoughnutTabs extends DynamicElement {
         const amountData = charts ? encode(charts.amount) : "";
         const countData = charts ? encode(charts.count) : "";
         const showDate = this.getAttribute("show-date") !== "false"; // default true
+
+        console.log("amountData", charts.amount);
 
         return `
       <div class="select-container">

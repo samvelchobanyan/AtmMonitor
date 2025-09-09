@@ -25,17 +25,17 @@ class AtmsDashboard extends DynamicElement {
 
     setupPolling() {
         // Register top-stats polling endpoint
-        pollingService.register('topStats', '/dashboard/top-stats', 2000);
-        
+        pollingService.register("topStats", "/dashboard/top-stats", 2000);
+
         // Subscribe to polling updates
-        this.unsubscribeTopStats = pollingService.subscribe('topStats', (data, error) => {
+        this.unsubscribeTopStats = pollingService.subscribe("topStats", (data, error) => {
             if (error) {
-                console.error('Top stats polling error:', error);
+                console.error("Top stats polling error:", error);
                 return;
             }
-            
+
             if (data) {
-                console.log('Received top stats data:', data);
+                console.log("Received top stats data:", data);
                 this.updateTopStats(data.data);
                 // You can handle the data here - update attributes, call methods, etc.
                 // For now, just logging so you can see it's working
@@ -43,13 +43,13 @@ class AtmsDashboard extends DynamicElement {
         });
     }
 
-    updateTopStats(data) {        
-        this.$('#total-balance').setAttribute('value', data.total_atm_balance);
-        this.$('#total-atms').setAttribute('value', data.total_atms);
-        this.$('#not-working-atms').setAttribute('value', data.not_working_atm_count);
-        this.$('#empty-cassettes').setAttribute('value', data.empty_cassettes_count);
-        this.$('#almost-empty-cassettes').setAttribute('value', data.almost_empty_cassettes_count);
-        this.$('#taken-cards').setAttribute('value', data.taken_cards_count);
+    updateTopStats(data) {
+        this.$("#total-balance").setAttribute("value", data.total_atm_balance);
+        this.$("#total-atms").setAttribute("value", data.total_atms);
+        this.$("#not-working-atms").setAttribute("value", data.not_working_atm_count);
+        this.$("#empty-cassettes").setAttribute("value", data.empty_cassettes_count);
+        this.$("#almost-empty-cassettes").setAttribute("value", data.almost_empty_cassettes_count);
+        this.$("#taken-cards").setAttribute("value", data.taken_cards_count);
     }
 
     onDisconnected() {
@@ -104,7 +104,7 @@ class AtmsDashboard extends DynamicElement {
         }
 
         const generalData = this.state.summary;
-        const transactionsData = this.state.summary.transactionsInfo; 
+        const transactionsData = this.state.summary.transactionsInfo;
         const encashmentData = this.state.summary.encashmentInfo;
         const atmWorkHours = this.state.summary.atmWorkHours;
 

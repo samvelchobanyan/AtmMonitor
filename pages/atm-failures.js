@@ -51,7 +51,8 @@ class AtmFailures extends DynamicElement {
 
         this.cities = locationTransformer.getAllCityOptions(state.regionsData);
         this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
-        this.fetchSummary();
+        this.fetchTopSummary();
+        this.fetchChartSummary();
     }
 
     onStoreChange(storeState) {
@@ -68,7 +69,6 @@ class AtmFailures extends DynamicElement {
 
         try {
             const response = await this.fetchData(`/device-faults/summary?${queryString}`);
-
             this.setState({
                 topSummary: response.data.top_faulting_atms,
             });
@@ -85,7 +85,9 @@ class AtmFailures extends DynamicElement {
 
         try {
             const chartResponse = await this.fetchData(`/device-faults/summary?${queryString}`);
-            const tableResponse = await this.fetchData(`/device-faults/by-device-type?${queryString}`);
+            const tableResponse = await this.fetchData(
+                `/device-faults/by-device-type?${queryString}`
+            );
             console.log("response.data", chartResponse.data);
 
             this.setState({
@@ -165,11 +167,6 @@ class AtmFailures extends DynamicElement {
     }
 
     onAfterRender() {
-        // const tableContainer = this.$(".table-container");
-        // if (tableContainer) {
-        //     tableContainer.innerHTML = this.renderTable(this.tableLink);
-        // }
-
         this.submitButton = this.$(".btn_blue");
         this.selectCityBox = this.$("#city-search");
         this.selectDistrictBox = this.$("#districts-search");
@@ -189,21 +186,6 @@ class AtmFailures extends DynamicElement {
         return `/device-faults/summary?${queryString.toString()}`;
     }
 
-    // updateTableSource() {
-    //     const table = this.$("simple-table");
-    //     if (table) {
-    //         const newSource = this.buildQuery();
-    //         if (table.getAttribute("data-source") !== newSource) {
-    //             this.tableLink = newSource;
-    //             const tableContainer = this.$(".table-container");
-
-    //             if (tableContainer) {
-    //                 tableContainer.innerHTML = this.renderTable(this.tableLink);
-    //             }
-    //         }
-    //     }
-    // }
-
     onStoreChange(storeState) {
         const region = storeState.selectedRegion;
         const city = storeState.selectedCity;
@@ -211,7 +193,6 @@ class AtmFailures extends DynamicElement {
         if (region !== this.selectedRegion || city !== this.selectedCity) {
             this.selectedRegion = region;
             this.selectedCity = city;
-            // this.updateTableSource();
         }
     }
 
@@ -226,7 +207,6 @@ class AtmFailures extends DynamicElement {
                 const { startDate, endDate } = e.detail;
                 this.startDate = startDate;
                 this.endDate = endDate;
-                // this.updateTableSource();
             });
         }
 
@@ -253,31 +233,22 @@ class AtmFailures extends DynamicElement {
         });
     }
 
-    // renderTable(link) {
-    //     return /*html*/ `
-    //         <div class="container">
-    //           <simple-table
-    //             data-source=${link}
-    //             columns='["atm_and_address", "total_faults", "faults_summary"]'
-    //             clickable-columns='["faults_summary"]'>
-    //           </simple-table>
-    //       </div>
-    //     </div>`;
-    // }
-
     template() {
         const cities = encode(this.cities);
         const districts = encode(this.districts);
         const segments = encode(this.segments);
-        console.log("state", this.state);
+
+        console.log("chartData", this.state.chartData);
 
         const topFailures = encode({
             top_faulting_atms: this.state.topSummary,
         });
 
+        // todo send correct data to the table according to chosen tab of device type 
         const faultsByDevice = encode({
             faults_by_device_type: this.state.devicesTypeSummary,
         });
+
         if (!this.state.topSummary || !this.state.devicesTypeSummary) {
             return /*html*/ `
             <div class="row">
@@ -306,8 +277,7 @@ class AtmFailures extends DynamicElement {
                     <div class="container">
                         <simple-table
                           data='${topFailures}'
-                          columns='["atm_and_address", "total_faults", "faults_summary"]'
-                          clickable-columns='["faults_summary"]'>
+                          columns='["atm_and_address", "total_faults_count", "faults_summary"]'>
                         </simple-table>
                     </div>  
                     </div>
@@ -356,18 +326,15 @@ class AtmFailures extends DynamicElement {
                     </div>
                 </div>
             </div>
-
-                  <simple-table
-                    data='${faultsByDevice}'
-                    columns='["atm_and_address", "total_faults", "faults_duration"]'>
-                  </simple-table>
+            
+            <simple-table
+            data='${faultsByDevice}'
+            columns='["atm_and_address", "total_faults", "faults_duration"]'>
+            </simple-table>
             </div>
             `;
+        }
     }
-}
-
-//  <doughnut-chart id="${this.getAttr(
-//      "id"
-//  )}-amount" data='${amountData}'></doughnut-chart>
+    // <doughnut-chart id="failures-amount" data='${amountData}'></doughnut-chart>
 
 customElements.define("atm-failures", AtmFailures);

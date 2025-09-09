@@ -153,7 +153,7 @@ export class SimpleTable extends DynamicElement {
     }
 
     addEventListeners() {
-        console.log("adding event listners");
+        // console.log("adding event listners");
         this.clearEventListeners();
         const table = this.$("table");
         if (!table) return;

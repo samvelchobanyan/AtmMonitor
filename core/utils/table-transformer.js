@@ -11,25 +11,22 @@ function transformFaultTableData(apiResponse) {
             transaction_id: event.transaction_id,
         }));
     }
-    // Fault data structure
-    else if (apiResponse.data.top_faulting_atms) {
-        return apiResponse.data.top_faulting_atms.map((data) => ({
+    // Failures data structure
+    else if (apiResponse.top_faulting_atms) {
+        return apiResponse.top_faulting_atms.map((data) => ({
             atm_and_address: `${data.atm_id} / ${data.address}`,
-            total_faults: data.total_faults,
+            total_faults_count: data.total_faults,
             faults_summary: data.device_faults
                 .map((df) => `${df.device_type}(${df.fault_count})`)
                 .join(", "),
         }));
+    } else if (apiResponse.faults_by_device_type) {
+        return apiResponse.faults_by_device_type.map((data) => ({
+            atm_and_address: `${data.atm_id} / ${data.address}`,
+            total_faults: data.error_count,
+            faults_duration: data.duration,
+        }));
     }
-    //  else if (apiResponse.data.faults_by_device_type) {
-    //     return apiResponse.data.faults_by_device_type.map((data) => ({
-    //         atm_and_address: `${data.atm_id} / ${data.address}`,
-    //         total_faults: data.total_faults,
-    //         faults_duration: data.device_faults
-    //             .map((df) => `${df.device_type}(${df.fault_count})`)
-    //             .join(", "),
-    //     }));
-    // }
     // Encashment data structure
     else if (apiResponse.data.encashments) {
         return apiResponse.data.encashments.map((item) => ({

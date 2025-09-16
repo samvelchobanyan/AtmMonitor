@@ -39,6 +39,8 @@ class DoughnutChartComponent extends DynamicElement {
     }
 
     onAfterRender() {
+        console.log(" this.chartData", this.chartData);
+
         if (!this.chartData) return;
         if (!this.chart) {
             this.chart = createDoughnutChart(this.canvasId, this.chartData, this.legendId, false);
@@ -64,8 +66,16 @@ class DoughnutChartComponent extends DynamicElement {
                   ${this.total}<span>֏</span>
                 </div>
                 <div class="badges">
-                  ${this.dailyAvg ? `<badge-item text="Օրական միջին՝ ${this.dailyAvg}֏"></badge-item>` : ""}
-                  ${this.transactionAvg ? `<badge-item text="Միջին գործարք՝ ${this.transactionAvg}֏"></badge-item>` : ""}
+                  ${
+                      this.dailyAvg
+                          ? `<badge-item text="Օրական միջին՝ ${this.dailyAvg}֏"></badge-item>`
+                          : ""
+                  }
+                  ${
+                      this.transactionAvg
+                          ? `<badge-item text="Միջին գործարք՝ ${this.transactionAvg}֏"></badge-item>`
+                          : ""
+                  }
                 </div>
               </div>
             </div>

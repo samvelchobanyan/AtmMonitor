@@ -29,7 +29,7 @@ class AtmFailures extends DynamicElement {
         this.province = [];
         this.cities = [];
         this.districts = [];
-        this.activeTab = "province";
+        this.locationActiveTab = "province";
         this.checkedValues = new Set();
         this.submitButton = null;
         this.selectCityBox = null;
@@ -38,7 +38,10 @@ class AtmFailures extends DynamicElement {
         this.dateSelectBox = null;
         this.segments = null;
 
-        this.tableLink = `/device-faults/summary`;
+        this.tableActiveTab = null;
+        this.tableLink = "/device-faults/summary";
+
+        this.deviceTypes = [];
     }
 
     onConnected() {
@@ -53,6 +56,7 @@ class AtmFailures extends DynamicElement {
         this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
         this.fetchTopSummary();
         this.fetchChartSummary();
+        this.initTableTabs();
     }
 
     onStoreChange(storeState) {
@@ -60,6 +64,14 @@ class AtmFailures extends DynamicElement {
             value: item.id,
             text: item.name,
         }));
+
+        const region = storeState.selectedRegion;
+        const city = storeState.selectedCity;
+
+        if (region !== this.selectedRegion || city !== this.selectedCity) {
+            this.selectedRegion = region;
+            this.selectedCity = city;
+        }
     }
 
     async fetchTopSummary() {
@@ -88,7 +100,7 @@ class AtmFailures extends DynamicElement {
             const tableResponse = await this.fetchData(
                 `/device-faults/by-device-type?${queryString}`
             );
-            console.log("response.data", chartResponse.data);
+            console.log(" tableResponse.data", tableResponse.data);
 
             this.setState({
                 devicesTypeSummary: tableResponse.data,
@@ -100,35 +112,33 @@ class AtmFailures extends DynamicElement {
         }
     }
 
+    async initTableTabs() {
+        try {
+            const res = await this.fetchData(`/device-faults/all-device-types`);
+            this.deviceTypes = res.data;
+            this.tableActiveTab = res.data[0].id;
+
+            console.log("deviceTypes", this.deviceTypes);
+        } catch (err) {
+            console.error("❌ Failed to init table tabs:", err);
+        }
+    }
+
     submitButtonListener() {
         if (!this.submitButton) return;
 
         this.addListener(this.submitButton, "click", () => {
-            const dateComponent = this.querySelector("select-box-date");
-            const startDate = dateComponent?.startDate || null;
-            const endDate = dateComponent?.endDate || null;
-
-            const queryString = this.buildQueryString(startDate, endDate);
-
-            console.log("queryString", queryString);
-
-            // this.fetchInfoCardData(queryString);
-
-            // this.tableLink = `/device-faults/summary?${queryString}`;
-            // const tableContainer = this.$(".table-container");
-            // if (tableContainer) {
-            //     tableContainer.innerHTML = this.renderTable(this.tableLink);
-            // }
+            this.fetchChartSummary();
         });
     }
 
     tabsListener() {
-        const tabs = this.$$("custom-tab");
+        const tabs = this.$$(".filter_tabs custom-tab");
         tabs.forEach((tab) => {
             this.addListener(tab, "click", () => {
                 const selectedTabName = tab.getAttribute("name");
                 // Store active tab so submitButtonListener knows which one is active
-                this.activeTab = selectedTabName;
+                this.locationActiveTab = selectedTabName;
             });
         });
     }
@@ -137,31 +147,32 @@ class AtmFailures extends DynamicElement {
         const queryString = new URLSearchParams();
 
         // Add tab-specific filters
-        if (this.activeTab === "province") {
+        if (this.locationActiveTab === "province") {
             const checkedValues = Array.from(this.checkedValues);
             const segments = this.querySelector("segment-block[name='province-segments']");
             checkedValues.forEach((v) => queryString.append("provinces", v));
             if (segments?.values?.length)
                 segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "city") {
+        } else if (this.locationActiveTab === "city") {
             const values = this.selectCityBox.getAttribute("value")?.split(",") || [];
             values.forEach((v) => queryString.append("cities", v));
             const segments = this.querySelector("segment-block[name='city-segments']");
             if (segments?.values?.length)
                 segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "district") {
+        } else if (this.locationActiveTab === "district") {
             const values = this.selectDistrictBox.getAttribute("value")?.split(",") || [];
             values.forEach((v) => queryString.append("districts", v));
             const segments = this.querySelector("segment-block[name='district-segments']");
             if (segments?.values?.length)
                 segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "segment") {
+        } else if (this.locationActiveTab === "segment") {
             const rawVal = this.selectSegmentBox.getAttribute("value") || "[]";
             JSON.parse(rawVal).forEach((v) => queryString.append("segmentIds", Number(v)));
         }
         // Add date filters if provided
         if (startDate) queryString.append("startDate", startDate);
         if (endDate) queryString.append("endDate", endDate);
+        if (this.tableActiveTab) queryString.append("deviceId", this.tableActiveTab);
 
         return queryString;
     }
@@ -186,16 +197,6 @@ class AtmFailures extends DynamicElement {
         return `/device-faults/summary?${queryString.toString()}`;
     }
 
-    onStoreChange(storeState) {
-        const region = storeState.selectedRegion;
-        const city = storeState.selectedCity;
-
-        if (region !== this.selectedRegion || city !== this.selectedCity) {
-            this.selectedRegion = region;
-            this.selectedCity = city;
-        }
-    }
-
     addEventListeners() {
         this.submitButtonListener();
         this.checkboxesListener();
@@ -213,6 +214,8 @@ class AtmFailures extends DynamicElement {
         table?.addEventListener("cell-click", (e) => {
             const { column, cellValue, rowData } = e.detail;
         });
+
+        this.tableTabsListener();
     }
 
     checkboxesListener() {
@@ -233,35 +236,60 @@ class AtmFailures extends DynamicElement {
         });
     }
 
+    tableTabsListener() {
+        const tableTabs = this.$$(".table_tabs custom-tab");
+
+        tableTabs.forEach((tab) => {
+            this.addListener(tab, "click", async () => {
+                const selectedTab = tab.getAttribute("name");
+
+                if (this.tableActiveTab === selectedTab) return;
+
+                this.tableActiveTab = selectedTab;
+                this.fetchChartSummary();
+            });
+        });
+    }
+
     template() {
         const cities = encode(this.cities);
         const districts = encode(this.districts);
         const segments = encode(this.segments);
 
-        console.log("chartData", this.state.chartData);
-
         const topFailures = encode({
             top_faulting_atms: this.state.topSummary,
         });
 
-        // todo send correct data to the table according to chosen tab of device type 
+        // todo send correct data to the table according to chosen tab of device type
         const faultsByDevice = encode({
             faults_by_device_type: this.state.devicesTypeSummary,
         });
 
-        if (!this.state.topSummary || !this.state.devicesTypeSummary) {
+        if (
+            !this.state.topSummary ||
+            !this.state.devicesTypeSummary ||
+            this.deviceTypes.length == 0
+        ) {
             return /*html*/ `
             <div class="row">
-                <div class="column sm-12">
-                    <div class="loading">
-                        <div class="loading__spinner spinner"></div>
-                        <div class="loading__text">Տվյալները բեռնվում են…</div>
-                    </div>
-                </div>
+            <div class="column sm-12">
+            <div class="loading">
+            <div class="loading__spinner spinner"></div>
+            <div class="loading__text">Տվյալները բեռնվում են…</div>
+            </div>
+            </div>
             </div>
             `;
         }
 
+        console.log("this.state.devicesTypeSummary", this.state.devicesTypeSummary);
+
+        // cant find correct one, because there is not type 12 in this.state.devicesTypeSummary yet. Told Aram to add that too
+        const selectedDeviceType = this.state.devicesTypeSummary.find(
+            (el) => el.device_type_id == this.tableActiveTab
+        );
+        console.log("selectedDeviceType", selectedDeviceType);
+        console.log("this.tableActiveTab", this.tableActiveTab);
         return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
@@ -286,7 +314,7 @@ class AtmFailures extends DynamicElement {
               <div class="column sm-12">
                 <div class="container">
                     <div class="tabs-container">
-                        <div class="tabs">
+                        <div class="tabs filter_tabs">
                             <custom-tab name="province" active>Մարզ</custom-tab>
                             <custom-tab name="city">Քաղաք</custom-tab>
                             <custom-tab name="district">Համայնք</custom-tab>
@@ -327,14 +355,29 @@ class AtmFailures extends DynamicElement {
                 </div>
             </div>
             
-            <simple-table
-            data='${faultsByDevice}'
-            columns='["atm_and_address", "total_faults", "faults_duration"]'>
-            </simple-table>
+            <div class="column sm-12">
+                <div class="container">
+                  <div class="tabs table_tabs">
+                    ${this.deviceTypes
+                        .map(
+                            (type) =>
+                                `<custom-tab name="${type.id}" ${
+                                    type.id == this.tableActiveTab ? "active" : ""
+                                }>${type.type_name}</custom-tab>`
+                        )
+                        .join("")}
+                 </div>
+                 <simple-table
+                    data='${faultsByDevice}'
+                    columns='["atm_and_address", "total_faults", "faults_duration"]'>
+                 </simple-table>
+                </div>
             </div>
-            `;
-        }
+      </div>
+      `;
     }
-    // <doughnut-chart id="failures-amount" data='${amountData}'></doughnut-chart>
+}
+
+// <doughnut-chart id="failures-amount" data='${amountData}'></doughnut-chart>
 
 customElements.define("atm-failures", AtmFailures);

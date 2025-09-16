@@ -1,4 +1,6 @@
 function transformFaultTableData(apiResponse) {
+    console.log("aapiResponse", apiResponse);
+
     // Journal data structure
     if (apiResponse.data?.events) {
         return apiResponse.data.events.map((event) => ({

@@ -6,6 +6,7 @@ import encode from '../assets/js/utils/encode.js';
 import '../components/ui/atmItem.js';
 import '../components/ui/infoItem.js';
 import '../components/dynamic/simpleTable.js';
+import formatDate from '../core/utils/date-transformer.js';
 
 class AtmDetails extends DynamicElement {
   constructor() {
@@ -54,18 +55,18 @@ class AtmDetails extends DynamicElement {
     }
   }
 
-  formatDate(dateString) {
-    const date = new Date(dateString); // parse ISO
+  // formatDate(dateString) {
+  //   const date = new Date(dateString); // parse ISO
 
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // months start at 0
-    const year = date.getFullYear();
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   const month = String(date.getMonth() + 1).padStart(2, '0'); // months start at 0
+  //   const year = date.getFullYear();
 
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+  //   const hours = String(date.getHours()).padStart(2, '0');
+  //   const minutes = String(date.getMinutes()).padStart(2, '0');
 
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  }
+  //   return `${day}/${month}/${year} ${hours}:${minutes}`;
+  // }
 
   _transformToTransactionDynamics(data) {
     const { dispense_dynamic, deposit_dynamic, exchange_dynamic } = data;
@@ -156,7 +157,7 @@ class AtmDetails extends DynamicElement {
                         <div class="column sm-6">
                             <div class="infos infos_margin">
                                 <info-card
-                                    title="Վերջին ինկասացիա (${this.formatDate(
+                                    title="Վերջին ինկասացիա (${formatDate(
                                       data.balance_info.last_encashment_date
                                     )})"
                                     value="${
@@ -266,10 +267,10 @@ class AtmDetails extends DynamicElement {
                     </div>
                     <div class="info-items-container">
                         <div class="info-items info-items_col">
-                         <info-item text="Վերջին Disconnect" value="${this.formatDate(
+                         <info-item text="Վերջին Disconnect" value="${formatDate(
                            atmWorkHours.last_disconnect
                          )}"></info-item>
-                            <info-item text="Վերջին Connect"  value="${this.formatDate(
+                            <info-item text="Վերջին Connect"  value="${formatDate(
                               atmWorkHours.last_connect
                             )}"></info-item>
                         </div> 

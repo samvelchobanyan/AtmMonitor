@@ -115,10 +115,9 @@ class GeoAnalythics extends DynamicElement {
                     label: atm.name,
                 })),
             });
-          
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
-      
+
             this.setState({
                 atmsList: [],
             });
@@ -164,6 +163,7 @@ class GeoAnalythics extends DynamicElement {
 
     renderLeftColumn(data) {
         if (!data) return `<div class="loading">Loading left column...</div>`;
+        console.log("data", data);
 
         const firstDispenseData = encode(data.dispense_summary);
         const firstDepositData = encode(data.deposit_summary);
@@ -174,7 +174,7 @@ class GeoAnalythics extends DynamicElement {
             data.transaction_dynamics.deposit_dynamic.hourly_data
         );
         const firstExchangeData = data.exchange_summary.currency_details;
-
+        const firstTransactionDynamics = encode(data.transaction_dynamics);
         return /*html*/ `
         <div class="container">
             <doughnut-tabs id="dispense1" data="${firstDispenseData}" show-date="false" title="Մուտքագրում"></doughnut-tabs>
@@ -193,7 +193,7 @@ class GeoAnalythics extends DynamicElement {
                     <info-card
                         title="${exchange.currency_code}"
                         value="${exchange.total_amount}"
-                        value-currency="$"
+                        value-currency="$" 
                         trend="${exchange.total_amount_percent_change}"
                         icon="icon icon-box"
                         show-border="true">
@@ -202,6 +202,18 @@ class GeoAnalythics extends DynamicElement {
                     )
                     .join("")}
             </div>
+        </div>
+
+        <div class="container">
+            <container-top icon="icon-trending-up" title="Գործարքների դինամիկա"></container-top>
+            <chart-component
+                id="line-chart-transaction-dynamics1"
+                chart-type="line"
+                chart-data='${firstTransactionDynamics}'
+                api-url="/analytics/transactions-dynamic-in-days"
+                ${this.attrIf("city", this.currentCity)}
+                ${this.attrIf("region", this.currentRegion)}>
+            </chart-component>
         </div>
 
         <div class="container">

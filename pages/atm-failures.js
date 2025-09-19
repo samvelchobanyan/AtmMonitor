@@ -116,7 +116,10 @@ class AtmFailures extends DynamicElement {
         try {
             const res = await this.fetchData(`/device-faults/all-device-types`);
             this.deviceTypes = res.data;
-            this.tableActiveTab = res.data[0].id;
+            // todo uncomment real code
+            // this.tableActiveTab = res.data[0].id;
+            // fake for testing
+            this.tableActiveTab = res.data[1].id;
 
             console.log("deviceTypes", this.deviceTypes);
         } catch (err) {
@@ -260,11 +263,6 @@ class AtmFailures extends DynamicElement {
             top_faulting_atms: this.state.topSummary,
         });
 
-        // todo send correct data to the table according to chosen tab of device type
-        const faultsByDevice = encode({
-            faults_by_device_type: this.state.devicesTypeSummary,
-        });
-
         if (
             !this.state.topSummary ||
             !this.state.devicesTypeSummary ||
@@ -284,11 +282,23 @@ class AtmFailures extends DynamicElement {
 
         console.log("this.state.devicesTypeSummary", this.state.devicesTypeSummary);
 
+        // todo send correct data to the table according to chosen tab of device type
+        console.log("this.tableActiveTab", this.tableActiveTab);
+
+        const found = this.state.devicesTypeSummary.find((item) => {
+            item.device_type_id === this.tableActiveTab;
+        });
+
+        console.log("found", found);
+
+        const faultsByDevice = encode({
+            faults_by_device_type: this.state.devicesTypeSummary,
+        });
         // cant find correct one, because there is not type 12 in this.state.devicesTypeSummary yet. Told Aram to add that too
-        const selectedDeviceType = this.state.devicesTypeSummary.find(
-            (el) => el.device_type_id == this.tableActiveTab
-        );
-        console.log("selectedDeviceType", selectedDeviceType);
+        // const selectedDeviceType = this.state.devicesTypeSummary.find(
+        //     (el) => el.device_type_id == this.tableActiveTab
+        // );
+        // console.log("selectedDeviceType", selectedDeviceType);
         console.log("this.tableActiveTab", this.tableActiveTab);
         return /*html*/ `
             <div class="row">

@@ -1,8 +1,6 @@
 import formatDate from './date-transformer.js';
 
 function transformFaultTableData(apiResponse) {
-  console.log('tableTransformer data--->', apiResponse);
-
   // Journal data structure
   if (apiResponse.data?.events) {
     return apiResponse.data.events.map((event) => ({
@@ -16,7 +14,7 @@ function transformFaultTableData(apiResponse) {
     }));
   }
   // Failures data structure
-  else if (apiResponse.top_faulting_atms) {
+  else if (apiResponse?.top_faulting_atms) {
     return apiResponse.top_faulting_atms.map((data) => ({
       atm_and_address: `${data.atm_id} / ${data.address}`,
       total_faults_count: data.total_faults,
@@ -24,7 +22,7 @@ function transformFaultTableData(apiResponse) {
         .map((df) => `${df.device_type}(${df.fault_count})`)
         .join(', '),
     }));
-  } else if (apiResponse.faults_by_device_type) {
+  } else if (apiResponse?.faults_by_device_type) {
     return apiResponse.faults_by_device_type.map((data) => ({
       atm_and_address: `${data.atm_id} / ${data.address}`,
       total_faults: data.error_count,
@@ -32,7 +30,7 @@ function transformFaultTableData(apiResponse) {
     }));
   }
   // Encashment data structure
-  else if (apiResponse.data.encashments) {
+  else if (apiResponse.data?.encashments) {
     return apiResponse.data.encashments.map((item) => ({
       date_time: formatDate(item.date_time),
       atm_address: `${item.atm_id} / ${item.atm_address}`,
@@ -42,7 +40,7 @@ function transformFaultTableData(apiResponse) {
     }));
   }
   // Journal data
-  else if (apiResponse.data.events) {
+  else if (apiResponse.data?.events) {
     return apiResponse.data.events.map((item) => ({
       date: formatDate(item.date),
       server_date: formatDate(item.server_date),

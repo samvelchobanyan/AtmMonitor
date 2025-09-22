@@ -195,7 +195,7 @@ export class SimpleTable extends DynamicElement {
             return `<div class="loading">Loading table…</div>`;
         }
 
-        if (!this.state.columns.length || !this.state.data.length) {
+        if (!this.state.columns || !this.state.data) {
             return `<div class="empty">No data available</div>`;
         }
 

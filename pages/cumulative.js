@@ -214,7 +214,10 @@ class Cumulative extends DynamicElement {
                 <div class="container">
                     <simple-table
                         data-source=${link}
-                        columns='["province","deposit_amount", "deposit_count", "dispense_amount", "dispense_count", "exchange_eur_amount", "exchange_rub_amount", "exchange_usd_amount"]'>
+                        columns='["province","deposit_amount", "deposit_count", "dispense_amount", "dispense_count", "exchange_eur_amount", "exchange_rub_amount", "exchange_usd_amount"]'
+                        exportable
+                        export-filename="cumulative"
+                        export-label="Download CSV">
                     </simple-table>
         </div>`;
     }

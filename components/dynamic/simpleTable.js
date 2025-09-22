@@ -5,12 +5,12 @@ import tableTransformer from "../../core/utils/table-transformer.js";
 // Lazy-load Simple-DataTables once for all instances
 let dataTableModulePromise = null;
 function loadDataTableModule() {
-    if (!dataTableModulePromise) {
-        dataTableModulePromise = import(
-            "https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/module.js"
-        );
-    }
-    return dataTableModulePromise;
+	if (!dataTableModulePromise) {
+		dataTableModulePromise = import(
+			"https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/module.js"
+		);
+	}
+	return dataTableModulePromise;
 }
 
 export class SimpleTable extends DynamicElement {
@@ -131,26 +131,27 @@ export class SimpleTable extends DynamicElement {
             this.datatableInstance = null;
         }
         const searchable = this.getAttribute("searchable") === "false" ? false : true;
-        if (this.$("table")) {
-            loadDataTableModule().then((module) => {
-                this.datatableInstance = new module.DataTable(this.$("table"), {
-                    perPage: this.getPerPageOption() || 10,
-                    perPageSelect: this.getPerPageSelectOption(),
-                    searchable, // disables search box
-                    sortable: true, // optional: keep sorting
-                });
+		if (this.$("table")) {
+			loadDataTableModule().then((module) => {
+				this.datatableInstance = new module.DataTable(this.$("table"), {
+					perPage: this.getPerPageOption() || 10,
+					perPageSelect: this.getPerPageSelectOption(),
+					sortable: true,
+					sessionStorage: false,
+					searchable,
+				});
 
-                // Listen to Simple-DataTables events to re-attach click listeners after pagination/sort/search
-                this.datatableInstance.on("datatable.page", () => {
-                    this.addEventListeners();
-                });
-                this.datatableInstance.on("datatable.sort", () => this.addEventListeners());
-                this.datatableInstance.on("datatable.search", () => this.addEventListeners());
+				// Listen to Simple-DataTables events to re-attach click listeners after pagination/sort/search
+				this.datatableInstance.on("datatable.page", () => {
+					this.addEventListeners();
+				});
+				this.datatableInstance.on("datatable.sort", () => this.addEventListeners());
+				this.datatableInstance.on("datatable.search", () => this.addEventListeners());
 
-                // Attach listeners initially
-                this.addEventListeners();
-            });
-        }
+				// Attach listeners initially
+				this.addEventListeners();
+			});
+		}
     }
 
     addEventListeners() {
@@ -158,6 +159,25 @@ export class SimpleTable extends DynamicElement {
         this.clearEventListeners();
         const table = this.$("table");
         if (!table) return;
+
+        // CSV export button
+        const exportBtn = this.$(".csv-export-btn");
+        if (exportBtn) {
+            this.addListener(exportBtn, "click", () => {
+                const filenameBase = (this.getAttr("export-filename") || "export").replace(/\.csv$/i, "");
+                if (this.datatableInstance && typeof this.datatableInstance.export === "function") {
+                    this.datatableInstance.export({
+                        type: "csv",
+                        filename: filenameBase,
+                        download: true,
+                    });
+                } else {
+                    console.warn("Simple-DataTables export() is not available. Ensure the export plugin is loaded or implement your own CSV generation.");
+                }
+            });
+        }
+
+
 
         const clickable = this.parseClickableColumnsAttr();
         const colIndices = clickable
@@ -209,11 +229,15 @@ export class SimpleTable extends DynamicElement {
             })
             .join("");
 
+        const showExport = this.hasAttribute("exportable");
+        const exportLabel = this.getAttr("export-label") || "Download CSV";
+
         return /* html */ `
       <table class="data-table">
         <thead><tr>${header}</tr></thead>
         <tbody>${rows}</tbody>
       </table>
+      ${showExport ? `<div class="table-actions"><button type="button" class="csv-export-btn">${exportLabel}</button></div>` : ``}
     `;
     }
 }

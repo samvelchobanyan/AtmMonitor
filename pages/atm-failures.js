@@ -296,9 +296,13 @@ class AtmFailures extends DynamicElement {
             (item) => item.device_type_id == this.tableActiveTab
         );
 
+        console.log(found);
+        
+
         const faultsByDevice = encode({
             faults_by_device_type: found?.atms,
         });
+        
         return /*html*/ `
             <div class="row">
                 <div class="column sm-12">

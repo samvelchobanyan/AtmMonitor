@@ -174,7 +174,9 @@ class GeoAnalythics extends DynamicElement {
             data.transaction_dynamics.deposit_dynamic.hourly_data
         );
         const firstExchangeData = data.exchange_summary.currency_details;
-        const firstTransactionDynamics = encode(data.transaction_dynamics);
+        const firstTransactionDynamics = encode(
+            data.transaction_dynamics.overall_dynamic.hourly_data
+        );
         return /*html*/ `
         <div class="container">
             <doughnut-tabs id="dispense1" data="${firstDispenseData}" show-date="false" title="Մուտքագրում"></doughnut-tabs>
@@ -254,7 +256,9 @@ class GeoAnalythics extends DynamicElement {
             data.transaction_dynamics.deposit_dynamic.hourly_data
         );
         const secondExchangeData = data.exchange_summary.currency_details;
-
+        const secondTransactionDynamics = encode(
+            data.transaction_dynamics.overall_dynamic.hourly_data
+        );
         return /*html*/ `
         <div class="container">
             <doughnut-tabs id="dispense2" data="${secondDispenseData}" show-date="false" title="Մուտքագրում"></doughnut-tabs>
@@ -283,6 +287,19 @@ class GeoAnalythics extends DynamicElement {
                     .join("")}
             </div>
         </div>
+
+          <div class="container">
+            <container-top icon="icon-trending-up" title="Գործարքների դինամիկա"></container-top>
+            <chart-component
+                id="line-chart-transaction-dynamics2"
+                chart-type="line"
+                chart-data='${secondTransactionDynamics}'
+                api-url="/analytics/transactions-dynamic-in-days"
+                ${this.attrIf("city", this.currentCity)}
+                ${this.attrIf("region", this.currentRegion)}>
+            </chart-component>
+        </div>
+
 
         <div class="container">
             <container-top icon="icon-trending-up" title="Կանխիկացումների դինամիկա"></container-top>

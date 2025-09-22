@@ -176,6 +176,13 @@ class SideBar extends DynamicElement {
 
         // Add active class based on current route
         switch (this.currentRoute) {
+            case "/notifications":
+                const notificationsItem = this.querySelector('a[href="./notifications"]');
+                if (notificationsItem) {
+                    notificationsItem.classList.add("active");
+                    console.log("Sidebar: Activated notifications item");
+                }
+                break;
             case "/home":
                 const homeItem = this.querySelector('a[href="./home"]');
                 if (homeItem) {
@@ -243,8 +250,10 @@ class SideBar extends DynamicElement {
                         <img src="assets/img/logo.png" alt="" />
                     </div>
                     <div class="notification">
-                        <i class="icon icon-bell"></i>
-                        <div class="notification__count">10</div>
+                        <a href="./notifications">
+                            <i class="icon icon-bell"></i>
+                            <div class="notification__count">10</div>
+                        <a>
                     </div>
                 </div>
                 <div class="sidebar__nav">

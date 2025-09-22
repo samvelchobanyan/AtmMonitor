@@ -178,9 +178,19 @@ class ChartComponent extends DynamicElement {
 
             switch (this.chartType) {
                 case "line":
-                    this.transformedData = chartDataTransformer.transformData(
-                        response.data[data_array_name]
-                    );
+                    if (
+                        this.getAttribute("id") == "line-chart-transaction-dynamics1" ||
+                        this.getAttribute("id") == "line-chart-transaction-dynamics2"
+                    ) {
+                        // case for geo page
+                        this.transformedData = chartDataTransformer.transformData(
+                            response.data.overall_dynamic[data_array_name]
+                        );
+                    } else {
+                        this.transformedData = chartDataTransformer.transformData(
+                            response.data[data_array_name]
+                        );
+                    }
                     this._updateChart();
                     break;
                 case "doughnut":

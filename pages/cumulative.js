@@ -8,7 +8,6 @@ import "../components/ui/customCheck.js";
 import "../components/dynamic/segment.js";
 import "../components/dynamic/simpleTable.js";
 import "../components/dynamic/select-box-date.js";
-import "../pages/atm-details.js";
 import encode from "../assets/js/utils/encode.js";
 
 class Cumulative extends DynamicElement {
@@ -16,7 +15,6 @@ class Cumulative extends DynamicElement {
         super();
         this.state = {
             atmsList: [],
-            segments: [],
         };
         // change link to get new data
         this.tableLink = "/analytics/cumulative-summary";
@@ -37,9 +35,9 @@ class Cumulative extends DynamicElement {
         this.selectSegmentBox = null;
         this.selectAtmsBox = null;
         this.dateSelectBox = null;
-    }
 
-    // todo: design fix
+        this.segments = null;
+    }
 
     onConnected() {
         const state = store.getState();
@@ -51,9 +49,15 @@ class Cumulative extends DynamicElement {
 
         this.cities = locationTransformer.getAllCityOptions(state.regionsData);
         this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
-        this.fetchSegments();
         this.fetchAtms();
         this.fetchSummary();
+    }
+
+    onStoreChange(storeState) {
+        this.segments = storeState.segments.map((item) => ({
+            value: item.id,
+            text: item.name,
+        }));
     }
 
     onAfterRender() {
@@ -125,23 +129,6 @@ class Cumulative extends DynamicElement {
             console.error("❌ Error fetching summary:", err);
             this.setState({
                 atmsList: [],
-            });
-        }
-    }
-
-    async fetchSegments() {
-        try {
-            const response = await this.fetchData("/atm/segments");
-            this.setState({
-                segments: response.data.map((item) => ({
-                    value: item.id,
-                    text: item.name,
-                })),
-            });
-        } catch (err) {
-            console.error("❌ Error fetching segmentItems:", err);
-            this.setState({
-                segments: [],
             });
         }
     }
@@ -229,8 +216,6 @@ class Cumulative extends DynamicElement {
                         data-source=${link}
                         columns='["province","deposit_amount", "deposit_count", "dispense_amount", "dispense_count", "exchange_eur_amount", "exchange_rub_amount", "exchange_usd_amount"]'>
                     </simple-table>
-           
-          </div>
         </div>`;
     }
 
@@ -272,7 +257,7 @@ class Cumulative extends DynamicElement {
     }
 
     template() {
-        if (this.state.atmsList.length == 0 || this.state.segments.length == 0) {
+        if (this.state.atmsList.length == 0) {
             return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
@@ -288,7 +273,7 @@ class Cumulative extends DynamicElement {
         const atmsList = encode(this.state.atmsList);
         const cities = encode(this.cities);
         const districts = encode(this.districts);
-        const segments = encode(this.state.segments);
+        const segments = encode(this.segments);
 
         return /*html*/ `
           <div class="row">
@@ -306,7 +291,7 @@ class Cumulative extends DynamicElement {
                                 start-date="${this.getAttr("start-date")}"
                                 end-date="${this.getAttr("end-date")}"
                             ></select-box-date>
-                        </div>
+                    </div>
                         <div class="tab-content" data-tab="province">
                          <div class="checkboxes">
                             ${this.province
@@ -341,7 +326,6 @@ class Cumulative extends DynamicElement {
             <div class="row">
                 <div class="column sm-12">
                     <div class="table-container"></div>
-                    <atm-details id='1621'></atm-details>
                 </div>
             </div>
         `;

@@ -151,4 +151,4 @@ console.log('template journal');
     }
 }
 
-customElements.define("journal-page", JournalPage);
+customElements.define('journal-page', JournalPage);

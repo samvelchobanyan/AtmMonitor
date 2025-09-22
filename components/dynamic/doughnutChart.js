@@ -64,8 +64,16 @@ class DoughnutChartComponent extends DynamicElement {
                   ${this.total}<span>֏</span>
                 </div>
                 <div class="badges">
-                  ${this.dailyAvg ? `<badge-item text="Օրական միջին՝ ${this.dailyAvg}֏"></badge-item>` : ""}
-                  ${this.transactionAvg ? `<badge-item text="Միջին գործարք՝ ${this.transactionAvg}֏"></badge-item>` : ""}
+                  ${
+                      this.dailyAvg
+                          ? `<badge-item text="Օրական միջին՝ ${this.dailyAvg}֏"></badge-item>`
+                          : ""
+                  }
+                  ${
+                      this.transactionAvg
+                          ? `<badge-item text="Միջին գործարք՝ ${this.transactionAvg}֏"></badge-item>`
+                          : ""
+                  }
                 </div>
               </div>
             </div>

@@ -26,17 +26,36 @@ export class SimpleTable extends DynamicElement {
     }
 
     static get observedAttributes() {
-        return ["data-source", "columns", "clickable-columns", "per-page", "per-page-select"];
+        return [
+            "data-source",
+            "columns",
+            "clickable-columns",
+            "per-page",
+            "per-page-select",
+            "searchable",
+            "data",
+        ];
     }
 
     async onConnected() {
         const url = this.getAttr("data-source");
-        if (url) await this.loadRemoteData();
+        const dataStr = this.getAttr("data");
+        if (url) {
+            await this.loadRemoteData();
+        } else if (dataStr) {
+            let raw = JSON.parse(dataStr);
+            this.transformData(raw);
+        }
     }
 
     async onAttributeChange(name, oldVal, newVal) {
         if (name === "data-source" && oldVal !== newVal) {
             await this.loadRemoteData();
+        }
+        if (name === "data" && oldVal !== newVal) {
+            let raw = JSON.parse(newVal);
+            this.transformData(raw);
+            this.transformData(raw);
         }
         if (name === "columns" && oldVal !== newVal) {
             const parsed = this.parseColumnsAttr();
@@ -82,18 +101,28 @@ export class SimpleTable extends DynamicElement {
 
         try {
             const raw = await this.fetchData(url);
-            const transformed = tableTransformer.transformFaultTableData(raw);
+            this.transformData(raw);
+            // const transformed = tableTransformer.transformFaultTableData(raw);
 
-            const definedColumns = this.parseColumnsAttr();
-            const columns = definedColumns.length
-                ? definedColumns
-                : Object.keys(transformed[0] || {});
+            // const definedColumns = this.parseColumnsAttr();
+            // const columns = definedColumns.length
+            //     ? definedColumns
+            //     : Object.keys(transformed[0] || {});
 
-            this.setState({ data: transformed, columns, loading: false });
+            // this.setState({ data: transformed, columns, loading: false });
         } catch (err) {
             console.warn("Failed to load or transform table data", err);
             this.setState({ loading: false, error: true });
         }
+    }
+
+    transformData(raw) {
+        const transformed = tableTransformer.transformFaultTableData(raw);
+
+        const definedColumns = this.parseColumnsAttr();
+        const columns = definedColumns.length ? definedColumns : Object.keys(transformed[0] || {});
+
+        this.setState({ data: transformed, columns, loading: false });
     }
 
     onAfterRender() {
@@ -101,13 +130,13 @@ export class SimpleTable extends DynamicElement {
             this.datatableInstance.destroy();
             this.datatableInstance = null;
         }
-
+        const searchable = this.getAttribute("searchable") === "false" ? false : true;
         if (this.$("table")) {
             loadDataTableModule().then((module) => {
                 this.datatableInstance = new module.DataTable(this.$("table"), {
                     perPage: this.getPerPageOption() || 10,
                     perPageSelect: this.getPerPageSelectOption(),
-                    searchable: true, // disables search box
+                    searchable, // disables search box
                     sortable: true, // optional: keep sorting
                 });
 
@@ -125,7 +154,7 @@ export class SimpleTable extends DynamicElement {
     }
 
     addEventListeners() {
-        console.log("adding event listners");
+        // console.log("adding event listners");
         this.clearEventListeners();
         const table = this.$("table");
         if (!table) return;

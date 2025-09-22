@@ -15,7 +15,6 @@ class Incassate extends DynamicElement {
         super();
         this.state = {
             summary: null,
-            segments: [],
             infoCardsSummary: [],
         };
         // change link to get new data
@@ -25,7 +24,7 @@ class Incassate extends DynamicElement {
         this.cities = [];
         this.districts = [];
 
-        this.activeTab = "";
+        this.activeTab = "province";
         this.checkedValues = new Set();
 
         this.submitButton = null;
@@ -33,9 +32,8 @@ class Incassate extends DynamicElement {
         this.selectDistrictBox = null;
         this.selectSegmentBox = null;
         this.dateSelectBox = null;
+        this.segments = null;
     }
-
-    // todo: design fix
 
     onConnected() {
         const state = store.getState();
@@ -47,7 +45,7 @@ class Incassate extends DynamicElement {
 
         this.cities = locationTransformer.getAllCityOptions(state.regionsData);
         this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
-        this.fetchSegments();
+
         this.fetchSummary();
         this.fetchInfoCardData();
     }
@@ -58,18 +56,20 @@ class Incassate extends DynamicElement {
             tableContainer.innerHTML = this.renderTable(this.tableLink);
         }
 
-        console.log(tableContainer);
-
         this.submitButton = this.$(".btn_blue");
         this.selectCityBox = this.$("#city-search");
         this.selectDistrictBox = this.$("#districts-search");
         this.selectSegmentBox = this.$("#segments-search");
         this.dateSelectBox = this.$("select-box-date");
+
+        this.tabsListener();
     }
 
     async fetchInfoCardData(queryString) {
         try {
-            const response = await this.fetchData(`/encashment/failed-transactions?${queryString.toString()}`);
+            const response = await this.fetchData(
+                `/encashment/failed-transactions?${queryString.toString()}`
+            );
             this.setState({ infoCardsSummary: response.data });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
@@ -104,27 +104,16 @@ class Incassate extends DynamicElement {
         }
     }
 
-    async fetchSegments() {
-        try {
-            const response = await this.fetchData("/atm/segments");
-            this.setState({
-                segments: response.data.map((item) => ({
-                    value: item.id,
-                    text: item.name,
-                })),
-            });
-        } catch (err) {
-            console.error("❌ Error fetching segmentItems:", err);
-            this.setState({
-                segments: [],
-            });
-        }
+    onStoreChange(storeState) {
+        this.segments = storeState.segments.map((item) => ({
+            value: item.id,
+            text: item.name,
+        }));
     }
 
     addEventListeners() {
         this.submitButtonListener();
         this.checkboxesListener();
-        this.tabsListener();
 
         if (this.dateSelectBox) {
             this.addListener(this.dateSelectBox, "date-range-change", (e) => {
@@ -148,9 +137,6 @@ class Incassate extends DynamicElement {
 
     checkboxesListener() {
         const checkboxes = this.$$("custom-checkbox");
-        if (this.activeTab == "") {
-            this.activeTab = "province";
-        }
 
         checkboxes.forEach((checkbox) => {
             const val = checkbox.getAttribute("value");
@@ -205,7 +191,7 @@ class Incassate extends DynamicElement {
                 data-source=${link}
                 columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'>
             </simple-table>
-        </div>`;
+        `;
     }
 
     buildQueryString(startDate = null, endDate = null) {
@@ -216,17 +202,20 @@ class Incassate extends DynamicElement {
             const checkedValues = Array.from(this.checkedValues);
             const segments = this.querySelector("segment-block[name='province-segments']");
             checkedValues.forEach((v) => queryString.append("provinces", v));
-            if (segments?.values?.length) segments.values.forEach((v) => queryString.append("segmentIds", v));
+            if (segments?.values?.length)
+                segments.values.forEach((v) => queryString.append("segmentIds", v));
         } else if (this.activeTab === "city") {
             const values = this.selectCityBox.getAttribute("value")?.split(",") || [];
             values.forEach((v) => queryString.append("cities", v));
             const segments = this.querySelector("segment-block[name='city-segments']");
-            if (segments?.values?.length) segments.values.forEach((v) => queryString.append("segmentIds", v));
+            if (segments?.values?.length)
+                segments.values.forEach((v) => queryString.append("segmentIds", v));
         } else if (this.activeTab === "district") {
             const values = this.selectDistrictBox.getAttribute("value")?.split(",") || [];
             values.forEach((v) => queryString.append("districts", v));
             const segments = this.querySelector("segment-block[name='district-segments']");
-            if (segments?.values?.length) segments.values.forEach((v) => queryString.append("segmentIds", v));
+            if (segments?.values?.length)
+                segments.values.forEach((v) => queryString.append("segmentIds", v));
         } else if (this.activeTab === "segment") {
             const rawVal = this.selectSegmentBox.getAttribute("value") || "[]";
             JSON.parse(rawVal).forEach((v) => queryString.append("segmentIds", Number(v)));
@@ -239,22 +228,9 @@ class Incassate extends DynamicElement {
     }
 
     template() {
-        if (this.state.segments.length == 0) {
-            return /*html*/ `
-            <div class="row">
-                <div class="column sm-12">
-                    <div class="loading">
-                        <div class="loading__spinner spinner"></div>
-                        <div class="loading__text">Տվյալները բեռնվում են…</div>
-                    </div>
-                </div>
-            </div>
-            `;
-        }
-
         const cities = encode(this.cities);
         const districts = encode(this.districts);
-        const segments = encode(this.state.segments);
+        const segments = encode(this.segments);
 
         return /*html*/ `
         <div class="row">
@@ -274,7 +250,14 @@ class Incassate extends DynamicElement {
                     </div>
                     <div class="tab-content" data-tab="province">
                     <div class="checkboxes">
-                            ${this.province.map((el) => `<custom-checkbox id="${el.value}" value="${el.value}"   ${this.checkedValues.has(el.value) ? "checked" : ""}>${el.label} </custom-checkbox>`).join("")}
+                            ${this.province
+                                .map(
+                                    (el) =>
+                                        `<custom-checkbox id="${el.value}" value="${el.value}"   ${
+                                            this.checkedValues.has(el.value) ? "checked" : ""
+                                        }>${el.label} </custom-checkbox>`
+                                )
+                                .join("")}
                     </div>  
                     <segment-block decor name='province-segments'></segment-block>
                 </div>
@@ -293,7 +276,7 @@ class Incassate extends DynamicElement {
                         <button type="submit" class="btn btn_fit btn_blue btn_md">Հաստատել</button>
                     </div>
                 </div>
-            </div>
+            </div> 
         </div>
         <div class="row">
             <div class="column sm-12">
@@ -304,8 +287,12 @@ class Incassate extends DynamicElement {
                 <div class="row">
                     <div class="column sm-6">
                         <div class="infos infos_margin">
-                            <info-card title="Այսօրվա ինկասացիաներ" value="${this.state.infoCardsSummary.failed_transactions_count}" value-color="color-blue" icon="icon icon-box" show-border="true"> </info-card>
-                            <info-card title="Այսօր հետ բերված գումար" value="${this.state.infoCardsSummary.failed_transactions_amount}" value-currency="֏" value-color="color-blue" icon="icon icon-arrow-down-left" show-border="true"> </info-card>
+                            <info-card title="Այսօրվա ինկասացիաներ" value="${
+                                this.state.infoCardsSummary.failed_transactions_count
+                            }" value-color="color-blue" icon="icon icon-box" show-border="true"> </info-card>
+                            <info-card title="Այսօր հետ բերված գումար" value="${
+                                this.state.infoCardsSummary.failed_transactions_amount
+                            }" value-currency="֏" value-color="color-blue" icon="icon icon-arrow-down-left" show-border="true"> </info-card>
                         </div>
                     </div>
                 </div>

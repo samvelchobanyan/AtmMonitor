@@ -158,12 +158,14 @@ class ChartComponent extends DynamicElement {
         const endDate = this.getAttr("end-date") || null;
         const city = this.getAttr("city") || null;
         const region = this.getAttr("region") || null;
+        const atmId = this.getAttr("atm-id") || null;
 
         const params = new URLSearchParams();
         if (startDate) params.append("startDate", startDate);
         if (endDate) params.append("endDate", endDate);
         if (city) params.append("city", city);
         if (region) params.append("region", region);
+        if (atmId) params.append("atmId", atmId);
 
         const url = `${endpoint}?${params.toString()}`;
         try {

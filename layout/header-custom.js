@@ -29,17 +29,23 @@ class HeaderCustom extends DynamicElement {
     addGlobalEventListeners() {
         this.addListener(document, "route-changed", (e) => {
             const { title, route } = e.detail;
-            
+
             // Update title
             if (title !== this.title) {
                 this.title = title;
                 this._applyTitle();
             }
-            
+
             // Update visibility based on route
-            const pathsToHide = ["/ATM_monitor/geo", "/ATM_monitor/cumulative"];
-            const newHideClass = pathsToHide.includes(route) ? "hide" : "";
-            
+            const pathsToHide = ["/geo", "/cumulative", "/incassate", "/atms/"];
+
+            // check this way to detect atms detail page as well
+            const newHideClass = pathsToHide.some(
+                (path) => path === route || (path.endsWith("/") && route.startsWith(path))
+            )
+                ? "hide"
+                : "";
+
             if (newHideClass !== this.state.hideClass) {
                 this.state.hideClass = newHideClass;
                 this.render();

@@ -7,8 +7,13 @@ let dataTableModulePromise = null;
 function loadDataTableModule() {
 	if (!dataTableModulePromise) {
 		dataTableModulePromise = import(
-			"https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/module.js"
-		);
+			"https://cdn.jsdelivr.net/npm/simple-datatables@9.0.4/dist/module.js"
+		).then((mod) => {
+			// Normalize the exports
+			const DataTable = mod.DataTable || mod.default;
+			const { exportCSV, exportJSON, exportSQL } = mod;
+			return { DataTable, exportCSV, exportJSON, exportSQL };
+		});
 	}
 	return dataTableModulePromise;
 }
@@ -132,8 +137,10 @@ export class SimpleTable extends DynamicElement {
         }
         const searchable = this.getAttribute("searchable") === "false" ? false : true;
 		if (this.$("table")) {
-			loadDataTableModule().then((module) => {
-				this.datatableInstance = new module.DataTable(this.$("table"), {
+			loadDataTableModule().then((sdtLib) => {
+                this.sdtLib = sdtLib;
+
+				this.datatableInstance = new this.sdtLib.DataTable(this.$("table"), {
 					perPage: this.getPerPageOption() || 10,
 					perPageSelect: this.getPerPageSelectOption(),
 					sortable: true,
@@ -165,12 +172,19 @@ export class SimpleTable extends DynamicElement {
         if (exportBtn) {
             this.addListener(exportBtn, "click", () => {
                 const filenameBase = (this.getAttr("export-filename") || "export").replace(/\.csv$/i, "");
-                if (this.datatableInstance && typeof this.datatableInstance.export === "function") {
-                    this.datatableInstance.export({
-                        type: "csv",
-                        filename: filenameBase,
+                console.log("this.sdtLib", this.sdtLib);
+                
+                if (this.sdtLib?.exportCSV && this.datatableInstance) {
+                    this.sdtLib.exportCSV(this.datatableInstance, {
                         download: true,
+                        filename: filenameBase,
+                        columnDelimiter: ";", // optional
                     });
+                    // this.datatableInstance.export({
+                    //     type: "csv",
+                    //     filename: filenameBase,
+                    //     download: true,
+                    // });
                 } else {
                     console.warn("Simple-DataTables export() is not available. Ensure the export plugin is loaded or implement your own CSV generation.");
                 }

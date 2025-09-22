@@ -189,7 +189,10 @@ class Incassate extends DynamicElement {
         return /*html*/ `
             <simple-table
                 data-source=${link}
-                columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'>
+                columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+                exportable
+                export-filename="incassate"
+                export-label="Download CSV">
             </simple-table>
         `;
     }

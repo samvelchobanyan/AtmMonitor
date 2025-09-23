@@ -79,6 +79,9 @@ class AtmFailures extends DynamicElement {
         if (region !== this.selectedRegion || city !== this.selectedCity) {
             this.selectedRegion = region;
             this.selectedCity = city;
+
+            this.fetchTopSummary();
+            this.fetchChartSummary();
         }
     }
 
@@ -86,6 +89,8 @@ class AtmFailures extends DynamicElement {
         const queryString = new URLSearchParams();
         if (this.topStartDate) queryString.append("startDate", this.topStartDate);
         if (this.topEndDate) queryString.append("endDate", this.topEndDate);
+        if (this.selectedCity) queryString.append("city", this.selectedCity);
+        if (this.selectedRegion) queryString.append("district", this.selectedRegion);
 
         try {
             const response = await this.fetchData(`/device-faults/summary?${queryString}`);
@@ -175,7 +180,8 @@ class AtmFailures extends DynamicElement {
         // Add date filters if provided
         if (this.bottomStartDate) queryString.append("startDate", this.bottomStartDate);
         if (this.bottomEndDate) queryString.append("endDate", this.bottomEndDate);
-        if (this.tableActiveTab) queryString.append("deviceId", this.tableActiveTab);
+        if (this.selectedCity) queryString.append("city", this.selectedCity);
+        if (this.selectedRegion) queryString.append("district", this.selectedRegion);
 
         return queryString;
     }
@@ -236,10 +242,15 @@ class AtmFailures extends DynamicElement {
                 if (this.tableActiveTab === selectedTab) return;
 
                 this.tableActiveTab = selectedTab;
-                this.fetchChartSummary();
+
+                this.setState({
+                    devicesTypeSummary: this.state.devicesTypeSummary,
+                });
             });
         });
     }
+
+    // todo show total notifications count on red circle
 
     selectDatesListener() {
         if (this.topDateSelectBox) {
@@ -281,12 +292,12 @@ class AtmFailures extends DynamicElement {
         ) {
             return /*html*/ `
             <div class="row">
-            <div class="column sm-12">
-            <div class="loading">
-            <div class="loading__spinner spinner"></div>
-            <div class="loading__text">Տվյալները բեռնվում են…</div>
-            </div>
-            </div>
+                <div class="column sm-12">
+                    <div class="loading">
+                        <div class="loading__spinner spinner"></div>
+                        <div class="loading__text">Տվյալները բեռնվում են…</div>
+                    </div>
+                </div>
             </div>
             `;
         }
@@ -297,12 +308,11 @@ class AtmFailures extends DynamicElement {
         );
 
         console.log(found);
-        
 
         const faultsByDevice = encode({
             faults_by_device_type: found?.atms,
         });
-        
+
         return /*html*/ `
             <div class="row">
                 <div class="column sm-12">

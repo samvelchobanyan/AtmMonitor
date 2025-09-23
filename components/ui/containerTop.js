@@ -1,6 +1,6 @@
 export class ContainerTop extends HTMLElement {
     static get observedAttributes() {
-        return ["icon", "title", "link-text", "link-href"];
+        return ["icon", "title", "link-text", "link-href", "number"];
     }
 
     constructor() {
@@ -20,13 +20,16 @@ export class ContainerTop extends HTMLElement {
         const title = this.getAttribute("title") || "";
         const linkText = this.getAttribute("link-text");
         const linkHref = this.getAttribute("link-href") || "#";
+        const number = this.getAttribute("number");
 
         this.classList.add("container__top");
 
         this.innerHTML = `
             <div class="container__title">
                 <div class="title-icon"><i class="icon ${icon}"></i></div>
-                <h2 class="h2-font">${title}</h2>
+                <h2 class="h2-font">${title} ${
+            number ? `<span class="title-number">${number}</span>` : ""
+        }</h2>
             </div>
             ${
                 linkText

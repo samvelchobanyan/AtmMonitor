@@ -69,6 +69,8 @@ class Notifications extends DynamicElement {
         if (region !== this.selectedRegion || city !== this.selectedCity) {
             this.selectedRegion = region;
             this.selectedCity = city;
+
+            this.fetchSummary();
         }
     }
 
@@ -81,6 +83,8 @@ class Notifications extends DynamicElement {
             this.setState({
                 summary: res.data,
             });
+
+            console.log(res.data);
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });
@@ -104,7 +108,8 @@ class Notifications extends DynamicElement {
 
         if (this.startDate) queryString.append("startDate", this.startDate);
         if (this.endDate) queryString.append("endDate", this.endDate);
-        if (this.tableActiveTab) queryString.append("deviceId", this.tableActiveTab);
+        if (this.selectedCity) queryString.append("city", this.selectedCity);
+        if (this.selectedRegion) queryString.append("district", this.selectedRegion);
 
         return queryString;
     }
@@ -128,7 +133,6 @@ class Notifications extends DynamicElement {
                 if (this.tableActiveTab === selectedTab) return;
 
                 this.tableActiveTab = selectedTab;
-                // this.fetchSummary();
 
                 this.setState({
                     summary: this.state.summary,
@@ -166,34 +170,30 @@ class Notifications extends DynamicElement {
             `;
         }
 
-        console.log("summary", this.state.summary);
-        const found1 = this.state.summary.device_errors.filter(
-            (item) => item.device_name == this.tableActiveTab
-        );
+        const { device_errors, taken_cards, problematic_transactions } = this.state.summary;
 
-        const found2 = this.state.summary.device_errors.filter(
-            (item) => item.device_name == this.tableActiveTab
-        );
-        console.log("this.tableActiveTab", this.tableActiveTab);
-
-        // console.log("found", found);
+        const found = device_errors.filter((item) => item.device_name == this.tableActiveTab);
 
         const deviceErrors = encode({
-            device_errors: found1,
+            device_errors: found,
         });
 
         const takenCards = encode({
-            taken_cards: found2,
+            taken_cards: taken_cards,
         });
 
-        // todo ask aram where is total count in second table
+        const problematicTransactions = encode({
+            problematic_transactions: problematic_transactions,
+        });
 
         return /*html*/ `
             <div class="column sm-12">
                 <div class="container">
 
                    <div class="select-container">
-                            <container-top icon="icon-x-octagon" title="Անսարքություններ"> </container-top>
+                            <container-top icon="icon-x-octagon" title="Անսարքություններ" number='${
+                                device_errors.length
+                            }'> </container-top>
                              <select-box-date
                                 start-date="${this.startDate ? this.startDate : ""}"
                                 end-date="${this.endDate ? this.endDate : ""}"
@@ -213,15 +213,33 @@ class Notifications extends DynamicElement {
                   </div>
                  <simple-table
                     data='${deviceErrors}' 
-                    columns='["date","atm_and_address","fault_type"]'>
+                    columns='["date","atm_and_address","fault_type"]'
+                    link-columns='{"atm_and_address": "atms/:id"}'
+                    searchable="false"
+                    id='device-errors-table'
+                    >
                  </simple-table>
                 </div>
 
                 <div class="container">
-                    <container-top icon="icon-x-octagon" title="Առգրավված քարտեր"> </container-top>
+                    <container-top icon="icon-x-octagon" title="Առգրավված քարտեր" number='${
+                        taken_cards.length
+                    }'> </container-top>
                     <simple-table
                         data='${takenCards}' 
-                        columns='["date","atm_and_address","fault_type"]'>
+                        columns='["date","atm_and_address","card_number"]'
+                        searchable="false">
+                    </simple-table>
+                </div>
+
+                 <div class="container">
+                    <container-top icon="icon-x-octagon" title="Խնդրահարույց գործարքներ" number='${
+                        problematic_transactions.length
+                    }'> </container-top>
+                    <simple-table
+                        data='${problematicTransactions}' 
+                        columns='["date","atm_and_address","amount"]'
+                        searchable="false">
                     </simple-table>
                 </div>
             </div>

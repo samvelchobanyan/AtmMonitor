@@ -5,17 +5,17 @@ import tableTransformer from "../../core/utils/table-transformer.js";
 // Lazy-load Simple-DataTables once for all instances
 let dataTableModulePromise = null;
 function loadDataTableModule() {
-	if (!dataTableModulePromise) {
-		dataTableModulePromise = import(
-			"https://cdn.jsdelivr.net/npm/simple-datatables@9.0.4/dist/module.js"
-		).then((mod) => {
-			// Normalize the exports
-			const DataTable = mod.DataTable || mod.default;
-			const { exportCSV, exportJSON, exportSQL } = mod;
-			return { DataTable, exportCSV, exportJSON, exportSQL };
-		});
-	}
-	return dataTableModulePromise;
+    if (!dataTableModulePromise) {
+        dataTableModulePromise = import(
+            "https://cdn.jsdelivr.net/npm/simple-datatables@9.0.4/dist/module.js"
+        ).then((mod) => {
+            // Normalize the exports
+            const DataTable = mod.DataTable || mod.default;
+            const { exportCSV, exportJSON, exportSQL } = mod;
+            return { DataTable, exportCSV, exportJSON, exportSQL };
+        });
+    }
+    return dataTableModulePromise;
 }
 
 export class SimpleTable extends DynamicElement {
@@ -136,29 +136,29 @@ export class SimpleTable extends DynamicElement {
             this.datatableInstance = null;
         }
         const searchable = this.getAttribute("searchable") === "false" ? false : true;
-		if (this.$("table")) {
-			loadDataTableModule().then((sdtLib) => {
+        if (this.$("table")) {
+            loadDataTableModule().then((sdtLib) => {
                 this.sdtLib = sdtLib;
 
-				this.datatableInstance = new this.sdtLib.DataTable(this.$("table"), {
-					perPage: this.getPerPageOption() || 10,
-					perPageSelect: this.getPerPageSelectOption(),
-					sortable: true,
-					sessionStorage: false,
-					searchable,
-				});
+                this.datatableInstance = new this.sdtLib.DataTable(this.$("table"), {
+                    perPage: this.getPerPageOption() || 10,
+                    perPageSelect: this.getPerPageSelectOption(),
+                    sortable: true,
+                    sessionStorage: false,
+                    searchable,
+                });
 
-				// Listen to Simple-DataTables events to re-attach click listeners after pagination/sort/search
-				this.datatableInstance.on("datatable.page", () => {
-					this.addEventListeners();
-				});
-				this.datatableInstance.on("datatable.sort", () => this.addEventListeners());
-				this.datatableInstance.on("datatable.search", () => this.addEventListeners());
+                // Listen to Simple-DataTables events to re-attach click listeners after pagination/sort/search
+                this.datatableInstance.on("datatable.page", () => {
+                    this.addEventListeners();
+                });
+                this.datatableInstance.on("datatable.sort", () => this.addEventListeners());
+                this.datatableInstance.on("datatable.search", () => this.addEventListeners());
 
-				// Attach listeners initially
-				this.addEventListeners();
-			});
-		}
+                // Attach listeners initially
+                this.addEventListeners();
+            });
+        }
     }
 
     addEventListeners() {
@@ -171,9 +171,12 @@ export class SimpleTable extends DynamicElement {
         const exportBtn = this.$(".csv-export-btn");
         if (exportBtn) {
             this.addListener(exportBtn, "click", () => {
-                const filenameBase = (this.getAttr("export-filename") || "export").replace(/\.csv$/i, "");
+                const filenameBase = (this.getAttr("export-filename") || "export").replace(
+                    /\.csv$/i,
+                    ""
+                );
                 console.log("this.sdtLib", this.sdtLib);
-                
+
                 if (this.sdtLib?.exportCSV && this.datatableInstance) {
                     this.sdtLib.exportCSV(this.datatableInstance, {
                         download: true,
@@ -186,12 +189,12 @@ export class SimpleTable extends DynamicElement {
                     //     download: true,
                     // });
                 } else {
-                    console.warn("Simple-DataTables export() is not available. Ensure the export plugin is loaded or implement your own CSV generation.");
+                    console.warn(
+                        "Simple-DataTables export() is not available. Ensure the export plugin is loaded or implement your own CSV generation."
+                    );
                 }
             });
         }
-
-
 
         const clickable = this.parseClickableColumnsAttr();
         const colIndices = clickable
@@ -220,6 +223,43 @@ export class SimpleTable extends DynamicElement {
         });
     }
 
+    // template() {
+    //     if (this.state.error) {
+    //         return `<div class="error">Failed to load table data.</div>`;
+    //     }
+
+    //     if (this.state.loading) {
+    //         return `<div class="loading">Loading table…</div>`;
+    //     }
+
+    //     console.log("this.state.data", this.state.data);
+
+    //     if (!this.state.columns || !this.state.data) {
+    //         return `<div class="empty">No data available</div>`;
+    //     }
+
+    //     const header = this.state.columns.map((c) => `<th>${c}</th>`).join("");
+    //     const rows = this.state.data
+    //         .map((row, index) => {
+    //             const cells = this.state.columns
+    //                 .map((col) => `<td>${row[col] ?? ""}</td>`)
+    //                 .join("");
+    //             return `<tr data-row-index="${index}">${cells}</tr>`;
+    //         })
+    //         .join("");
+
+    //     const showExport = this.hasAttribute("exportable");
+    //     const exportLabel = this.getAttr("export-label") || "Download CSV";
+
+    //     return /* html */ `
+    //   <table class="data-table">
+    //     <thead><tr>${header}</tr></thead>
+    //     <tbody>${rows}</tbody>
+    //   </table>
+    //   ${showExport ? `<div class="table-actions"><button type="button" class="csv-export-btn">${exportLabel}</button></div>` : ``}
+    // `;
+    // }
+
     template() {
         if (this.state.error) {
             return `<div class="error">Failed to load table data.</div>`;
@@ -229,18 +269,44 @@ export class SimpleTable extends DynamicElement {
             return `<div class="loading">Loading table…</div>`;
         }
 
-        console.log("this.state.data", this.state.data);
-
         if (!this.state.columns || !this.state.data) {
             return `<div class="empty">No data available</div>`;
         }
 
+        const linkCols = (() => {
+            try {
+                const raw = this.getAttr("link-columns");
+                return raw ? JSON.parse(raw) : {};
+            } catch (e) {
+                return {};
+            }
+        })();
+
         const header = this.state.columns.map((c) => `<th>${c}</th>`).join("");
+
         const rows = this.state.data
             .map((row, index) => {
                 const cells = this.state.columns
-                    .map((col) => `<td>${row[col] ?? ""}</td>`)
+                    .map((col) => {
+                        let cellValue = row[col] ?? "";
+
+                        // for notifications redirect
+                        // If column is in link-columns → wrap in <a>
+                        if (linkCols[col]) {
+                            // extract ID (first part before "/")
+                            const id = String(cellValue)
+                                .split("/")[0]
+                                .trim();
+
+                            const href = linkCols[col].replace(":id", id);
+
+                            return `<td><a href="${href}">${cellValue}</a></td>`;
+                        }
+
+                        return `<td>${cellValue}</td>`;
+                    })
                     .join("");
+
                 return `<tr data-row-index="${index}">${cells}</tr>`;
             })
             .join("");
@@ -253,7 +319,11 @@ export class SimpleTable extends DynamicElement {
         <thead><tr>${header}</tr></thead>
         <tbody>${rows}</tbody>
       </table>
-      ${showExport ? `<div class="table-actions"><button type="button" class="csv-export-btn">${exportLabel}</button></div>` : ``}
+      ${
+          showExport
+              ? `<div class="table-actions "><button type="button" class="csv-export-btn btn btn_fit btn_blue btn_md">${exportLabel}</button></div>`
+              : ``
+      }
     `;
     }
 }

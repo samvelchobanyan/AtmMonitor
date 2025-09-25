@@ -61,10 +61,7 @@ class Cumulative extends DynamicElement {
     }
 
     onAfterRender() {
-        const tableContainer = this.$(".table-container");
-        if (tableContainer) {
-            tableContainer.innerHTML = this.renderTable(this.tableLink);
-        }
+        this.updateTable();
 
         this.submitButton = this.$(".btn_blue");
         this.selectCityBox = this.$("#city-search");
@@ -149,10 +146,7 @@ class Cumulative extends DynamicElement {
                 const queryString = this.buildQueryString(startDate, endDate);
 
                 this.tableLink = `/analytics/cumulative-summary?${queryString}`;
-                const tableContainer = this.$(".table-container");
-                if (tableContainer) {
-                    tableContainer.innerHTML = this.renderTable(this.tableLink);
-                }
+                this.updateTable();
             });
         }
     }
@@ -189,10 +183,7 @@ class Cumulative extends DynamicElement {
             const queryString = this.buildQueryString(startDate, endDate);
 
             this.tableLink = `/analytics/cumulative-summary?${queryString}`;
-            const tableContainer = this.$(".table-container");
-            if (tableContainer) {
-                tableContainer.innerHTML = this.renderTable(this.tableLink);
-            }
+            this.updateTable();
         });
     }
 
@@ -209,17 +200,25 @@ class Cumulative extends DynamicElement {
         });
     }
 
-    renderTable(link) {
+    renderTable() {
         return /*html*/ `
                 <div class="container">
                     <simple-table
-                        data-source=${link}
+                        data-source=${this.tableLink}
                         columns='["province","deposit_amount", "deposit_count", "dispense_amount", "dispense_count", "exchange_eur_amount", "exchange_rub_amount", "exchange_usd_amount"]'
                         exportable
+                        searchable="false"
                         export-filename="cumulative"
                         export-label="Ներբեռնել CSV">
                     </simple-table>
         </div>`;
+    }
+
+    updateTable() {
+        const tableContainer = this.$(".table-container");
+        if (tableContainer) {
+            tableContainer.innerHTML = this.renderTable(this.tableLink);
+        }
     }
 
     buildQueryString(startDate = null, endDate = null) {

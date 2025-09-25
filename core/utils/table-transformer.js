@@ -40,11 +40,25 @@ function transformFaultTableData(apiResponse) {
             collected_amount: item.collected_amount,
             marked_as_empty: item.marked_as_empty,
         }));
-    } else if (apiResponse?.device_errors) {
+    }
+    // Notifications data
+    else if (apiResponse?.device_errors) {
         return apiResponse.device_errors.map((item) => ({
             date: formatDate(item.created_at),
             atm_and_address: `${item.atm_id} / ${item.address}`,
             fault_type: item.device_name,
+        }));
+    } else if (apiResponse?.taken_cards) {
+        return apiResponse.taken_cards.map((item) => ({
+            date: formatDate(item.created_at),
+            atm_and_address: `${item.atm_id} / ${item.address}`,
+            card_number: item.card_number,
+        }));
+    } else if (apiResponse?.problematic_transactions) {
+        return apiResponse.problematic_transactions.map((item) => ({
+            date: formatDate(item.created_at),
+            atm_and_address: `${item.atm_id} / ${item.address}`,
+            amount: item.amount,
         }));
     }
     // Journal data

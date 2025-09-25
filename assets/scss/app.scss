@@ -214,3 +214,16 @@
         margin-bottom: 0;
     }
 }
+
+.container__top {
+    .title-number {
+        background-color: #eaeaea;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: bold;
+        margin-left: 8px;
+        padding: 6px 8px;
+        min-width: 24px;
+        height: 24px;
+    }
+}

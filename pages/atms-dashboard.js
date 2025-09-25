@@ -75,9 +75,11 @@ class AtmsDashboard extends DynamicElement {
         if (city) {
             queryString.append("city", city);
         }
+        let url = `/dashboard/summary?${queryString}`;
+        url = url.endsWith('?') ? url.slice(0, - 1) : url;
 
         try {
-            const response = await this.fetchData(`/dashboard/summary?${queryString}`);
+            const response = await this.fetchData(url);
             this.setState({
                 selectedRegion: region,
                 selectedCity: city,

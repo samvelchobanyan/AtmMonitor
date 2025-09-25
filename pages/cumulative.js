@@ -217,7 +217,7 @@ class Cumulative extends DynamicElement {
                         columns='["province","deposit_amount", "deposit_count", "dispense_amount", "dispense_count", "exchange_eur_amount", "exchange_rub_amount", "exchange_usd_amount"]'
                         exportable
                         export-filename="cumulative"
-                        export-label="Download CSV">
+                        export-label="Ներբեռնել CSV">
                     </simple-table>
         </div>`;
     }

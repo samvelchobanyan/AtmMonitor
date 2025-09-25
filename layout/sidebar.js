@@ -1,4 +1,6 @@
 import { DynamicElement } from "../core/dynamic-element.js";
+import { store } from "../core/store/store.js";
+import { memoryStore } from "../core/memory-store.js";
 
 class SideBar extends DynamicElement {
     constructor() {
@@ -44,6 +46,19 @@ class SideBar extends DynamicElement {
 
         // Click outside to close dropdowns
         this.addListener(document, "click", this.handleOutsideClick.bind(this));
+
+        // Logout
+        const logoutBtn = this.$("#logout-btn");
+        if (logoutBtn) {
+            this.addListener(logoutBtn, "click", (e) => {
+                e.preventDefault();
+                try { sessionStorage.removeItem("auth_token"); } catch {}
+                try { sessionStorage.removeItem("auth_user"); } catch {}
+                try { store.reset(); } catch {}
+                try { memoryStore.clear(); } catch {}
+                window.location.href = "/ATM_monitor/signin";
+            });
+        }
     }
 
     handleToggle() {

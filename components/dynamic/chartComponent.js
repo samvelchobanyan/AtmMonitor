@@ -180,7 +180,8 @@ class ChartComponent extends DynamicElement {
                 case "line":
                     if (
                         this.getAttribute("id") == "line-chart-transaction-dynamics1" ||
-                        this.getAttribute("id") == "line-chart-transaction-dynamics2"
+                        this.getAttribute("id") == "line-chart-transaction-dynamics2" ||
+                        this.getAttribute("id") == "line-chart-transactions"
                     ) {
                         // case for geo page
                         this.transformedData = chartDataTransformer.transformData(

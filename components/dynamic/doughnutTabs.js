@@ -145,6 +145,7 @@ export default class DoughnutTabs extends DynamicElement {
             dispense_count_percent_change,
             breakdowns,
         } = this.rawData;
+        console.log('asklsdjlakjsdlaksdjalksdj',this.rawData);
 
         const result = {};
         Object.entries(breakdowns).forEach(([key, items]) => {

@@ -154,7 +154,7 @@ class inOut extends DynamicElement {
                             id="line-chart-transactions" 
                             chart-type="line" 
                             chart-data='${transactionDynamicsData}' 
-                            api-url="/analytics/exchange-dynamic-in-days" 
+                            api-url="/analytics/transactions-dynamic-in-days" 
                             ${this.attrIf("city", this.state.currentCity)} 
                             ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
                     </div>

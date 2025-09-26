@@ -58,7 +58,7 @@ class DoughnutChartComponent extends DynamicElement {
         return `
           <div class="overview">
             <div class="overview-top">
-              <div class="overview-top__title">Կանխիկացված գումար</div>
+              <div class="overview-top__title">${this.getAttr('title')}</div>
               <div class="overview-top__info">
                 <div class="overview-top__subtitle">
                   ${this.total}<span>֏</span>

@@ -70,6 +70,7 @@ class ChartComponent extends DynamicElement {
                             this.transformedData = chartDataTransformer.transformDoughnutData(
                                 parsed
                             );
+
                             break;
                         case "bar":
                             const isStack = this.getAttribute("stacked");
@@ -257,7 +258,7 @@ class ChartComponent extends DynamicElement {
                       <div class="chart chart_280">
                           <canvas id="${this.canvasId}"></canvas>
                           <div class="chart-info">
-                              <div class="chart-info__number">${this.transformedData.metaData.total.toLocaleString()}<span>֏</span></div>
+                              <div class="chart-info__number">${this.transformedData.metaData.total.toLocaleString()}</div>
                               <change-indicator value="${
                                   this.transformedData.metaData.percent
                               }"></change-indicator>

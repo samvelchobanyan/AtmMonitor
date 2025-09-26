@@ -224,13 +224,13 @@ class AtmsDashboard extends DynamicElement {
                     <container-top icon="icon-coins" title="Ինկասացիա"> </container-top> 
                     <div class="infos infos_margin">
                         <info-card
-                            title="Այսօրվա ինկասացիաներ"
+                            title="Ինկասացիաների քանակ"
                             value="${encashmentData.total_encashments}"
                             icon="icon icon-box"
                             show-border="true">
                         </info-card>
                         <info-card
-                            title="Այսօր հետ բերված գումար"
+                            title="Հետ բերված գումար"
                             value="${encashmentData.total_collected_amount}"
                             value-currency="֏"
                             value-color="color-green"
@@ -238,7 +238,7 @@ class AtmsDashboard extends DynamicElement {
                             show-border="true">
                         </info-card>
                         <info-card
-                            title="Այսօրվա ինկասացիայի գումար"
+                            title="Ինկասացիայի գումար"
                             value="${encashmentData.total_added_amount}"
                             value-currency="֏"
                             value-color="color-blue"

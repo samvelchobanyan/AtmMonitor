@@ -1,9 +1,18 @@
 import { api } from './api-client.js';
+import { store } from './store/store.js';
 
 class PollingService {
   constructor() {
     this.pollers = new Map(); // pollerId -> { endpoint, callbacks, intervalId, intervalMs, isFetching }
     this.isTabVisible = true;
+
+    try {
+      this.pollingEnabled = store.getState().settings.pollingEnabled;
+    } catch (error) {
+      console.error("PollingService: Error getting polling enables from store:", error);
+      this.pollingEnabled = true;
+    }
+
     this.setupVisibilityListener();
   }
 
@@ -52,13 +61,15 @@ class PollingService {
   }
 
   async startPoller(pollerId) {
+    if (!this.pollingEnabled) return;
+
     const poller = this.pollers.get(pollerId);
     if (!poller || poller.intervalId) return;
 
     console.log(`[PollingService] Starting poller "${pollerId}"`);
 
     const poll = async () => {
-      if (!this.isTabVisible || poller.isFetching) return;
+      if (!this.isTabVisible || poller.isFetching || !this.pollingEnabled) return;
       
       poller.isFetching = true;
       try {
@@ -110,7 +121,7 @@ class PollingService {
       // Resume/pause all active pollers
       this.pollers.forEach((poller, pollerId) => {
         if (poller.callbacks.size > 0) {
-          if (this.isTabVisible) {
+          if (this.isTabVisible && this.pollingEnabled) {
             this.startPoller(pollerId);
           } else {
             this.stopPoller(pollerId);

@@ -7,6 +7,7 @@ export const initialState = {
     settings: {
         theme: "light",
         language: "en",
+        pollingEnabled: false,
     },
     regionsData: null,
     selectedRegion: null,

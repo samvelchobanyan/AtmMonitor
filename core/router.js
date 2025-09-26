@@ -99,7 +99,7 @@ export function startRouter() {
         if (!customElements.get("atms-dashboard")) {
             await import("../pages/atms-dashboard.js");
         }
-        mountComponent("atms-dashboard", "Ակնարկ", ctx.query, "/home");
+        mountComponent("atms-dashboard", "Ամփոփ", ctx.query, "/home");
     });
 
     // — Input-output page Route

@@ -223,43 +223,6 @@ export class SimpleTable extends DynamicElement {
         });
     }
 
-    // template() {
-    //     if (this.state.error) {
-    //         return `<div class="error">Failed to load table data.</div>`;
-    //     }
-
-    //     if (this.state.loading) {
-    //         return `<div class="loading">Loading table…</div>`;
-    //     }
-
-    //     console.log("this.state.data", this.state.data);
-
-    //     if (!this.state.columns || !this.state.data) {
-    //         return `<div class="empty">No data available</div>`;
-    //     }
-
-    //     const header = this.state.columns.map((c) => `<th>${c}</th>`).join("");
-    //     const rows = this.state.data
-    //         .map((row, index) => {
-    //             const cells = this.state.columns
-    //                 .map((col) => `<td>${row[col] ?? ""}</td>`)
-    //                 .join("");
-    //             return `<tr data-row-index="${index}">${cells}</tr>`;
-    //         })
-    //         .join("");
-
-    //     const showExport = this.hasAttribute("exportable");
-    //     const exportLabel = this.getAttr("export-label") || "Download CSV";
-
-    //     return /* html */ `
-    //   <table class="data-table">
-    //     <thead><tr>${header}</tr></thead>
-    //     <tbody>${rows}</tbody>
-    //   </table>
-    //   ${showExport ? `<div class="table-actions"><button type="button" class="csv-export-btn">${exportLabel}</button></div>` : ``}
-    // `;
-    // }
-
     template() {
         if (this.state.error) {
             return `<div class="error">Failed to load table data.</div>`;

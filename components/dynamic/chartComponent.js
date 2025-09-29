@@ -172,6 +172,14 @@ class ChartComponent extends DynamicElement {
         try {
             const response = await this.fetchData(url);
 
+            // for dashboard incashment info cards
+            this.dispatchEvent(
+                new CustomEvent("chart-changed", {
+                    detail: { data: response.data },
+                    bubbles: true,
+                })
+            );
+
             const isValid = response && response.errors === null && response.data;
 
             if (!isValid) throw new Error("Invalid API response format");

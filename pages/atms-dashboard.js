@@ -15,7 +15,12 @@ class AtmsDashboard extends DynamicElement {
             selectedRegion: null,
             selectedCity: null,
             summary: null,
+            incashmentInfoCardsData: null,
+            atmInfoCardsData: null,
         };
+
+        this.incashmentChart = null;
+        this.barChart = null;
     }
 
     onConnected() {
@@ -76,19 +81,76 @@ class AtmsDashboard extends DynamicElement {
             queryString.append("city", city);
         }
         let url = `/dashboard/summary?${queryString}`;
-        url = url.endsWith('?') ? url.slice(0, - 1) : url;
+        url = url.endsWith("?") ? url.slice(0, -1) : url;
 
         try {
             const response = await this.fetchData(url);
+            console.log("response.data.work_hours_per_day", response.data);
+            console.log("response", response.data);
             this.setState({
                 selectedRegion: region,
                 selectedCity: city,
                 summary: response.data,
+                incashmentInfoCardsData: response.data.encashmentInfo,
+                atmInfoCardsData: response.data.atmWorkHours,
             });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });
         }
+    }
+
+    onAfterRender() {
+        this.incashmentChart = this.$("#line-chart-transit");
+        this.barChart = this.$("#bar-chart");
+    }
+
+    addEventListeners() {
+        if (this.incashmentChart) {
+            this.addListener(this.incashmentChart, "chart-changed", (e) => {
+                let data = e.detail.data;
+                const newInfo = {
+                    total_encashments: data.total_encashments,
+                    total_collected_amount: data.total_collected_amount,
+                    total_added_amount: data.total_added_amount,
+                    yesterday_marked_as_empty: data.yesterday_marked_as_empty,
+                };
+
+                // Only update if different, because creates loop
+                if (
+                    JSON.stringify(newInfo) !== JSON.stringify(this.state.incashmentInfoCardsData)
+                ) {
+                    this.setState({ incashmentInfoCardsData: newInfo });
+                    console.log("Chart changed data:", data);
+                }
+            });
+        }
+        // todo ask if this should also update. If so, then they should gice just 1 value, now its an array. Delete all data if this doesnt need
+        // if (this.barChart) {
+        //     this.addListener(this.barChart, "chart-changed", (e) => {
+        //         let data = e.detail.data;
+
+        //         // const newInfo = {
+        //         //     total_encashments: data.total_encashments,
+        //         //     total_collected_amount: data.total_collected_amount,
+        //         //     total_added_amount: data.total_added_amount,
+        //         //     yesterday_marked_as_empty: data.yesterday_marked_as_empty,
+        //         // };
+        //         console.log("!!!!!!!", this.state.atmInfoCardsData);
+        //         console.log("data.work_hours_per_day", data);
+
+        //         // Only update if different, because creates loop
+        //         if (
+        //             JSON.stringify(data.work_hours_per_day[0]) !==
+        //             JSON.stringify(this.state.atmInfoCardsData)
+        //         ) {
+        //             this.setState({ atmInfoCardsData: data.work_hours_per_day[0] });
+        //             console.log("Chart changed data:", data);
+
+        //             console.log("atmInfoCardsData", this.state.atmInfoCardsData);
+        //         }
+        //     });
+        // }
     }
 
     template() {
@@ -107,8 +169,8 @@ class AtmsDashboard extends DynamicElement {
 
         const generalData = this.state.summary;
         const transactionsData = this.state.summary.transactionsInfo;
-        const encashmentData = this.state.summary.encashmentInfo;
-        const atmWorkHours = this.state.summary.atmWorkHours;
+        const encashmentData = this.state.incashmentInfoCardsData;
+        const atmWorkHours = this.state.atmInfoCardsData;
 
         const transactionDaily = this.state.summary.hourly_transactions;
         const encashmentsDaily = this.state.summary.hourly_encashments;
@@ -178,17 +240,17 @@ class AtmsDashboard extends DynamicElement {
         <div class="row">
             <div class="column sm-6">
                 <div class="container">
-                    <container-top icon="icon-trending-up" title="Գործարքների գումար" link-text="Մանրամասն" link-href="/details"> </container-top>
+                    <container-top icon="icon-trending-up" title="Գործարքների գումար" link-text="Մանրամասն" link-href="inout"> </container-top>
                     <div class="infos infos_margin">
                         <info-card
-                            title="Այսօր կանխիկացված գումար"
+                            title="Կանխիկացված գումար"
                             value="${transactionsData.total_dispense_amount}"
                             value-currency="֏" value-color="color-green"
                             trend="${transactionsData.dispense_amount_percent_change}"
                             show-border="true">
                         </info-card>
                         <info-card
-                            title="Այսօր մուտքագրված գումար"
+                            title="Մուտքագրված գումար"
                             value="${transactionsData.total_deposit_amount}"
                             value-currency="֏"
                             value-color="color-blue"
@@ -207,7 +269,7 @@ class AtmsDashboard extends DynamicElement {
             </div>
             <div class="column sm-6">
                 <div class="container">
-                    <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="/details"> </container-top>
+                    <container-top icon="icon-chart" title="Գործարքների քանակ" link-text="Մանրամասն" link-href="inout"> </container-top>
                     <chart-component
                         id="pie-chart"
                         chart-type="doughnut"

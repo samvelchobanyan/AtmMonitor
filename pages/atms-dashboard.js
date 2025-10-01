@@ -7,6 +7,7 @@ import "../components/dynamic/modal-popup.js";
 import "../components/static/changeIndicator.js";
 import "../components/dynamic/infoCard.js";
 import "../components/dynamic/doughnutChart.js";
+import encode from "../assets/js/utils/encode.js";
 
 class AtmsDashboard extends DynamicElement {
     constructor() {
@@ -19,6 +20,7 @@ class AtmsDashboard extends DynamicElement {
         };
 
         this.incashmentChart = null;
+        this.commentsData = [];
     }
 
     onConnected() {
@@ -91,6 +93,16 @@ class AtmsDashboard extends DynamicElement {
                 summary: response.data,
                 incashmentInfoCardsData: response.data.encashmentInfo,
             });
+        } catch (err) {
+            console.error("❌ Error fetching summary:", err);
+            this.setState({ summary: null });
+        }
+    }
+
+    async fetchComments() {
+        try {
+            const response = await this.fetchData("/dashboard/comments");
+            this.commentsData = response.data;
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });
@@ -282,8 +294,8 @@ class AtmsDashboard extends DynamicElement {
                             value="${encashmentData.yesterday_marked_as_empty}"
                             value-color="color-red"
                             icon="icon icon-box"
-                            message="2"
-                            message-endpoint='dashboard/comments'
+                            message="${this.commentsData.length}"
+                            messages-data='${encode(this.commentsData)}'
                             show-border="true">
                         </info-card>
                     </div>

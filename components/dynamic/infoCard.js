@@ -16,8 +16,7 @@ class InfoCard extends DynamicElement {
             "message",
             "highlight",
             "border",
-            "duration",
-            "message-endpoint",
+            "duration"
         ];
     }
     static get observedAttributes() {
@@ -39,35 +38,35 @@ class InfoCard extends DynamicElement {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
         modal.setContent(`
-   <div class="modal__header">
-      <div class="modal__title">Մեկնաբանություններ</div>
-      <img class="modal__close"   src="assets/img/icons/x-circle.svg" alt="" />
-    </div>
-      <div class="modal__body">
-          <div class="modal__messages">
-       ${
-           messages.length
-               ? messages
-                     .map((msg) => {
-                         const dt = new Date(msg.date_time);
-                         const formattedDate = dt.toLocaleDateString("en-GB", {
-                             day: "2-digit",
-                             month: "long",
-                         });
-                         const formattedTime = dt.toLocaleTimeString("en-GB", {
-                             hour: "2-digit",
-                             minute: "2-digit",
-                         });
-                         return `
-                    <div class="modal__message">
-                      <div class="modal__message-meta">${formattedDate} | ${formattedTime}</div>
-                      <div class="modal__message-text">${msg.comment}</div>
-                    </div>`;
-                     })
-                     .join("")
-               : `<div class="modal__message-empty">Մեկնաբանություններ չկան</div>`
-       }
-      </div>
+        <div class="modal__header">
+            <div class="modal__title">Մեկնաբանություններ</div>
+            <img class="modal__close"   src="assets/img/icons/x-circle.svg" alt="" />
+        </div>
+        <div class="modal__body">
+            <div class="modal__messages">
+                ${
+                    messages.length
+                        ? messages
+                              .map((msg) => {
+                                  const dt = new Date(msg.date_time);
+                                  const formattedDate = dt.toLocaleDateString("en-GB", {
+                                      day: "2-digit",
+                                      month: "long",
+                                  });
+                                  const formattedTime = dt.toLocaleTimeString("en-GB", {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                  });
+                                  return `
+                                <div class="modal__message">
+                                    <div class="modal__message-meta">${formattedDate} | ${formattedTime}</div>
+                                    <div class="modal__message-text">${msg.comment}</div>
+                                </div>`;
+                              })
+                              .join("")
+                        : `<div class="modal__message-empty">Մեկնաբանություններ չկան</div>`
+                }
+                </div>
       </div>
     
    
@@ -79,53 +78,8 @@ class InfoCard extends DynamicElement {
     }
 
     async handleMessageClick() {
-        const endpoint = this.getAttribute("message-endpoint");
-        if (!endpoint) return;
-
-        this.setState({ isLoading: true });
-
-        // const fakeMessages = [
-        //     {
-        //         id: 1,
-        //         comment: "Բարև, խնդրում եմ նորացնել տեղեկատվությունը:",
-        //         date_time: "2025-07-23 10:45",
-        //         user_id: 12,
-        //     },
-        //     {
-        //         id: 2,
-        //         comment: "Նկարներն արդեն վերաբերցվել են:",
-        //         date_time: "2025-07-23 11:10",
-        //         user_id: 15,
-        //     },
-        //     {
-        //         id: 3,
-        //         comment: "Հնարավոր է՞ ավելացնել մեկ տարբերակ:",
-        //         date_time: "2025-07-24 09:00",
-        //         user_id: 12,
-        //     },
-        //     {
-        //         id: 4,
-        //         comment: "Շնորհակալ եմ արձագանքի համար։",
-        //         date_time: "2025-07-24 12:30",
-        //         user_id: 18,
-        //     },
-        // ];
-
-        try {
-            // fake to see it works, no data in api yet
-            // this._openMessagesPopup(fakeMessages);
-
-            const response = await this.fetchData(endpoint);
-            if (Array.isArray(response)) {
-                this._openMessagesPopup(response);
-            } else {
-                console.warn("Expected array of messages but got:", response);
-            }
-        } catch (err) {
-            console.error("Failed to fetch messages:", err);
-        } finally {
-            this.setState({ isLoading: false });
-        }
+        let comments = this.getAttribute("messages-data");
+        this._openMessagesPopup(JSON.parse(comments));
     }
 
     onAttributeChange(name, oldValue, newValue) {

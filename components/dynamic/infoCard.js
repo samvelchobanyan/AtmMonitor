@@ -95,7 +95,7 @@ class InfoCard extends DynamicElement {
                         <span class="atm-item__value">#<span class="font-black">{{atm_id}}</span></span>
                     </div>
                     <div class="atm-item__address">
-                        <span class="atm-item__value">{{card_number}}</span>
+                        <span class="atm-item__value">Քարտի համար։ {{card_number}}</span>
                     </div>
                 </div>
             </div>
@@ -118,10 +118,10 @@ class InfoCard extends DynamicElement {
                             <span class="atm-item__value">#{{atm_id}}</span>
                         </div>
                         <div class="atm-item__address">
-                            <span class="atm-item__value">Cassette type : {{cassette_type}}</span>
+                            <span class="atm-item__value">Կասետի տիպ : {{cassette_type}}</span>
                         </div>
                         <div class="atm-item__address">
-                            <span class="atm-item__value">Left : {{count}}</span>
+                            <span class="atm-item__value">Մնացած քանակ : {{count}}</span>
                         </div>
                     </div>
                     </div>
@@ -132,21 +132,19 @@ class InfoCard extends DynamicElement {
             modalTitle = "Դատարկ";
 
             itemTemplate = `
-            <a href="atms/{{atm_id}}">
-                <div class="atm-item">
+            <a href="atms/{{atm_id}}"class="atm-item">
                         <div class="atm-item__icon">
                             <img src="assets/img/atm-icon.svg" alt="ATM Icon"/>
-                        </div>     <div class="atm-item">
+                        </div>    
                     <div class="atm-item__info">
                         <div class="atm-item__id">
                             <span class="atm-item__label">ATM ID:</span>
                             <span class="atm-item__value">#{{atm_id}}</span>
                         </div>
                         <div class="atm-item__address">
-                            <span class="atm-item__value">Cassette type : {{cassette_type}}</span>
+                            <span class="atm-item__value">Կասետի տիպ : {{cassette_type}}</span>
                         </div>
                     </div>
-                </div>
                 </div>
             </a>
         `;

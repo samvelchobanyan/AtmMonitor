@@ -639,6 +639,7 @@
     border: 1px solid #eaeaea;
 }
 .infos {
+    margin-top: 16px;
     margin-bottom: -1.25rem;
 }
 .infos .info {

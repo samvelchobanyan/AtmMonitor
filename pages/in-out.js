@@ -3,6 +3,7 @@ import { ContainerTop } from "../components/ui/containerTop.js";
 import "../components/dynamic/doughnutTabs.js";
 import dataTransformer from "../core/utils/data-transformer.js";
 import encode from "../assets/js/utils/encode.js";
+import "../components/dynamic/select-box-date.js";
 
 class inOut extends DynamicElement {
     constructor() {
@@ -11,14 +12,41 @@ class inOut extends DynamicElement {
         this.state = {
             summary: null,
             atmId: null,
+            exchangeData: null,
         };
 
         this.currentRegion = null;
         this.currentCity = null;
+        this.exchangeDateBox = null;
     }
 
     onConnected() {
         this.fetchSummary();
+    }
+
+    onAfterRender() {
+        this.exchangeDateBox = this.$("#exchange-date");
+    }
+
+    addEventListeners() {
+        if (this.exchangeDateBox) {
+            this.addListener(this.exchangeDateBox, "date-range-change", (e) => {
+                // let startDate = this.exchangeDateBox.getAttribute("start-date");
+                // let endDate = this.exchangeDateBox.getAttribute("end-date");
+                const { startDate, endDate } = e.detail;
+                console.log(startDate, endDate);
+                this.fetchExchangeData(startDate, endDate);
+            });
+        }
+    }
+
+    async fetchExchangeData(startDate, endDate) {
+        const response = await this.fetchData(
+            `/analytics/exchange-summary-in-days?startDate=${startDate}&endDate=${endDate}`
+        );
+        this.setState({
+            exchangeData: response.data,
+        });
     }
 
     async fetchSummary(region, city, atmId) {
@@ -40,13 +68,14 @@ class inOut extends DynamicElement {
             this.setState({
                 summary: response,
                 atmId: atmId,
+                exchangeData: response.data.exchange_summary,
             });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });
         }
     }
-    
+
     onStoreChange(storeState) {
         const region = storeState.selectedRegion;
         const city = storeState.selectedCity;
@@ -100,9 +129,11 @@ class inOut extends DynamicElement {
             `;
         }
 
+        console.log("!!!!!!!!!!!!!", this.state.exchangeData);
+
         const dispenseData = encode(summary.data.dispense_summary);
         const depositData = encode(summary.data.deposit_summary);
-        const exchangeData = summary.data.exchange_summary.currency_details;
+        const exchangeData = this.state.exchangeData.currency_details;
 
         const depositDynamicData = encode(
             summary.data.transaction_dynamics.deposit_dynamic.hourly_data
@@ -114,7 +145,7 @@ class inOut extends DynamicElement {
         const transactionDynamicsData = encode(
             this._transformToTransactionDynamics(summary.data.transaction_dynamics)
         );
-
+// todo contine here, exchange dates are resert after change
         return /*html*/ `
             <div class="row">
                 <div class="column sm-6">
@@ -129,15 +160,17 @@ class inOut extends DynamicElement {
                 </div>
                 <div class="column sm-12">
                     <div class="container">
+                    <div class="select-container">
                         <container-top icon="icon-dollar-sign" title="Արտարժույթի փոխանակում"></container-top>
-                        <div class="infos">
+                      <select-box-date id='exchange-date'></select-box-date>
+                      </div>
+                        <div class="infos">  
                             ${exchangeData
                                 .map((exchange) => {
                                     return `
                                 <info-card
                                     title="${exchange.currency_code}"
                                     value="${exchange.total_amount}"
-                                    value-currency="$"
                                     trend="${exchange.total_amount_percent_change}"
                                     icon="icon icon-box"
                                     show-border="true">

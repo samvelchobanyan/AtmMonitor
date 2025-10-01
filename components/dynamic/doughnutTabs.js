@@ -234,7 +234,7 @@ export default class DoughnutTabs extends DynamicElement {
         ${this._renderRadios()}
       </div>
       <div class="chart-container">
-        <doughnut-chart id="${this.getAttr("id")}-amount" data='${amountData}' title="Կանխիկացված գումար"></doughnut-chart>
+        <doughnut-chart id="${this.getAttr("id")}-amount" data='${amountData}' title="Կանխիկացված գումար"  currency="true"></doughnut-chart>
         <doughnut-chart id="${this.getAttr("id")}-count" data='${countData}'  title="Կանխիկացումների քանակ"></doughnut-chart>
       </div>
     `;

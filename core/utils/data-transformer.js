@@ -21,6 +21,13 @@ const CHART_CONFIG = {
         own_card: "Անձնական քարտ",
         other_card: "Ուրիշի քարտ",
 
+        card_replenishment: 'Մուտքագրում քարտին',
+        card_transfer: 'Փոխանցում քարտին',
+        pers_account_replenishment: 'Անձնական հաշվի համալրում',
+        org_account_replenishment: 'Կազմակերպության հաշվի համալրում',
+        deposit_replenishment: 'Ավանդի համալրում',
+        loan_payment: 'Վարկի մարում',
+
         // atm detail page
         current_count: "Առկա գումար",
         last_encashment_count: "Վերջին ինկասացիա",

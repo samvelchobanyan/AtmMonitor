@@ -55,7 +55,6 @@ class DoughnutChartComponent extends DynamicElement {
             return `<div class="loading">Waiting for chart data…</div>`;
         }
         let suffix = this.getAttr('currency') ? '<span>֏</span>' : '';
-        console.log('asdasdasdasd',this.dailyAvg);
 
         return `
           <div class="overview">
@@ -68,12 +67,12 @@ class DoughnutChartComponent extends DynamicElement {
                 <div class="badges">
                   ${
                       this.dailyAvg
-                          ? `<badge-item text="Օրական միջին՝ ${this.dailyAvg + suffix}"></badge-item>`
+                          ? `<badge-item text="Օրական միջին՝ ${this.dailyAvg.toLocaleString() + suffix}"></badge-item>`
                           : ""
                   }
                   ${
                       this.transactionAvg
-                          ? `<badge-item text="Միջին գործարք՝ ${this.transactionAvg + suffix}"></badge-item>`
+                          ? `<badge-item text="Միջին գործարք՝ ${this.transactionAvg.toLocaleString() + suffix}"></badge-item>`
                           : ""
                   }
                 </div>

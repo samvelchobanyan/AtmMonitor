@@ -57,7 +57,7 @@ const htmlLegendPlugin = {
                 if (customLegendEl.hasClass("custom-legend_percent")) {
                     textContainer.textContent = `${item.text} (${percent}%)`;
                 } else if (customLegendEl.hasClass("custom-legend_data")) {
-                    textContainer.innerHTML = `${item.text} <div>${percent}% / ${value}</div>`;
+                    textContainer.innerHTML = `${item.text} <div>${percent}% / ${value.toLocaleString()}</div>`;
                 } else {
                     // Default: label text only
                     textContainer.textContent = `${item.text}`;
@@ -254,8 +254,6 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
     if (useLabelLines) {
         plugins.push(doughnutLabelLinesPlugin);
     }
-
-    console.log("chartData", chartData);
 
     return new Chart(ctx, {
         type: "doughnut",

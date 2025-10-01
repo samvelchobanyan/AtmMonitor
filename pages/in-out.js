@@ -129,8 +129,6 @@ class inOut extends DynamicElement {
             `;
         }
 
-        console.log("!!!!!!!!!!!!!", this.state.exchangeData);
-
         const dispenseData = encode(summary.data.dispense_summary);
         const depositData = encode(summary.data.deposit_summary);
         const exchangeData = this.state.exchangeData.currency_details;

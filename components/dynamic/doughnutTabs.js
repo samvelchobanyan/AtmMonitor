@@ -14,6 +14,7 @@ const TAB_LABELS = {
         "\u054d\u0565\u0583\u0561\u056f\u0561\u0576 / \u0531\u0575\u056c \u056f\u0561\u0580\u057f",
     payment_system:
         "\u054e\u0580\u0561\u0580\u0561\u0575\u056b\u0576 \u0570\u0561\u0574\u0561\u056f\u0561\u0580\u0563",
+    type: "Ըստ տեսակի",
 };
 
 export default class DoughnutTabs extends DynamicElement {
@@ -145,7 +146,6 @@ export default class DoughnutTabs extends DynamicElement {
             dispense_count_percent_change,
             breakdowns,
         } = this.rawData;
-        console.log('asklsdjlakjsdlaksdjalksdj',this.rawData);
 
         const result = {};
         Object.entries(breakdowns).forEach(([key, items]) => {

@@ -41,42 +41,6 @@ class InfoCard extends DynamicElement {
         }
     }
 
-    // _openMessagesPopup(messages) {
-    //     const modal = document.createElement("modal-popup");
-    //     document.body.appendChild(modal);
-    //     modal.setContent(`
-    //     <div class="modal__header">
-    //         <div class="modal__title">Մեկնաբանություններ</div>
-    //         <img class="modal__close"   src="assets/img/icons/x-circle.svg" alt="" />
-    //     </div>
-    //     <div class="modal__body">
-    //         <div class="modal__messages">
-    //             ${
-    //                 messages.length
-    //                     ? messages
-    //                           .map((msg) => {
-    //                               const dt = new Date(msg.date_time);
-    //                               const formattedDate = dt.toLocaleDateString("en-GB", {
-    //                                   day: "2-digit",
-    //                                   month: "long",
-    //                               });
-    //                               const formattedTime = dt.toLocaleTimeString("en-GB", {
-    //                                   hour: "2-digit",
-    //                                   minute: "2-digit",
-    //                               });
-    //                               return `
-    //                             <div class="modal__message">
-    //                                 <div class="modal__message-meta">${formattedDate} | ${formattedTime}</div>
-    //                                 <div class="modal__message-text">${msg.comment}</div>
-    //                             </div>`;
-    //                           })
-    //                           .join("")
-    //                     : `<div class="modal__message-empty">Մեկնաբանություններ չկան</div>`
-    //             }
-    //             </div>
-    //   </div>
-
-    // `);
     _openMessagesPopup(messages) {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
@@ -106,85 +70,147 @@ class InfoCard extends DynamicElement {
         closeBtn?.addEventListener("click", () => modal.remove());
     }
 
-    _openDataPopup(messages) {
+    _openCardPopup(messages) {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
 
+        const endpoint = this.getAttribute("data-endpoint");
+
+        // Decide template content based on endpoint
+        let itemTemplate = "";
+        let modalTitle = "";
+        if (endpoint == "/dashboard/taken-cards") {
+            modalTitle = "Առգրավված քարտեր";
+            itemTemplate = `
+            <div class="atm-item">
+                <div class="atm-item__icon">
+                    <img src="assets/img/credit-card.svg" alt="ATM Icon"/>
+                </div>
+                <div class="atm-item__info">
+                    <div class="atm-item__location">
+                        <div><span class="atm-item__value">{{date_time}}</span></div>
+                    </div>
+                    <div class="atm-item__id">
+                        <span class="atm-item__label">ATM ID:</span>
+                        <span class="atm-item__value">#<span class="font-black">{{atm_id}}</span></span>
+                    </div>
+                    <div class="atm-item__address">
+                        <span class="atm-item__value">{{card_number}}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        } else if (endpoint === "/dashboard/almost-empty-cassettes") {
+            modalTitle = "Վերջացող";
+
+            itemTemplate = `
+            <a href="atms/{{atm_id}}">
+                <div class="atm-item">
+                    <div class="atm-item__icon">
+                        <img src="assets/img/atm-icon.svg" alt="ATM Icon"/>
+                    </div>
+                    <div class="atm-item__info">
+                        <div class="atm-item__location">
+                            <span class="atm-item__value">{{date_time}}</span>
+                        </div>
+                        <div class="atm-item__id">
+                            <span class="atm-item__label">ATM ID:</span>
+                            <span class="atm-item__value">#{{atm_id}}</span>
+                        </div>
+                        <div class="atm-item__address">
+                            <span class="atm-item__value">Cassette type : {{cassette_type}}</span>
+                        </div>
+                        <div class="atm-item__address">
+                            <span class="atm-item__value">Left : {{count}}</span>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </a>
+        `;
+        } else if (endpoint === "/dashboard/empty-cassettes") {
+            modalTitle = "Դատարկ";
+
+            itemTemplate = `
+            <a href="atms/{{atm_id}}">
+                <div class="atm-item">
+                        <div class="atm-item__icon">
+                            <img src="assets/img/atm-icon.svg" alt="ATM Icon"/>
+                        </div>     <div class="atm-item">
+                    <div class="atm-item__info">
+                        <div class="atm-item__id">
+                            <span class="atm-item__label">ATM ID:</span>
+                            <span class="atm-item__value">#{{atm_id}}</span>
+                        </div>
+                        <div class="atm-item__address">
+                            <span class="atm-item__value">Cassette type : {{cassette_type}}</span>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </a>
+        `;
+        } else if (endpoint === "/dashboard/not-working-atms") {
+            modalTitle = "Չաշխատող";
+
+            itemTemplate = `
+            <a href="atms/{{atm_id}}">
+                <div class="atm-item">
+                    <div class="atm-item__icon">
+                        <img src="assets/img/atm-icon.svg" alt="ATM Icon"/>
+                    </div>
+                    <div class="atm-item__info">
+                        <div class="atm-item__id"><span class="atm-item__label">ATM ID:</span> <span class="atm-item__value">#<span class="font-black">{{atm_id}}</span></span></div>
+                        <div class="atm-item__location">
+                            <div><span class="atm-item__label">Քաղաք՝</span> <span class="atm-item__value">{{city}}</span></div>
+                            <div><span class="atm-item__label">Համայնք՝</span> <span class="atm-item__value">{{district}}</span></div>
+                        </div>
+                        <div class="atm-item__address">
+                            <span class="atm-item__label">Հասցե՝</span> <span class="atm-item__value">{{address}}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+           
+        `;
+        } else {
+            itemTemplate = `
+            <div class="atm-item">
+                <span>Unknown endpoint: ${endpoint}</span>
+            </div>
+        `;
+        }
+
         modal.setContent(`
         <div class="modal__header">
-            <div class="modal__title">Առգրավված քարտեր</div>
-            <img class="modal__close"   src="assets/img/icons/x-circle.svg" alt="" />
+            <div class="modal__title">${modalTitle}</div>
+            <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
         </div>
         <div class="modal__body">
-
-           <list-view items='${JSON.stringify(messages)}'>
+            <list-view items='${JSON.stringify(messages)}'>
                 <template>
-                    <div class="modal__message">
-                        <div class="modal__message-meta">{{date_time}}</div>
-                        <div class="modal__message-meta">Atm Id: {{atm_id}}</div>
-                        <div class="modal__message-text">Card number: {{card_number}}</div>
-                    </div>
+                    ${itemTemplate}
                 </template>
             </list-view>
-            
-      </div>
-    
-   
+        </div>
     `);
 
         // Add close button listener
         const closeBtn = modal.querySelector(".modal__close");
         closeBtn?.addEventListener("click", () => modal.remove());
+
+        // Remove modal after page redirection
+        const body = modal.querySelector(".modal__body");
+        body.addEventListener("click", (e) => {
+            const link = e.target.closest("a"); // any <a> inside modal body
+            if (link) {
+                modal.remove();
+            }
+        });
     }
 
     async handleMessageClick() {
         let comments = this.getAttribute("messages-data");
-
-        // const fakeMessages = [
-        //     {
-        //         id: 1,
-        //         comment: "Բարև, խնդրում եմ նորացնել տեղեկատվությունը:",
-        //         date_time: "2025-07-23 10:45",
-        //         user_id: 12,
-        //     },
-        //     {
-        //         id: 2,
-        //         comment: "Նկարներն արդեն վերաբերցվել են:",
-        //         date_time: "2025-07-23 11:10",
-        //         user_id: 15,
-        //     },
-        //     {
-        //         id: 3,
-        //         comment: "Հնարավոր է՞ ավելացնել մեկ տարբերակ:",
-        //         date_time: "2025-07-24 09:00",
-        //         user_id: 12,
-        //     },
-        //     {
-        //         id: 4,
-        //         comment: "Շնորհակալ եմ արձագանքի համար։",
-        //         date_time: "2025-07-24 12:30",
-        //         user_id: 18,
-        //     },
-        //     {
-        //         id: 2,
-        //         comment: "Նկարներն արդեն վերաբերցվել են:",
-        //         date_time: "2025-07-23 11:10",
-        //         user_id: 15,
-        //     },
-        //     {
-        //         id: 3,
-        //         comment: "Հնարավոր է՞ ավելացնել մեկ տարբերակ:",
-        //         date_time: "2025-07-24 09:00",
-        //         user_id: 12,
-        //     },
-        //     {
-        //         id: 4,
-        //         comment: "Շնորհակալ եմ արձագանքի համար։",
-        //         date_time: "2025-07-24 12:30",
-        //         user_id: 18,
-        //     },
-        // ];
-        // this._openMessagesPopup(fakeMessages);
         this._openMessagesPopup(comments);
     }
 
@@ -195,7 +221,7 @@ class InfoCard extends DynamicElement {
         this.setState({ isLoading: true });
         try {
             const response = await this.fetchData(endpoint);
-            this._openDataPopup(response.data);
+            this._openCardPopup(response.data);
         } catch (err) {
             console.error("Failed to fetch messages:", err);
         } finally {

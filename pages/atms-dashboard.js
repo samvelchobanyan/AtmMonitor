@@ -185,7 +185,8 @@ class AtmsDashboard extends DynamicElement {
                     value="${generalData.not_working_atm_count}"
                     value-color="color-red"
                     icon="icon icon-x-octagon"
-                    button-text="Տեսնել">
+                    button-text="Տեսնել"                    
+                    data-endpoint="/dashboard/not-working-atms">
                 </info-card>
             </div>
             <div class="column sm-2">
@@ -195,7 +196,8 @@ class AtmsDashboard extends DynamicElement {
                     value="${generalData.empty_cassettes_count}"
                     value-color="color-red"
                     icon="icon icon-minus-circle"
-                    button-text="Տեսնել">
+                    button-text="Տեսնել"
+                    data-endpoint="/dashboard/empty-cassettes">
                 </info-card>
             </div>
             <div class="column sm-2">
@@ -205,7 +207,8 @@ class AtmsDashboard extends DynamicElement {
                     value="${generalData.almost_empty_cassettes_count}"
                     icon="icon icon-box"
                     value-color="color-orange"
-                    button-text="Տեսնել">
+                    button-text="Տեսնել"
+                    data-endpoint="/dashboard/almost-empty-cassettes">
                 </info-card>
             </div>
             <div class="column sm-2">

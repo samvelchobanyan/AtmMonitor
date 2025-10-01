@@ -11,6 +11,7 @@ import chartDataTransformer from "../../core/utils/data-transformer.js";
 import { memoryStore } from "../../core/memory-store.js";
 import "./select-box-date.js";
 import "./modal-popup.js";
+import "../ui/customCheck.js";
 
 const observedAttrs = ["api-url", "city", "region", "start-date", "end-date"];
 class ChartComponent extends DynamicElement {

@@ -74,7 +74,8 @@ class GeoAnalythics extends DynamicElement {
                 segments.values.forEach((v) => queryString.append("segmentId", v));
             }
         } else if (this.activeTab1 == "atms1") {
-            const values = this.selectAtmsBox1.getAttribute("value")?.split(",") || [];
+            let valuesAttr = this.selectAtmsBox1.getAttribute("value");
+            let values = JSON.parse(valuesAttr);
             values.forEach((v) => queryString.append("atmId", v));
         }
 
@@ -88,15 +89,22 @@ class GeoAnalythics extends DynamicElement {
         }
     }
 
-    async fetchSecondSummary(atmId) {
+    async fetchSecondSummary() {
         const queryString = new URLSearchParams();
-        if (this.currentRegion2 != null) queryString.append("district", this.currentRegion2);
-        if (this.currentCity2 != null) queryString.append("city", this.currentCity2);
-        if (atmId != null) queryString.append("atmId", atmId);
-        const segments = this.querySelector("#segments2");
-        if (segments?.values?.length)
-            segments.values.forEach((v) => queryString.append("segmentId", v));
 
+        if (this.activeTab2 == "geo2") {
+            if (this.currentRegion2 != null) queryString.append("district", this.currentRegion2);
+            if (this.currentCity2 != null) queryString.append("city", this.currentCity2);
+
+            const segments = this.querySelector("#segments2");
+            if (segments?.values?.length) {
+                segments.values.forEach((v) => queryString.append("segmentId", v));
+            }
+        } else if (this.activeTab2 == "atms2") {
+            let valuesAttr = this.selectAtmsBox2.getAttribute("value");
+            let values = JSON.parse(valuesAttr);
+            values.forEach((v) => queryString.append("atmId", v));
+        }
         try {
             const response = await this.fetchData(`/analytics/summary?${queryString}`);
             const rightColumn = this.$("#right-column");

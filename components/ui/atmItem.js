@@ -11,26 +11,6 @@ export class AtmItem extends HTMLElement {
 
     connectedCallback() {
         this.render();
-
-        // Add click event listener and dispatch custom event to show atm on map
-        // this.addEventListener("click", () => {
-        //     this.dispatchEvent(
-        //         new CustomEvent("atm-item-clicked", {
-        //             detail: {
-        //                 id: this.getAttribute("id"),
-        //                 latitude: this.getAttribute("data-lat"),
-        //                 longitude: this.getAttribute("data-lng"),
-        //             },
-        //             bubbles: true,
-        //             composed: true,
-        //         })
-        //     );
-        // });
-
-        // const link = this.querySelector("a[data-link], .atm-item__link");
-        // if (link) {
-        //     page(href);
-        // }
     }
 
     attributeChangedCallback() {

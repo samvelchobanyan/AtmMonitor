@@ -22,8 +22,6 @@ class ListView extends DynamicElement {
         const tpl = this.querySelector("template");
         this.userTemplateHTML = tpl?.innerHTML?.trim() || null;
 
-        // console.log('this.getAttr("items")', this.getAttr("items"));
-
         const parsed = JSON.parse(this.getAttr("items"));
 
         try {
@@ -48,10 +46,35 @@ class ListView extends DynamicElement {
         return raw ? raw.split(",").map((f) => f.trim()) : null;
     }
 
+    // renderTemplate(template, item) {
+    //     return template.replace(/\{\{(.*?)\}\}/g, (_, key) => {
+    //         const val = item[key.trim()];
+    //         return val != null ? String(val) : "";
+    //     });
+    // }
+
     renderTemplate(template, item) {
         return template.replace(/\{\{(.*?)\}\}/g, (_, key) => {
-            const val = item[key.trim()];
-            return val != null ? String(val) : "";
+            const k = key.trim();
+            let val = item[k];
+
+            if (val == null) return "";
+
+            // Special case for date_time
+            if (k === "date_time") {
+                const dt = new Date(val);
+                const formattedDate = dt.toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "long",
+                });
+                const formattedTime = dt.toLocaleTimeString("en-GB", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                });
+                return `${formattedDate} | ${formattedTime}`;
+            }
+
+            return String(val);
         });
     }
 
@@ -62,18 +85,20 @@ class ListView extends DynamicElement {
 
         if (!container || !template) return;
 
-        if (!filteredItems.length) {
+        if (filteredItems.length == 0) {
             container.innerHTML = `<div class="empty">No items found.</div>`;
             return;
         }
 
-        container.innerHTML = filteredItems.map((item) => this.renderTemplate(template, item)).join("");
+        container.innerHTML = filteredItems
+            .map((item) => this.renderTemplate(template, item))
+            .join("");
 
         this.addCheckboxListeners();
     }
 
     template() {
-        if (this.state.items.length == 0) return;
+        // if (this.state.items.length == 0) return;
         const { loading, error } = this.state;
         const searchEnabled = this.hasAttribute("searchable");
         const rawTemplate = this.userTemplateHTML;
@@ -82,21 +107,22 @@ class ListView extends DynamicElement {
         if (error) return `<div class="error">Failed to load list items.</div>`;
         if (!rawTemplate) return `<div class="error">No template provided inside list-view.</div>`;
 
-        const searchClass = this.hasAttribute("white") ? "list-search list-search_white" : "list-search";
+        const searchClass = this.hasAttribute("white")
+            ? "list-search list-search_white"
+            : "list-search";
         const scroll = this.hasAttribute("scroll") ? "list list_scroll" : "list";
 
         return `
         ${
             searchEnabled
-                ? `
-            <div class="${searchClass}">
-                <input type="search" placeholder="Փնտրել..." />
-            </div>
-        `
+                ? `<div class="${searchClass}">
+                       <input type="search" placeholder="Փնտրել..." />
+                   </div>`
                 : ""
         }
-        <div class="${scroll}"></div>
-    `;
+        <div class="${scroll}">
+            ${this.state.items.length === 0 ? `<div class="empty">No items found.</div>` : ""}
+        </div> `;
     }
 
     onAfterRender() {
@@ -113,7 +139,9 @@ class ListView extends DynamicElement {
                 const q = e.target.value.trim().toLowerCase();
 
                 const filtered = this.state.items.filter((item) => {
-                    const values = searchFields ? searchFields.map((k) => item[k]).filter((v) => v != null) : Object.values(item).filter((v) => v != null);
+                    const values = searchFields
+                        ? searchFields.map((k) => item[k]).filter((v) => v != null)
+                        : Object.values(item).filter((v) => v != null);
 
                     return values.some((val) =>
                         String(val)

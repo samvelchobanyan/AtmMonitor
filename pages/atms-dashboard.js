@@ -215,7 +215,8 @@ class AtmsDashboard extends DynamicElement {
                     value="${generalData.taken_cards_count}"
                     value-color="color-red"
                     icon="icon icon-card"
-                    button-text="Տեսնել">
+                    button-text="Տեսնել"
+                    data-endpoint="/dashboard/taken-cards">
                 </info-card>
             </div>
         </div>

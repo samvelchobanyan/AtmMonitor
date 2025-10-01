@@ -16,11 +16,9 @@ class AtmsDashboard extends DynamicElement {
             selectedCity: null,
             summary: null,
             incashmentInfoCardsData: null,
-            atmInfoCardsData: null,
         };
 
         this.incashmentChart = null;
-        this.barChart = null;
     }
 
     onConnected() {
@@ -92,7 +90,6 @@ class AtmsDashboard extends DynamicElement {
                 selectedCity: city,
                 summary: response.data,
                 incashmentInfoCardsData: response.data.encashmentInfo,
-                atmInfoCardsData: response.data.atmWorkHours,
             });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
@@ -102,7 +99,6 @@ class AtmsDashboard extends DynamicElement {
 
     onAfterRender() {
         this.incashmentChart = this.$("#line-chart-transit");
-        this.barChart = this.$("#bar-chart");
     }
 
     addEventListeners() {
@@ -125,32 +121,6 @@ class AtmsDashboard extends DynamicElement {
                 }
             });
         }
-        // todo ask if this should also update. If so, then they should gice just 1 value, now its an array. Delete all data if this doesnt need
-        // if (this.barChart) {
-        //     this.addListener(this.barChart, "chart-changed", (e) => {
-        //         let data = e.detail.data;
-
-        //         // const newInfo = {
-        //         //     total_encashments: data.total_encashments,
-        //         //     total_collected_amount: data.total_collected_amount,
-        //         //     total_added_amount: data.total_added_amount,
-        //         //     yesterday_marked_as_empty: data.yesterday_marked_as_empty,
-        //         // };
-        //         console.log("!!!!!!!", this.state.atmInfoCardsData);
-        //         console.log("data.work_hours_per_day", data);
-
-        //         // Only update if different, because creates loop
-        //         if (
-        //             JSON.stringify(data.work_hours_per_day[0]) !==
-        //             JSON.stringify(this.state.atmInfoCardsData)
-        //         ) {
-        //             this.setState({ atmInfoCardsData: data.work_hours_per_day[0] });
-        //             console.log("Chart changed data:", data);
-
-        //             console.log("atmInfoCardsData", this.state.atmInfoCardsData);
-        //         }
-        //     });
-        // }
     }
 
     template() {
@@ -170,7 +140,7 @@ class AtmsDashboard extends DynamicElement {
         const generalData = this.state.summary;
         const transactionsData = this.state.summary.transactionsInfo;
         const encashmentData = this.state.incashmentInfoCardsData;
-        const atmWorkHours = this.state.atmInfoCardsData;
+        const atmWorkHours = this.state.summary.atmWorkHours;
 
         const transactionDaily = this.state.summary.hourly_transactions;
         const encashmentsDaily = this.state.summary.hourly_encashments;

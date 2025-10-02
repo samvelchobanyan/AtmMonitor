@@ -18,6 +18,9 @@ class inOut extends DynamicElement {
         this.currentRegion = null;
         this.currentCity = null;
         this.exchangeDateBox = null;
+
+        this.exchangeStartDate = null;
+        this.exchangeEndDate = null;
     }
 
     onConnected() {
@@ -31,10 +34,9 @@ class inOut extends DynamicElement {
     addEventListeners() {
         if (this.exchangeDateBox) {
             this.addListener(this.exchangeDateBox, "date-range-change", (e) => {
-                // let startDate = this.exchangeDateBox.getAttribute("start-date");
-                // let endDate = this.exchangeDateBox.getAttribute("end-date");
                 const { startDate, endDate } = e.detail;
-                console.log(startDate, endDate);
+                this.exchangeStartDate = startDate;
+                this.exchangeEndDate = endDate;
                 this.fetchExchangeData(startDate, endDate);
             });
         }
@@ -134,7 +136,7 @@ class inOut extends DynamicElement {
         const exchangeData = this.state.exchangeData.currency_details;
 
         const depositDynamicData = encode(
-            summary.data.transaction_dynamics.deposit_dynamic.hourly_data
+            summary.data.transaction_dynamics.deposit_dynamic.hourly_datate
         );
 
         const dispenseDynamicData = encode(
@@ -143,7 +145,7 @@ class inOut extends DynamicElement {
         const transactionDynamicsData = encode(
             this._transformToTransactionDynamics(summary.data.transaction_dynamics)
         );
-// todo contine here, exchange dates are resert after change
+
         return /*html*/ `
             <div class="row">
                 <div class="column sm-6">
@@ -160,7 +162,8 @@ class inOut extends DynamicElement {
                     <div class="container">
                     <div class="select-container">
                         <container-top icon="icon-dollar-sign" title="Արտարժույթի փոխանակում"></container-top>
-                      <select-box-date id='exchange-date'></select-box-date>
+                      <select-box-date id='exchange-date' start-date='${this.exchangeStartDate ||
+                          ""}' end-date='${this.exchangeEndDate || ""}'></select-box-date>
                       </div>
                         <div class="infos">  
                             ${exchangeData

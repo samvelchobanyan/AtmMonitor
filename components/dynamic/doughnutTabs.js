@@ -215,10 +215,12 @@ export default class DoughnutTabs extends DynamicElement {
         const amountData = charts ? encode(charts.amount) : "";
         const countData = charts ? encode(charts.count) : "";
         const showDate = this.getAttribute("show-date") !== "false"; // default true
-
+        let ifDispense = this.getAttribute("id") == "dispense";
         return `
       <div class="select-container">
-        <container-top icon="icon-arrow-down-left" title="${title}"></container-top>
+        <container-top icon="${
+            ifDispense ? "icon-arrow-down-left" : "icon-arrow-up-right"
+        }" title="${title}"></container-top>
           ${
               showDate
                   ? `
@@ -234,8 +236,12 @@ export default class DoughnutTabs extends DynamicElement {
         ${this._renderRadios()}
       </div>
       <div class="chart-container">
-        <doughnut-chart id="${this.getAttr("id")}-amount" data='${amountData}' title="Կանխիկացված գումար"  currency="true"></doughnut-chart>
-        <doughnut-chart id="${this.getAttr("id")}-count" data='${countData}'  title="Կանխիկացումների քանակ"></doughnut-chart>
+        <doughnut-chart id="${this.getAttr("id")}-amount" data='${amountData}' title="${
+            ifDispense ? "Կանխիկացված գումար" : "Մուտքագրումների գումար"
+        }"  currency="true"></doughnut-chart>
+        <doughnut-chart id="${this.getAttr("id")}-count" data='${countData}'  title="${
+            ifDispense ? "Կանխիկացված քանակ" : "Մուտքագրումների քանակ"
+        }"></doughnut-chart>
       </div>
     `;
     }

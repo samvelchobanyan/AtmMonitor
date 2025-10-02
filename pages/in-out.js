@@ -18,6 +18,9 @@ class inOut extends DynamicElement {
         this.currentRegion = null;
         this.currentCity = null;
         this.exchangeDateBox = null;
+
+        this.exchangeStartDate = null;
+        this.exchangeEndDate = null;
     }
 
     onConnected() {
@@ -31,10 +34,9 @@ class inOut extends DynamicElement {
     addEventListeners() {
         if (this.exchangeDateBox) {
             this.addListener(this.exchangeDateBox, "date-range-change", (e) => {
-                // let startDate = this.exchangeDateBox.getAttribute("start-date");
-                // let endDate = this.exchangeDateBox.getAttribute("end-date");
                 const { startDate, endDate } = e.detail;
-                console.log(startDate, endDate);
+                this.exchangeStartDate = startDate;
+                this.exchangeEndDate = endDate;
                 this.fetchExchangeData(startDate, endDate);
             });
         }
@@ -84,36 +86,6 @@ class inOut extends DynamicElement {
         }
     }
 
-    _transformToTransactionDynamics(data) {
-        const { dispense_dynamic, deposit_dynamic, exchange_dynamic } = data;
-
-        // Create the transactionDynamics array by mapping over exchange_dynamic.hourly_data
-        const transactionDynamics = exchange_dynamic.hourly_data.map((exchangeItem) => {
-            const hour = exchangeItem.hour;
-
-            // Find corresponding to dispense data for this hour
-            const dispenseItem = dispense_dynamic.hourly_data.find((item) => item.hour === hour);
-            const dispenseAmount = dispenseItem
-                ? dispenseItem.with_card_amount + dispenseItem.without_card_amount
-                : 0;
-
-            // Find the corresponding deposit data for this hour
-            const depositItem = deposit_dynamic.hourly_data.find((item) => item.hour === hour);
-            const depositAmount = depositItem
-                ? depositItem.with_card_amount + depositItem.without_card_amount
-                : 0;
-
-            return {
-                hour: hour,
-                dispense_amount: dispenseAmount,
-                deposit_amount: depositAmount,
-                exchange_amount: exchangeItem.amount,
-            };
-        });
-
-        return transactionDynamics;
-    }
-
     template() {
         const summary = this.state.summary;
         if (!summary) {
@@ -140,14 +112,11 @@ class inOut extends DynamicElement {
         const dispenseDynamicData = encode(
             summary.data.transaction_dynamics.dispense_dynamic.hourly_data
         );
+
         const transactionDynamicsData = encode(
-            this._transformToTransactionDynamics(summary.data.transaction_dynamics)
+            summary.data.transaction_dynamics.overall_dynamic.hourly_data
         );
 
-        // const dispenseDynamicData = encode({"dispense_dynamic" : summary.data.transaction_dynamics.dispense_dynamic.hourly_data});
-
-        console.log('depositData',asd.hasOwnProperty('depositData'));
-// todo contine here, exchange dates are resert after change
         return /*html*/ `
             <div class="row">
                 <div class="column sm-6">
@@ -164,7 +133,8 @@ class inOut extends DynamicElement {
                     <div class="container">
                     <div class="select-container">
                         <container-top icon="icon-dollar-sign" title="Արտարժույթի փոխանակում"></container-top>
-                      <select-box-date id='exchange-date'></select-box-date>
+                      <select-box-date id='exchange-date' start-date='${this.exchangeStartDate ||
+                          ""}' end-date='${this.exchangeEndDate || ""}'></select-box-date>
                       </div>
                         <div class="infos">  
                             ${exchangeData

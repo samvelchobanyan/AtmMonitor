@@ -52,10 +52,18 @@ class SideBar extends DynamicElement {
         if (logoutBtn) {
             this.addListener(logoutBtn, "click", (e) => {
                 e.preventDefault();
-                try { sessionStorage.removeItem("auth_token"); } catch {}
-                try { sessionStorage.removeItem("auth_user"); } catch {}
-                try { store.reset(); } catch {}
-                try { memoryStore.clear(); } catch {}
+                try {
+                    sessionStorage.removeItem("auth_token");
+                } catch {}
+                try {
+                    sessionStorage.removeItem("auth_user");
+                } catch {}
+                try {
+                    store.reset();
+                } catch {}
+                try {
+                    memoryStore.clear();
+                } catch {}
                 window.location.href = "/ATM_monitor/signin";
             });
         }
@@ -291,6 +299,8 @@ class SideBar extends DynamicElement {
                     <a href="failures" class="sidebar__item"> <i class="icon icon-x-octagon"></i><span>Անսարքություններ</span> </a>
                     <a href="journal" class="sidebar__item"> <i class="icon icon-clipboard"></i><span>Մատյան</span> </a>
                 </div>
+                    <a href="create-atm" class="sidebar__item"> <i class="icon icon-atm"></i><span>Ստեղծել բանկոմատ</span> </a>
+                    <a href="create-segment" class="sidebar__item"> <i class="icon icon-segment"></i><span>Ստեղծել սեգմենտ</span> </a>
                 <div class="sidebar__bottom">
                     <button id="logout-btn" class="btn btn_logout">
                         <i class="icon icon-log-out"></i>

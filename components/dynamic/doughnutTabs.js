@@ -138,12 +138,12 @@ export default class DoughnutTabs extends DynamicElement {
         }
         console.log('this.rawData',this.rawData);
         const {
-            dispense_amount,
+            amount,
             daily_median,
             transaction_median,
-            dispense_count,
+            count,
             median_count,
-            dispense_count_percent_change,
+            count_percent_change,
             breakdowns,
         } = this.rawData;
 
@@ -155,7 +155,7 @@ export default class DoughnutTabs extends DynamicElement {
 
             result[key] = {
                 amount: {
-                    total: dispense_amount,
+                    total: amount,
                     dailyAvg: daily_median,
                     transactionAvg: transaction_median,
                     chartData: {
@@ -164,9 +164,9 @@ export default class DoughnutTabs extends DynamicElement {
                     },
                 },
                 count: {
-                    total: dispense_count,
+                    total: count,
                     dailyAvg: median_count,
-                    changeValue: dispense_count_percent_change,
+                    changeValue: count_percent_change,
                     chartData: {
                         labels,
                         datasets: [{ data: counts }],
@@ -215,11 +215,12 @@ export default class DoughnutTabs extends DynamicElement {
         const amountData = charts ? encode(charts.amount) : "";
         const countData = charts ? encode(charts.count) : "";
         const showDate = this.getAttribute("show-date") !== "false"; // default true
-        console.log('amountData',amountData);
-
+        let ifDispense = this.getAttribute("id") == "dispense";
         return `
       <div class="select-container">
-        <container-top icon="icon-arrow-down-left" title="${title}"></container-top>
+        <container-top icon="${
+            ifDispense ? "icon-arrow-down-left" : "icon-arrow-up-right"
+        }" title="${title}"></container-top>
           ${
               showDate
                   ? `
@@ -235,8 +236,12 @@ export default class DoughnutTabs extends DynamicElement {
         ${this._renderRadios()}
       </div>
       <div class="chart-container">
-        <doughnut-chart id="${this.getAttr("id")}-amount" data='${amountData}' title="Կանխիկացված գումար"  currency="true"></doughnut-chart>
-        <doughnut-chart id="${this.getAttr("id")}-count" data='${countData}'  title="Կանխիկացումների քանակ"></doughnut-chart>
+        <doughnut-chart id="${this.getAttr("id")}-amount" data='${amountData}' title="${
+            ifDispense ? "Կանխիկացված գումար" : "Մուտքագրումների գումար"
+        }"  currency="true"></doughnut-chart>
+        <doughnut-chart id="${this.getAttr("id")}-count" data='${countData}'  title="${
+            ifDispense ? "Կանխիկացված քանակ" : "Մուտքագրումների քանակ"
+        }"></doughnut-chart>
       </div>
     `;
     }

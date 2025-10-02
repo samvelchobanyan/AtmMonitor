@@ -62,7 +62,7 @@ class DoughnutChartComponent extends DynamicElement {
               <div class="overview-top__title">${this.getAttr('title')}</div>
               <div class="overview-top__info">
                 <div class="overview-top__subtitle">
-                  ${this.total + suffix}
+                  ${this.total.toLocaleString() + suffix}
                 </div>
                 <div class="badges">
                   ${

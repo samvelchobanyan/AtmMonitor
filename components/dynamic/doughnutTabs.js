@@ -136,7 +136,7 @@ export default class DoughnutTabs extends DynamicElement {
             this.setState({ selectedTab: this.state.selectedTab });
             return;
         }
-
+        console.log('this.rawData',this.rawData);
         const {
             dispense_amount,
             daily_median,
@@ -215,6 +215,7 @@ export default class DoughnutTabs extends DynamicElement {
         const amountData = charts ? encode(charts.amount) : "";
         const countData = charts ? encode(charts.count) : "";
         const showDate = this.getAttribute("show-date") !== "false"; // default true
+        console.log('amountData',amountData);
 
         return `
       <div class="select-container">

@@ -1,4 +1,5 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
+import { formatDateOnly, formatTimeOnly } from "../../core/utils/date-transformer.js";
 
 class ListView extends DynamicElement {
     constructor() {
@@ -62,16 +63,16 @@ class ListView extends DynamicElement {
 
             // Special case for date_time
             if (k === "date_time") {
-                const dt = new Date(val);
-                const formattedDate = dt.toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "long",
-                });
-                const formattedTime = dt.toLocaleTimeString("en-GB", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                });
-                return `${formattedDate} | ${formattedTime}`;
+                // const dt = new Date(val);
+                // const formattedDate = dt.toLocaleDateString("en-GB", {
+                //     day: "2-digit",
+                //     month: "long",
+                // });
+                // const formattedTime = dt.toLocaleTimeString("en-GB", {
+                //     hour: "2-digit",
+                //     minute: "2-digit",
+                // });
+                return `${formatDateOnly(val)} | ${formatTimeOnly(val)}`;
             }
 
             return String(val);

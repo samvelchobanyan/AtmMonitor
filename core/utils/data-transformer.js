@@ -15,18 +15,21 @@ const CHART_CONFIG = {
         // in/out page
         with_card: "Քարտով",
         without_card: "Անքարտ",
+        with_card_amount: "Քարտով",
+        without_card_amount: "Անքարտ",
         visa: "Visa",
         master: "Master",
         arca: "Arca",
         own_card: "Անձնական քարտ",
         other_card: "Ուրիշի քարտ",
 
+
         card_replenishment: 'Մուտքագրում քարտին',
         card_transfer: 'Փոխանցում քարտին',
         pers_account_replenishment: 'Անձնական հաշվի համալրում',
         org_account_replenishment: 'Կազմակերպության հաշվի համալրում',
-        deposit_replenishment: 'Ավանդի համալրում',
         loan_payment: 'Վարկի մարում',
+        deposit_replenishment: 'Ավանդի համալրում',
 
         // atm detail page
         current_count: "Առկա գումար",
@@ -34,14 +37,17 @@ const CHART_CONFIG = {
     },
 
     inout_dispenseDynamicsToInclude: [
-        "Մուտքագրում քարտին",
-        "Փոխանցում քարտին",
-        "Անձնական հաշվի համալրում",
-        "Կազմակերպության հաշվի համալրում",
-        "Ավանդի համալրում",
-        "Վարկի մարում",
+        "with_card_amount",
+        "without_card_amount",
     ],
-    inout_depositDynamicsToInclude: ["with_card_amount", "without_card_amount"],
+    inout_depositDynamicsToInclude: [
+        "card_replenishment",
+        "card_transfer",
+        "pers_account_replenishment",
+        "org_account_replenishment",
+        "loan_payment",
+        "deposit_replenishment",
+    ],
     inout_transactionDynamicsToInclude: ["deposit_amount", "dispense_amount", "exchange_amount"],
 
     // Define which fields to include and their order
@@ -172,7 +178,7 @@ class ChartDataTransformer {
             fields = encashmentFieldsToInclude;
         } else if (dailyData[0].hasOwnProperty("Անձնական հաշվի համալրում")) {
             fields = inout_dispenseDynamicsToInclude;
-        } else if (dailyData[0].hasOwnProperty("with_card_amount")) {
+        } else if (dailyData[0].hasOwnProperty("card_replenishment")) {
             fields = inout_depositDynamicsToInclude;
         } else if (dailyData[0].hasOwnProperty("exchange_amount")) {
             fields = inout_transactionDynamicsToInclude;

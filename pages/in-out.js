@@ -143,6 +143,10 @@ class inOut extends DynamicElement {
         const transactionDynamicsData = encode(
             this._transformToTransactionDynamics(summary.data.transaction_dynamics)
         );
+
+        // const dispenseDynamicData = encode({"dispense_dynamic" : summary.data.transaction_dynamics.dispense_dynamic.hourly_data});
+
+        console.log('depositData',asd.hasOwnProperty('depositData'));
 // todo contine here, exchange dates are resert after change
         return /*html*/ `
             <div class="row">

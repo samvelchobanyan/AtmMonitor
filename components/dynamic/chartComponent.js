@@ -66,6 +66,7 @@ class ChartComponent extends DynamicElement {
                     switch (this.chartType) {
                         case "line":
                             this.transformedData = chartDataTransformer.transformData(parsed);
+                            console.log('chart component data',this.transformedData.chartData);
                             break;
                         case "doughnut":
                             this.transformedData = chartDataTransformer.transformDoughnutData(
@@ -102,6 +103,7 @@ class ChartComponent extends DynamicElement {
         this.selectBox = this.$("select-box-date");
 
         const chartData = this.transformedData ? this.transformedData.chartData : null;
+
         switch (this.chartType) {
             case "line":
                 this.chart = createLineChart(this.canvasId, chartData, this.legendId);

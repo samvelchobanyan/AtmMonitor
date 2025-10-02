@@ -1,7 +1,6 @@
 import { DynamicElement } from "../core/dynamic-element.js";
 import { ContainerTop } from "../components/ui/containerTop.js";
 import "../components/dynamic/doughnutTabs.js";
-import dataTransformer from "../core/utils/data-transformer.js";
 import encode from "../assets/js/utils/encode.js";
 import "../components/dynamic/select-box-date.js";
 
@@ -12,15 +11,11 @@ class inOut extends DynamicElement {
         this.state = {
             summary: null,
             atmId: null,
-            exchangeData: null,
         };
 
         this.currentRegion = null;
         this.currentCity = null;
         this.exchangeDateBox = null;
-
-        this.exchangeStartDate = null;
-        this.exchangeEndDate = null;
     }
 
     onConnected() {
@@ -35,8 +30,6 @@ class inOut extends DynamicElement {
         if (this.exchangeDateBox) {
             this.addListener(this.exchangeDateBox, "date-range-change", (e) => {
                 const { startDate, endDate } = e.detail;
-                this.exchangeStartDate = startDate;
-                this.exchangeEndDate = endDate;
                 this.fetchExchangeData(startDate, endDate);
             });
         }
@@ -46,8 +39,14 @@ class inOut extends DynamicElement {
         const response = await this.fetchData(
             `/analytics/exchange-summary-in-days?startDate=${startDate}&endDate=${endDate}`
         );
-        this.setState({
-            exchangeData: response.data,
+        const currencies = response.data.currency_details;
+
+        currencies.forEach((currency) => {
+            const el = this.$(`#${currency.currency_code}`);
+            if (el) {
+                el.setAttribute("value", currency.total_amount);
+                el.setAttribute("trend", currency.total_amount_percent_change);
+            }
         });
     }
 
@@ -68,9 +67,8 @@ class inOut extends DynamicElement {
             this.currentRegion = region;
             this.currentCity = city;
             this.setState({
-                summary: response,
+                summary: response.data,
                 atmId: atmId,
-                exchangeData: response.data.exchange_summary,
             });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
@@ -101,20 +99,18 @@ class inOut extends DynamicElement {
             `;
         }
 
-        const dispenseData = encode(summary.data.dispense_summary);
-        const depositData = encode(summary.data.deposit_summary);
-        const exchangeData = this.state.exchangeData.currency_details;
+        const dispenseData = encode(summary.dispense_summary);
+        const depositData = encode(summary.deposit_summary);
+        const exchangeData = summary.exchange_summary.currency_details;
 
-        const depositDynamicData = encode(
-            summary.data.transaction_dynamics.deposit_dynamic.hourly_data
-        );
+        const depositDynamicData = encode(summary.transaction_dynamics.deposit_dynamic.hourly_data);
 
         const dispenseDynamicData = encode(
-            summary.data.transaction_dynamics.dispense_dynamic.hourly_data
+            summary.transaction_dynamics.dispense_dynamic.hourly_data
         );
 
         const transactionDynamicsData = encode(
-            summary.data.transaction_dynamics.overall_dynamic.hourly_data
+            summary.transaction_dynamics.overall_dynamic.hourly_data
         );
 
         return /*html*/ `
@@ -133,14 +129,14 @@ class inOut extends DynamicElement {
                     <div class="container">
                     <div class="select-container">
                         <container-top icon="icon-dollar-sign" title="Արտարժույթի փոխանակում"></container-top>
-                      <select-box-date id='exchange-date' start-date='${this.exchangeStartDate ||
-                          ""}' end-date='${this.exchangeEndDate || ""}'></select-box-date>
+                      <select-box-date id='exchange-date'></select-box-date>
                       </div>
                         <div class="infos">  
                             ${exchangeData
                                 .map((exchange) => {
                                     return `
                                 <info-card
+                                    id="${exchange.currency_code}"
                                     title="${exchange.currency_code}"
                                     value="${exchange.total_amount}"
                                     trend="${exchange.total_amount_percent_change}"

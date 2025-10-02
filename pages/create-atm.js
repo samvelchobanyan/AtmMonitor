@@ -2,7 +2,7 @@ import { DynamicElement } from "../core/dynamic-element.js";
 import { api } from "../core/api-client.js";
 import "../components/dynamic/select-box-search.js";
 import encode from "../assets/js/utils/encode.js";
-import "../components/dynamic/yandex-map.js";
+import "../components/dynamic/yandex-address.js";
 
 class CreateAtm extends DynamicElement {
     constructor() {
@@ -96,21 +96,32 @@ class CreateAtm extends DynamicElement {
                                 </div>
                             </div>
 
-                                <div class="row">
-                            <div class="column sm-6">
-                                <div class="atm-map">
-                                   <yandex-map
-                                    center-lat="40.1772"
-                                    center-lng="44.50349"
-                                    zoom="14"
-                                    ></yandex-map> 
+                            <div class="row">
+                                <div class="column sm-6">
+                                    <div class="atm-map">
+                                    <yandex-address
+                                        center-lat="40.1772"
+                                        center-lng="44.50349"
+                                        zoom="14"
+                                        ></yandex-address> 
+                                    </div>
                                 </div>
-                            </div>
-                     </div>        ${
-                         this.state.error
-                             ? `<div class="error color-red" style="margin-bottom:10px;">${this.state.error}</div>`
-                             : ""
-                     }
+                                <div column sm-6">
+                                    <div class="form__item">
+                                        <label for="lat">Latitude</label>
+                                        <input id="lat" class="w-100" name="lat" type="text" readonly />
+                                    </div>
+                                    <div class="form__item">
+                                        <label for="lon">Longitude</label>
+                                        <input id="lon" class="w-100" name="lon" type="text" readonly />
+                                    </div>
+                                </div>
+                            </div>        
+                            ${
+                                this.state.error
+                                    ? `<div class="error color-red" style="margin-bottom:10px;">${this.state.error}</div>`
+                                    : ""
+                            }
                             <div class="form__btn">
                                 <button id="login-btn" type="submit" class="btn btn_md btn_blue btn_full" ${
                                     this.state.isLoading ? "disabled" : ""
@@ -135,9 +146,20 @@ class CreateAtm extends DynamicElement {
     }
 
     addEventListeners() {
-        const form = this.$("#create-form");
+        const form = this.$("#create-atm-form");
         if (form) {
             this.addListener(form, "submit", this.handleSubmit);
+        }
+
+        const address = this.querySelector("yandex-address");
+        if (address) {
+            this.addListener(address, "newCoordinate", (e) => {
+                const { lat, lng } = e.detail || {};
+                const latInput = this.$("#lat");
+                const lonInput = this.$("#lon");
+                if (latInput) latInput.value = String(lat ?? "");
+                if (lonInput) lonInput.value = String(lng ?? "");
+            });
         }
     }
 

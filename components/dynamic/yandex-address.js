@@ -11,6 +11,7 @@ class YandexAddress extends DynamicElement {
     this.map = null;
     this.pin = null;
     this.handleResize = null;
+    
   }
 
   static get observedAttributes() {
@@ -38,7 +39,15 @@ class YandexAddress extends DynamicElement {
 
   onAfterRender() {
     if (window.ymaps && !this.map) {
-      this.createMapWithSearch();
+      try {
+        window.ymaps.ready(() => {
+          if (this.isDestroyed || this.map) return;
+          this.createMapWithSearch();
+        });
+      } catch (e) {
+        // Fallback if ready is not available for some reason
+        this.createMapWithSearch();
+      }
     } else if (!window.ymaps) {
       this.setState({ error: "Yandex Maps not loaded" });
     }
@@ -79,18 +88,24 @@ class YandexAddress extends DynamicElement {
     }
 
     try {
+      if (typeof window.ymaps?.Map !== "function") {
+        this.setState({ error: "Yandex Maps API not ready" });
+        return;
+      }
       this.map = new window.ymaps.Map(mapContainer, {
         center: [centerLat, centerLng],
         zoom: zoom,
-        controls: ["zoomControl", "searchControl"]
+        controls: ["zoomControl", "searchControl"],
       });
 
+      // Use native Yandex SearchControl with button; manage pin placement ourselves
       const searchControl = this.map.controls.get("searchControl");
       if (searchControl) {
-        // Prevent default placemark so we can manage our own draggable pin
+        // Prevent default placemark to avoid duplicates; use larger UI
         searchControl.options.set("noPlacemark", true);
+        searchControl.options.set("size", "large");
 
-        // Selecting a result from the list
+        // When user selects a result from the list
         searchControl.events.add("resultselect", (e) => {
           const index = e.get("index");
           searchControl.getResult(index).then((res) => {
@@ -101,7 +116,7 @@ class YandexAddress extends DynamicElement {
           });
         });
 
-        // Submitting a query (Enter) without choosing a list item
+        // When user submits a query via the search button or Enter
         searchControl.events.add("submit", () => {
           const query = searchControl.getRequestString();
           if (!query) return;
@@ -124,11 +139,13 @@ class YandexAddress extends DynamicElement {
         this.dispatchCoordinate(coords);
       });
 
-      // Initialize pin from attributes if provided
+      // Initialize pin from attributes if provided, otherwise show at center
       const plat = parseFloat(this.getAttribute("pin-lat"));
       const plng = parseFloat(this.getAttribute("pin-lng"));
       if (!Number.isNaN(plat) && !Number.isNaN(plng)) {
         this.placeOrMovePin([plat, plng], false);
+      } else {
+        this.placeOrMovePin([centerLat, centerLng], false);
       }
     } catch (error) {
       console.error("Error creating map:", error);
@@ -145,9 +162,8 @@ class YandexAddress extends DynamicElement {
         {},
         {
           draggable: true,
-          iconLayout: "default#image",
-          iconImageHref: "assets/img/pin.svg",
-          iconImageSize: [32, 32]
+          // Use a highly visible built-in preset
+          preset: "islands#redIcon"
         }
       );
 

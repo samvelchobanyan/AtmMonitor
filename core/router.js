@@ -193,5 +193,12 @@ export function startRouter() {
         mountComponent("notifications-page", "Ծանուցումներ", ctx.query, "/notifications");
     });
 
+    page("/create-atm", async (ctx) => {
+        if (!customElements.get("create-atm-page")) {
+            await import("../pages/create-atm.js");
+        }
+        mountComponent("create-atm-page", "Ստեղծել բանկոմատ", ctx.query, "/create-atm");
+    });
+
     page();
 }

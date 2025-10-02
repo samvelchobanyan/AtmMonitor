@@ -13,3 +13,11 @@
         }
     }
 }
+
+.create_form {
+    margin: rem(96) 0 0;
+    background-color: map-get($color-scheme, "white");
+    box-shadow: 0 rem(4) rem(3) 0 #00000008, 0 rem(12) rem(24) 0 #00000014;
+    padding: rem(56);
+    border-radius: rem(32);
+}

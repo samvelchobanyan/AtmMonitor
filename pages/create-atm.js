@@ -1,0 +1,216 @@
+import { DynamicElement } from "../core/dynamic-element.js";
+import { api } from "../core/api-client.js";
+import "../components/dynamic/select-box-search.js";
+import encode from "../assets/js/utils/encode.js";
+import "../components/dynamic/yandex-map.js";
+
+class CreateAtm extends DynamicElement {
+    constructor() {
+        super();
+        this.state = {
+            isLoading: false,
+            error: "",
+            modelId: "",
+            name: "",
+            ipAddress: "",
+            lat: "",
+            lon: "",
+            segmentId: "",
+            atmType: "",
+            atmVersion: "",
+            atmArchived: "",
+            atmCimType: "",
+            connectionStatusId: "",
+        };
+
+        this.segments = null;
+    }
+
+    static get observedAttributes() {
+        // return ["next"]; // optional redirect target after login
+    }
+
+    onStoreChange(storeState) {
+        this.segments = storeState.segments.map((item) => ({
+            value: item.id,
+            text: item.name,
+        }));
+    }
+
+    template() {
+        const segments = encode(this.segments);
+
+        return /* html */ `
+            <div class="row align-center">
+                <div class="column sm-12">
+                    <div class="create_form">
+                        <form id="create-atm-form" class="form">
+                            <div class="row">
+                                <div class="form__item column sm-6">
+                                    <label for="name">Atm name</label>
+                                    <input id="name" class="w-100" name="name" type="text" required />
+                                </div>
+                                <div class="form__item column sm-6">
+                                    <label for="modelId">modelId</label>
+                                    <input id="modelId" class="w-100" name="modelId" required />
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form__item column sm-6">
+                                    <label for="ipAddress">ipAddress</label>
+                                    <input id="ipAddress" class="w-100" name="ipAddress" type="text" required />
+                                </div>
+                                <div class="form__item column sm-6">
+                                    <select-box-search id='segmentId' placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="form__item column sm-6">
+                                    <label for="atmType">atmType</label>
+                                    <input id="atmType" class="w-100" name="atmType" type="text" required />
+                                </div>
+                                <div class="form__item column sm-6">
+                                    <label for="atmVersion">atmVersion</label>
+                                    <input id="atmVersion" class="w-100" name="atmVersion" required />
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                               <div class="form__item column sm-6">
+                                    <label for="atmCimType">atmCimType</label>
+                                    <input id="atmCimType" class="w-100" name="atmCimType" type="text" required />
+                                </div>
+                                <div class="form__item column sm-6">
+                                    <label for="atmArchived">atmArchived</label>
+                                    <input id="atmArchived" class="w-100" name="atmArchived" required />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form__item column sm-6">
+                                    <label for="connectionStatusId">connectionStatusId</label>
+                                    <input id="connectionStatusId" class="w-100" name="connectionStatusId" required />
+                                </div>
+                            </div>
+
+                                <div class="row">
+                            <div class="column sm-6">
+                                <div class="atm-map">
+                                   <yandex-map
+                                    center-lat="40.1772"
+                                    center-lng="44.50349"
+                                    zoom="14"
+                                    ></yandex-map> 
+                                </div>
+                            </div>
+                     </div>        ${
+                         this.state.error
+                             ? `<div class="error color-red" style="margin-bottom:10px;">${this.state.error}</div>`
+                             : ""
+                     }
+                            <div class="form__btn">
+                                <button id="login-btn" type="submit" class="btn btn_md btn_blue btn_full" ${
+                                    this.state.isLoading ? "disabled" : ""
+                                }>
+                                    <span>${
+                                        this.state.isLoading ? "Կատարվում է …" : "Ստեղծել"
+                                    }</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    onAfterRender() {
+        // const username = this.$("#username");
+        // const password = this.$("#password");
+        // if (username) username.value = this.state.username || "";
+        // if (password) password.value = this.state.password || "";
+    }
+
+    addEventListeners() {
+        const form = this.$("#create-form");
+        if (form) {
+            this.addListener(form, "submit", this.handleSubmit);
+        }
+    }
+
+    async handleSubmit(event) {
+        event.preventDefault();
+
+        // lat: "", //later
+        // lon: "", //later
+
+        const nameInput = this.$("#name");
+        const modelIdInput = this.$("#modelId");
+        const ipAddressInput = this.$("#ipAddress");
+        const segmentIdInput = this.$("#segmentId");
+        const atmTypeInput = this.$("#atmType");
+        const atmVersionInput = this.$("#atmVersion");
+        const atmArchivedInput = this.$("#atmArchived");
+        const atmCimTypeInput = this.$("#atmCimType");
+        const connectionStatusIdInput = this.$("#connectionStatusId");
+
+        const name = nameInput?.value.trim() || "";
+        const modelId = modelIdInput?.value.trim() || "";
+        const ipAddress = ipAddressInput?.value.trim() || "";
+        const segmentId = segmentIdInput?.value.trim() || "";
+        const atmType = atmTypeInput?.value.trim() || "";
+        const atmVersion = atmVersionInput?.value.trim() || "";
+        const atmArchived = atmArchivedInput?.value.trim() || "";
+        const atmCimType = atmCimTypeInput?.value.trim() || "";
+        const connectionStatusId = connectionStatusIdInput?.value.trim() || "";
+
+        if (
+            !name ||
+            !modelId ||
+            !ipAddress ||
+            !segmentId ||
+            !atmType ||
+            !atmVersion ||
+            !atmArchived ||
+            !atmCimType ||
+            !connectionStatusId
+        ) {
+            this.setState({ error: "Լրացրեք բոլոր դաշտերը" });
+            return;
+        }
+
+        this.setState({ isLoading: true, error: "" });
+
+        try {
+            const response = await this.fetchData("/atm/add-atm", {
+                method: "POST",
+                body: {
+                    name,
+                    modelId,
+                    ipAddress,
+                    segmentId,
+                    atmType,
+                    atmVersion,
+                    atmArchived,
+                    atmCimType,
+                    connectionStatusId,
+                },
+            });
+            console.log("creation response", response);
+
+            // const nextAttr = this.getAttribute("next") || "";
+            // const next = nextAttr && nextAttr.startsWith("/") ? nextAttr : "/home";
+            // window.location.href = `/ATM_monitor${next}`;
+        } catch (err) {
+            const message = err?.message || "Ստեղծել ձախողվեց";
+            this.setState({ error: message });
+        } finally {
+            this.setState({ isLoading: false });
+        }
+    }
+}
+
+customElements.define("create-atm-page", CreateAtm);

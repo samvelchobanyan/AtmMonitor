@@ -86,36 +86,6 @@ class inOut extends DynamicElement {
         }
     }
 
-    _transformToTransactionDynamics(data) {
-        const { dispense_dynamic, deposit_dynamic, exchange_dynamic } = data;
-
-        // Create the transactionDynamics array by mapping over exchange_dynamic.hourly_data
-        const transactionDynamics = exchange_dynamic.hourly_data.map((exchangeItem) => {
-            const hour = exchangeItem.hour;
-
-            // Find corresponding to dispense data for this hour
-            const dispenseItem = dispense_dynamic.hourly_data.find((item) => item.hour === hour);
-            const dispenseAmount = dispenseItem
-                ? dispenseItem.with_card_amount + dispenseItem.without_card_amount
-                : 0;
-
-            // Find the corresponding deposit data for this hour
-            const depositItem = deposit_dynamic.hourly_data.find((item) => item.hour === hour);
-            const depositAmount = depositItem
-                ? depositItem.with_card_amount + depositItem.without_card_amount
-                : 0;
-
-            return {
-                hour: hour,
-                dispense_amount: dispenseAmount,
-                deposit_amount: depositAmount,
-                exchange_amount: exchangeItem.amount,
-            };
-        });
-
-        return transactionDynamics;
-    }
-
     template() {
         const summary = this.state.summary;
         if (!summary) {
@@ -136,14 +106,15 @@ class inOut extends DynamicElement {
         const exchangeData = this.state.exchangeData.currency_details;
 
         const depositDynamicData = encode(
-            summary.data.transaction_dynamics.deposit_dynamic.hourly_datate
+            summary.data.transaction_dynamics.deposit_dynamic.hourly_data
         );
 
         const dispenseDynamicData = encode(
             summary.data.transaction_dynamics.dispense_dynamic.hourly_data
         );
+
         const transactionDynamicsData = encode(
-            this._transformToTransactionDynamics(summary.data.transaction_dynamics)
+            summary.data.transaction_dynamics.overall_dynamic.hourly_data
         );
 
         return /*html*/ `

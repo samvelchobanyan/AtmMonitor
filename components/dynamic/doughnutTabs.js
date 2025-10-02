@@ -136,14 +136,14 @@ export default class DoughnutTabs extends DynamicElement {
             this.setState({ selectedTab: this.state.selectedTab });
             return;
         }
-
+        console.log('this.rawData',this.rawData);
         const {
-            dispense_amount,
+            amount,
             daily_median,
             transaction_median,
-            dispense_count,
+            count,
             median_count,
-            dispense_count_percent_change,
+            count_percent_change,
             breakdowns,
         } = this.rawData;
 
@@ -155,7 +155,7 @@ export default class DoughnutTabs extends DynamicElement {
 
             result[key] = {
                 amount: {
-                    total: dispense_amount,
+                    total: amount,
                     dailyAvg: daily_median,
                     transactionAvg: transaction_median,
                     chartData: {
@@ -164,9 +164,9 @@ export default class DoughnutTabs extends DynamicElement {
                     },
                 },
                 count: {
-                    total: dispense_count,
+                    total: count,
                     dailyAvg: median_count,
-                    changeValue: dispense_count_percent_change,
+                    changeValue: count_percent_change,
                     chartData: {
                         labels,
                         datasets: [{ data: counts }],

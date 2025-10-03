@@ -3,6 +3,8 @@ import { api } from "../core/api-client.js";
 import "../components/dynamic/select-box-search.js";
 import encode from "../assets/js/utils/encode.js";
 import "../components/dynamic/yandex-address.js";
+import "../components/ui/customCheck.js";
+import "../components/ui/selectBox.js";
 
 class CreateAtm extends DynamicElement {
     constructor() {
@@ -21,6 +23,8 @@ class CreateAtm extends DynamicElement {
             atmArchived: "",
             atmCimType: "",
             connectionStatusId: "",
+            models: null,
+            cimTypes: null,
         };
 
         this.segments = null;
@@ -36,9 +40,48 @@ class CreateAtm extends DynamicElement {
             text: item.name,
         }));
     }
+    onConnected() {
+        this.fetchModels();
+        this.fetchCimTypes();
+    }
+
+    async fetchModels() {
+        try {
+            const response = await this.fetchData(`/atm/models`);
+            const options = response.data.map((m) => ({
+                value: m.id,
+                label: m.model_name,
+            }));
+
+            this.setState({ models: options });
+        } catch (err) {
+            console.error("❌ Error fetching models:", err);
+            this.setState({ models: null });
+        }
+    }
+
+    async fetchCimTypes() {
+        try {
+            const response = await this.fetchData(`/atm/cim-types`);
+
+            const options = response.data.map((c) => ({
+                value: c.id,
+                label: c.name,
+            }));
+
+            this.setState({ cimTypes: options });
+        } catch (err) {
+            console.error("❌ Error fetching cimTypes:", err);
+            this.setState({ cimTypes: null });
+        }
+    }
 
     template() {
         const segments = encode(this.segments);
+        const models = encode(this.state.models);
+        const cimTypes = encode(this.state.cimTypes);
+
+        console.log("this.state.models", this.state.models);
 
         return /* html */ `
             <div class="row align-center">
@@ -50,49 +93,41 @@ class CreateAtm extends DynamicElement {
                                     <label for="name">Atm name</label>
                                     <input id="name" class="w-100" name="name" type="text" required />
                                 </div>
-                                <div class="form__item column sm-6">
-                                    <label for="modelId">modelId</label>
-                                    <input id="modelId" class="w-100" name="modelId" required />
+                                  <div class="form__item column sm-6">
+                                    <select-box-search id='segmentId' placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
                                 </div>
+                              
                             </div>
+
+
                             <div class="row">
+                              <div class="form__item column sm-6">
+                                    <label for="atmType">atmType</label>
+                                    <input id="atmType" class="w-100" name="atmType" type="number" required />
+                                </div>
+                             
                                 <div class="form__item column sm-6">
                                     <label for="ipAddress">ipAddress</label>
                                     <input id="ipAddress" class="w-100" name="ipAddress" type="text" required />
                                 </div>
-                                <div class="form__item column sm-6">
-                                    <select-box-search id='segmentId' placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
-                                </div>
                             </div>
 
 
                             <div class="row">
-                                <div class="form__item column sm-6">
-                                    <label for="atmType">atmType</label>
-                                    <input id="atmType" class="w-100" name="atmType" type="text" required />
+                               <div class="form__item column sm-2">
+                                    <p>modelId</p>
+                                    <select-box id="modelId" placeholder="Ընտրել մոդելը" options='${models}'></select-box>
+                                </div>
+                                <div class="form__item column sm-2">
+                                    <p>atmCimType</p>
+                                    <select-box id="atmCimType" placeholder="Ընտրել տեսակ" options='${cimTypes}'></select-box>
+                                </div>
+                                 <div class="form__item column sm-2 checkbox">
+                                    <custom-checkbox id="atmArchived" value="true">առխիվացված </custom-checkbox>
                                 </div>
                                 <div class="form__item column sm-6">
                                     <label for="atmVersion">atmVersion</label>
-                                    <input id="atmVersion" class="w-100" name="atmVersion" required />
-                                </div>
-                            </div>
-
-
-                            <div class="row">
-                               <div class="form__item column sm-6">
-                                    <label for="atmCimType">atmCimType</label>
-                                    <input id="atmCimType" class="w-100" name="atmCimType" type="text" required />
-                                </div>
-                                <div class="form__item column sm-6">
-                                    <label for="atmArchived">atmArchived</label>
-                                    <input id="atmArchived" class="w-100" name="atmArchived" required />
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="form__item column sm-6">
-                                    <label for="connectionStatusId">connectionStatusId</label>
-                                    <input id="connectionStatusId" class="w-100" name="connectionStatusId" required />
+                                    <input id="atmVersion" class="w-100"  type='text' name="atmVersion" required />
                                 </div>
                             </div>
 
@@ -167,103 +202,78 @@ class CreateAtm extends DynamicElement {
         const atmVersionInput = this.$("#atmVersion");
         const atmArchivedInput = this.$("#atmArchived");
         const atmCimTypeInput = this.$("#atmCimType");
-        const connectionStatusIdInput = this.$("#connectionStatusId");
         const lonInput = this.$("#lon");
         const latInput = this.$("#lat");
 
-        // const name = nameInput?.value.trim() || "";
-        // const modelId = modelIdInput?.value.trim() || "";
-        // const ipAddress = ipAddressInput?.value.trim() || "";
+        const name = nameInput?.value.trim();
+        const modelId = Number(modelIdInput?.value);
+        const ipAddress = ipAddressInput?.value.trim();
 
-        // const atmType = atmTypeInput?.value.trim() || "";
-        // const atmVersion = atmVersionInput?.value.trim() || "";
-        // const atmArchived = atmArchivedInput?.value.trim() || "";
-        // const atmCimType = atmCimTypeInput?.value.trim() || "";
-        // const connectionStatusId = connectionStatusIdInput?.value.trim() || "";
-        // const lon = lonInput?.value.trim() || "";
-        // const lat = latInput?.value.trim() || "";
+        const atmType = Number(atmTypeInput?.value);
+        const atmVersion = atmVersionInput?.value.trim();
+        const atmArchived = atmArchivedInput?.hasAttribute("checked") || false;
 
-        // const rawVal = segmentIdInput.getAttribute("value") || "[]";
-        // const segmentIds = JSON.parse(rawVal).map((v) => Number(v));
+        const atmCimType = Number(atmCimTypeInput?.value);
 
-        const name = nameInput?.value.trim() || "";
-        const modelId = Number(modelIdInput?.value) || "";
-        const ipAddress = ipAddressInput?.value.trim() || "";
-
-        const atmType = Number(atmTypeInput?.value) || "";
-        const atmVersion = atmVersionInput?.value.trim() || "";
-        const atmArchived = atmArchivedInput?.checked || false; // ✅ checkbox → boolean
-        const atmCimType = Number(atmCimTypeInput?.value) || "";
-        const connectionStatusId = Number(connectionStatusIdInput?.value) || "";
-
-        const lon = lonInput?.value.trim() || "";
-        const lat = latInput?.value.trim() || "";
+        const lon = lonInput?.value.trim();
+        const lat = latInput?.value.trim();
 
         const rawVal = segmentIdInput.getAttribute("value") || "[]";
         const segmentIds = JSON.parse(rawVal).map((v) => Number(v));
-
-        console.log("segmentIds", segmentIds);
-        console.log("values", {
-            name,
-            modelId,
-            ipAddress,
-            segmentIds,
-            atmType,
-            atmVersion,
-            atmArchived,
-            atmCimType,
-            connectionStatusId,
-            lon,
-            lat,
+        console.log("Input values:", {
+            name: nameInput?.value,
+            modelId: modelIdInput?.value,
+            ipAddress: ipAddressInput?.value,
+            atmType: atmTypeInput?.value,
+            atmVersion: atmVersionInput?.value,
+            atmArchived: atmArchived,
+            atmCimType: atmCimTypeInput?.value,
+            lon: lonInput?.value,
+            lat: latInput?.value,
+            segmentIdsRaw: segmentIdInput?.getAttribute("value"),
         });
 
-        // if (
-        //     !name ||
-        //     modelId !== "" ||
-        //     !ipAddress ||
-        //     segmentIds.length > 0 ||
-        //     atmType !== "" ||
-        //     !atmVersion ||
-        //     atmArchived ||
-        //     atmCimType !== "" ||
-        //     connectionStatusId !== "" ||
-        //     !lon ||
-        //     !lat
-        // ) {
-        //     this.setState({ error: "Լրացրեք բոլոր դաշտերը" });
-        //     return;
-        // }
+        if (
+            !name ||
+            !modelId ||
+            !ipAddress ||
+            segmentIds.length == 0 ||
+            !atmType ||
+            !atmVersion ||
+            !atmCimType ||
+            !lon ||
+            !lat
+        ) {
+            this.setState({ error: "Լրացրեք բոլոր դաշտերը" });
+            return;
+        }
 
-        // this.setState({ isLoading: true, error: "" });
+        this.setState({ isLoading: true, error: "" });
 
         try {
             const response = await api.post("/atm/add-atm", {
-                method: "POST",
-                body: {
-                    // name,
-                    // modelId,
-                    // ipAddress,
-                    // segmentIds,
-                    // atmType,
-                    // atmVersion,
-                    // atmArchived,
-                    // atmCimType,
-                    // connectionStatusId,
-                    // lon,
-                    // lat,
+                name,
+                modelId,
+                ipAddress,
+                segmentIds,
+                atmType,
+                atmVersion,
+                atmArchived,
+                atmCimType,
+                lon,
+                lat,
 
-                    modelId: 2,
-                    name: "aaaa",
-                    ipAddress: "3232sd",
-                    lat: "40.17763102651336",
-                    lon: "44.51742541693688",
-                    segmentIds: [1,5],
-                    atmType: 0,
-                    atmVersion: "3223dfd",
-                    atmArchived: true,
-                    atmCimType: 0,
-                    connectionStatusId: 0,
-                },
+                // for test
+                // modelId: 1,
+                // name: "string",
+                // ipAddress: "string",
+                // lat: "44.3333333",
+                // lon: "40.333232332",
+                // segmentIds: [1, 5],
+                // atmType: 1,
+                // atmVersion: "string",
+                // atmArchived: true,
+                // atmCimType: 1
             });
             console.log("creation response", response);
 

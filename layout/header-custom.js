@@ -37,7 +37,7 @@ class HeaderCustom extends DynamicElement {
             }
 
             // Update visibility based on route
-            const pathsToHide = ["/geo", "/cumulative", "/incassate", "/atms/"];
+            const pathsToHide = ["/geo", "/cumulative", "/incassate", "/atms/", "/create-atm"];
 
             // check this way to detect atms detail page as well
             const newHideClass = pathsToHide.some(

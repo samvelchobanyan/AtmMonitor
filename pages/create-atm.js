@@ -106,7 +106,7 @@ class CreateAtm extends DynamicElement {
                                         ></yandex-address> 
                                     </div>
                                 </div>
-                                <div column sm-6">
+                                <div class="column sm-6">
                                     <div class="form__item">
                                         <label for="lat">Latitude</label>
                                         <input id="lat" class="w-100" name="lat" type="text" readonly />
@@ -138,13 +138,6 @@ class CreateAtm extends DynamicElement {
         `;
     }
 
-    onAfterRender() {
-        // const username = this.$("#username");
-        // const password = this.$("#password");
-        // if (username) username.value = this.state.username || "";
-        // if (password) password.value = this.state.password || "";
-    }
-
     addEventListeners() {
         const form = this.$("#create-atm-form");
         if (form) {
@@ -166,9 +159,6 @@ class CreateAtm extends DynamicElement {
     async handleSubmit(event) {
         event.preventDefault();
 
-        // lat: "", //later
-        // lon: "", //later
-
         const nameInput = this.$("#name");
         const modelIdInput = this.$("#modelId");
         const ipAddressInput = this.$("#ipAddress");
@@ -178,47 +168,101 @@ class CreateAtm extends DynamicElement {
         const atmArchivedInput = this.$("#atmArchived");
         const atmCimTypeInput = this.$("#atmCimType");
         const connectionStatusIdInput = this.$("#connectionStatusId");
+        const lonInput = this.$("#lon");
+        const latInput = this.$("#lat");
+
+        // const name = nameInput?.value.trim() || "";
+        // const modelId = modelIdInput?.value.trim() || "";
+        // const ipAddress = ipAddressInput?.value.trim() || "";
+
+        // const atmType = atmTypeInput?.value.trim() || "";
+        // const atmVersion = atmVersionInput?.value.trim() || "";
+        // const atmArchived = atmArchivedInput?.value.trim() || "";
+        // const atmCimType = atmCimTypeInput?.value.trim() || "";
+        // const connectionStatusId = connectionStatusIdInput?.value.trim() || "";
+        // const lon = lonInput?.value.trim() || "";
+        // const lat = latInput?.value.trim() || "";
+
+        // const rawVal = segmentIdInput.getAttribute("value") || "[]";
+        // const segmentIds = JSON.parse(rawVal).map((v) => Number(v));
 
         const name = nameInput?.value.trim() || "";
-        const modelId = modelIdInput?.value.trim() || "";
+        const modelId = Number(modelIdInput?.value) || "";
         const ipAddress = ipAddressInput?.value.trim() || "";
-        const segmentId = segmentIdInput?.value.trim() || "";
-        const atmType = atmTypeInput?.value.trim() || "";
+
+        const atmType = Number(atmTypeInput?.value) || "";
         const atmVersion = atmVersionInput?.value.trim() || "";
-        const atmArchived = atmArchivedInput?.value.trim() || "";
-        const atmCimType = atmCimTypeInput?.value.trim() || "";
-        const connectionStatusId = connectionStatusIdInput?.value.trim() || "";
+        const atmArchived = atmArchivedInput?.checked || false; // ✅ checkbox → boolean
+        const atmCimType = Number(atmCimTypeInput?.value) || "";
+        const connectionStatusId = Number(connectionStatusIdInput?.value) || "";
 
-        if (
-            !name ||
-            !modelId ||
-            !ipAddress ||
-            !segmentId ||
-            !atmType ||
-            !atmVersion ||
-            !atmArchived ||
-            !atmCimType ||
-            !connectionStatusId
-        ) {
-            this.setState({ error: "Լրացրեք բոլոր դաշտերը" });
-            return;
-        }
+        const lon = lonInput?.value.trim() || "";
+        const lat = latInput?.value.trim() || "";
 
-        this.setState({ isLoading: true, error: "" });
+        const rawVal = segmentIdInput.getAttribute("value") || "[]";
+        const segmentIds = JSON.parse(rawVal).map((v) => Number(v));
+
+        console.log("segmentIds", segmentIds);
+        console.log("values", {
+            name,
+            modelId,
+            ipAddress,
+            segmentIds,
+            atmType,
+            atmVersion,
+            atmArchived,
+            atmCimType,
+            connectionStatusId,
+            lon,
+            lat,
+        });
+
+        // if (
+        //     !name ||
+        //     modelId !== "" ||
+        //     !ipAddress ||
+        //     segmentIds.length > 0 ||
+        //     atmType !== "" ||
+        //     !atmVersion ||
+        //     atmArchived ||
+        //     atmCimType !== "" ||
+        //     connectionStatusId !== "" ||
+        //     !lon ||
+        //     !lat
+        // ) {
+        //     this.setState({ error: "Լրացրեք բոլոր դաշտերը" });
+        //     return;
+        // }
+
+        // this.setState({ isLoading: true, error: "" });
 
         try {
-            const response = await this.fetchData("/atm/add-atm", {
+            const response = await api.post("/atm/add-atm", {
                 method: "POST",
                 body: {
-                    name,
-                    modelId,
-                    ipAddress,
-                    segmentId,
-                    atmType,
-                    atmVersion,
-                    atmArchived,
-                    atmCimType,
-                    connectionStatusId,
+                    // name,
+                    // modelId,
+                    // ipAddress,
+                    // segmentIds,
+                    // atmType,
+                    // atmVersion,
+                    // atmArchived,
+                    // atmCimType,
+                    // connectionStatusId,
+                    // lon,
+                    // lat,
+
+                    modelId: 2,
+                    name: "aaaa",
+                    ipAddress: "3232sd",
+                    lat: "40.17763102651336",
+                    lon: "44.51742541693688",
+                    segmentIds: [1,5],
+                    atmType: 0,
+                    atmVersion: "3223dfd",
+                    atmArchived: true,
+                    atmCimType: 0,
+                    connectionStatusId: 0,
                 },
             });
             console.log("creation response", response);

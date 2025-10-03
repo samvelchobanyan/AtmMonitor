@@ -145,14 +145,6 @@ class AtmDetails extends DynamicElement {
                     <div class="row">
                         <div class="column sm-6">
                             <div class="infos infos_margin">
-                                <info-card title="Մնացորդ" value="250108500" value-currency="֏" value-color="color-green" trend="7" show-border="true"> </info-card>
-                            </div>
-                            <chart-component id="bar-chart-1" chart-data="${encode(
-                                nominalList
-                            )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
-                        </div>
-                        <div class="column sm-6">
-                            <div class="infos infos_margin">
                                 <info-card
                                     title="Վերջին ինկասացիա (${formatDate(
                                         data.balance_info.last_encashment_date
@@ -161,12 +153,22 @@ class AtmDetails extends DynamicElement {
                                     value-currency="֏"
                                     value-color="color-blue"
                                     show-border="true"
+                                    
                                     button-text="Մանրամասն"
                                 >
                                 </info-card>
                             </div>
                             <chart-component id="bar-chart-2" chart-data="${encode(
                                 modelList
+                            )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
+                        </div>
+
+                         <div class="column sm-6">
+                            <div class="infos infos_margin">
+                                <info-card title="Մնացորդ" value="250108500" value-currency="֏" value-color="color-green" trend="7" show-border="true"> </info-card>
+                            </div>
+                            <chart-component id="bar-chart-1" chart-data="${encode(
+                                nominalList
                             )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
                         </div>
                     </div>

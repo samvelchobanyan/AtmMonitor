@@ -280,7 +280,7 @@ class SideBar extends DynamicElement {
                     </div>
                 </div>
                 <div class="sidebar__nav">
-                    <a href="./home" class="sidebar__item"> <i class="icon icon-grid"></i><span>Ակնարկ</span> </a>
+                    <a href="./home" class="sidebar__item"> <i class="icon icon-grid"></i><span>Ամփոփ</span> </a>
                     <div class="sidebar__section">
                         <div class="sidebar__item sidebar__item-has-dropdown">
                             <i class="icon icon-activity"></i><span>Անալիտիկա</span>

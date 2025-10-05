@@ -129,6 +129,7 @@ class AtmDetails extends DynamicElement {
         const exchangeData = data.transactions_summary.exchange_summary.currency_details;
         const nominalList = data.balance_info.cassettes.filter((c) => c.nominal === 0);
         const modelList = data.balance_info.cassettes.filter((c) => c.nominal !== 0);
+        
 
         const transactionDynamics = encode(
             this._transformToTransactionDynamics(data.transactions_summary.transaction_dynamics)
@@ -158,9 +159,7 @@ class AtmDetails extends DynamicElement {
                                 >
                                 </info-card>
                             </div>
-                            <chart-component id="bar-chart-2" chart-data="${encode(
-                                modelList
-                            )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
+                            <chart-component id="bar-chart-2" chart-data="${encode(modelList)}" chart-type="bar" show-date-selector="false" stacked></chart-component>
                         </div>
 
                          <div class="column sm-6">

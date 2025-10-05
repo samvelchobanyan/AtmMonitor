@@ -153,10 +153,14 @@ class AtmsDashboard extends DynamicElement {
         const transactionsData = this.state.summary.transactionsInfo;
         const encashmentData = this.state.incashmentInfoCardsData;
         const atmWorkHours = this.state.summary.atmWorkHours;
+        const totalWorkingTime = atmWorkHours.total_working_time.replace('h', 'ժ').replace('m', 'ր');
+        const totalNonWorkingTime = atmWorkHours.total_non_working_time.replace('h', 'Ժ').replace('m', 'ր');
 
         const transactionDaily = this.state.summary.hourly_transactions;
         const encashmentsDaily = this.state.summary.hourly_encashments;
         const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
+        console.log('atmWorkHours',atmWorkHours);
+        
 
         return /* html */ `
         <div class="row">
@@ -319,16 +323,18 @@ class AtmsDashboard extends DynamicElement {
                         <info-card
                             title="Այսօր աշխատաժամանակ"
                             value="${atmWorkHours.working_percent}"
+                            value-currency="%"
                             icon="icon icon-clock"
                             show-border="true"
-                            duration="${atmWorkHours.total_working_time}">
+                            duration="${totalWorkingTime}">
                         </info-card>
                         <info-card
                             title="Այսօր պարապուրդ"
                             value="${atmWorkHours.non_working_percent}"
+                            value-currency="%"
                             icon="icon icon-clock"
                             show-border="true"
-                            duration="${atmWorkHours.total_non_working_time}">
+                            duration="${totalNonWorkingTime}">
                         </info-card>
                     </div>
                     <chart-component

@@ -11,9 +11,9 @@ const nonRenderAttrs = new Set(["start-date", "end-date"]);
 const TAB_LABELS = {
     card: "\u0554\u0561\u0580\u057f\u0578\u057e / \u0531\u0576\u0584\u0561\u0580\u057f",
     cardownership:
-        "\u054d\u0565\u0583\u0561\u056f\u0561\u0576 / \u0531\u0575\u056c \u056f\u0561\u0580\u057f",
+        "Սեփական / Այլ քարտ",
     payment_system:
-        "\u054e\u0580\u0561\u0580\u0561\u0575\u056b\u0576 \u0570\u0561\u0574\u0561\u056f\u0561\u0580\u0563",
+        "Վճարման համակարգ",
     type: "Ըստ տեսակի",
 };
 
@@ -136,7 +136,6 @@ export default class DoughnutTabs extends DynamicElement {
             this.setState({ selectedTab: this.state.selectedTab });
             return;
         }
-        console.log('this.rawData',this.rawData);
         const {
             amount,
             daily_median,
@@ -144,6 +143,7 @@ export default class DoughnutTabs extends DynamicElement {
             count,
             median_count,
             count_percent_change,
+            amount_percent_change,
             breakdowns,
         } = this.rawData;
 
@@ -158,6 +158,7 @@ export default class DoughnutTabs extends DynamicElement {
                     total: amount,
                     dailyAvg: daily_median,
                     transactionAvg: transaction_median,
+                    changeValue: amount_percent_change,
                     chartData: {
                         labels,
                         datasets: [{ data: amounts }],
@@ -216,19 +217,18 @@ export default class DoughnutTabs extends DynamicElement {
         const countData = charts ? encode(charts.count) : "";
         const showDate = this.getAttribute("show-date") !== "false"; // default true
         let ifDispense = this.getAttribute("id") == "dispense";
-        return `
+        
+        return /* html */ `
       <div class="select-container">
-        <container-top icon="${
-            ifDispense ? "icon-arrow-down-left" : "icon-arrow-up-right"
-        }" title="${title}"></container-top>
+        <container-top icon="${ifDispense ? "icon-arrow-down-left" : "icon-arrow-up-right"}" title="${title}"></container-top>
           ${
               showDate
                   ? `
-          <select-box-date
-            start-date="${this.getAttr("start-date")}"
-            end-date="${this.getAttr("end-date")}"
-          ></select-box-date>
-        `
+                    <select-box-date
+                        start-date="${this.getAttr("start-date")}"
+                        end-date="${this.getAttr("end-date")}"
+                    ></select-box-date>
+                    `
                   : ""
           }
       </div>

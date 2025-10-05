@@ -59,7 +59,7 @@ const CHART_CONFIG = {
     byMethodFieldsToInclude: ["visa", "master", "arca"],
     ownOtherFieldsToInclude: ["own_card", "other_card"],
 
-    stackBarFieldsToInclude: ["current_count", "last_encashment_count"],
+    stackBarFieldsToInclude: ["current_count", "last_encashment_count","capacity"],
 
     dateFormat: {
         locale: "hy-AM", // Armenian locale
@@ -73,15 +73,14 @@ class ChartDataTransformer {
     }
 
     // === LineChart transformation  - default ===
-    transformData(daily_data) {
+    transformData(daily_data,filedNamesconfig = null) {
         // const { daily_data } = apiResponse;
-
         if (!Array.isArray(daily_data)) {
             throw new Error("Invalid data format: daily_data must be an array");
         }
 
         const labels = this.extractLabels(daily_data);
-        const datasets = this.extractDatasets(daily_data);
+        const datasets = this.extractDatasets(daily_data, filedNamesconfig);
 
         return {
             metaData: {},
@@ -163,7 +162,7 @@ class ChartDataTransformer {
         });
     }
 
-    extractDatasets(dailyData) {
+    extractDatasets(dailyData, filedNamesconfig) {
         const {
             fieldLabels,
             encashmentFieldsToInclude,
@@ -184,6 +183,13 @@ class ChartDataTransformer {
             fields = inout_transactionDynamicsToInclude;
         } else {
             fields = fieldsToInclude;
+        }
+        
+        if(filedNamesconfig !== null) {
+            
+            if(filedNamesconfig === 'line-chart-dispense-dynamics') {
+                fields = inout_dispenseDynamicsToInclude;
+            }
         }
 
         return fields.map((fieldName) => {

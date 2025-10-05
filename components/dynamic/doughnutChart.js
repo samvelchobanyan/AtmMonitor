@@ -56,7 +56,7 @@ class DoughnutChartComponent extends DynamicElement {
         }
         let suffix = this.getAttr('currency') ? '<span>֏</span>' : '';
 
-        return `
+        return /* html */ `
           <div class="overview">
             <div class="overview-top">
               <div class="overview-top__title">${this.getAttr('title')}</div>

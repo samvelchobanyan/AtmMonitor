@@ -65,8 +65,7 @@ class ChartComponent extends DynamicElement {
                     const parsed = JSON.parse(dataAttr);
                     switch (this.chartType) {
                         case "line":
-                            this.transformedData = chartDataTransformer.transformData(parsed);
-                            console.log('chart component data',this.transformedData.chartData);
+                            this.transformedData = chartDataTransformer.transformData(parsed,this.getAttr('id'));
                             break;
                         case "doughnut":
                             this.transformedData = chartDataTransformer.transformDoughnutData(
@@ -201,7 +200,7 @@ class ChartComponent extends DynamicElement {
                         );
                     } else {
                         this.transformedData = chartDataTransformer.transformData(
-                            response.data[data_array_name]
+                            response.data[data_array_name],this.getAttr('id')
                         );
                     }
                     this._updateChart();

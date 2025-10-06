@@ -42,9 +42,8 @@ class AtmDetails extends DynamicElement {
 
         if (this.depositChart) {
             this.addListener(this.depositChart, "chart-bar-clicked", (e) => {
-                let label = e.detail.columnLabel;
+                let label = e.detail.columnLabel.substring(0, e.detail.columnLabel.indexOf("-"));
 
-                console.log("label", label);
                 let link = "";
                 if (label == "DC") {
                     link = "/atm/deposit-cassette-contents";
@@ -121,7 +120,6 @@ class AtmDetails extends DynamicElement {
     openPopUp(data) {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
-        console.log("data", data);
 
         modal.setContent(`
             <div class="modal__header">

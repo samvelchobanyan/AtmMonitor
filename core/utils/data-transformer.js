@@ -129,10 +129,8 @@ class ChartDataTransformer {
 
         // const labels = apiResponse.map((item) => item.nominal);
         const labels = apiResponse.map((item) => {
-            console.log('nominal',item);
             let lbl = '';
-            // console.log('item.nominal',item.nominal);
-            
+
             switch (item.cassette_type_name) {
                 case "RECYCLE 1000":
                     lbl = `1K-${item.current_count}/${item.last_encashment_count}`;
@@ -167,17 +165,13 @@ class ChartDataTransformer {
                 default:
                     break;
             }
-            console.log('lbl',lbl);
-            
+
             return lbl;
         });
-        // console.log('nlabels',nlabels);
-        console.log('labels',labels);
-        
+
         
         const datasets = stackBarFieldsToInclude.map((field) => {
-            console.log('field',field);
-            
+
             return {
                 label: fieldLabels[field] || field,
                 data: apiResponse.map((item) => item[field] ?? 0),

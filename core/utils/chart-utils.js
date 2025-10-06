@@ -334,12 +334,8 @@ export function createBarChart(ctxId, chartData, containerID, stacked = false, o
                 },
             },
             onClick(event, elements, chart) {
-                console.log("eeee", event);
-
                 if (!elements.length) return;
                 const element = elements[0];
-
-                console.log("!!!!!!", element);
 
                 // const datasetIndex = element.datasetIndex;
                 const dataIndex = element.index;

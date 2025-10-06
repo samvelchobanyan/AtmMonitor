@@ -16,24 +16,48 @@ class AtmDetails extends DynamicElement {
             summary: null,
         };
         this.atmId = "";
+        this.exchangeDateBox = null;
+        this.encashmentDateBox = null;
     }
 
-    onConnected() {
-        // const pathParts = window.location.pathname.split("/").filter(Boolean);
-        // this.atmId = pathParts[pathParts.length - 1];
-        // this.fetchAtm();
-    }
+    onConnected() {}
 
     onAfterRender() {
         const pathParts = window.location.pathname.split("/").filter(Boolean);
         this.atmId = pathParts[pathParts.length - 1];
+        this.exchangeDateBox = this.$("#exchange-date");
+        this.encashmentDateBox = this.$("#encashment-date");
 
         if (this.state.summary == null) {
             this.fetchAtm();
+            this.fetchFailedEncashments();
         }
     }
 
     addEventListeners() {
+        this.tableDateChange();
+        this.encashmentChanges();
+    }
+
+    encashmentChanges() {
+        if (this.exchangeDateBox) {
+            this.addListener(this.exchangeDateBox, "date-range-change", (e) => {
+                const { startDate, endDate } = e.detail;
+                this.fetchExchangeData(startDate, endDate);
+            });
+        }
+
+        if (this.encashmentDateBox) {
+            this.addListener(this.encashmentDateBox, "date-range-change", (e) => {
+                const { startDate, endDate } = e.detail;
+                let link = `/encashment/summary?atmId=${this.atmId}&startDate=${startDate}&endDate=${endDate}`;
+                this.$("simple-table").setAttribute("data-source", link);
+                this.fetchFailedEncashments();
+            });
+        }
+    }
+
+    tableDateChange() {
         const dateSelector = this.$("select-box-date");
         const table = this.$("simple-table");
 
@@ -47,11 +71,23 @@ class AtmDetails extends DynamicElement {
         }
     }
 
+    async fetchExchangeData(startDate, endDate) {
+        const response = await this.fetchData(
+            `/analytics/exchange-summary-in-days?startDate=${startDate}&endDate=${endDate}&atmIds=[${this.atmId}]`
+        );
+        const currencies = response.data.currency_details;
+
+        currencies.forEach((currency) => {
+            const el = this.$(`#${currency.currency_code}`);
+            if (el) {
+                el.setAttribute("value", currency.total_amount);
+                el.setAttribute("trend", currency.total_amount_percent_change);
+            }
+        });
+    }
+
     async fetchAtm() {
         const id = parseInt(this.atmId, 10);
-
-        console.log("this.atmId", this.atmId);
-        console.log("id", id);
 
         try {
             const response = await this.fetchData(`/atm/my-profile?atmId=${id}`);
@@ -65,19 +101,27 @@ class AtmDetails extends DynamicElement {
         }
     }
 
-    // formatDate(dateString) {
-    //   const date = new Date(dateString); // parse ISO
+    async fetchFailedEncashments() {
+        try {
+            const response = await this.fetchData(`/encashment/failed-transactions`);
+            // continue here
+            const data = response.data;
 
-    //   const day = String(date.getDate()).padStart(2, '0');
-    //   const month = String(date.getMonth() + 1).padStart(2, '0'); // months start at 0
-    //   const year = date.getFullYear();
+            const failedCount = this.$("#failed-count");
+            const failedAmount = this.$("#failed-amount");
+            if (failedCount) {
+                failedCount.setAttribute("value", data.failed_transactions_count);
+            }
+            if (failedAmount) {
+                failedAmount.setAttribute("value", data.failed_transactions_amount);
+            }
+        } catch (err) {
+            console.error("❌ Error fetching summary:", err);
+            this.setState({ summary: null });
+        }
+    }
 
-    //   const hours = String(date.getHours()).padStart(2, '0');
-    //   const minutes = String(date.getMinutes()).padStart(2, '0');
-
-    //   return `${day}/${month}/${year} ${hours}:${minutes}`;
-    // }
-
+    // todo delete if not used
     _transformToTransactionDynamics(data) {
         const { dispense_dynamic, deposit_dynamic, exchange_dynamic } = data;
 
@@ -108,6 +152,31 @@ class AtmDetails extends DynamicElement {
         return transactionDynamics;
     }
 
+    getCassetteDifferences(before, after) {
+        const result = [];
+
+        after.forEach((afterCassette) => {
+            const beforeCassette = before.find(
+                (b) => b.cassette_name === afterCassette.cassette_name
+            );
+
+            // Determine count difference
+            const countDiff = afterCassette.count - (beforeCassette?.count || 0);
+
+            // Extract the numeric part from the cassette name (e.g. "RECYCLE 10000" → 10000)
+            const match = afterCassette.cassette_name.match(/\d+/);
+            if (!match) return;
+            const banknoteName = match ? Number(match[0]) : afterCassette.cassette_name;
+            result.push({
+                banknot_name: banknoteName,
+                count: countDiff,
+                result: banknoteName * countDiff,
+            });
+        });
+
+        return result;
+    }
+
     template() {
         if (!this.state.summary) {
             return /*html*/ `
@@ -129,12 +198,23 @@ class AtmDetails extends DynamicElement {
         const exchangeData = data.transactions_summary.exchange_summary.currency_details;
         const nominalList = data.balance_info.cassettes.filter((c) => c.nominal === 0);
         const modelList = data.balance_info.cassettes.filter((c) => c.nominal !== 0);
-        
 
         const transactionDynamics = encode(
-            this._transformToTransactionDynamics(data.transactions_summary.transaction_dynamics)
+            data.transactions_summary.transaction_dynamics.overall_dynamic.hourly_data
         );
 
+        const incData = encode(
+            this.getCassetteDifferences(
+                data.encashments_summary.encashments[0].cassettes_before,
+                data.encashments_summary.encashments[0].cassettes_after
+            )
+        );
+
+        // todo see why 500 error on date change of transactionDynamics
+
+        // todo finish exchangeData, now call doesnt recieve atmId, but should
+
+        // todo add date selector functionality to incashment
         const devicesData = data.devices;
         const atmWorkHours = data.atm_work_hours;
 
@@ -146,7 +226,16 @@ class AtmDetails extends DynamicElement {
                     <div class="row">
                         <div class="column sm-6">
                             <div class="infos infos_margin">
-                                <info-card
+                                <info-card title="Մնացորդ" value="250108500" value-currency="֏" value-color="color-green" trend="7" show-border="true"> </info-card>
+                            </div>
+                            <chart-component id="bar-chart-2" chart-data="${encode(
+                                modelList
+                            )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
+                        </div>
+
+                         <div class="column sm-6">
+                            <div class="infos infos_margin">
+                                 <info-card
                                     title="Վերջին ինկասացիա (${formatDate(
                                         data.balance_info.last_encashment_date
                                     )})"
@@ -154,17 +243,10 @@ class AtmDetails extends DynamicElement {
                                     value-currency="֏"
                                     value-color="color-blue"
                                     show-border="true"
-                                    
                                     button-text="Մանրամասն"
+                                    incashment-data='${incData}'
                                 >
                                 </info-card>
-                            </div>
-                            <chart-component id="bar-chart-2" chart-data="${encode(modelList)}" chart-type="bar" show-date-selector="false" stacked></chart-component>
-                        </div>
-
-                         <div class="column sm-6">
-                            <div class="infos infos_margin">
-                                <info-card title="Մնացորդ" value="250108500" value-currency="֏" value-color="color-green" trend="7" show-border="true"> </info-card>
                             </div>
                             <chart-component id="bar-chart-1" chart-data="${encode(
                                 nominalList
@@ -189,16 +271,19 @@ class AtmDetails extends DynamicElement {
                    </div>
                    <div class="column sm-12">
                        <div class="container">
+                        <div class="select-container">
                            <container-top icon="icon-dollar-sign" title="Արտարժույթի փոխանակում"></container-top>
+                            <select-box-date id='exchange-date'></select-box-date>
+                        </div>
                            <div class="infos">
                                ${exchangeData
                                    .map((exchange) => {
                                        return `
                                    <info-card
+                                       id="${exchange.currency_code}"  
                                        title="${exchange.currency_code}"
                                        value="${exchange.total_amount}"
-                                          value-currency="$"
-                                          trend="${exchange.total_amount_percent_change}"
+                                       trend="${exchange.total_amount_percent_change}"
                                        icon="icon icon-box"
                                        show-border="true"></info-card>`;
                                    })
@@ -214,7 +299,7 @@ class AtmDetails extends DynamicElement {
                             id="line-chart-transactions" 
                             chart-type="line" 
                             chart-data='${transactionDynamics}' 
-                            api-url="/analytics/exchange-dynamic-in-days" 
+                            api-url="/analytics/transactions-dynamic-in-days?atmIds=${this.atmId}" 
                             ${this.attrIf("city", this.state.currentCity)} 
                             ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
                     </div>
@@ -284,6 +369,7 @@ class AtmDetails extends DynamicElement {
                 <div class="select-container">
                 <container-top icon="icon-coins" title="Ինկասացիաներ"></container-top>
                 <select-box-date
+                    id="encashment-date"
                     start-date="${this.getAttr("start-date")}"
                     end-date="${this.getAttr("end-date")}"
                 ></select-box-date>
@@ -291,13 +377,14 @@ class AtmDetails extends DynamicElement {
 
                 <div class="col sm-6">
                 <div class="row infos infos_margin">
-                    <info-card title="Չկատարված գործարքների գումար" value="250,108,500֏" show-border="true"></info-card>
-                    <info-card title="Չկատարված գործարքների քանակ" value="410" show-border="true"></info-card>
+                    <info-card id='failed-amount' title="Չկատարված գործարքների գումար" show-border="true"></info-card>
+                    <info-card id='failed-count' title="Չկատարված գործարքների քանակ" show-border="true"></info-card>
                 </div>
                 </div>
 
                 <simple-table
-                data-source="/encashment/summary?startDate=2025-06-01&&atmId=${this.atmId}"
+                searchable="false"
+                data-source="/encashment/summary?atmId=${this.atmId}"
                 columns='["date_time", "atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
                 clickable-columns='["added_amount"]'>
                 </simple-table>

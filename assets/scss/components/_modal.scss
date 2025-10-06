@@ -94,6 +94,21 @@
         font-size: rem(16);
         line-height: 1.4;
     }
+
+    &__incashment {
+        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        &:after {
+            bottom: 0;
+        }
+        padding: rem(16) 0;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+
+        &:first-child {
+            padding-top: 0;
+        }
+    }
+
     &__body {
         .list {
             max-height: rem(196);

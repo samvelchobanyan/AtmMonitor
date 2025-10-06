@@ -128,7 +128,7 @@ class SelectBoxDate extends DynamicElement {
         value="${this.period}"
         options='[
           {"value":"today","label":"Այսօր"},
-          {"value":"week","label":"Այս շաբաթ"},
+          {"value":"week","label":"Նաղորդ 7 օր"},
           {"value":"custom","label":"Ամսաթվի միջակայք"}
         ]'>
       </select-box>

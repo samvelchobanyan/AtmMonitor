@@ -54,6 +54,7 @@ class HeaderCustom extends DynamicElement {
     }
 
     addEventListeners() {
+        // todo add in here that after provicne change need to make new call to get correct cities
         this.addListener(this.$("#province-selector"), "change", (e) => {
             store.setState({
                 selectedRegion: e.target.value,

@@ -187,7 +187,7 @@ class GeoAnalythics extends DynamicElement {
         );
         return /*html*/ `
         <div class="container">
-            <doughnut-tabs id="dispense1" data="${firstDispenseData}" show-date="false" title="Մուտքագրում"></doughnut-tabs>
+            <doughnut-tabs id="dispense1" data="${firstDispenseData}" show-date="false" title="Կանխիկացում"></doughnut-tabs>
         </div>
 
         <div class="container">
@@ -269,7 +269,7 @@ class GeoAnalythics extends DynamicElement {
         );
         return /*html*/ `
         <div class="container">
-            <doughnut-tabs id="dispense2" data="${secondDispenseData}" show-date="false" title="Մուտքագրում"></doughnut-tabs>
+            <doughnut-tabs id="dispense2" data="${secondDispenseData}" show-date="false" title="Կանխիկացում"></doughnut-tabs>
         </div>
 
         <div class="container">

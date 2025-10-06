@@ -170,7 +170,14 @@ class ChartComponent extends DynamicElement {
         if (region) params.append("region", region);
         if (atmId) params.append("atmId", atmId);
 
-        const url = `${endpoint}?${params.toString()}`;
+        // handle cases where endpoint has already param in there (for example atmId)
+        let url = endpoint;
+        if (url.includes("?")) {
+            url += `&${params.toString()}`;
+        } else {
+            url += `?${params.toString()}`;
+        }
+
         try {
             const response = await this.fetchData(url);
 

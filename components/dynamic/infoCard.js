@@ -37,7 +37,11 @@ class InfoCard extends DynamicElement {
 
         const linkButton = this.$(".btn_link");
         if (linkButton) {
-            this.addListener(linkButton, "click", this.handleLinkClick);
+            if (this.getAttribute("incashment-data")) {
+                this.addListener(linkButton, "click", this.handleIncashmentClick);
+            } else {
+                this.addListener(linkButton, "click", this.handleLinkClick);
+            }
         }
     }
 
@@ -70,6 +74,36 @@ class InfoCard extends DynamicElement {
         closeBtn?.addEventListener("click", () => modal.remove());
     }
 
+    _openIncashmentPopup(incData) {
+        const modal = document.createElement("modal-popup");
+        document.body.appendChild(modal);
+        modal.setContent(`
+        <div class="modal__header">
+            <div class="modal__title">Վերջին ինկասացիա</div>
+            <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
+        </div>
+        <div class="modal__body">
+                <list-view
+                    items='${incData}'
+                >
+                    <template>
+                        <div class="modal__incashment">
+                            <div class="modal__incashment-text">{{banknot_name}}</div>
+                            <div class="modal__incashment-text">{{count}} հատ</div>
+                            <div class="modal__incashment-text">{{result}}</div>
+                        </div>
+                    </template>
+                </list-view>
+      </div>
+    
+   
+    `);
+
+        // Add close button listener
+        const closeBtn = modal.querySelector(".modal__close");
+        closeBtn?.addEventListener("click", () => modal.remove());
+    }
+
     _openCardPopup(messages) {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
@@ -82,23 +116,25 @@ class InfoCard extends DynamicElement {
         if (endpoint == "/dashboard/taken-cards") {
             modalTitle = "Առգրավված քարտեր";
             itemTemplate = `
-            <div class="atm-item">
-                <div class="atm-item__icon">
-                    <img src="assets/img/credit-card.svg" alt="ATM Icon"/>
-                </div>
-                <div class="atm-item__info">
-                    <div class="atm-item__location">
-                        <div><span class="atm-item__value">{{date_time}}</span></div>
+                <a href="atms/{{atm_id}}">
+                    <div class="atm-item">
+                        <div class="atm-item__icon">
+                            <img src="assets/img/credit-card.svg" alt="ATM Icon"/>
+                        </div>
+                        <div class="atm-item__info">
+                            <div class="atm-item__location">
+                                <div><span class="atm-item__value">{{date_time}}</span></div>
+                            </div>
+                            <div class="atm-item__id">
+                                <span class="atm-item__label">ATM ID:</span>
+                                <span class="atm-item__value">#<span class="font-black">{{atm_id}}</span></span>
+                            </div>
+                            <div class="atm-item__address">
+                                <span class="atm-item__value">Քարտի համար։ {{card_number}}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="atm-item__id">
-                        <span class="atm-item__label">ATM ID:</span>
-                        <span class="atm-item__value">#<span class="font-black">{{atm_id}}</span></span>
-                    </div>
-                    <div class="atm-item__address">
-                        <span class="atm-item__value">Քարտի համար։ {{card_number}}</span>
-                    </div>
-                </div>
-            </div>
+                </a>
         `;
         } else if (endpoint === "/dashboard/almost-empty-cassettes") {
             modalTitle = "Վերջացող";
@@ -162,10 +198,11 @@ class InfoCard extends DynamicElement {
                         <div class="atm-item__location">
                             <div><span class="atm-item__label">Քաղաք՝</span> <span class="atm-item__value">{{city}}</span></div>
                             <div><span class="atm-item__label">Համայնք՝</span> <span class="atm-item__value">{{district}}</span></div>
-                        </div>
-                        <div class="atm-item__address">
+                            </div>
+                            <div class="atm-item__address">
                             <span class="atm-item__label">Հասցե՝</span> <span class="atm-item__value">{{address}}</span>
-                        </div>
+                            </div>
+                            <div><span class="atm-item__label">Անսարքություն՝</span> <span class="atm-item__value">{{device_type_name}}</span></div>
                     </div>
                 </div>
             </a>
@@ -210,6 +247,11 @@ class InfoCard extends DynamicElement {
     async handleMessageClick() {
         let comments = this.getAttribute("messages-data");
         this._openMessagesPopup(comments);
+    }
+
+    async handleIncashmentClick() {
+        let incData = this.getAttribute("incashment-data");
+        this._openIncashmentPopup(incData);
     }
 
     async handleLinkClick() {
@@ -274,7 +316,7 @@ class InfoCard extends DynamicElement {
         }</div>
         ${trend ? `<change-indicator value="${trend}"></change-indicator>` : ""}
         ${
-            buttonText
+            value !== "0" && value !== 0 && buttonText
                 ? `<div class="btn btn_link"><span>${buttonText}</span> <i class="icon icon-chevron-right"></i></div>`
                 : ""
         }

@@ -10,10 +10,8 @@ const nonRenderAttrs = new Set(["start-date", "end-date"]);
 
 const TAB_LABELS = {
     card: "\u0554\u0561\u0580\u057f\u0578\u057e / \u0531\u0576\u0584\u0561\u0580\u057f",
-    cardownership:
-        "Սեփական / Այլ քարտ",
-    payment_system:
-        "Վճարման համակարգ",
+    cardownership: "Սեփական / Այլ քարտ",
+    payment_system: "Վճարման համակարգ",
     type: "Ըստ տեսակի",
 };
 
@@ -216,11 +214,16 @@ export default class DoughnutTabs extends DynamicElement {
         const amountData = charts ? encode(charts.amount) : "";
         const countData = charts ? encode(charts.count) : "";
         const showDate = this.getAttribute("show-date") !== "false"; // default true
-        let ifDispense = this.getAttribute("id") == "dispense";
-        
+
+        // handle fields names in diff charts
+        const id = this.getAttribute("id");
+        const ifDispense = id?.includes("dispense");
+
         return /* html */ `
       <div class="select-container">
-        <container-top icon="${ifDispense ? "icon-arrow-down-left" : "icon-arrow-up-right"}" title="${title}"></container-top>
+        <container-top icon="${
+            ifDispense ? "icon-arrow-down-left" : "icon-arrow-up-right"
+        }" title="${title}"></container-top>
           ${
               showDate
                   ? `

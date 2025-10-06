@@ -127,8 +127,57 @@ class ChartDataTransformer {
 
         const { fieldLabels, stackBarFieldsToInclude } = this.config;
 
-        const labels = apiResponse.map((item) => item.nominal);
+        // const labels = apiResponse.map((item) => item.nominal);
+        const labels = apiResponse.map((item) => {
+            console.log('nominal',item);
+            let lbl = '';
+            // console.log('item.nominal',item.nominal);
+            
+            switch (item.cassette_type_name) {
+                case "RECYCLE 1000":
+                    lbl = `1K-${item.current_count}/${item.last_encashment_count}`;
+                    break;
+                case "RECYCLE 5000":
+                    lbl = `5K-${item.current_count}/${item.last_encashment_count}`;
+                    break;
+                case "RECYCLE 10000":
+                    lbl = `10k-${item.current_count}/${item.last_encashment_count}`;
+                    break;
+                case "RECYCLE 20000":
+                    lbl = `20k-${item.current_count}/${item.last_encashment_count}`;
+                    break;
+                case "Reject":
+                    lbl = `RJ-${item.current_count}/${item.capacity}`;
+                    break;                        
+                case "Retract":
+                    lbl = `RT-${item.current_count}/${item.capacity}`;
+                    break;
+                case "Deposit Cassette":
+                    lbl = `DC-${item.current_count}/${item.capacity}`;
+                    break;
+                case "Reject Cassette 1":
+                    lbl = `RJ1-${item.current_count}/${item.capacity}`;
+                    break;                        
+                case "Reject Cassette 2":
+                    lbl = `RJ2-${item.current_count}/${item.capacity}`;
+                    break;
+                case "Retract Cassette":
+                    lbl = `RT-${item.current_count}/${item.capacity}`;
+                    break;
+                default:
+                    break;
+            }
+            console.log('lbl',lbl);
+            
+            return lbl;
+        });
+        // console.log('nlabels',nlabels);
+        console.log('labels',labels);
+        
+        
         const datasets = stackBarFieldsToInclude.map((field) => {
+            console.log('field',field);
+            
             return {
                 label: fieldLabels[field] || field,
                 data: apiResponse.map((item) => item[field] ?? 0),

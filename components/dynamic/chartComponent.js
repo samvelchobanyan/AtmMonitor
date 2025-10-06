@@ -65,7 +65,10 @@ class ChartComponent extends DynamicElement {
                     const parsed = JSON.parse(dataAttr);
                     switch (this.chartType) {
                         case "line":
-                            this.transformedData = chartDataTransformer.transformData(parsed,this.getAttr('id'));
+                            this.transformedData = chartDataTransformer.transformData(
+                                parsed,
+                                this.getAttr("id")
+                            );
                             break;
                         case "doughnut":
                             this.transformedData = chartDataTransformer.transformDoughnutData(
@@ -115,7 +118,43 @@ class ChartComponent extends DynamicElement {
                     ? this.getAttr("stacked") !== "false"
                     : false;
 
-                this.chart = createBarChart(this.canvasId, chartData, this.legendId, stacked);
+                this.chart = createBarChart(
+                    this.canvasId,
+                    chartData,
+                    this.legendId,
+                    stacked,
+                    ({
+                        label,
+                        value,
+                        dataset,
+                        datasetIndex,
+                        dataIndex,
+                        columnLabel,
+                        datasetLabel,
+                    }) => {
+                        console.log(
+                            "Clicked:",
+                            columnLabel
+                            // "aaaaaaaaaaaaaaaaaa", // ← column label (x-axis)
+                            // datasetLabel, // ← dataset label (legend)
+                            // label, // same as columnLabel
+                            // value,
+                            // dataset,
+                            // datasetIndex,
+                            // dataIndex
+                        );
+
+                        // click on chart in atm details
+                        this.dispatchEvent(
+                            new CustomEvent("chart-bar-clicked", {
+                                detail: { columnLabel },
+                                bubbles: true,
+                            })
+                        );
+                        // Example: do something useful
+                        // this._openDetailsModal(label, value, dataset.label);
+                    }
+                );
                 break;
         }
 
@@ -207,7 +246,8 @@ class ChartComponent extends DynamicElement {
                         );
                     } else {
                         this.transformedData = chartDataTransformer.transformData(
-                            response.data[data_array_name],this.getAttr('id')
+                            response.data[data_array_name],
+                            this.getAttr("id")
                         );
                     }
                     this._updateChart();

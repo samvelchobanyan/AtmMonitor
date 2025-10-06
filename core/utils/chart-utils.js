@@ -57,7 +57,9 @@ const htmlLegendPlugin = {
                 if (customLegendEl.hasClass("custom-legend_percent")) {
                     textContainer.textContent = `${item.text} (${percent}%)`;
                 } else if (customLegendEl.hasClass("custom-legend_data")) {
-                    textContainer.innerHTML = `${item.text} <div>${percent}% / ${value.toLocaleString()}</div>`;
+                    textContainer.innerHTML = `${
+                        item.text
+                    } <div>${percent}% / ${value.toLocaleString()}</div>`;
                 } else {
                     // Default: label text only
                     textContainer.textContent = `${item.text}`;
@@ -296,7 +298,7 @@ export function updateDoughnutChart(chart, chartData) {
 
 /* ====== BarChart ====== */
 
-export function createBarChart(ctxId, chartData, containerID, stacked = false) {
+export function createBarChart(ctxId, chartData, containerID, stacked = false, onBarClick) {
     const ctx = document.getElementById(ctxId).getContext("2d");
     const datasetsWithColors = chartData ? prepareBarChart(chartData) : null;
 
@@ -330,6 +332,35 @@ export function createBarChart(ctxId, chartData, containerID, stacked = false) {
                     ticks: { display: stacked },
                     stacked: stacked,
                 },
+            },
+            onClick(event, elements, chart) {
+                console.log("eeee", event);
+
+                if (!elements.length) return;
+                const element = elements[0];
+
+                console.log("!!!!!!", element);
+
+                // const datasetIndex = element.datasetIndex;
+                const dataIndex = element.index;
+
+                // const dataset = chart.data.datasets[datasetIndex];
+                const columnLabel = chart.data.labels[dataIndex]; // ← column name on x-axis
+                // const datasetLabel = dataset.label; // ← dataset (legend) name
+                // const value = dataset.data[dataIndex];
+                // const label = chart.data.labels[dataIndex];
+                // console.log("dataset", dataset);
+                if (typeof onBarClick === "function") {
+                    onBarClick({
+                        columnLabel, // x-axis label (column)
+                        // datasetLabel, // dataset name (legend)
+                        // label,
+                        // value, // numeric value
+                        // dataset,
+                        // datasetIndex,
+                        // dataIndex,
+                    });
+                }
             },
         },
         plugins: [htmlLegendPlugin, loadingPlugin],

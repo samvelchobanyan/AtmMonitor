@@ -230,7 +230,7 @@ class ChartDataTransformer {
         
         if(filedNamesconfig !== null) {
             
-            if(filedNamesconfig === 'line-chart-dispense-dynamics') {
+            if(filedNamesconfig === 'line-chart-dispense-dynamics' || filedNamesconfig === 'line-chart-dispense-dynamics1' || filedNamesconfig === 'line-chart-dispense-dynamics2') {
                 fields = inout_dispenseDynamicsToInclude;
             }
         }

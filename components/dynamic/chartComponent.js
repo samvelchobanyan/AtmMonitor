@@ -105,7 +105,9 @@ class ChartComponent extends DynamicElement {
         this.selectBox = this.$("select-box-date");
 
         const chartData = this.transformedData ? this.transformedData.chartData : null;
-
+if(this.getAttr('id') === 'line-chart-dispense-dynamics1'){
+    console.log('chartData',chartData);
+}
         switch (this.chartType) {
             case "line":
                 this.chart = createLineChart(this.canvasId, chartData, this.legendId);
@@ -245,10 +247,14 @@ class ChartComponent extends DynamicElement {
                             response.data.overall_dynamic[data_array_name]
                         );
                     } else {
+                        console.log('mtanq sovorakan');
                         this.transformedData = chartDataTransformer.transformData(
                             response.data[data_array_name],
                             this.getAttr("id")
                         );
+                    }
+                    if(this.getAttr('id') === 'line-chart-dispense-dynamics1'){
+                        console.log('this.transformedData',this.transformedData);
                     }
                     this._updateChart();
                     break;

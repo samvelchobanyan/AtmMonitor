@@ -67,7 +67,7 @@ class GeoAnalythics extends DynamicElement {
     async fetchFirstSummary() {
         const queryString = new URLSearchParams();
         if (this.activeTab1 == "geo1") {
-            if (this.currentRegion1 != null) queryString.append("district", this.currentRegion1);
+            if (this.currentRegion1 != null) queryString.append("province", this.currentRegion1);
             if (this.currentCity1 != null) queryString.append("city", this.currentCity1);
 
             const segments = this.querySelector("#segments1");
@@ -94,7 +94,7 @@ class GeoAnalythics extends DynamicElement {
         const queryString = new URLSearchParams();
 
         if (this.activeTab2 == "geo2") {
-            if (this.currentRegion2 != null) queryString.append("district", this.currentRegion2);
+            if (this.currentRegion2 != null) queryString.append("province", this.currentRegion2);
             if (this.currentCity2 != null) queryString.append("city", this.currentCity2);
 
             const segments = this.querySelector("#segments2");

@@ -53,7 +53,7 @@ class inOut extends DynamicElement {
     async fetchSummary(region, city, atmId) {
         const queryString = new URLSearchParams();
         if (region) {
-            queryString.append("district", region);
+            queryString.append("province", region);
         }
         if (city) {
             queryString.append("city", city);

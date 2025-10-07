@@ -109,7 +109,7 @@ class Notifications extends DynamicElement {
         if (this.startDate) queryString.append("startDate", this.startDate);
         if (this.endDate) queryString.append("endDate", this.endDate);
         if (this.selectedCity) queryString.append("city", this.selectedCity);
-        if (this.selectedRegion) queryString.append("district", this.selectedRegion);
+        if (this.selectedRegion) queryString.append("province", this.selectedRegion);
 
         return queryString;
     }

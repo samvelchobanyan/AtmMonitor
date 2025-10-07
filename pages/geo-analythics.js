@@ -7,6 +7,7 @@ import "../components/dynamic/select-box-search.js";
 import "../components/ui/customCheck.js";
 import "../components/dynamic/segment.js";
 import encode from "../assets/js/utils/encode.js";
+import "../components/dynamic/select-box-date.js";
 
 class GeoAnalythics extends DynamicElement {
     constructor() {
@@ -30,6 +31,13 @@ class GeoAnalythics extends DynamicElement {
         this.selectAtmsBox2 = null;
         this.submitButtons1 = null;
         this.submitButtons2 = null;
+        this.dateSelector1 = null;
+        this.dateSelector2 = null;
+
+        this.startDate1 = null;
+        this.endDate1 = null;
+        this.startDate2 = null;
+        this.endDate2 = null;
 
         this.activeTab1 = "geo1";
         this.activeTab2 = "geo2";
@@ -59,6 +67,9 @@ class GeoAnalythics extends DynamicElement {
         this.submitButtons2 = this.$$(".submit-button-2");
         this.selectAtmsBox1 = this.$("#atms-search1");
         this.selectAtmsBox2 = this.$("#atms-search2");
+        this.dateSelector1 = this.$("#date-selector1");
+        this.dateSelector2 = this.$("#date-selector2");
+
         this.fetchFirstSummary();
         this.fetchSecondSummary();
     }
@@ -66,8 +77,8 @@ class GeoAnalythics extends DynamicElement {
     async fetchFirstSummary() {
         const queryString = new URLSearchParams();
         if (this.activeTab1 == "geo1") {
-            if (this.currentRegion1 != null) queryString.append("province", this.currentRegion1);
-            if (this.currentCity1 != null) queryString.append("city", this.currentCity1);
+            if (this.currentRegion1) queryString.append("province", this.currentRegion1);
+            if (this.currentCity1) queryString.append("city", this.currentCity1);
 
             const segments = this.querySelector("#segments1");
             if (segments?.values?.length) {
@@ -78,6 +89,8 @@ class GeoAnalythics extends DynamicElement {
             let values = JSON.parse(valuesAttr);
             values.forEach((v) => queryString.append("atmId", v));
         }
+        if (this.startDate1) queryString.append("startDate", this.startDate1);
+        if (this.endDate1) queryString.append("endDate", this.endDate1);
 
         try {
             const response = await this.fetchData(`/analytics/summary?${queryString}`);
@@ -105,6 +118,8 @@ class GeoAnalythics extends DynamicElement {
             let values = JSON.parse(valuesAttr);
             values.forEach((v) => queryString.append("atmId", v));
         }
+        if (this.startDate2) queryString.append("startDate", this.startDate2);
+        if (this.endDate2) queryString.append("endDate", this.endDate2);
         try {
             const response = await this.fetchData(`/analytics/summary?${queryString}`);
             const rightColumn = this.$("#right-column");
@@ -164,6 +179,28 @@ class GeoAnalythics extends DynamicElement {
         this.submitButtons2.forEach((btn) => {
             this.addListener(btn, "click", () => this.fetchSecondSummary());
         });
+
+        if (this.dateSelector1) {
+            this.addListener(this.dateSelector1, "date-range-change", (e) => {
+                const { startDate, endDate } = e.detail || {};
+                if (!startDate || !endDate) return;
+                this.startDate1 = startDate;
+                this.endDate1 = endDate;
+
+                this.fetchFirstSummary();
+            });
+        }
+
+        if (this.dateSelector2) {
+            this.addListener(this.dateSelector2, "date-range-change", (e) => {
+                const { startDate, endDate } = e.detail || {};
+                if (!startDate || !endDate) return;
+                this.startDate2 = startDate;
+                this.endDate2 = endDate;
+
+                this.fetchSecondSummary();
+            });
+        }
 
         this.leftTabsListener();
         this.rightTabsListener();
@@ -359,7 +396,6 @@ class GeoAnalythics extends DynamicElement {
 
     template() {
         const atmsList = encode(this.state.atmsList);
-        // const atmsList = encode(this.atmsList);
         if (this.state.atmsList.length == 0) {
             return /*html*/ `
             <div class="row">
@@ -376,20 +412,25 @@ class GeoAnalythics extends DynamicElement {
         <div class="row">
            <div class="column sm-6">
                 <div class="container">
+
                     <div class="tabs-container">
                         <div class="tabs left-tabs">
                             <custom-tab name="geo1" active>Աշխարհագրական</custom-tab>
                             <custom-tab name="atms1">Բանկոմատներ</custom-tab>
                         </div>
+                
+                        <select-box-date id='date-selector1'></select-box-date>
                     </div>
+
                     <div class="tab-content" data-tab="geo1">
-                       <div class="combo-box-items">
-                           <select-box id="province-selector1"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
-                                this.province
-                            )}'></select-box>
+                        <div class="combo-box-items">
                             <select-box id="city-selector1" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
                                 this.cities
-                            )}'></select-box>                            
+                            )}'></select-box>
+                            <select-box id="province-selector1"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
+                                this.province
+                            )}'></select-box>
+                            
                         </div>
                         <segment-block id='segments1'></segment-block>
                          <div class="btn-container btn-container_decor">
@@ -412,15 +453,17 @@ class GeoAnalythics extends DynamicElement {
                             <custom-tab name="geo2" active>Աշխարհագրական</custom-tab>
                             <custom-tab name="atms2">Բանկոմատներ</custom-tab>
                         </div>
+                        <select-box-date id='date-selector2'></select-box-date>
+
                     </div>
                     <div class="tab-content" data-tab="geo2">
                        <div class="combo-box-items">
-                           <select-box id="province-selector2"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
-                                this.province
-                            )}'></select-box>
                             <select-box id="city-selector2" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
                                 this.cities
-                            )}'></select-box>                            
+                            )}'></select-box>
+                            <select-box id="province-selector2"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
+                                this.province
+                            )}'></select-box>
                         </div>
                         <segment-block id='segments2'></segment-block>
                          <div class="btn-container btn-container_decor">

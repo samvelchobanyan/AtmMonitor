@@ -245,7 +245,17 @@ export class SimpleTable extends DynamicElement {
             }
         })();
 
-        const header = this.state.columns.map((c) => `<th>${c}</th>`).join("");
+        // take translated column labels from column-labels attr
+        const labels = (() => {
+            try {
+                const raw = this.getAttr("column-labels");
+                return raw ? JSON.parse(raw) : {};
+            } catch {
+                return {};
+            }
+        })();
+
+        const header = this.state.columns.map((c) => `<th>${labels[c] || c}</th>`).join("");
 
         const rows = this.state.data
             .map((row, index) => {

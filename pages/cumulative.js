@@ -30,6 +30,10 @@ class Cumulative extends DynamicElement {
                                     "dispense_amount","dispense_count",
                                     "exchange_eur_amount","exchange_rub_amount","exchange_usd_amount"
                                 ]'
+                                column-labels='{"province":"Մարզ","deposit_amount":"Մուտքագրված գումար",
+                                "deposit_count":"Մուտքագրված քանակ","dispense_amount":"Կանխիկացված գումար",
+                                "dispense_count":"Կանխիկացված քանակ","exchange_eur_amount":"Փոխանակված EUR գումար",
+                                "exchange_rub_amount":"Փոխանակված RUB գումար","exchange_usd_amount":"Փոխանակված USD գումար"}'
                                 exportable
                                 searchable="false"
                                 export-filename="cumulative"

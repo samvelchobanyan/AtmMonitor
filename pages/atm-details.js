@@ -454,6 +454,8 @@ class AtmDetails extends DynamicElement {
                 searchable="false"
                 data-source="/encashment/summary?atmId=${this.atmId}"
                 columns='["date_time", "atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+                column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
+                "added_amount":"Ավելացած գումար","collected_amount":"Հավաքված գումար","marked_as_empty":"Դատարկ"}'
                 clickable-columns='["added_amount"]'>
                 </simple-table>
             </div> 

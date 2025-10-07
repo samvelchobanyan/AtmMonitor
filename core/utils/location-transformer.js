@@ -36,6 +36,17 @@ class LocationTransformer {
         const province = data.find(p => p.province === provinceName);
         if (!province) return [];
 
+        // Special case: for Երևան province, return its districts as options
+        if (provinceName === 'Երևան') {
+            const yerevanCity = province.cities.find(c => c.city === 'Երևան');
+            const districts = (yerevanCity && yerevanCity.districts) ? yerevanCity.districts : [];
+            return districts.map(d => ({
+                label: d,
+                value: d,
+                province: province.province
+            })).filter(opt => this.config.filterEmpty ? opt.value !== "" : true);
+        }
+
         return province.cities.map(cityObj => ({
             label: cityObj.city || this.config.emptyValueDisplay,
             value: cityObj.city,

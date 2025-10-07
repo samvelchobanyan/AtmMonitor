@@ -216,9 +216,11 @@ class Notifications extends DynamicElement {
                   </div>
                  <simple-table
                     data='${deviceErrors}' 
-                    columns='["atm_id", "date","atm_and_address","fault_type","message"]'
-                    link-columns='{"atm_and_address": "atms/:id"}'
+                    columns='["atm_id", "date","address","fault_type","message"]'
+                    link-columns='{"atm_id": "atms/:id"}'
                     searchable="false"
+                    column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե",
+                    "fault_type":"Սարքի տեսակ","message":"Նկարագրություն"}'
                     id='device-errors-table'
                     >
                  </simple-table>
@@ -230,7 +232,8 @@ class Notifications extends DynamicElement {
                     }'> </container-top>
                     <simple-table
                         data='${takenCards}' 
-                        columns='["atm_id", "date","atm_and_address","card_number"]'
+                        columns='["atm_id", "date","address","card_number"]'
+                        column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե", "card_number": "Քարտի համար"}'
                         searchable="false">
                     </simple-table>
                 </div>
@@ -241,7 +244,9 @@ class Notifications extends DynamicElement {
                     }'> </container-top>
                     <simple-table
                         data='${problematicTransactions}' 
-                        columns='["atm_id", "date","atm_and_address","amount", "message", "transaction_id"]'
+                        columns='["atm_id", "date","address","amount", "message", "transaction_id"]'
+                        column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե", 
+                        "amount": "Գումար", "message": "Նկարագրություն","transaction_id": "Գործարքի ID"}'
                         searchable="false">
                     </simple-table>
                 </div>

@@ -331,6 +331,9 @@ class AtmFailures extends DynamicElement {
                         <simple-table
                           data='${topFailures}'
                           columns='["atm_and_address", "total_faults_count", "faults_summary"]'
+                          column-labels='{"atm_and_address":"Բանկոմատ և հասցե",
+                          "total_faults_count":"Խափանումների քանակ",
+                          "faults_summary":"Խափանումների ամփոփում"}'
                           searchable="false">
                         </simple-table>
                     </div>  
@@ -396,7 +399,9 @@ class AtmFailures extends DynamicElement {
                  </div>
                  <simple-table
                     data='${faultsByDevice}'
-                    columns='["atm_and_address", "total_faults", "faults_duration"]'>
+                    columns='["atm_and_address", "total_faults", "faults_duration"]'
+                    column-labels='{"atm_and_address":"Բանկոմատ և հասցե",
+                    "total_faults":"Խափանումների քանակ","faults_duration":"Խափանումների տևողություն"}'>
                  </simple-table>
                 </div>
             </div>

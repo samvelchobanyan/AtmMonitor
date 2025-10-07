@@ -55,6 +55,9 @@ class Incassate extends DynamicElement {
             <simple-table
                 data-source=${this.tableLink}
                 columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+                column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի ID և հասցե",
+                "added_amount":"Ավելացված գումար","collected_amount":"Հավաքված գումար",
+                "marked_as_empty":"Դատարկ"}'
                 exportable
                 export-filename="incassate"
                 export-label="Download CSV">

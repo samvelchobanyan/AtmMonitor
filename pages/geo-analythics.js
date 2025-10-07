@@ -7,6 +7,7 @@ import "../components/dynamic/select-box-search.js";
 import "../components/ui/customCheck.js";
 import "../components/dynamic/segment.js";
 import encode from "../assets/js/utils/encode.js";
+import "../components/dynamic/select-box-date.js";
 
 class GeoAnalythics extends DynamicElement {
     constructor() {
@@ -359,7 +360,6 @@ class GeoAnalythics extends DynamicElement {
 
     template() {
         const atmsList = encode(this.state.atmsList);
-        // const atmsList = encode(this.atmsList);
         if (this.state.atmsList.length == 0) {
             return /*html*/ `
             <div class="row">
@@ -376,21 +376,25 @@ class GeoAnalythics extends DynamicElement {
         <div class="row">
            <div class="column sm-6">
                 <div class="container">
+
                     <div class="tabs-container">
                         <div class="tabs left-tabs">
                             <custom-tab name="geo1" active>Աշխարհագրական</custom-tab>
                             <custom-tab name="atms1">Բանկոմատներ</custom-tab>
                         </div>
+                        // todo continue here
+                        <select-box-date id='exchange-date'></select-box-date>
                     </div>
+
                     <div class="tab-content" data-tab="geo1">
-                       <div class="combo-box-items">
+                        <div class="combo-box-items">
                             <select-box id="city-selector1" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
                                 this.cities
                             )}'></select-box>
                             <select-box id="province-selector1"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
                                 this.province
                             )}'></select-box>
-
+                            
                         </div>
                         <segment-block id='segments1'></segment-block>
                          <div class="btn-container btn-container_decor">

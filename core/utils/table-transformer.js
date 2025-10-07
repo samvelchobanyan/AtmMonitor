@@ -46,7 +46,7 @@ function transformFaultTableData(apiResponse) {
         return apiResponse.device_errors.map((item) => ({
             atm_id: item.atm_id,
             date: formatDate(item.created_at),
-            atm_and_address: `${item.atm_id} / ${item.address}`,
+            address: `${item.city}, ${item.address}`,
             fault_type: item.device_name,
             message: item.message,
         }));
@@ -54,14 +54,14 @@ function transformFaultTableData(apiResponse) {
         return apiResponse.taken_cards.map((item) => ({
             atm_id: item.atm_id,
             date: formatDate(item.created_at),
-            atm_and_address: `${item.atm_id} / ${item.address}`,
+            address: `${item.city}, ${item.address}`,
             card_number: item.card_number,
         }));
     } else if (apiResponse?.problematic_transactions) {
         return apiResponse.problematic_transactions.map((item) => ({
             atm_id: item.atm_id,
             date: formatDate(item.created_at),
-            atm_and_address: `${item.atm_id} / ${item.address}`,
+            address: `${item.city}, ${item.address}`,
             amount: item.amount,
             transaction_id: item.transaction_id,
             message: item.message,

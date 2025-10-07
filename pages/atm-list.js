@@ -56,7 +56,7 @@ class AtmList extends DynamicElement {
     const globalState = store.getState();
     if (globalState.selectedRegion) {
       this.selectedRegion = globalState.selectedRegion;
-      queryString.append("district", globalState.selectedRegion);
+      queryString.append("province", globalState.selectedRegion);
     }
     if (globalState.selectedCity) {
       this.selectedCity = globalState.selectedCity;

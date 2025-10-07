@@ -79,7 +79,7 @@ class AtmsDashboard extends DynamicElement {
 
         
         if (region) {
-            queryString.append("district", region);
+            queryString.append("province", region);
         }
         if (city) {
             queryString.append("city", city);

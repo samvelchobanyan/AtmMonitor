@@ -251,7 +251,6 @@ class AtmFailures extends DynamicElement {
         });
     }
 
-    // todo show total notifications count on red circle
 
     selectDatesListener() {
         if (this.topDateSelectBox) {
@@ -710,7 +709,6 @@ customElements.define("atm-failures", AtmFailures);
 //         });
 //     }
 
-//     // todo show total notifications count on red circle
 
 //     selectTopDateListener() {
 //         if (this.topDateSelectBox) {

@@ -157,6 +157,8 @@ class GeoAnalythics extends DynamicElement {
         if (this.selectRegionBox1) {
             this.addListener(this.selectRegionBox1, "change", (e) => {
                 this.currentRegion1 = e.target.value;
+                // continue here
+                this.cities = locationTransformer.getCitiesByProvince(state.regionsData,e.target.value);
             });
         }
 

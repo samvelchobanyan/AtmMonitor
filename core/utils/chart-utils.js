@@ -227,7 +227,7 @@ export function createLineChart(ctxId, chartData, containerID) {
                 x: {
                     grid: { display: true, drawBorder: true, color: "#D9D9DD" },
                     border: { dash: [2, 4] },
-                    ticks: { display: false },
+                    ticks: { display: true },
                 },
             },
         },
@@ -336,25 +336,12 @@ export function createBarChart(ctxId, chartData, containerID, stacked = false, o
             onClick(event, elements, chart) {
                 if (!elements.length) return;
                 const element = elements[0];
-
-                // const datasetIndex = element.datasetIndex;
                 const dataIndex = element.index;
+                const columnLabel = chart.data.labels[dataIndex];
 
-                // const dataset = chart.data.datasets[datasetIndex];
-                const columnLabel = chart.data.labels[dataIndex]; // ← column name on x-axis
-                // const datasetLabel = dataset.label; // ← dataset (legend) name
-                // const value = dataset.data[dataIndex];
-                // const label = chart.data.labels[dataIndex];
-                // console.log("dataset", dataset);
                 if (typeof onBarClick === "function") {
                     onBarClick({
-                        columnLabel, // x-axis label (column)
-                        // datasetLabel, // dataset name (legend)
-                        // label,
-                        // value, // numeric value
-                        // dataset,
-                        // datasetIndex,
-                        // dataIndex,
+                        columnLabel,
                     });
                 }
             },

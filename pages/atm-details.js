@@ -282,7 +282,6 @@ class AtmDetails extends DynamicElement {
 
         // todo finish exchangeData, now call doesnt recieve atmId, but should
 
-        // todo add date selector functionality to incashment
         const devicesData = data.devices;
         const atmWorkHours = data.atm_work_hours;
 

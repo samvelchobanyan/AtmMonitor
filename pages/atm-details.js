@@ -50,12 +50,13 @@ class AtmDetails extends DynamicElement {
                 } else if (label == "RJ1") {
                     link = "/atm/reject-cassette-contents";
                 } else if (label == "RJ2") {
-                    link = "/atm/reject-cassette-contents";
+                    link = "/atm/retract-cassette-contents";
                 }
 
-                // for test
-                // let link = "/atm/deposit-cassette-contents";
-                this.fetchPopUpData(link);
+                const labelName = e.detail.columnLabel.replace(/[^A-Za-z]/g, "");
+                console.log("labelName", labelName);
+
+                if (link) this.fetchPopUpData(link, labelName);
             });
         }
     }
@@ -107,37 +108,40 @@ class AtmDetails extends DynamicElement {
         });
     }
 
-    async fetchPopUpData(link) {
+    async fetchPopUpData(link, popUpName) {
         const response = await this.fetchData(`${link}?atmId=${this.atmId}`);
         const data = response.data?.totals;
         if (data) {
-            this.openPopUp(data);
+            this.openPopUp(data, popUpName);
         } else {
             console.log("noo info!");
         }
     }
 
-    openPopUp(data) {
+    // todo ask Aram which one RJ is which title
+    openPopUp(data, name) {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
 
+        const cards = data
+            .map(
+                (item) => `
+            <info-card
+                title="${item.currency}"
+                value="${item.amount}"
+                show-border="true"
+            ></info-card>
+        `
+            )
+            .join("");
         modal.setContent(`
             <div class="modal__header">
-                <div class="modal__title">Մեկնաբանություններ</div>
+                <div class="modal__title">${name}</div>
                 <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
             </div>
-            <div class="modal__body">
-                    <list-view
-                        items='${encode(data)}'
-                    >
-                        <template>
-                           <info-card
-                               title="{{currency}}"
-                               value="{{amount}}"
-                               show-border="true"></info-card>
-                        </template>
-                    </list-view>
-          </div>
+            <div class="modal__chart">
+                     ${cards}
+            </div>
         
        
         `);

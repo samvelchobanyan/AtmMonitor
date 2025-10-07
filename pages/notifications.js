@@ -34,10 +34,10 @@ class Notifications extends DynamicElement {
 
         this.segments = null;
 
-        this.tableActiveTab = null;
+        this.tableActiveTab = "Բորոլը";
         this.tableLink = "/device-faults/summary";
 
-        this.deviceTypes = [];
+        this.deviceTypes = [{ id: 0, type_name: "Բորոլը" }];
     }
 
     onConnected() {
@@ -94,8 +94,8 @@ class Notifications extends DynamicElement {
     async initTableTabs() {
         try {
             const res = await this.fetchData(`/device-faults/all-device-types`);
-            this.deviceTypes = res.data;
-            this.tableActiveTab = res.data[0].type_name;
+            this.deviceTypes = [...this.deviceTypes, ...res.data];
+            // this.tableActiveTab = res.data[0].type_name;
         } catch (err) {
             console.error("❌ Failed to init table tabs:", err);
         }
@@ -174,9 +174,12 @@ class Notifications extends DynamicElement {
 
         const found = device_errors.filter((item) => item.device_name == this.tableActiveTab);
 
-        const deviceErrors = encode({
-            device_errors: found,
-        });
+        const deviceErrors =
+            this.tableActiveTab == "Բորոլը"
+                ? encode({ device_errors })
+                : encode({
+                      device_errors: found,
+                  });
 
         const takenCards = encode({
             taken_cards: taken_cards,
@@ -213,7 +216,7 @@ class Notifications extends DynamicElement {
                   </div>
                  <simple-table
                     data='${deviceErrors}' 
-                    columns='["date","atm_and_address","fault_type"]'
+                    columns='["atm_id", "date","atm_and_address","fault_type","message"]'
                     link-columns='{"atm_and_address": "atms/:id"}'
                     searchable="false"
                     id='device-errors-table'
@@ -227,7 +230,7 @@ class Notifications extends DynamicElement {
                     }'> </container-top>
                     <simple-table
                         data='${takenCards}' 
-                        columns='["date","atm_and_address","card_number"]'
+                        columns='["atm_id", "date","atm_and_address","card_number"]'
                         searchable="false">
                     </simple-table>
                 </div>
@@ -238,7 +241,7 @@ class Notifications extends DynamicElement {
                     }'> </container-top>
                     <simple-table
                         data='${problematicTransactions}' 
-                        columns='["date","atm_and_address","amount"]'
+                        columns='["atm_id", "date","atm_and_address","amount", "message", "transaction_id"]'
                         searchable="false">
                     </simple-table>
                 </div>

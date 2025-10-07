@@ -109,6 +109,12 @@
         }
     }
 
+    &__chart {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
     &__body {
         .list {
             max-height: rem(196);

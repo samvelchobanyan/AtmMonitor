@@ -31,6 +31,13 @@ class GeoAnalythics extends DynamicElement {
         this.selectAtmsBox2 = null;
         this.submitButtons1 = null;
         this.submitButtons2 = null;
+        this.dateSelector1 = null;
+        this.dateSelector2 = null;
+
+        this.startDate1 = null;
+        this.endDate1 = null;
+        this.startDate2 = null;
+        this.endDate2 = null;
 
         this.activeTab1 = "geo1";
         this.activeTab2 = "geo2";
@@ -60,6 +67,9 @@ class GeoAnalythics extends DynamicElement {
         this.submitButtons2 = this.$$(".submit-button-2");
         this.selectAtmsBox1 = this.$("#atms-search1");
         this.selectAtmsBox2 = this.$("#atms-search2");
+        this.dateSelector1 = this.$("#date-selector1");
+        this.dateSelector2 = this.$("#date-selector2");
+
         this.fetchFirstSummary();
         this.fetchSecondSummary();
     }
@@ -67,8 +77,8 @@ class GeoAnalythics extends DynamicElement {
     async fetchFirstSummary() {
         const queryString = new URLSearchParams();
         if (this.activeTab1 == "geo1") {
-            if (this.currentRegion1 != null) queryString.append("province", this.currentRegion1);
-            if (this.currentCity1 != null) queryString.append("city", this.currentCity1);
+            if (this.currentRegion1) queryString.append("province", this.currentRegion1);
+            if (this.currentCity1) queryString.append("city", this.currentCity1);
 
             const segments = this.querySelector("#segments1");
             if (segments?.values?.length) {
@@ -79,6 +89,8 @@ class GeoAnalythics extends DynamicElement {
             let values = JSON.parse(valuesAttr);
             values.forEach((v) => queryString.append("atmId", v));
         }
+        if (this.startDate1) queryString.append("startDate", this.startDate1);
+        if (this.endDate1) queryString.append("endDate", this.endDate1);
 
         try {
             const response = await this.fetchData(`/analytics/summary?${queryString}`);
@@ -106,6 +118,8 @@ class GeoAnalythics extends DynamicElement {
             let values = JSON.parse(valuesAttr);
             values.forEach((v) => queryString.append("atmId", v));
         }
+        if (this.startDate2) queryString.append("startDate", this.startDate2);
+        if (this.endDate2) queryString.append("endDate", this.endDate2);
         try {
             const response = await this.fetchData(`/analytics/summary?${queryString}`);
             const rightColumn = this.$("#right-column");
@@ -165,6 +179,28 @@ class GeoAnalythics extends DynamicElement {
         this.submitButtons2.forEach((btn) => {
             this.addListener(btn, "click", () => this.fetchSecondSummary());
         });
+
+        if (this.dateSelector1) {
+            this.addListener(this.dateSelector1, "date-range-change", (e) => {
+                const { startDate, endDate } = e.detail || {};
+                if (!startDate || !endDate) return;
+                this.startDate1 = startDate;
+                this.endDate1 = endDate;
+
+                this.fetchFirstSummary();
+            });
+        }
+
+        if (this.dateSelector2) {
+            this.addListener(this.dateSelector2, "date-range-change", (e) => {
+                const { startDate, endDate } = e.detail || {};
+                if (!startDate || !endDate) return;
+                this.startDate2 = startDate;
+                this.endDate2 = endDate;
+
+                this.fetchSecondSummary();
+            });
+        }
 
         this.leftTabsListener();
         this.rightTabsListener();
@@ -382,8 +418,8 @@ class GeoAnalythics extends DynamicElement {
                             <custom-tab name="geo1" active>Աշխարհագրական</custom-tab>
                             <custom-tab name="atms1">Բանկոմատներ</custom-tab>
                         </div>
-                        // todo continue here
-                        <select-box-date id='exchange-date'></select-box-date>
+                
+                        <select-box-date id='date-selector1'></select-box-date>
                     </div>
 
                     <div class="tab-content" data-tab="geo1">
@@ -417,6 +453,8 @@ class GeoAnalythics extends DynamicElement {
                             <custom-tab name="geo2" active>Աշխարհագրական</custom-tab>
                             <custom-tab name="atms2">Բանկոմատներ</custom-tab>
                         </div>
+                        <select-box-date id='date-selector2'></select-box-date>
+
                     </div>
                     <div class="tab-content" data-tab="geo2">
                        <div class="combo-box-items">

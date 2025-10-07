@@ -384,13 +384,12 @@ class GeoAnalythics extends DynamicElement {
                     </div>
                     <div class="tab-content" data-tab="geo1">
                        <div class="combo-box-items">
-                            <select-box id="city-selector1" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
-                                this.cities
-                            )}'></select-box>
-                            <select-box id="province-selector1"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
+                           <select-box id="province-selector1"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
                                 this.province
                             )}'></select-box>
-
+                            <select-box id="city-selector1" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
+                                this.cities
+                            )}'></select-box>                            
                         </div>
                         <segment-block id='segments1'></segment-block>
                          <div class="btn-container btn-container_decor">
@@ -416,12 +415,12 @@ class GeoAnalythics extends DynamicElement {
                     </div>
                     <div class="tab-content" data-tab="geo2">
                        <div class="combo-box-items">
-                            <select-box id="city-selector2" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
-                                this.cities
-                            )}'></select-box>
-                            <select-box id="province-selector2"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
+                           <select-box id="province-selector2"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
                                 this.province
                             )}'></select-box>
+                            <select-box id="city-selector2" placeholder="Ընտրել քաղաքը" options='${JSON.stringify(
+                                this.cities
+                            )}'></select-box>                            
                         </div>
                         <segment-block id='segments2'></segment-block>
                          <div class="btn-container btn-container_decor">

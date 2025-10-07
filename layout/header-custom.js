@@ -8,10 +8,12 @@ class HeaderCustom extends DynamicElement {
         super();
         this.state = {
             hideClass: "",
+            province: [],
+            cities: [],
         };
         this.title = ""; // current known title
-        this.province = [];
-        this.cities = [];
+        // this.province = [];
+        // this.cities = [];
     }
 
     onConnected() {
@@ -22,8 +24,21 @@ class HeaderCustom extends DynamicElement {
             label: item.province,
             value: item.province,
         }));
+        this.province.unshift({
+            label: "Ընտրել մարզը",
+            value: null,
+        });
 
         this.cities = locationTransformer.getAllCityOptions(state.regionsData);
+        this.cities.unshift({
+            label: "Ընտրել քաղաքը",
+            value: null,
+        });
+
+        this.setState({
+            province: this.province,
+            cities: this.cities,
+        });
     }
 
     addGlobalEventListeners() {
@@ -56,13 +71,30 @@ class HeaderCustom extends DynamicElement {
     addEventListeners() {
         // todo add in here that after provicne change need to make new call to get correct cities
         this.addListener(this.$("#province-selector"), "change", (e) => {
+            console.log('e.target.value', e.target.value);
+            
+            if(e.target.value !== null && e.target.value !== 'null'){
+                this.cities = locationTransformer.getCitiesByProvince(store.getState().regionsData, e.target.value);
+            }
+            else{
+                this.cities = locationTransformer.getAllCityOptions(store.getState().regionsData);
+            }
+            this.cities.unshift({
+                label: "Ընտրել քաղաքը",
+                value: null,
+            });
+
+            
             store.setState({
-                selectedRegion: e.target.value,
+                selectedRegion: e.target.value === 'null' ? null : e.target.value,
+            });
+            this.setState({
+                cities: this.cities,
             });
         });
 
         this.addListener(this.$("#city-selector"), "change", (e) => {
-            store.setState({ selectedCity: e.target.value });
+            store.setState({ selectedCity: e.target.value === 'null' ? null : e.target.value });
         });
     }
 
@@ -80,6 +112,9 @@ class HeaderCustom extends DynamicElement {
     }
 
     template() {
+        console.log('header template',this.state.cities);
+        const state = store.getState();
+        
         return /* html */ `
             <div class="main-container">
                 <div class="row">
@@ -89,12 +124,18 @@ class HeaderCustom extends DynamicElement {
                                 <div id="title-text" class="h1-font"></div>
                             </div>
                             <div class="header__right ${this.state.hideClass}">
-                                <select-box   id="city-selector" placeholder="Ընտրել քաղաքը"
-                
-                                options='${JSON.stringify(this.cities)}'></select-box>
-                                <select-box    id="province-selector"  placeholder="Ընտրել մարզը" options='${JSON.stringify(
-                                    this.province
-                                )}'></select-box>
+                                <select-box    
+                                    id="province-selector" 
+                                    placeholder="Ընտրել մարզը" 
+                                    value="${state.selectedRegion}"
+                                    options='${JSON.stringify(this.state.province)}'>
+                                </select-box>
+                                <select-box   
+                                    id="city-selector" 
+                                    placeholder="Ընտրել քաղաքը" 
+                                    value="${state.selectedCity}"
+                                    options='${JSON.stringify(this.state.cities)}'>
+                                </select-box>
                             </div>
                         </div>
                     </div>

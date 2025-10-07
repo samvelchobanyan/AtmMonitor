@@ -74,6 +74,10 @@ class AtmsDashboard extends DynamicElement {
 
     async fetchSummary(region, city) {
         const queryString = new URLSearchParams();
+        console.log('region, city', region, city);
+        console.log('region, city type', typeof region, typeof city);
+
+        
         if (region) {
             queryString.append("district", region);
         }

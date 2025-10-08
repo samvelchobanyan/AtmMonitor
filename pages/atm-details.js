@@ -293,7 +293,9 @@ class AtmDetails extends DynamicElement {
                     <div class="row">
                         <div class="column sm-6">
                             <div class="infos infos_margin">
-                                <info-card title="Մնացորդ" value="250108500" value-currency="֏" value-color="color-green" trend="7" show-border="true"> </info-card>
+                                <info-card title="Մնացորդ" value="${
+                                    data.balance_info.total_balance
+                                }" value-currency="֏" value-color="color-green" trend="7" show-border="true"> </info-card>
                             </div>
                             <chart-component id="bar-chart-1" chart-data="${encode(
                                 modelList

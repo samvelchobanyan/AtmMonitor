@@ -11,7 +11,7 @@ const nonRenderAttrs = new Set(["start-date", "end-date"]);
 const TAB_LABELS = {
     card: "\u0554\u0561\u0580\u057f\u0578\u057e / \u0531\u0576\u0584\u0561\u0580\u057f",
     cardownership: "Սեփական / Այլ քարտ",
-    payment_system: "Վճարման համակարգ",
+    payment_system: "Վճարային համակարգ",
     type: "Ըստ տեսակի",
 };
 

@@ -37,7 +37,7 @@ class Cumulative extends DynamicElement {
                                 exportable
                                 searchable="false"
                                 export-filename="cumulative"
-                                export-label="Download CSV">
+                                export-label="Ներբեռնել CSV-ն">
                             </simple-table>
                         </div>
                     </div>

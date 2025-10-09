@@ -214,7 +214,7 @@ class Notifications extends DynamicElement {
                          )
                          .join("")}
                   </div>
-                 <simple-table
+                 <simple-table 
                     data='${deviceErrors}' 
                     columns='["atm_id", "date","address","fault_type","message"]'
                     link-columns='{"atm_id": "atms/:id"}'

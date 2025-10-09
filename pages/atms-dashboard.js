@@ -16,7 +16,6 @@ class AtmsDashboard extends DynamicElement {
             selectedRegion: null,
             selectedCity: null,
             summary: null,
-            incashmentInfoCardsData: null,
         };
 
         this.incashmentChart = null;
@@ -57,6 +56,15 @@ class AtmsDashboard extends DynamicElement {
         this.$("#taken-cards").setAttribute("value", data.taken_cards_count);
     }
 
+    updateIncashmentCards(data) {
+        this.$("#total-balance").setAttribute("value", data.total_atm_balance);
+        this.$("#total-atms").setAttribute("value", data.total_atms);
+        this.$("#not-working-atms").setAttribute("value", data.not_working_atm_count);
+        this.$("#empty-cassettes").setAttribute("value", data.empty_cassettes_count);
+        this.$("#almost-empty-cassettes").setAttribute("value", data.almost_empty_cassettes_count);
+        this.$("#taken-cards").setAttribute("value", data.taken_cards_count);
+    }
+
     onDisconnected() {
         // Clean up polling subscription
         if (this.unsubscribeTopStats) {
@@ -68,16 +76,13 @@ class AtmsDashboard extends DynamicElement {
         const region = storeState.selectedRegion;
         const city = storeState.selectedCity;
         if (region !== this.state.selectedRegion || city !== this.state.selectedCity) {
-            this.fetchSummary(region, city); // one API call → one render
+            this.fetchSummary(region, city);
         }
     }
 
     async fetchSummary(region, city) {
         const queryString = new URLSearchParams();
-        console.log('region, city', region, city);
-        console.log('region, city type', typeof region, typeof city);
 
-        
         if (region) {
             queryString.append("province", region);
         }
@@ -89,13 +94,10 @@ class AtmsDashboard extends DynamicElement {
 
         try {
             const response = await this.fetchData(url);
-            console.log("response.data.work_hours_per_day", response.data);
-            console.log("response", response.data);
             this.setState({
                 selectedRegion: region,
                 selectedCity: city,
                 summary: response.data,
-                incashmentInfoCardsData: response.data.encashmentInfo,
             });
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
@@ -121,26 +123,18 @@ class AtmsDashboard extends DynamicElement {
         if (this.incashmentChart) {
             this.addListener(this.incashmentChart, "chart-changed", (e) => {
                 let data = e.detail.data;
-                const newInfo = {
-                    total_encashments: data.total_encashments,
-                    total_collected_amount: data.total_collected_amount,
-                    total_added_amount: data.total_added_amount,
-                    yesterday_marked_as_empty: data.yesterday_marked_as_empty,
-                };
 
-                // Only update if different, because creates loop
-                if (
-                    JSON.stringify(newInfo) !== JSON.stringify(this.state.incashmentInfoCardsData)
-                ) {
-                    this.setState({ incashmentInfoCardsData: newInfo });
-                    console.log("Chart changed data:", data);
-                }
+                this.$("#inc_count").setAttribute("value", data.total_encashments);
+                this.$("#inc_collected").setAttribute("value", data.total_collected_amount);
+                this.$("#inc_amount").setAttribute("value", data.total_added_amount);
+                this.$("#inc_empty").setAttribute("value", data.yesterday_marked_as_empty);
             });
         }
     }
 
     template() {
-        if (!this.state.summary) {
+        let generalData = this.state.summary;
+        if (!generalData) {
             return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
@@ -153,18 +147,19 @@ class AtmsDashboard extends DynamicElement {
             `;
         }
 
-        const generalData = this.state.summary;
-        const transactionsData = this.state.summary.transactionsInfo;
-        const encashmentData = this.state.incashmentInfoCardsData;
-        const atmWorkHours = this.state.summary.atmWorkHours;
-        const totalWorkingTime = atmWorkHours.total_working_time.replace('h', 'ժ').replace('m', 'ր');
-        const totalNonWorkingTime = atmWorkHours.total_non_working_time.replace('h', 'Ժ').replace('m', 'ր');
+        const transactionsData = generalData.transactionsInfo;
+        const encashmentData = generalData.encashmentInfo;
+        const atmWorkHours = generalData.atmWorkHours;
+        const totalWorkingTime = atmWorkHours.total_working_time
+            .replace("h", "ժ")
+            .replace("m", "ր");
+        const totalNonWorkingTime = atmWorkHours.total_non_working_time
+            .replace("h", "Ժ")
+            .replace("m", "ր");
 
-        const transactionDaily = this.state.summary.hourly_transactions;
-        const encashmentsDaily = this.state.summary.hourly_encashments;
-        const atmPrductivityDaily = this.state.summary.atmWorkHoursDaily;
-        console.log('atmWorkHours',atmWorkHours);
-        
+        const transactionDaily = generalData.hourly_transactions;
+        const encashmentsDaily = generalData.hourly_encashments;
+        const atmPrductivityDaily = generalData.atmWorkHoursDaily;
 
         return /* html */ `
         <div class="row">
@@ -280,12 +275,14 @@ class AtmsDashboard extends DynamicElement {
                     <container-top icon="icon-coins" title="Ինկասացիա"> </container-top> 
                     <div class="infos infos_margin">
                         <info-card
+                            id='inc_count'
                             title="Ինկասացիաների քանակ"
                             value="${encashmentData.total_encashments}"
                             icon="icon icon-box"
                             show-border="true">
                         </info-card>
                         <info-card
+                            id='inc_collected'
                             title="Հետ բերված գումար"
                             value="${encashmentData.total_collected_amount}"
                             value-currency="֏"
@@ -294,6 +291,7 @@ class AtmsDashboard extends DynamicElement {
                             show-border="true">
                         </info-card>
                         <info-card
+                            id='inc_amount'
                             title="Ինկասացիայի գումար"
                             value="${encashmentData.total_added_amount}"
                             value-currency="֏"
@@ -302,6 +300,7 @@ class AtmsDashboard extends DynamicElement {
                             show-border="true">
                         </info-card>
                         <info-card
+                            id='inc_empty'
                             title="Երեկ դատարկ բանկոմատներ"
                             value="${encashmentData.yesterday_marked_as_empty}"
                             value-color="color-red"

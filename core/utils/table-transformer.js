@@ -34,8 +34,9 @@ function transformFaultTableData(apiResponse) {
     // Encashment data structure
     else if (apiResponse.data?.encashments) {
         return apiResponse.data.encashments.map((item) => ({
+            atm_id: item.atm_id,
             date_time: formatDate(item.date_time),
-            atm_address: `${item.atm_id} / ${item.atm_address}`,
+            atm_address: `${item.atm_address}`,
             added_amount: item.added_amount,
             collected_amount: item.collected_amount,
             marked_as_empty: item.marked_as_empty,

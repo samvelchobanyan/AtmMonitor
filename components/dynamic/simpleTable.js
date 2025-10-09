@@ -146,6 +146,12 @@ export class SimpleTable extends DynamicElement {
                     sortable: true,
                     sessionStorage: false,
                     searchable,
+                    labels: {
+                        placeholder: "Փնտրել...",
+                        perPage: "Տողեր յուրաքանչյուր էջում",
+                        noRows: "Տվյալներ չկան",
+                        info: "Ցուցադրված են {start}–{end} տողերը՝ ընդհանուր {rows}-ից",
+                    },
                 });
 
                 // Listen to Simple-DataTables events to re-attach click listeners after pagination/sort/search
@@ -285,7 +291,7 @@ export class SimpleTable extends DynamicElement {
             .join("");
 
         const showExport = this.hasAttribute("exportable");
-        const exportLabel = this.getAttr("export-label") || "Download CSV";
+        const exportLabel = this.getAttr("export-label") || "Ներբեռնել CSV-ն";
 
         return /* html */ `
       <table class="data-table">

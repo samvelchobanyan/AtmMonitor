@@ -35,7 +35,6 @@ class Notifications extends DynamicElement {
         this.segments = null;
 
         this.tableActiveTab = "Բորոլը";
-        this.tableLink = "/device-faults/summary";
 
         this.deviceTypes = [{ id: 0, type_name: "Բորոլը" }];
     }
@@ -52,7 +51,15 @@ class Notifications extends DynamicElement {
 
         this.cities = locationTransformer.getAllCityOptions(state.regionsData);
         this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
-        // this.fetchTopSummary();
+
+        if (!this.startDate) {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, "0");
+            const day = String(today.getDate()).padStart(2, "0");
+            this.startDate = `${year}-${month}-${day}`;
+        }
+
         this.fetchSummary();
         this.initTableTabs();
     }
@@ -83,8 +90,6 @@ class Notifications extends DynamicElement {
             this.setState({
                 summary: res.data,
             });
-
-            console.log(res.data);
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });

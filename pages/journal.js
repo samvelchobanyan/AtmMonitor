@@ -6,18 +6,10 @@ import "../components/dynamic/simpleGrid.js"; // switch to simple grid
 class JournalPage extends DynamicElement {
     constructor() {
         super();
-        this.tableLink = `/journal/events-journal`;
         this.activeTab = "atm";
         this.selectedCity = null;
         this.selectedRegion = null;
         this.searchValue = "";
-    }
-
-    onAfterRender() {
-        const tableContainer = this.$(".table-container");
-        if (tableContainer) {
-            tableContainer.innerHTML = this.renderTable();
-        }
     }
 
     onStoreChange(storeState) {
@@ -76,24 +68,10 @@ class JournalPage extends DynamicElement {
             if (this.searchValue) queryString.append("cardnumber", this.searchValue);
         }
 
-        this.tableLink = `/journal/events-journal?${queryString.toString()}`;
+        let link = `/journal/events-journal?${queryString.toString()}`;
 
-        const tableContainer = this.$(".table-container");
-        if (tableContainer) {
-            tableContainer.innerHTML = this.renderTable();
-        }
-    }
-
-    renderTable() {
-        return /*html*/ `
-             <simple-grid
-                    data-source="${this.tableLink}"
-                    columns='["server_date", "code", "card_number", "event_description"]'
-                    clickable-columns='["code"]'
-                    mode="server"
-                    per-page="10">
-                </simple-grid>
-        `;
+        const table = this.$("simple-grid");
+        table.setAttribute("data-source", link);
     }
 
     template() {
@@ -113,7 +91,15 @@ class JournalPage extends DynamicElement {
               <input type="text" placeholder="Որոնել ըստ Քարտի" id='card-search' class="list-search"/>
             </div>
 
-            <div class="table-container"></div>
+            <div class="table-container">
+                <simple-grid
+                    data-source="/journal/events-journal"
+                    columns='["server_date", "code", "card_number", "event_description"]'
+                    clickable-columns='["code"]'
+                    mode="server"
+                    per-page="10">
+                </simple-grid>
+            </div>
           </div>
         </div>
       </div>

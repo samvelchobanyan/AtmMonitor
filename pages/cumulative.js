@@ -18,7 +18,7 @@ class Cumulative extends DynamicElement {
 
     template() {
         return /*html*/ `
-            <filtration-tabs></filtration-tabs>
+            <filtration-tabs showAtm='true'></filtration-tabs>
             <div class="row">
                 <div class="column sm-12">
                     <div class="table-container">  

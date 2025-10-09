@@ -56,10 +56,20 @@ const htmlLegendPlugin = {
 
                 if (customLegendEl.hasClass("custom-legend_percent")) {
                     textContainer.textContent = `${item.text} (${percent}%)`;
-                } else if (customLegendEl.hasClass("custom-legend_data")) {
-                    textContainer.innerHTML = `${
-                        item.text
-                    } <div>${percent}% / ${value.toLocaleString()}</div>`;
+                }
+                // else if (customLegendEl.hasClass("custom-legend_data")) {
+                //     textContainer.innerHTML = `${
+                //         item.text
+                //     } <div>${percent}% / ${value.toLocaleString()}</div>`;
+                // }
+                if (customLegendEl.hasClass("custom-legend_data")) {
+                    if (isNaN(percent)) {
+                        textContainer.innerHTML = ` ${item.text} <div>0</div>`;
+                    } else {
+                        textContainer.innerHTML = ` ${
+                            item.text
+                        }  <div>${percent}% / ${value.toLocaleString()}</div>`;
+                    }
                 } else {
                     // Default: label text only
                     textContainer.textContent = `${item.text}`;
@@ -252,6 +262,10 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
     const hasCustomCutout = canvas.classList.contains("custom-cutout");
 
     const plugins = [htmlLegendPlugin, loadingPlugin];
+
+    console.log("filledDataset.data", filledDataset);
+
+    // filledDataset.data = filledDataset.data.map((v) => (isNaN(v) || v == null ? 0 : v));
 
     if (useLabelLines) {
         plugins.push(doughnutLabelLinesPlugin);

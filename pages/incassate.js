@@ -71,24 +71,35 @@ class Incassate extends DynamicElement {
                         <div class="infos infos_margin">
                             <info-card title="Չկատարված գործարքների գումար" id='failed_amount' value-currency="֏"   value-color="color-blue" show-border="true"> </info-card>
                             <info-card title="Չկատարված գործարքների քանակ" id='failed_count' value-color="color-blue" show-border="true"> </info-card>
+                            <info-card title="Այսօրվա ինկասացիաներ" id='today_count' value-currency="֏"   value-color="color-blue" show-border="true"> </info-card>
+                            <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-color="color-blue" show-border="true"> </info-card>
                         </div>
                     </div>
                 </div>
-                <simple-table
+                  <simple-grid
                     data-source="/encashment/summary"
                     columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
-                    column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի ID և հասցե",
-                    "added_amount":"Ավելացված գումար","collected_amount":"Հավաքված գումար",
-                    "marked_as_empty":"Դատարկ"}'
-                    exportable
-                    export-filename="incassate"
-                    export-label="Ներբեռնել CSV-ն">
-                </simple-table>
+                    mode="server"
+                    per-page="10">
+                </simple-grid>
             </div>
             </div>
         </div>
         `;
     }
+
+    // old
+    //  <simple-table
+    //                 data-source="/encashment/summary"
+    //                 columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+    //                 column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի ID և հասցե",
+    //                 "added_amount":"Ավելացված գումար","collected_amount":"Հավաքված գումար",
+    //                 "marked_as_empty":"Դատարկ"}'
+    //                 exportable
+    //                 export-filename="incassate"
+    //                 export-label="Ներբեռնել CSV-ն"
+    //                 >
+    //             </simple-table>
 }
 
 customElements.define("incassate-analythics", Incassate);

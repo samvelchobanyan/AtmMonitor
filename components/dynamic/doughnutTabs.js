@@ -58,7 +58,7 @@ export default class DoughnutTabs extends DynamicElement {
 
         this.transformData();
     }
-
+ 
     onAttributeChange(name, oldValue, newValue) {
         if (name === "data" && oldValue !== newValue) {
             this._parseDataAttr(newValue);

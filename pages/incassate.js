@@ -1,6 +1,6 @@
 import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/segment.js";
-import "../components/dynamic/simpleTable.js";
+import "../components/dynamic/simpleGrid.js";
 import "../components/dynamic/filtrationTabs.js";
 
 class Incassate extends DynamicElement {
@@ -8,22 +8,24 @@ class Incassate extends DynamicElement {
         super();
         this.filtrationTabs = null;
         this.table = null;
+
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+        this.initQuery = `startDate=${year}-${month}-${day}`;
     }
 
     onConnected() {
-        this.fetchInfoCardsData("");
+        this.fetchInfoCardsData(this.initQuery);
     }
 
     onAfterRender() {
-        console.log("onAfterRender");
-
         this.filtrationTabs = this.$("filtration-tabs");
-        this.table = this.$("simple-table");
+        this.table = this.$("simple-grid");
     }
 
     async fetchInfoCardsData(queryString) {
-        console.log("fetchInfoCardsData");
-
         try {
             const response = await this.fetchData(`/encashment/failed-transactions?${queryString}`);
 
@@ -34,18 +36,14 @@ class Incassate extends DynamicElement {
     }
 
     updateInfoCards(data) {
-        console.log("updateInfoCards");
-
         this.$("#failed_amount").setAttribute("value", data.failed_transactions_amount);
         this.$("#failed_count").setAttribute("value", data.failed_transactions_count);
+        this.$("#today_count").setAttribute("value", data.failed_transactions_amount); //todo change when all data will come from api
+        this.$("#collected_amount").setAttribute("value", data.failed_transactions_count); //todo change when all data will come from api
     }
 
     addEventListeners() {
-        console.log("addEventListeners");
-
         this.addListener(this.filtrationTabs, "filter-submit", (e) => {
-            console.log("filter-submit");
-
             const queryString = e.detail.query;
             this.table.setAttribute("data-source", `/encashment/summary?${queryString}`);
 
@@ -54,8 +52,6 @@ class Incassate extends DynamicElement {
     }
 
     template() {
-        console.log("template");
-
         return /*html*/ `
         <filtration-tabs showAtm='true'></filtration-tabs>
         <div class="row">
@@ -65,24 +61,21 @@ class Incassate extends DynamicElement {
                     <container-top icon="icon-coins" title="Ինկասացիաներ"> </container-top>
                 </div>
               
-            <div class="table-container">  
-                <div class="row">
-                    <div class="column sm-6">
-                        <div class="infos infos_margin">
-                            <info-card title="Չկատարված գործարքների գումար" id='failed_amount' value-currency="֏"   value-color="color-blue" show-border="true"> </info-card>
-                            <info-card title="Չկատարված գործարքների քանակ" id='failed_count' value-color="color-blue" show-border="true"> </info-card>
-                            <info-card title="Այսօրվա ինկասացիաներ" id='today_count' value-currency="֏"   value-color="color-blue" show-border="true"> </info-card>
-                            <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-color="color-blue" show-border="true"> </info-card>
-                        </div>
+                <div class="table-container">  
+                    <div class="infos infos_margin">
+                        <info-card title="Չկատարված գործարքների գումար" id='failed_amount' value-currency="֏"   value-color="color-blue" show-border="true"> </info-card>
+                        <info-card title="Չկատարված գործարքների քանակ" id='failed_count' value-color="color-blue" show-border="true"> </info-card>
+                        <info-card title="Այսօրվա ինկասացիաներ" id='today_count'    value-color="color-blue" show-border="true"> </info-card>
+                        <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
                     </div>
+
+                    <simple-grid
+                        data-source="/encashment/summary?${this.initQuery}"
+                        columns='["atm_id","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+                        mode="server"
+                        per-page="10">
+                    </simple-grid>
                 </div>
-                  <simple-grid
-                    data-source="/encashment/summary"
-                    columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
-                    mode="server"
-                    per-page="10">
-                </simple-grid>
-            </div>
             </div>
         </div>
         `;

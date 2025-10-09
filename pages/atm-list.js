@@ -116,7 +116,7 @@ class AtmList extends DynamicElement {
                                 city="{{city}}" 
                                 district="{{district}}" 
                                 address="{{address}}"
-                                data-working="{{connection_status_id === 1}}"
+                                data-working="{{connection_status_id}}"
                                 data-lat="{{latitude}}"
                                 data-lng="{{longitude}}">
                             </atm-item>

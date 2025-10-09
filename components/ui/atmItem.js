@@ -22,8 +22,7 @@ export class AtmItem extends HTMLElement {
         const city = this.getAttribute("city") || "";
         const district = this.getAttribute("district") || "";
         const address = this.getAttribute("address") || "";
-
-        const isWorking = this.getAttribute("data-working") === "true";
+        const isWorking = this.getAttribute("data-working") === "1";
         const status = isWorking ? "Աշխատող" : "Չաշխատող";
         const statusClass = isWorking ? "atm-item__status_working" : "atm-item__status_not-working";
 

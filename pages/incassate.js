@@ -11,39 +11,51 @@ class Incassate extends DynamicElement {
     }
 
     onConnected() {
-        this.fetchSummary("");
+        this.fetchInfoCardsData("");
     }
 
     onAfterRender() {
+        console.log("onAfterRender");
+
         this.filtrationTabs = this.$("filtration-tabs");
         this.table = this.$("simple-table");
     }
 
-    async fetchSummary(queryString) {
+    async fetchInfoCardsData(queryString) {
+        console.log("fetchInfoCardsData");
+
         try {
             const response = await this.fetchData(`/encashment/failed-transactions?${queryString}`);
 
             this.updateInfoCards(response.data);
         } catch (err) {
-            console.error("❌ Error fetching summary:", err);
+            console.error("❌ Error fetching info cards data:", err);
         }
     }
 
     updateInfoCards(data) {
+        console.log("updateInfoCards");
+
         this.$("#failed_amount").setAttribute("value", data.failed_transactions_amount);
         this.$("#failed_count").setAttribute("value", data.failed_transactions_count);
     }
 
     addEventListeners() {
+        console.log("addEventListeners");
+
         this.addListener(this.filtrationTabs, "filter-submit", (e) => {
+            console.log("filter-submit");
+
             const queryString = e.detail.query;
             this.table.setAttribute("data-source", `/encashment/summary?${queryString}`);
 
-            this.fetchSummary(queryString);
+            this.fetchInfoCardsData(queryString);
         });
-    } 
+    }
 
     template() {
+        console.log("template");
+
         return /*html*/ `
         <filtration-tabs showAtm='true'></filtration-tabs>
         <div class="row">

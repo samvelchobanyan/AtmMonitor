@@ -70,12 +70,14 @@ class HeaderCustom extends DynamicElement {
 
     addEventListeners() {
         this.addListener(this.$("#province-selector"), "change", (e) => {
-            console.log('e.target.value', e.target.value);
-            
-            if(e.target.value !== null && e.target.value !== 'null'){
-                this.cities = locationTransformer.getCitiesByProvince(store.getState().regionsData, e.target.value);
-            }
-            else{
+            console.log("e.target.value", e.target.value);
+
+            if (e.target.value !== null && e.target.value !== "null") {
+                this.cities = locationTransformer.getCitiesByProvince(
+                    store.getState().regionsData,
+                    e.target.value
+                );
+            } else {
                 this.cities = locationTransformer.getAllCityOptions(store.getState().regionsData);
             }
             this.cities.unshift({
@@ -83,9 +85,8 @@ class HeaderCustom extends DynamicElement {
                 value: null,
             });
 
-            
             store.setState({
-                selectedRegion: e.target.value === 'null' ? null : e.target.value,
+                selectedRegion: e.target.value === "null" ? null : e.target.value,
             });
             this.setState({
                 cities: this.cities,
@@ -93,7 +94,7 @@ class HeaderCustom extends DynamicElement {
         });
 
         this.addListener(this.$("#city-selector"), "change", (e) => {
-            store.setState({ selectedCity: e.target.value === 'null' ? null : e.target.value });
+            store.setState({ selectedCity: e.target.value === "null" ? null : e.target.value });
         });
     }
 
@@ -111,9 +112,8 @@ class HeaderCustom extends DynamicElement {
     }
 
     template() {
-        console.log('header template',this.state.cities);
         const state = store.getState();
-        
+
         return /* html */ `
             <div class="main-container">
                 <div class="row">

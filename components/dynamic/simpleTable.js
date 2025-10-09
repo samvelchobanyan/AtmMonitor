@@ -43,11 +43,8 @@ export class SimpleTable extends DynamicElement {
     }
 
     async onConnected() {
-        const url = this.getAttr("data-source");
         const dataStr = this.getAttr("data");
-        if (url) {
-            await this.loadRemoteData();
-        } else if (dataStr) {
+        if (dataStr) {
             let raw = JSON.parse(dataStr);
             this.transformData(raw);
         }

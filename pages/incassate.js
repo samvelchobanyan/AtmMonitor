@@ -72,6 +72,8 @@ class Incassate extends DynamicElement {
                     <simple-grid
                         data-source="/encashment/summary?${this.initQuery}"
                         columns='["atm_id","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+                        column-labels='{"atm_id":"Բանկոմատի ID","date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
+                          "added_amount":"Լցված գումար","collected_amount":"Հավաքված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'
                         mode="server"
                         per-page="10">
                     </simple-grid>

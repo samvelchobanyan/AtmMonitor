@@ -42,7 +42,7 @@ export class SimpleGrid extends DynamicElement {
     }
 
     static get observedAttributes() {
-        return ["data-source", "columns", "clickable-columns", "mode", "per-page"]; 
+        return ["data-source", "columns", "clickable-columns", "mode", "per-page"];
     }
 
     async onConnected() {
@@ -103,8 +103,6 @@ export class SimpleGrid extends DynamicElement {
         return isNaN(val) ? 10 : val;
     }
 
-    
-
     async loadData() {
         const mode = this.getModeOption();
         this.setState({ loading: true, error: false, mode, perPage: this.getPerPageOption() });
@@ -120,7 +118,9 @@ export class SimpleGrid extends DynamicElement {
                 const raw = await this.fetchData(url);
                 const transformed = tableTransformer.transformFaultTableData(raw) || [];
                 const definedColumns = this.parseColumnsAttr();
-                const columns = definedColumns.length ? definedColumns : Object.keys(transformed[0] || {});
+                const columns = definedColumns.length
+                    ? definedColumns
+                    : Object.keys(transformed[0] || {});
                 this.setState({ data: transformed, columns, loading: false });
             } catch (err) {
                 console.warn("Failed to load or transform grid data", err);
@@ -149,10 +149,22 @@ export class SimpleGrid extends DynamicElement {
         }
     }
 
+    parseColumnLabelsAttr() {
+        try {
+            const raw = this.getAttr("column-labels");
+            return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+            console.warn("Invalid column-labels attribute JSON", e);
+            return {};
+        }
+    }
+
     onAfterRender() {
         // Destroy old grid if exists to avoid duplicates
         if (this.grid && typeof this.grid.destroy === "function") {
-            try { this.grid.destroy(); } catch {}
+            try {
+                this.grid.destroy();
+            } catch {}
             this.grid = null;
         }
 
@@ -167,12 +179,15 @@ export class SimpleGrid extends DynamicElement {
 
             const clickableColumns = this.parseClickableColumnsAttr();
             const clickableSet = new Set(clickableColumns);
+            const labels = this.parseColumnLabelsAttr();
 
             const gridColumns = this.state.columns.map((colName, colIndex) => {
+                // use translations
+                const displayName = labels[colName] || colName;
                 // Use formatter only for clickable columns
-                if (!clickableSet.has(colName)) return { name: colName };
+                if (!clickableSet.has(colName)) return { name: displayName };
                 return {
-                    name: colName,
+                    name: displayName,
                     formatter: (cell, row) => {
                         // Wrap in a clickable span; Grid.js "row" includes cell data array
                         return h(
@@ -180,17 +195,20 @@ export class SimpleGrid extends DynamicElement {
                             {
                                 className: "clickable",
                                 onclick: () => {
-                                    const rowObj = this.rowArrayToObject(row.cells.map(c => c.data));
+                                    const rowObj = this.rowArrayToObject(
+                                        row.cells.map((c) => c.data)
+                                    );
                                     this.dispatch("cell-click", {
                                         column: colName,
                                         cellValue: rowObj[colName],
                                         rowData: rowObj,
                                     });
-                                }
+                                },
                             },
+
                             cell ?? ""
                         );
-                    }
+                    },
                 };
             });
 
@@ -204,19 +222,20 @@ export class SimpleGrid extends DynamicElement {
                 search: false,
                 className: {
                     td: "gridjs-td",
-                    th: "gridjs-th"
-                }
+                    th: "gridjs-th",
+                },
             };
 
             const mode = this.state.mode;
             let endpoint = this.getAttr("data-source");
-            
 
             if (mode === "client") {
-                const dataArray = this.state.data.map(row => this.state.columns.map(c => row[c] ?? ""));
+                const dataArray = this.state.data.map((row) =>
+                    this.state.columns.map((c) => row[c] ?? "")
+                );
                 this.grid = new Grid({
                     ...baseConfig,
-                    data: dataArray
+                    data: dataArray,
                 });
             } else {
                 // Server mode
@@ -233,30 +252,36 @@ export class SimpleGrid extends DynamicElement {
                             if (resp && resp.data) {
                                 // Try transform helper
                                 try {
-                                    const maybe = tableTransformer.transformFaultTableData({ data: resp.data });
+                                    const maybe = tableTransformer.transformFaultTableData({
+                                        data: resp.data,
+                                    });
                                     transformed = Array.isArray(maybe) ? maybe : resp.data;
                                 } catch (_) {
                                     transformed = resp.data;
                                 }
                             } else {
                                 try {
-                                    const maybe = tableTransformer.transformFaultTableData(resp) || [];
+                                    const maybe =
+                                        tableTransformer.transformFaultTableData(resp) || [];
                                     transformed = maybe;
                                 } catch (_) {
                                     transformed = Array.isArray(resp) ? resp : [];
                                 }
                             }
-                            return transformed.map(item => this.state.columns.map(c => item?.[c] ?? ""));
+                            return transformed.map((item) =>
+                                this.state.columns.map((c) => item?.[c] ?? "")
+                            );
                         },
                         total: (resp) => {
                             // Try common fields for total records
-                            if (typeof resp?.data?.total_count === "number") return resp.data.total_count;
+                            if (typeof resp?.data?.total_count === "number")
+                                return resp.data.total_count;
                             if (typeof resp?.total === "number") return resp.total;
                             if (typeof resp?.data?.total === "number") return resp.data.total;
                             if (Array.isArray(resp?.data)) return resp.data.length;
                             if (Array.isArray(resp)) return resp.length;
                             return 0;
-                        }
+                        },
                     },
                     pagination: {
                         enabled: true,
@@ -266,8 +291,8 @@ export class SimpleGrid extends DynamicElement {
                                 const join = prev.includes("?") ? "&" : "?";
                                 // API expects pageSize and 1-based pageNumber
                                 return `${prev}${join}pageSize=${limit}&pageNumber=${page + 1}`;
-                            }
-                        }
+                            },
+                        },
                     },
                     sort: {
                         multiColumn: false,
@@ -278,10 +303,12 @@ export class SimpleGrid extends DynamicElement {
                                 const dir = col.direction === 1 ? "asc" : "desc";
                                 const colName = this.state.columns[col.index];
                                 const join = prev.includes("?") ? "&" : "?";
-                                return `${prev}${join}sort=${encodeURIComponent(colName)}&order=${dir}`;
-                            }
-                        }
-                    }
+                                return `${prev}${join}sort=${encodeURIComponent(
+                                    colName
+                                )}&order=${dir}`;
+                            },
+                        },
+                    },
                 });
             }
 
@@ -313,4 +340,3 @@ export class SimpleGrid extends DynamicElement {
 }
 
 customElements.define("simple-grid", SimpleGrid);
-

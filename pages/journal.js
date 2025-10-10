@@ -59,7 +59,7 @@ class JournalPage extends DynamicElement {
 
     buildTable() {
         const queryString = new URLSearchParams();
-        if (this.selectedRegion) queryString.append("district", this.selectedRegion);
+        if (this.selectedRegion) queryString.append("province", this.selectedRegion);
         if (this.selectedCity) queryString.append("city", this.selectedCity);
 
         if (this.activeTab == "atm") {

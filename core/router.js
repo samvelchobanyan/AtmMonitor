@@ -2,7 +2,7 @@ import page from "https://unpkg.com/page/page.mjs";
 
 const mount = document.querySelector("main");
 
-function mountComponent(tagName, title = null, query = {}, route = null) {
+function mountComponent(tagName, title = null, query = {}, route = null, icon = null) {
     const sidebar = document.querySelector("side-bar");
     const header = document.querySelector("header-custom");
     const mainContainer = document.querySelector("main");
@@ -35,6 +35,7 @@ function mountComponent(tagName, title = null, query = {}, route = null) {
             detail: {
                 route: route,
                 title: title || "",
+                icon: icon || null,
                 component: tagName,
                 query: query,
             },
@@ -181,7 +182,8 @@ export function startRouter() {
             "atm-details",
             `ATM #${ctx.params.id}`,
             { id: ctx.params.id },
-            `/atms/${ctx.params.id}`
+            `/atms/${ctx.params.id}`,
+            "icon-arrow-left"
         );
     });
 

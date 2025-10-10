@@ -19,6 +19,7 @@ class AtmDetails extends DynamicElement {
         this.exchangeDateBox = null;
         this.encashmentDateBox = null;
         this.depositChart = null;
+        this.worktimeChart = null;
     }
 
     onConnected() {}
@@ -29,6 +30,7 @@ class AtmDetails extends DynamicElement {
         this.exchangeDateBox = this.$("#exchange-date");
         this.encashmentDateBox = this.$("#encashment-date");
         this.depositChart = this.$("#bar-chart-2");
+        this.worktimeChart = this.$("#worktime-bar-chart");
 
         if (this.state.summary == null) {
             this.fetchAtm();
@@ -57,6 +59,40 @@ class AtmDetails extends DynamicElement {
                 console.log("labelName", labelName);
 
                 if (link) this.fetchPopUpData(link, labelName);
+            });
+        }
+
+        if (this.worktimeChart) {
+            this.addListener(this.worktimeChart, "chart-changed", (e) => {
+                console.log("!!!", e.detail);
+                let data = e.detail.data;
+                let atmWorkingPercent = this.$("#atm_working_percent");
+                let atmNonWorkingPercent = this.$("#atm_non_working_percent");
+                let atmLastDisconnect = this.$("#atm_last_disconnect");
+                let atmLastConnect = this.$("#atm_last_connect");
+                let atmLastStatusDuration = this.$("#atm_last_status_duration");
+
+                if (atmWorkingPercent)
+                    atmWorkingPercent.setAttribute("value", `${data.total_working_percent}%`);
+
+                if (atmNonWorkingPercent)
+                    atmNonWorkingPercent.setAttribute(
+                        "value",
+                        `${data.total_non_working_percent}%`
+                    );
+
+                console.log("data.last_disconnect", data.last_disconnect);
+
+                console.log(" formatDate(data.last_disconnect)", formatDate(data.last_disconnect));
+
+                if (atmLastDisconnect)
+                    atmLastDisconnect.setAttribute("value", formatDate(data.last_disconnect));
+
+                if (atmLastConnect)
+                    atmLastConnect.setAttribute("value", formatDate(data.last_connect));
+
+                if (atmLastStatusDuration)
+                    atmLastStatusDuration.setAttribute("value", data.last_status_duration);
             });
         }
     }
@@ -153,10 +189,10 @@ class AtmDetails extends DynamicElement {
 
     async fetchAtm() {
         const id = parseInt(this.atmId, 10);
+        const today = new Date().toISOString().split("T")[0];
 
         try {
-            const response = await this.fetchData(`/atm/my-profile?atmId=${id}`);
-
+            const response = await this.fetchData(`/atm/my-profile?atmId=${id}&StartDate=${today}`);
             this.setState({
                 summary: response.data,
             });
@@ -169,7 +205,7 @@ class AtmDetails extends DynamicElement {
     async fetchFailedEncashments() {
         try {
             const response = await this.fetchData(`/encashment/failed-transactions`);
-            // continue here
+
             const data = response.data;
 
             const failedCount = this.$("#failed-count");
@@ -187,35 +223,35 @@ class AtmDetails extends DynamicElement {
     }
 
     // todo delete if not used
-    _transformToTransactionDynamics(data) {
-        const { dispense_dynamic, deposit_dynamic, exchange_dynamic } = data;
+    // _transformToTransactionDynamics(data) {
+    //     const { dispense_dynamic, deposit_dynamic, exchange_dynamic } = data;
 
-        // Create the transactionDynamics array by mapping over exchange_dynamic.hourly_data
-        const transactionDynamics = exchange_dynamic.hourly_data.map((exchangeItem) => {
-            const hour = exchangeItem.hour;
+    //     // Create the transactionDynamics array by mapping over exchange_dynamic.hourly_data
+    //     const transactionDynamics = exchange_dynamic.hourly_data.map((exchangeItem) => {
+    //         const hour = exchangeItem.hour;
 
-            // Find corresponding to dispense data for this hour
-            const dispenseItem = dispense_dynamic.hourly_data.find((item) => item.hour === hour);
-            const dispenseAmount = dispenseItem
-                ? dispenseItem.with_card_amount + dispenseItem.without_card_amount
-                : 0;
+    //         // Find corresponding to dispense data for this hour
+    //         const dispenseItem = dispense_dynamic.hourly_data.find((item) => item.hour === hour);
+    //         const dispenseAmount = dispenseItem
+    //             ? dispenseItem.with_card_amount + dispenseItem.without_card_amount
+    //             : 0;
 
-            // Find the corresponding deposit data for this hour
-            const depositItem = deposit_dynamic.hourly_data.find((item) => item.hour === hour);
-            const depositAmount = depositItem
-                ? depositItem.with_card_amount + depositItem.without_card_amount
-                : 0;
+    //         // Find the corresponding deposit data for this hour
+    //         const depositItem = deposit_dynamic.hourly_data.find((item) => item.hour === hour);
+    //         const depositAmount = depositItem
+    //             ? depositItem.with_card_amount + depositItem.without_card_amount
+    //             : 0;
 
-            return {
-                hour: hour,
-                dispense_amount: dispenseAmount,
-                deposit_amount: depositAmount,
-                exchange_amount: exchangeItem.amount,
-            };
-        });
+    //         return {
+    //             hour: hour,
+    //             dispense_amount: dispenseAmount,
+    //             deposit_amount: depositAmount,
+    //             exchange_amount: exchangeItem.amount,
+    //         };
+    //     });
 
-        return transactionDynamics;
-    }
+    //     return transactionDynamics;
+    // }
 
     getCassetteDifferences(before, after) {
         const result = [];
@@ -327,16 +363,16 @@ class AtmDetails extends DynamicElement {
                     </div>
                 <div class="column sm-12">
                     <div class='row'>
-                    <div class="column sm-6">
-                       <div class="container">
-                           <doughnut-tabs id="dispense" data="${dispenseData}" show-date="false" title="Կանխիկացում"></doughnut-tabs>
-                       </div>
-                   </div>
-                   <div class="column sm-6">
-                   <div class="container">
-                   <doughnut-tabs id="deposit" data="${depositData}" show-date="false"  title="Մուտքագրում"></doughnut-tabs>
-                   </div>
-                   </div>
+                        <div class="column sm-6">
+                            <div class="container">
+                                <doughnut-tabs id="dispense" data="${dispenseData}" show-date="false" title="Կանխիկացում"></doughnut-tabs>
+                            </div>
+                        </div>
+                        <div class="column sm-6">
+                            <div class="container">
+                                <doughnut-tabs id="deposit" data="${depositData}" show-date="false"  title="Մուտքագրում"></doughnut-tabs>
+                            </div>
+                    </div>
                    </div>
                    <div class="column sm-12">
                        <div class="container">
@@ -396,33 +432,35 @@ class AtmDetails extends DynamicElement {
                     <div class="infos infos_margin">
                        <info-card
                             title="Աշխատաժամանակ"
+                            id= 'atm_working_percent'
                             value="${atmWorkHours.work_hours_per_day[0].working_percent}%"
                             icon="icon icon-clock"
                             show-border="true"></info-card>
                         <info-card
                             title="Խափանում"
+                            id= 'atm_non_working_percent'
                             value="${atmWorkHours.work_hours_per_day[0].non_working_percent}%"
                             icon="icon icon-clock"
                             show-border="true"></info-card>
                     </div>
                     <div class="info-items-container">
                         <div class="info-items info-items_col">
-                         <info-item text="Վերջին Disconnect" value="${formatDate(
+                         <info-item text="Վերջին Disconnect" id='atm_last_disconnect' value="${formatDate(
                              atmWorkHours.last_disconnect
                          )}"></info-item>
-                            <info-item text="Վերջին Connect"  value="${formatDate(
+                            <info-item text="Վերջին Connect" id='atm_last_connect' value="${formatDate(
                                 atmWorkHours.last_connect
                             )}"></info-item>
                         </div> 
                         <div class="info-items">
-                            <info-item text="Վերջին ստատուսի տևողություն" value="${
+                            <info-item text="Վերջին ստատուսի տևողություն" id='atm_last_status_duration' value="${
                                 atmWorkHours.last_status_duration
                             }"></info-item>
                         </div>
 
 
                         <chart-component
-                            id="bar-chart"
+                            id="worktime-bar-chart"
                             api-url="/dashboard/atm-worktime-in-days"
                             atm-id="${this.atmId}"
                             chart-type="bar">

@@ -43,16 +43,24 @@ class HeaderCustom extends DynamicElement {
 
     addGlobalEventListeners() {
         this.addListener(document, "route-changed", (e) => {
-            const { title, route } = e.detail;
+            const { title, icon, route } = e.detail;
 
             // Update title
             if (title !== this.title) {
                 this.title = title;
+                this.icon = icon;
                 this._applyTitle();
             }
 
             // Update visibility based on route
-            const pathsToHide = ["/geo", "/cumulative", "/incassate", "/atms/", "/create-atm"];
+            const pathsToHide = [
+                "/geo",
+                "/cumulative",
+                "/incassate",
+                "/atms/",
+                "/create-atm",
+                "/failures",
+            ];
 
             // check this way to detect atms detail page as well
             const newHideClass = pathsToHide.some(
@@ -70,8 +78,6 @@ class HeaderCustom extends DynamicElement {
 
     addEventListeners() {
         this.addListener(this.$("#province-selector"), "change", (e) => {
-            console.log("e.target.value", e.target.value);
-
             if (e.target.value !== null && e.target.value !== "null") {
                 this.cities = locationTransformer.getCitiesByProvince(
                     store.getState().regionsData,
@@ -106,8 +112,11 @@ class HeaderCustom extends DynamicElement {
         const el = this.$("#title-text");
         if (!el) return;
 
-        if (el.textContent !== this.title) {
-            el.textContent = this.title;
+        const iconHTML = this.icon ? `<a href='atms'> <i class="icon ${this.icon}"></i></a>` : "";
+        const newHTML = `${iconHTML} ${this.title}`;
+
+        if (el.innerHTML !== newHTML) {
+            el.innerHTML = newHTML;
         }
     }
 

@@ -16,21 +16,32 @@ function transformFaultTableData(apiResponse) {
         }));
     }
     // Failures data structure
-    else if (apiResponse?.top_faulting_atms) {
-        return apiResponse.top_faulting_atms.map((data) => ({
-            atm_and_address: `${data.atm_id} / ${data.address}`,
-            total_faults_count: data.total_faults,
+    else if (Array.isArray(apiResponse?.data) && apiResponse.data[0]?.total_faults) {
+        return apiResponse.data?.map((data) => ({
+            atm_id: data.atm_id,
+            address: data.address,
+            total_faults: data.total_faults,
             faults_summary: data.device_faults
                 .map((df) => `${df.device_type}(${df.fault_count})`)
                 .join(", "),
         }));
-    } else if (apiResponse?.faults_by_device_type) {
-        return apiResponse.faults_by_device_type.map((data) => ({
-            atm_and_address: `${data.atm_id} / ${data.address}`,
+    } else if (Array.isArray(apiResponse?.data) && apiResponse.data[0]?.atms) {
+        console.log("yes", apiResponse.data[0].atms);
+
+        return apiResponse.data[0].atms.map((data) => ({
+            atm_id: data.atm_id,
+            address: data.address,
             total_faults: data.error_count,
             faults_duration: data.duration,
         }));
     }
+    // else if (apiResponse?.faults_by_device_type) {
+    //     return apiResponse.faults_by_device_type.map((data) => ({
+    //         atm_and_address: `${data.atm_id} / ${data.address}`,
+    //         total_faults: data.error_count,
+    //         faults_duration: data.duration,
+    //     }));
+    // }
     // Encashment data structure
     else if (apiResponse.data?.encashments) {
         return apiResponse.data.encashments.map((item) => ({

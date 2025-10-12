@@ -51,6 +51,13 @@ export function openDateRangePopup() {
       </div>
     `);
 
+        // Set default values: end date defaults to today if nothing is provided
+        const endInput = modal.querySelector("#end");
+        if (endInput) {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            endInput.value = todayStr;
+        }
+
         const cancelBtn = modal.querySelector(".cancel");
         const okBtn = modal.querySelector(".ok");
 

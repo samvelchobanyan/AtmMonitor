@@ -58,7 +58,9 @@ class SelectBoxDate extends DynamicElement {
     const val = e.target.value;
 
     if (val === 'custom') {
+      console.log('custom');
       openDateRangePopup().then((range) => {
+        console.log('range', range);
         if (range && range.startDate && range.endDate) {
           this.startDate = range.startDate;
           this.endDate = range.endDate;
@@ -69,6 +71,9 @@ class SelectBoxDate extends DynamicElement {
             endDate: this.endDate,
             period: 'custom',
           });
+        }else{
+          const now = new Date();
+          this.endDate =  new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         }
       });
     } else {

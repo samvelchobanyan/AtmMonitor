@@ -224,6 +224,20 @@ export class SimpleGrid extends DynamicElement {
                     td: "gridjs-td",
                     th: "gridjs-th",
                 },
+                language: {
+                    'search': {
+                      'placeholder': '🔍 Որոնել...'
+                    },
+                    'pagination': {
+                      'previous': 'նախորդը',
+                      'next': 'հաջորդը',
+                      'showing': '😃 Ցուցադրվում են',
+                      'results': () => 'Տվյալներ'
+                    },
+                    loading: 'Տվյալներ բեռնվում են...',
+                    noRecordsFound: 'Տվյալներ չեն գտնվել',
+                    error: 'Տվյալներ չեն գտնվել',
+                  }
             };
 
             const mode = this.state.mode;

@@ -370,6 +370,8 @@ export function prepareBarChart(chartData) {
         backgroundColor: chartColors[index % chartColors.length],
         borderColor: chartColors[index % chartColors.length],
         borderWidth: 1,
+        grouped: false,
+        order: index +1
     }));
 }
 

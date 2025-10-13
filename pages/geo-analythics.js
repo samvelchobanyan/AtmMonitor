@@ -13,12 +13,21 @@ class GeoAnalythics extends DynamicElement {
 
     async fetchFirstSummary(filters) {
         const query = filters ? this.buildQueryString(filters) : "";
+        let daily = false;
         try {
+            if (filters?.startDate || filters?.endDate) {
+                const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+
+                daily = filters.startDate === today && filters.endDate === today;
+
+                console.log("Is date range today?", daily);
+            }
+
             const response = await this.fetchData(`/analytics/summary?${query}`);
             const leftColumn = this.$("#left-column");
 
             if (leftColumn) {
-                leftColumn.innerHTML = this.renderLeftColumn(response.data);
+                leftColumn.innerHTML = this.renderLeftColumn(response.data,daily);
             }
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
@@ -27,12 +36,21 @@ class GeoAnalythics extends DynamicElement {
 
     async fetchSecondSummary(filters) {
         const query = filters ? this.buildQueryString(filters) : "";
+        let daily = false;
         try {
+            if (filters?.startDate || filters?.endDate) {
+                const today = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+
+                daily = filters.startDate === today && filters.endDate === today;
+
+                console.log("Is date range today?", daily);
+            }
+
             const response = await this.fetchData(`/analytics/summary?${query}`);
             const rightColumn = this.$("#right-column");
 
             if (rightColumn) {
-                rightColumn.innerHTML = this.renderRightColumn(response.data);
+                rightColumn.innerHTML = this.renderRightColumn(response.data, daily);
             }
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
@@ -64,27 +82,27 @@ class GeoAnalythics extends DynamicElement {
         });
     }
 
-    renderLeftColumn(data) {
-        return this.renderColumn(data, "1");
+    renderLeftColumn(data,daily) {
+        return this.renderColumn(data, "1", daily);
     }
-    renderRightColumn(data) {
-        return this.renderColumn(data, "2");
+    renderRightColumn(data, daily) {
+        return this.renderColumn(data, "2", daily);
     }
 
-    renderColumn(data, suffix) {
+    renderColumn(data, suffix, daily) {
         if (!data) return `<div class="loading">Loading...</div>`;
 
         const dispense = encode(data.dispense_summary);
         const deposit = encode(data.deposit_summary);
-        const dispenseDynamic = encode(data.transaction_dynamics.dispense_dynamic.hourly_data);
-        const depositDynamic = encode(data.transaction_dynamics.deposit_dynamic.hourly_data);
+        const dispenseDynamic = daily ? encode(data.transaction_dynamics.dispense_dynamic.hourly_data) : encode(data.transaction_dynamics.dispense_dynamic.daily_data);
+        const depositDynamic = daily ? encode(data.transaction_dynamics.deposit_dynamic.hourly_data) : encode(data.transaction_dynamics.deposit_dynamic.daily_data);
         const exchange = data.exchange_summary.currency_details;
-        const transactionDynamics = encode(data.transaction_dynamics.overall_dynamic.hourly_data);
+        const transactionDynamics = daily ? encode(data.transaction_dynamics.overall_dynamic.hourly_data) : encode(data.transaction_dynamics.overall_dynamic.daily_data);
 
         const commonAttrs = `
-    ${this.attrIf("city", this.currentCity)}
-    ${this.attrIf("region", this.currentRegion)}
-  `;
+            ${this.attrIf("city", this.currentCity)}
+            ${this.attrIf("region", this.currentRegion)}
+          `;
 
         return /*html*/ `
     <div class="container">
@@ -122,6 +140,7 @@ class GeoAnalythics extends DynamicElement {
         chart-type="line"
         chart-data='${transactionDynamics}'
         api-url="/analytics/transactions-dynamic-in-days"
+        show-date-selector="false"
         ${commonAttrs}>
       </chart-component>
     </div>
@@ -133,6 +152,7 @@ class GeoAnalythics extends DynamicElement {
         chart-type="line"
         chart-data='${dispenseDynamic}'
         api-url="/analytics/dispense-dynamic-in-days"
+        show-date-selector="false"
         ${commonAttrs}>
       </chart-component>
     </div>
@@ -144,6 +164,7 @@ class GeoAnalythics extends DynamicElement {
         chart-type="line"
         chart-data='${depositDynamic}'
         api-url="/analytics/deposit-dynamic-in-days"
+        show-date-selector="false"
         ${commonAttrs}>
       </chart-component>
     </div>

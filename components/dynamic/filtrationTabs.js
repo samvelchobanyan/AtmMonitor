@@ -1,266 +1,216 @@
-import "./doughnutTabs.js";
-import "../ui/customTab.js";
-import "./select-box-search.js";
-import "../ui/customCheck.js";
-import "./segment.js";
-import "./simpleTable.js";
-import "./select-box-date.js";
-import encode from "../../assets/js/utils/encode.js";
-import { store } from "../../core/store/store.js";
-import locationTransformer from "../../core/utils/location-transformer.js";
-import { DynamicElement } from "../../core/dynamic-element.js";
+import './doughnutTabs.js';
+import '../ui/customTab.js';
+import './select-box-search.js';
+import '../ui/customCheck.js';
+import './segment.js';
+import './simpleTable.js';
+import './select-box-date.js';
+import encode from '../../assets/js/utils/encode.js';
+import { store } from '../../core/store/store.js';
+import locationTransformer from '../../core/utils/location-transformer.js';
+import { DynamicElement } from '../../core/dynamic-element.js';
 
 class FiltrationTabs extends DynamicElement {
-    constructor() {
-        super();
-        this.state = {
-            atmsList: [],
-        };
+  constructor() {
+    super();
+    this.state = {
+      atmsList: [],
+    };
 
-        this.province = [];
-        this.cities = [];
-        this.districts = [];
+    this.province = [];
+    this.cities = [];
+    this.districts = [];
 
-        this.currentRegion = null;
+    this.currentRegion = null;
 
-        this.currentCity = null;
+    this.currentCity = null;
 
-        this.activeTab = "";
-        this.checkedValues = new Set();
+    this.activeTab = '';
+    this.checkedValues = new Set();
 
-        this.submitButton = null;
-        this.selectCityBox = null;
-        this.selectDistrictBox = null;
-        this.selectSegmentBox = null;
-        this.selectAtmsBox = null;
-        this.dateSelectBox = null;
+    this.submitButton = null;
+    this.selectCityBox = null;
+    this.selectDistrictBox = null;
+    this.selectSegmentBox = null;
+    this.selectAtmsBox = null;
+    this.dateSelectBox = null;
 
-        this.showAtm = true;
+    this.startDate = null;
+    this.endDate = null;
 
-        this.segments = null;
+    this.showAtm = true;
+
+    this.segments = null;
+  }
+
+  onConnected() {
+    const state = store.getState();
+
+    this.province = state.regionsData.map((item) => ({
+      label: item.province,
+      value: item.province,
+    }));
+    if (this.getAttribute('show-atm') == false) {
+      this.showAtm = false;
     }
 
-    onConnected() {
-        const state = store.getState();
+    this.cities = locationTransformer.getAllCityOptions(state.regionsData);
+    this.districts = locationTransformer.getAllDistrictOptions(
+      state.regionsData
+    );
+    if (this.showAtm) this.fetchAtms();
+  }
 
-        this.province = state.regionsData.map((item) => ({
-            label: item.province,
-            value: item.province,
-        }));
-        if (this.getAttribute("show-atm") == false) {
-            this.showAtm = false;
-        }
+  onStoreChange(storeState) {
+    this.segments = storeState.segments.map((item) => ({
+      value: item.id,
+      text: item.name,
+    }));
+  }
 
-        this.cities = locationTransformer.getAllCityOptions(state.regionsData);
-        this.districts = locationTransformer.getAllDistrictOptions(state.regionsData);
-        if (this.showAtm) this.fetchAtms();
-        this.fetchSummary();
+  onAfterRender() {
+    this.submitButton = this.$('.btn_blue');
+    this.selectCityBox = this.$('#city-search');
+    this.selectDistrictBox = this.$('#districts-search');
+    this.selectSegmentBox = this.$('#segments-search');
+    if (this.showAtm) this.selectAtmsBox = this.$('#atms-search');
+    this.dateSelectBox = this.$('select-box-date');
+  }
+
+  getSubmitButton() {
+    return this.$('#submit_button');
+  }
+
+  async fetchAtms() {
+    try {
+      const response = await this.fetchData(`/atm/getatms`);
+      this.setState({
+        atmsList: response.data.atms.map((atm) => ({
+          value: atm.id,
+          label: atm.name,
+        })),
+      });
+    } catch (err) {
+      console.error('❌ Error fetching summary:', err);
+      this.setState({
+        atmsList: [],
+      });
+    }
+  }
+
+  addEventListeners() {
+    this.submitButtonListener();
+    this.checkboxesListener();
+    this.tabsListener();
+
+    if (this.dateSelectBox) {
+      this.addListener(this.dateSelectBox, 'date-range-change', (e) => {
+        const { startDate, endDate } = e.detail || {};
+        if (!startDate || !endDate) return;
+        this.startDate = startDate;
+        this.endDate = endDate;
+      });
+    }
+  }
+
+  checkboxesListener() {
+    const checkboxes = this.$$('custom-checkbox');
+    if (this.activeTab == '') {
+      this.activeTab = 'province';
     }
 
-    onStoreChange(storeState) {
-        this.segments = storeState.segments.map((item) => ({
-            value: item.id,
-            text: item.name,
-        }));
+    checkboxes.forEach((checkbox) => {
+      const val = checkbox.getAttribute('value');
+
+      this.addListener(checkbox, 'change', () => {
+        const input = checkbox.querySelector('input[type="checkbox"]');
+
+        if (input && input.checked) {
+          this.checkedValues.add(val);
+        } else {
+          this.checkedValues.delete(val);
+        }
+      });
+    });
+  }
+
+  submitButtonListener() {
+    if (!this.submitButton) return;
+
+    this.addListener(this.submitButton, 'click', () => {
+      const queryString = this.buildQueryString();
+      this.dispatchEvent(
+        new CustomEvent('filter-submit', {
+          detail: { query: queryString.toString() },
+          bubbles: true,
+        })
+      );
+    });
+  }
+
+  tabsListener() {
+    const tabs = this.$$('custom-tab');
+
+    tabs.forEach((tab) => {
+      this.addListener(tab, 'click', () => {
+        const selectedTabName = tab.getAttribute('name');
+
+        // Store active tab so submitButtonListener knows which one is active
+        this.activeTab = selectedTabName;
+      });
+    });
+  }
+
+  buildQueryString() {
+    const queryString = new URLSearchParams();
+
+    // Add tab-specific filters
+    if (this.activeTab === 'province') {
+      const checkedValues = Array.from(this.checkedValues);
+      const segments = this.querySelector(
+        "segment-block[name='province-segments']"
+      );
+      checkedValues.forEach((v) => queryString.append('provinces', v));
+      if (segments?.values?.length)
+        segments.values.forEach((v) => queryString.append('segmentIds', v));
+    } else if (this.activeTab === 'city') {
+      const values = this.selectCityBox.getAttribute('value')?.split(',') || [];
+      values.forEach((v) => queryString.append('cities', v));
+      const segments = this.querySelector(
+        "segment-block[name='city-segments']"
+      );
+      if (segments?.values?.length)
+        segments.values.forEach((v) => queryString.append('segmentIds', v));
+    } else if (this.activeTab === 'district') {
+      const values =
+        this.selectDistrictBox.getAttribute('value')?.split(',') || [];
+      values.forEach((v) => queryString.append('districts', v));
+      const segments = this.querySelector(
+        "segment-block[name='district-segments']"
+      );
+      if (segments?.values?.length)
+        segments.values.forEach((v) => queryString.append('segmentIds', v));
+    } else if (this.activeTab === 'segment') {
+      const rawVal = this.selectSegmentBox.getAttribute('value') || '[]';
+      JSON.parse(rawVal).forEach((v) =>
+        queryString.append('segmentIds', Number(v))
+      );
+    } else if (this.activeTab === 'atm') {
+      const rawVal = this.selectAtmsBox.getAttribute('value') || '[]';
+      JSON.parse(rawVal).forEach((v) =>
+        queryString.append('atmIds', String(v))
+      );
     }
 
-    onAfterRender() {
-        this.submitButton = this.$(".btn_blue");
-        this.selectCityBox = this.$("#city-search");
-        this.selectDistrictBox = this.$("#districts-search");
-        this.selectSegmentBox = this.$("#segments-search");
-        if (this.showAtm) this.selectAtmsBox = this.$("#atms-search");
-        this.dateSelectBox = this.$("select-box-date");
-    }
+    if (this.startDate) queryString.append('startDate', this.startDate);
+    if (this.endDate) queryString.append('endDate', this.endDate);
 
-    getQuery() {
-        return this.buildQueryString();
-    }
+    return queryString;
+  }
 
-    getSubmitButton() {
-        return this.$("#submit_button"); // or whatever your button selector is
-    }
-
-    async fetchSummary(region, city, province, segmentId, atmId) {
-        const queryString = new URLSearchParams();
-        if (region) {
-            queryString.append("district", region);
-        }
-        if (city) {
-            queryString.append("city", city);
-        }
-        if (province) {
-            queryString.append("province", province);
-        }
-        if (segmentId) {
-            queryString.append("segmentId", segmentId);
-        }
-        if (this.showAtm) {
-            if (atmId) {
-                queryString.append("atmId", atmId);
-            }
-        }
-        // for test to get data
-        queryString.append("startDate", "2025-06-27");
-        queryString.append("startDate", "2025-08-11");
-
-        try {
-            this.tableLink = `/analytics/cumulative-summary?${queryString}`;
-
-            this.currentRegion = region;
-            this.currentCity = city;
-        } catch (err) {
-            console.error("❌ Error fetching summary:", err);
-        }
-    }
-
-    async fetchAtms(region, city, atmId) {
-        const queryString = new URLSearchParams();
-        if (region) {
-            queryString.append("district", region);
-        }
-        if (city) {
-            queryString.append("city", city);
-        }
-        if (atmId) {
-            queryString.append("atmId", atmId);
-        }
-
-        try {
-            const response = await this.fetchData(`/atm/getatms?${queryString}`);
-            this.setState({
-                atmsList: response.data.atms.map((atm) => ({
-                    value: atm.id,
-                    label: atm.name,
-                })),
-            });
-        } catch (err) {
-            console.error("❌ Error fetching summary:", err);
-            this.setState({
-                atmsList: [],
-            });
-        }
-    }
-
-    addEventListeners() {
-        this.submitButtonListener();
-        this.checkboxesListener();
-        this.tabsListener();
-
-        if (this.dateSelectBox) {
-            this.addListener(this.dateSelectBox, "date-range-change", (e) => {
-                const { startDate, endDate } = e.detail || {};
-                if (!startDate || !endDate) return;
-
-                this.setAttribute("start-date", startDate);
-                this.setAttribute("end-date", endDate);
-
-                const queryString = this.buildQueryString(startDate, endDate);
-
-                this.dispatchEvent(
-                    new CustomEvent("filter-submit", {
-                        detail: { query: queryString.toString() }, // pass string
-                        bubbles: true,
-                    })
-                );
-            });
-        }
-    }
-
-    checkboxesListener() {
-        const checkboxes = this.$$("custom-checkbox");
-        if (this.activeTab == "") {
-            this.activeTab = "province";
-        }
-
-        checkboxes.forEach((checkbox) => {
-            const val = checkbox.getAttribute("value");
-
-            this.addListener(checkbox, "change", () => {
-                const input = checkbox.querySelector('input[type="checkbox"]');
-
-                if (input && input.checked) {
-                    this.checkedValues.add(val);
-                } else {
-                    this.checkedValues.delete(val);
-                }
-            });
-        });
-    }
-
-    submitButtonListener() {
-        if (!this.submitButton) return;
-
-        this.addListener(this.submitButton, "click", () => {
-            const dateComponent = this.querySelector("select-box-date");
-            const startDate = dateComponent?.startDate || null;
-            const endDate = dateComponent?.endDate || null;
-
-            const queryString = this.buildQueryString(startDate, endDate);
-            this.dispatchEvent(
-                new CustomEvent("filter-submit", {
-                    detail: { query: queryString.toString() }, // pass string
-                    bubbles: true,
-                })
-            );
-            // this.tableLink = `/analytics/cumulative-summary?${queryString}`;
-            // this.updateTable();
-        });
-    }
-
-    tabsListener() {
-        const tabs = this.$$("custom-tab");
-
-        tabs.forEach((tab) => {
-            this.addListener(tab, "click", () => {
-                const selectedTabName = tab.getAttribute("name");
-
-                // Store active tab so submitButtonListener knows which one is active
-                this.activeTab = selectedTabName;
-            });
-        });
-    }
-
-    buildQueryString(startDate = null, endDate = null) {
-        const queryString = new URLSearchParams();
-
-        // Add tab-specific filters
-        if (this.activeTab === "province") {
-            const checkedValues = Array.from(this.checkedValues);
-            const segments = this.querySelector("segment-block[name='province-segments']");
-            checkedValues.forEach((v) => queryString.append("provinces", v));
-            if (segments?.values?.length)
-                segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "city") {
-            const values = this.selectCityBox.getAttribute("value")?.split(",") || [];
-            values.forEach((v) => queryString.append("cities", v));
-            const segments = this.querySelector("segment-block[name='city-segments']");
-            if (segments?.values?.length)
-                segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "district") {
-            const values = this.selectDistrictBox.getAttribute("value")?.split(",") || [];
-            values.forEach((v) => queryString.append("districts", v));
-            const segments = this.querySelector("segment-block[name='district-segments']");
-            if (segments?.values?.length)
-                segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "segment") {
-            const rawVal = this.selectSegmentBox.getAttribute("value") || "[]";
-            JSON.parse(rawVal).forEach((v) => queryString.append("segmentIds", Number(v)));
-        } else if (this.activeTab === "atm") {
-            const rawVal = this.selectAtmsBox.getAttribute("value") || "[]";
-            JSON.parse(rawVal).forEach((v) => queryString.append("atmIds", String(v)));
-        }
-
-        // Add date filters if provided
-        if (startDate) queryString.append("startDate", startDate);
-        if (endDate) queryString.append("endDate", endDate);
-
-        return queryString;
-    }
-
-    template() {
-        if (this.state.atmsList.length == 0) {
-            return /*html*/ `
+  template() {
+    if (this.state.atmsList.length == 0) {
+      return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
                     <div class="loading">
@@ -270,14 +220,14 @@ class FiltrationTabs extends DynamicElement {
                 </div>
             </div>
             `;
-        }
+    }
 
-        const atmsList = encode(this.state.atmsList);
-        const cities = encode(this.cities);
-        const districts = encode(this.districts);
-        const segments = encode(this.segments);
+    const atmsList = encode(this.state.atmsList);
+    const cities = encode(this.cities);
+    const districts = encode(this.districts);
+    const segments = encode(this.segments);
 
-        return /*html*/ `
+    return /*html*/ `
           <div class="row">
             <div class="column sm-12">
                 <div class="container">
@@ -288,24 +238,21 @@ class FiltrationTabs extends DynamicElement {
                             <custom-tab name="district">Համայնք</custom-tab>
                             <custom-tab name="segment">Սեգմենտ</custom-tab>
                               ${
-                                  this.getAttribute("showAtm")
-                                      ? `<custom-tab name="atm">Բանկոմատ</custom-tab>`
-                                      : ""
+                                this.getAttribute('showAtm')
+                                  ? `<custom-tab name="atm">Բանկոմատ</custom-tab>`
+                                  : ''
                               }
                         </div>
-                           <select-box-date
-                                start-date="${this.getAttr("start-date")}"
-                                end-date="${this.getAttr("end-date")}"
-                            ></select-box-date>
+                           <select-box-date></select-box-date>
                     </div>
                         <div class="tab-content" data-tab="province">
                          <div class="checkboxes">
                             ${this.province
-                                .map(
-                                    (el) =>
-                                        `<custom-checkbox id="${el.value}" value="${el.value}">${el.label}</custom-checkbox>`
-                                )
-                                .join("")}
+                              .map(
+                                (el) =>
+                                  `<custom-checkbox id="${el.value}" value="${el.value}">${el.label}</custom-checkbox>`
+                              )
+                              .join('')}
                         </div>  
                        <segment-block decor name='province-segments'></segment-block>
                     </div>
@@ -321,11 +268,11 @@ class FiltrationTabs extends DynamicElement {
                         <select-box-search placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
                     </div>
                 ${
-                    this.getAttribute("showAtm")
-                        ? `<div class="tab-content" data-tab="atm" style="display:none">
+                  this.getAttribute('showAtm')
+                    ? `<div class="tab-content" data-tab="atm" style="display:none">
                                <select-box-search placeholder="Որոնել ըստ բանկոմատի ID-ի կամ հասցեի" options='${atmsList}' id='atms-search'></select-box-search>
                            </div>`
-                        : ""
+                    : ''
                 }
                     <div class="btn-container btn-container_decor">
                         <button type="submit" class="btn btn_fit btn_blue btn_md" id='submit_button'>Հաստատել</button>
@@ -335,7 +282,7 @@ class FiltrationTabs extends DynamicElement {
             </div>
           
         `;
-    }
+  }
 }
 
-customElements.define("filtration-tabs", FiltrationTabs);
+customElements.define('filtration-tabs', FiltrationTabs);

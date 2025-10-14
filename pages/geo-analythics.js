@@ -133,14 +133,7 @@ class GeoAnalythics extends DynamicElement {
         show-date-selector='false'
         id="line-chart-transaction-dynamics${suffix}"
         chart-type="line"
-<<<<<<< HEAD
         chart-data=${transactionDynamics}>
-=======
-        chart-data='${transactionDynamics}'
-        api-url="/analytics/transactions-dynamic-in-days"
-        show-date-selector="false"
-        ${commonAttrs}>
->>>>>>> 07af725606b13182ee35591542c7497a3c35403b
       </chart-component>
     </div>
 
@@ -150,14 +143,7 @@ class GeoAnalythics extends DynamicElement {
         show-date-selector='false'
         id="line-chart-dispense-dynamics${suffix}"
         chart-type="line"
-<<<<<<< HEAD
         chart-data=${dispenseDynamic}>
-=======
-        chart-data='${dispenseDynamic}'
-        api-url="/analytics/dispense-dynamic-in-days"
-        show-date-selector="false"
-        ${commonAttrs}>
->>>>>>> 07af725606b13182ee35591542c7497a3c35403b
       </chart-component>
     </div>
 
@@ -167,14 +153,7 @@ class GeoAnalythics extends DynamicElement {
         show-date-selector='false'
         id="line-chart-deposit-dynamics${suffix}"
         chart-type="line"
-<<<<<<< HEAD
         chart-data=${depositDynamic}>
-=======
-        chart-data='${depositDynamic}'
-        api-url="/analytics/deposit-dynamic-in-days"
-        show-date-selector="false"
-        ${commonAttrs}>
->>>>>>> 07af725606b13182ee35591542c7497a3c35403b
       </chart-component>
     </div>
   `;

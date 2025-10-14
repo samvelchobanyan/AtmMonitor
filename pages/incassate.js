@@ -46,15 +46,15 @@ class Incassate extends DynamicElement {
       'value',
       data.failed_transactions_count
     );
-    this.$('#inc_count').setAttribute('value', data.total); //todo continue here when talk with Arsen
-    this.$('#collected_amount').setAttribute(
-      'value',
-      data.total_collected_amount
-    );
-    this.$('#encachment_amount').setAttribute(
-      'value',
-      data.total_encachment_amount
-    );
+    // this.$('#inc_count').setAttribute('value', data.total); //todo continue here when talk with Arsen
+    // this.$('#collected_amount').setAttribute(
+    //   'value',
+    //   data.total_collected_amount
+    // );
+    // this.$('#encachment_amount').setAttribute(
+    //   'value',
+    //   data.total_encachment_amount
+    // );
   }
 
   addEventListeners() {
@@ -83,16 +83,16 @@ class Incassate extends DynamicElement {
                     <div class="infos infos_margin">
                         <info-card title="Չկատարված գործարքների գումար" id='failed_amount' value-currency="֏"   value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Չկատարված գործարքների քանակ" id='failed_count' value-color="color-blue" show-border="true"> </info-card>
-                        <info-card title="Ինկասացիաների քանակ" id='inc_count' value-color="color-blue" show-border="true"> </info-card>
+                      <!--  <info-card title="Ինկասացիաների քանակ" id='inc_count' value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
-                        <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
+                        <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>-->
                     </div>
 
                     <simple-grid
                         data-source="/encashment/summary?${this.initQuery}"
                         columns='["atm_id","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
                         column-labels='{"atm_id":"Բանկոմատի ID","date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
-                          "added_amount":"Լցված գումար","collected_amount":"Հավաքված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'
+                          "added_amount":"Լիցքավորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'
                         mode="server"
                         per-page="10">
                     </simple-grid>

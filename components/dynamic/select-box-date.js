@@ -54,8 +54,16 @@ class SelectBoxDate extends DynamicElement {
 
   onSelectChange(e) {
     console.log('onSelectChange', e.target.value);
-    
-    const val = e.target.value;
+
+  }
+
+  onSelectClick(e) {
+    console.log('onSelectClick', this.selectEl.value);
+    //todo: ask Anna why this was here
+
+
+    // const val = e.target.value; //this was used in on SelectChange
+    const val = this.selectEl.value;
 
     if (val === 'custom') {
       console.log('custom');
@@ -90,16 +98,6 @@ class SelectBoxDate extends DynamicElement {
         });
       }
     }
-  }
-
-  onSelectClick(e) {
-    console.log('onSelectClick', this.selectEl.value);
-    //todo: ask Anna why this was here
-
-    // if (this.selectEl.value === 'custom') {
-    //   // force open custom date picker again
-    //   this.onSelectChange({ target: { value: 'custom' } });
-    // }
   }
 
   _updateFromAttributes() {

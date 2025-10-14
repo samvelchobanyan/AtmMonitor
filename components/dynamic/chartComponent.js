@@ -52,8 +52,6 @@ class ChartComponent extends DynamicElement {
   }
 
   onConnected() {
-    console.log('onconnected');
-
     this.hasConnected = true;
     const override = memoryStore.get(this.memoryKey);
     if (override) {
@@ -63,8 +61,6 @@ class ChartComponent extends DynamicElement {
       this.fetchAndRenderChart();
     } else {
       const dataAttr = this.getAttr('chart-data');
-
-      console.log('dataAttr', dataAttr);
 
       if (dataAttr) {
         try {
@@ -144,18 +140,6 @@ class ChartComponent extends DynamicElement {
             columnLabel,
             datasetLabel,
           }) => {
-            console.log(
-              'Clicked:',
-              columnLabel
-              // "aaaaaaaaaaaaaaaaaa", // ← column label (x-axis)
-              // datasetLabel, // ← dataset label (legend)
-              // label, // same as columnLabel
-              // value,
-              // dataset,
-              // datasetIndex,
-              // dataIndex
-            );
-
             // click on chart in atm details
             this.dispatchEvent(
               new CustomEvent('chart-bar-clicked', {
@@ -163,17 +147,10 @@ class ChartComponent extends DynamicElement {
                 bubbles: true,
               })
             );
-            // Example: do something useful
-            // this._openDetailsModal(label, value, dataset.label);
           }
         );
         break;
     }
-
-    // if (this.state.chartData && !this.state.isLoading) {
-    //   console.log('state after render',this.state);
-    //   createLineChart(this.canvasId, this.state.chartData, this.legendId);
-    // }
   }
 
   addEventListeners() {
@@ -262,15 +239,12 @@ class ChartComponent extends DynamicElement {
               response.data.overall_dynamic[data_array_name]
             );
           } else {
-            console.log('mtanq sovorakan');
             this.transformedData = chartDataTransformer.transformData(
               response.data[data_array_name],
               this.getAttr('id')
             );
           }
-          if (this.getAttr('id') === 'line-chart-dispense-dynamics1') {
-            console.log('this.transformedData', this.transformedData);
-          }
+
           this._updateChart();
           break;
         case 'doughnut':

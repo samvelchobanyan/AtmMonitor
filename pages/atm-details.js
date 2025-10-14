@@ -271,12 +271,10 @@ class AtmDetails extends DynamicElement {
     const depositData = encode(data.transactions_summary.deposit_summary);
     const exchangeData =
       data.transactions_summary.exchange_summary.currency_details;
-    const nominalList = data.balance_info.cassettes.filter(
-      (c) => c.nominal === 0
-    );
-    const modelList = data.balance_info.cassettes.filter(
-      (c) => c.nominal !== 0
-    );
+
+    const balanceInfo = data.balance_info;
+    const nominalList = balanceInfo.cassettes.filter((c) => c.nominal === 0);
+    const modelList = balanceInfo.cassettes.filter((c) => c.nominal !== 0);
 
     const transactionDynamics = encode(
       data.transactions_summary.transaction_dynamics.overall_dynamic.hourly_data
@@ -296,6 +294,23 @@ class AtmDetails extends DynamicElement {
     const atmWorkHours = data.atm_work_hours;
 
     return /*html*/ `
+          <div class="row align-middle" style="margin-bottom: 16px;">
+            <div class="column shrink" style="margin-right: 16px;">
+              <span class="atm-item__label">Քաղաք՝</span>
+              <span class="atm-item__value">${balanceInfo.city}</span>
+            </div>
+
+            <div class="column shrink" style="margin-right: 16px;">
+              <span class="atm-item__label">Համայնք՝</span>
+              <span class="atm-item__value">${balanceInfo.district}</span>
+            </div>
+
+            <div class="column shrink">
+              <span class="atm-item__label">Հասցե՝</span>
+              <span class="atm-item__value">${balanceInfo.address}</span>
+            </div>
+          </div>
+
             <div class="row">
                 <div class="column sm-12">
                    <div class="container">

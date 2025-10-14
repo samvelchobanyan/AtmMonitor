@@ -21,6 +21,7 @@ class AtmsDashboard extends DynamicElement {
     this.incashmentChart = null;
     this.commentsData = [];
     this.worktimeChart = null;
+    this.transactionsAmountChart = null;
   }
 
   onConnected() {
@@ -143,9 +144,16 @@ class AtmsDashboard extends DynamicElement {
   onAfterRender() {
     this.worktimeChart = this.$('#worktime-bar-chart');
     this.incashmentChart = this.$('#line-chart-transit');
+    this.transactionsAmountChart = this.$('#line-chart');
   }
 
   addEventListeners() {
+    this.workTimeChange();
+    this.incashmentChange();
+    this.transactionsAmountChange();
+  }
+
+  incashmentChange() {
     if (this.incashmentChart) {
       this.addListener(this.incashmentChart, 'chart-changed', (e) => {
         let data = e.detail.data;
@@ -162,50 +170,52 @@ class AtmsDashboard extends DynamicElement {
         );
       });
     }
+  }
 
+  transactionsAmountChange() {
+    if (this.transactionsAmountChart) {
+      this.addListener(this.transactionsAmountChart, 'chart-changed', (e) => {
+        let data = e.detail.data;
+
+        this.$('#dispense').setAttribute('value', data.total_dispense_amount);
+        this.$('#dispense').setAttribute(
+          'trend',
+          data.dispense_amount_percent_change
+        );
+
+        this.$('#deposit').setAttribute('value', data.total_deposit_amount);
+        this.$('#deposit').setAttribute(
+          'trend',
+          data.deposit_amount_percent_change
+        );
+      });
+    }
+  }
+
+  workTimeChange() {
     if (this.worktimeChart) {
       this.addListener(this.worktimeChart, 'chart-changed', (e) => {
-        console.log('!!!', e.detail);
         let data = e.detail.data;
         let atmWorkingPercent = this.$('#atm_working_percent');
         let atmNonWorkingPercent = this.$('#atm_non_working_percent');
-        let atmLastDisconnect = this.$('#atm_last_disconnect');
-        let atmLastConnect = this.$('#atm_last_connect');
-        let atmLastStatusDuration = this.$('#atm_last_status_duration');
 
-        if (atmWorkingPercent)
-          atmWorkingPercent.setAttribute(
-            'value',
-            `${data.total_working_percent}%`
-          );
-
-        if (atmNonWorkingPercent)
-          atmNonWorkingPercent.setAttribute(
-            'value',
-            `${data.total_non_working_percent}%`
-          );
-
-        console.log('data.last_disconnect', data.last_disconnect);
-
-        console.log(
-          ' formatDate(data.last_disconnect)',
-          formatDate(data.last_disconnect)
+        atmWorkingPercent.setAttribute(
+          'value',
+          `${data.total_working_percent}%`
+        );
+        atmWorkingPercent.setAttribute(
+          'duration',
+          `${data.total_working_time}`
         );
 
-        if (atmLastDisconnect)
-          atmLastDisconnect.setAttribute(
-            'value',
-            formatDate(data.last_disconnect)
-          );
-
-        if (atmLastConnect)
-          atmLastConnect.setAttribute('value', formatDate(data.last_connect));
-
-        if (atmLastStatusDuration)
-          atmLastStatusDuration.setAttribute(
-            'value',
-            data.last_status_duration
-          );
+        atmNonWorkingPercent.setAttribute(
+          'value',
+          `${data.total_non_working_percent}%`
+        );
+        atmNonWorkingPercent.setAttribute(
+          'duration',
+          `${data.total_non_working_time}`
+        );
       });
     }
   }
@@ -228,12 +238,6 @@ class AtmsDashboard extends DynamicElement {
     const transactionsData = generalData.transactionsInfo;
     const encashmentData = generalData.encashmentInfo;
     const atmWorkHours = generalData.atmWorkHours;
-    const totalWorkingTime = atmWorkHours.total_working_time
-      .replace('h', 'ժ')
-      .replace('m', 'ր');
-    const totalNonWorkingTime = atmWorkHours.total_non_working_time
-      .replace('h', 'Ժ')
-      .replace('m', 'ր');
 
     const transactionDaily = generalData.hourly_transactions;
     const encashmentsDaily = generalData.hourly_encashments;
@@ -310,6 +314,7 @@ class AtmsDashboard extends DynamicElement {
                     <container-top icon="icon-trending-up" title="Գործարքների գումար" link-text="Մանրամասն" link-href="inout"> </container-top>
                     <div class="infos infos_margin">
                         <info-card
+                            id='dispense'
                             title="Կանխիկացված գումար"
                             value="${transactionsData.total_dispense_amount}"
                             value-currency="֏" value-color="color-green"
@@ -319,6 +324,7 @@ class AtmsDashboard extends DynamicElement {
                             show-border="true">
                         </info-card>
                         <info-card
+                            id='deposit'
                             title="Մուտքագրված գումար"
                             value="${transactionsData.total_deposit_amount}"
                             value-currency="֏"
@@ -418,16 +424,14 @@ class AtmsDashboard extends DynamicElement {
                             id= 'atm_working_percent'
                             value="${atmWorkHours.working_percent}"
                             icon="icon icon-clock"
-                            show-border="true"
-                            duration="${totalWorkingTime}">
+                            show-border="true">
                         </info-card>
                         <info-card
                             title="Պարապուրդ"
                             id= 'atm_non_working_percent'
                             value="${atmWorkHours.non_working_percent}"
                             icon="icon icon-clock"
-                            show-border="true"
-                            duration="${totalNonWorkingTime}">
+                            show-border="true">
                         </info-card>
                     </div>
                     <chart-component

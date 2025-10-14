@@ -1,92 +1,104 @@
-import { DynamicElement } from "../core/dynamic-element.js";
-import "../components/dynamic/doughnutTabs.js";
-import encode from "../assets/js/utils/encode.js";
-import "../components/dynamic/geo-filtration-tabs.js";
-import "../components/dynamic/chartComponent.js";
-import "../components/dynamic/infoCard.js";
+import { DynamicElement } from '../core/dynamic-element.js';
+import '../components/dynamic/doughnutTabs.js';
+import encode from '../assets/js/utils/encode.js';
+import '../components/dynamic/geo-filtration-tabs.js';
+import '../components/dynamic/chartComponent.js';
+import '../components/dynamic/infoCard.js';
 
 class GeoAnalythics extends DynamicElement {
-    onAfterRender() {
-        this.fetchFirstSummary();
-        this.fetchSecondSummary();
+  onAfterRender() {
+    this.fetchFirstSummary();
+    this.fetchSecondSummary();
+  }
+
+  async fetchFirstSummary(filters) {
+    const query = filters ? this.buildQueryString(filters) : '';
+    try {
+      const response = await this.fetchData(`/analytics/summary?${query}`);
+      const leftColumn = this.$('#left-column');
+
+      if (leftColumn) {
+        leftColumn.innerHTML = this.renderLeftColumn(response.data);
+      }
+    } catch (err) {
+      console.error('❌ Error fetching summary:', err);
     }
+  }
 
-    async fetchFirstSummary(filters) {
-        const query = filters ? this.buildQueryString(filters) : "";
-        try {
-            const response = await this.fetchData(`/analytics/summary?${query}`);
-            const leftColumn = this.$("#left-column");
+  async fetchSecondSummary(filters) {
+    const query = filters ? this.buildQueryString(filters) : '';
+    try {
+      const response = await this.fetchData(`/analytics/summary?${query}`);
+      const rightColumn = this.$('#right-column');
 
-            if (leftColumn) {
-                leftColumn.innerHTML = this.renderLeftColumn(response.data);
-            }
-        } catch (err) {
-            console.error("❌ Error fetching summary:", err);
-        }
+      if (rightColumn) {
+        rightColumn.innerHTML = this.renderRightColumn(response.data);
+      }
+    } catch (err) {
+      console.error('❌ Error fetching summary:', err);
     }
+  }
 
-    async fetchSecondSummary(filters) {
-        const query = filters ? this.buildQueryString(filters) : "";
-        try {
-            const response = await this.fetchData(`/analytics/summary?${query}`);
-            const rightColumn = this.$("#right-column");
-
-            if (rightColumn) {
-                rightColumn.innerHTML = this.renderRightColumn(response.data);
-            }
-        } catch (err) {
-            console.error("❌ Error fetching summary:", err);
-        }
+  buildQueryString(filters) {
+    const query = new URLSearchParams();
+    for (const [key, value] of Object.entries(filters || {})) {
+      if (value == null || value == 'null') continue;
+      if (Array.isArray(value) && value.length) {
+        value.forEach((v) => query.append(key, v));
+      } else if (value !== '') {
+        query.append(key, value);
+      }
     }
+    return query.toString();
+  }
 
-    buildQueryString(filters) {
-        const query = new URLSearchParams();
-        for (const [key, value] of Object.entries(filters || {})) {
-            if (value == null || value == "null") continue;
-            if (Array.isArray(value) && value.length) {
-                value.forEach((v) => query.append(key, v));
-            } else if (value !== "") {
-                query.append(key, value);
-            }
-        }
-        return query.toString();
-    }
+  addEventListeners() {
+    let tabs1 = this.$('#tabs1');
+    tabs1?.addEventListener('geo-submit', (e) => {
+      this.fetchFirstSummary(e.detail);
+    });
 
-    addEventListeners() {
-        let tabs1 = this.$("#tabs1");
-        tabs1?.addEventListener("geo-submit", (e) => {
-            this.fetchFirstSummary(e.detail);
-        });
+    let tabs2 = this.$('#tabs2');
+    tabs2?.addEventListener('geo-submit', (e) => {
+      console.log('e.detail', e.detail);
 
-        let tabs2 = this.$("#tabs2");
-        tabs2?.addEventListener("geo-submit", (e) => {
-            this.fetchSecondSummary(e.detail);
-        });
-    }
+      this.fetchSecondSummary(e.detail);
+    });
+  }
 
-    renderLeftColumn(data) {
-        return this.renderColumn(data, "1");
-    }
-    renderRightColumn(data) {
-        return this.renderColumn(data, "2");
-    }
+  renderLeftColumn(data) {
+    return this.renderColumn(data, '1');
+  }
+  renderRightColumn(data) {
+    return this.renderColumn(data, '2');
+  }
 
-    renderColumn(data, suffix) {
-        if (!data) return `<div class="loading">Loading...</div>`;
+  renderColumn(data, suffix) {
+    if (!data) return `<div class="loading">Loading...</div>`;
 
-        const dispense = encode(data.dispense_summary);
-        const deposit = encode(data.deposit_summary);
-        const dispenseDynamic = encode(data.transaction_dynamics.dispense_dynamic.hourly_data);
-        const depositDynamic = encode(data.transaction_dynamics.deposit_dynamic.hourly_data);
-        const exchange = data.exchange_summary.currency_details;
-        const transactionDynamics = encode(data.transaction_dynamics.overall_dynamic.hourly_data);
+    const dispense = encode(data.dispense_summary);
+    const deposit = encode(data.deposit_summary);
+    const dispenseDynamic = encode(
+      data.transaction_dynamics.dispense_dynamic.hourly_data?.length
+        ? data.transaction_dynamics.dispense_dynamic.hourly_data
+        : data.transaction_dynamics.dispense_dynamic.daily_data
+    );
 
-        const commonAttrs = `
-    ${this.attrIf("city", this.currentCity)}
-    ${this.attrIf("region", this.currentRegion)}
-  `;
+    const depositDynamic = encode(
+      data.transaction_dynamics.deposit_dynamic.hourly_data?.length
+        ? data.transaction_dynamics.deposit_dynamic.hourly_data
+        : data.transaction_dynamics.deposit_dynamic.daily_data
+    );
 
-        return /*html*/ `
+    const exchange = data.exchange_summary.currency_details;
+
+    const transactionDynamics = encode(
+      data.transaction_dynamics.overall_dynamic.hourly_data?.length
+        ? data.transaction_dynamics.overall_dynamic.hourly_data
+        : data.transaction_dynamics.overall_dynamic.daily_data
+    );
+
+    return /*html*/ `
     <div class="container">
       <doughnut-tabs id="dispense${suffix}" data="${dispense}" show-date="false" title="Կանխիկացում"></doughnut-tabs>
     </div>
@@ -99,8 +111,8 @@ class GeoAnalythics extends DynamicElement {
       <container-top icon="icon-dollar-sign" title="Արտարժույթի փոխանակում"></container-top>
       <div class="infos">
         ${exchange
-            .map(
-                (ex) => `
+          .map(
+            (ex) => `
             <info-card
               title="${ex.currency_code}"
               value="${ex.total_amount}"
@@ -110,48 +122,45 @@ class GeoAnalythics extends DynamicElement {
               show-border="true">
             </info-card>
           `
-            )
-            .join("")}
+          )
+          .join('')}
       </div>
     </div>
 
     <div class="container">
       <container-top icon="icon-trending-up" title="Գործարքների դինամիկա"></container-top>
       <chart-component
+        show-date-selector='false'
         id="line-chart-transaction-dynamics${suffix}"
         chart-type="line"
-        chart-data='${transactionDynamics}'
-        api-url="/analytics/transactions-dynamic-in-days"
-        ${commonAttrs}>
+        chart-data=${transactionDynamics}>
       </chart-component>
     </div>
 
     <div class="container">
       <container-top icon="icon-trending-up" title="Կանխիկացումների դինամիկա"></container-top>
       <chart-component
+        show-date-selector='false'
         id="line-chart-dispense-dynamics${suffix}"
         chart-type="line"
-        chart-data='${dispenseDynamic}'
-        api-url="/analytics/dispense-dynamic-in-days"
-        ${commonAttrs}>
+        chart-data=${dispenseDynamic}>
       </chart-component>
     </div>
 
     <div class="container">
       <container-top icon="icon-trending-up" title="Մուտքագրված գումարների դինամիկա"></container-top>
       <chart-component
+        show-date-selector='false'
         id="line-chart-deposit-dynamics${suffix}"
         chart-type="line"
-        chart-data='${depositDynamic}'
-        api-url="/analytics/deposit-dynamic-in-days"
-        ${commonAttrs}>
+        chart-data=${depositDynamic}>
       </chart-component>
     </div>
   `;
-    }
+  }
 
-    template() {
-        return /*html*/ `
+  template() {
+    return /*html*/ `
         <div class="row">
             <div class="column sm-6">
                 <geo-filtration-tabs id='tabs1'></geo-filtration-tabs>
@@ -166,7 +175,7 @@ class GeoAnalythics extends DynamicElement {
             <div class="column sm-6"  id="right-column"></div>
         </div>  
         `;
-    }
+  }
 }
 
-customElements.define("geo-analythics", GeoAnalythics);
+customElements.define('geo-analythics', GeoAnalythics);

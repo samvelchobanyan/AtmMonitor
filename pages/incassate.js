@@ -1,58 +1,76 @@
-import { DynamicElement } from "../core/dynamic-element.js";
-import "../components/dynamic/segment.js";
-import "../components/dynamic/simpleGrid.js";
-import "../components/dynamic/filtrationTabs.js";
+import { DynamicElement } from '../core/dynamic-element.js';
+import '../components/dynamic/segment.js';
+import '../components/dynamic/simpleGrid.js';
+import '../components/dynamic/filtrationTabs.js';
 
 class Incassate extends DynamicElement {
-    constructor() {
-        super();
-        this.filtrationTabs = null;
-        this.table = null;
+  constructor() {
+    super();
+    this.filtrationTabs = null;
+    this.table = null;
 
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, "0");
-        const day = String(today.getDate()).padStart(2, "0");
-        this.initQuery = `startDate=${year}-${month}-${day}`;
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    this.initQuery = `startDate=${year}-${month}-${day}`;
+  }
+
+  onConnected() {
+    this.fetchInfoCardsData(this.initQuery);
+  }
+
+  onAfterRender() {
+    this.filtrationTabs = this.$('filtration-tabs');
+    this.table = this.$('simple-grid');
+  }
+
+  async fetchInfoCardsData(queryString) {
+    try {
+      const response = await this.fetchData(
+        `/encashment/failed-transactions?${queryString}`
+      );
+
+      this.updateInfoCards(response.data);
+    } catch (err) {
+      console.error('❌ Error fetching info cards data:', err);
     }
+  }
 
-    onConnected() {
-        this.fetchInfoCardsData(this.initQuery);
-    }
+  updateInfoCards(data) {
+    this.$('#failed_amount').setAttribute(
+      'value',
+      data.failed_transactions_amount
+    );
+    this.$('#failed_count').setAttribute(
+      'value',
+      data.failed_transactions_count
+    );
+    this.$('#inc_count').setAttribute('value', data.total); //todo continue here when talk with Arsen
+    this.$('#collected_amount').setAttribute(
+      'value',
+      data.total_collected_amount
+    );
+    this.$('#encachment_amount').setAttribute(
+      'value',
+      data.total_encachment_amount
+    );
+  }
 
-    onAfterRender() {
-        this.filtrationTabs = this.$("filtration-tabs");
-        this.table = this.$("simple-grid");
-    }
+  addEventListeners() {
+    this.addListener(this.filtrationTabs, 'filter-submit', (e) => {
+      const queryString = e.detail.query;
+      this.table.setAttribute(
+        'data-source',
+        `/encashment/summary?${queryString}`
+      );
 
-    async fetchInfoCardsData(queryString) {
-        try {
-            const response = await this.fetchData(`/encashment/failed-transactions?${queryString}`);
+      this.fetchInfoCardsData(queryString);
+    });
+  }
 
-            this.updateInfoCards(response.data);
-        } catch (err) {
-            console.error("❌ Error fetching info cards data:", err);
-        }
-    }
-
-    updateInfoCards(data) {
-        this.$("#failed_amount").setAttribute("value", data.failed_transactions_amount);
-        this.$("#failed_count").setAttribute("value", data.failed_transactions_count);
-        this.$("#today_count").setAttribute("value", data.failed_transactions_amount); //todo change when all data will come from api
-        this.$("#collected_amount").setAttribute("value", data.failed_transactions_count); //todo change when all data will come from api
-    }
-
-    addEventListeners() {
-        this.addListener(this.filtrationTabs, "filter-submit", (e) => {
-            const queryString = e.detail.query;
-            this.table.setAttribute("data-source", `/encashment/summary?${queryString}`);
-
-            this.fetchInfoCardsData(queryString);
-        });
-    }
-
-    template() {
-        return /*html*/ `
+  template() {
+    return /*html*/ `
         <filtration-tabs showAtm='true'></filtration-tabs>
         <div class="row">
             <div class="column sm-12">
@@ -65,7 +83,8 @@ class Incassate extends DynamicElement {
                     <div class="infos infos_margin">
                         <info-card title="Չկատարված գործարքների գումար" id='failed_amount' value-currency="֏"   value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Չկատարված գործարքների քանակ" id='failed_count' value-color="color-blue" show-border="true"> </info-card>
-                        <info-card title="Այսօրվա ինկասացիաներ" id='today_count'    value-color="color-blue" show-border="true"> </info-card>
+                        <info-card title="Ինկասացիաների քանակ" id='inc_count' value-color="color-blue" show-border="true"> </info-card>
+                        <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
                     </div>
 
@@ -81,20 +100,20 @@ class Incassate extends DynamicElement {
             </div>
         </div>
         `;
-    }
+  }
 
-    // old
-    //  <simple-table
-    //                 data-source="/encashment/summary"
-    //                 columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
-    //                 column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի ID և հասցե",
-    //                 "added_amount":"Ավելացված գումար","collected_amount":"Հավաքված գումար",
-    //                 "marked_as_empty":"Դատարկ"}'
-    //                 exportable
-    //                 export-filename="incassate"
-    //                 export-label="Ներբեռնել CSV-ն"
-    //                 >
-    //             </simple-table>
+  // old
+  //  <simple-table
+  //                 data-source="/encashment/summary"
+  //                 columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+  //                 column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի ID և հասցե",
+  //                 "added_amount":"Ավելացված գումար","collected_amount":"Հավաքված գումար",
+  //                 "marked_as_empty":"Դատարկ"}'
+  //                 exportable
+  //                 export-filename="incassate"
+  //                 export-label="Ներբեռնել CSV-ն"
+  //                 >
+  //             </simple-table>
 }
 
-customElements.define("incassate-analythics", Incassate);
+customElements.define('incassate-analythics', Incassate);

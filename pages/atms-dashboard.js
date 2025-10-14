@@ -1,141 +1,219 @@
-import { ContainerTop } from "../components/ui/containerTop.js";
-import { LineChart } from "../components/ui/lineChart.js";
-import { DynamicElement } from "../core/dynamic-element.js";
-import { pollingService } from "../core/polling-service.js";
-import "../components/dynamic/chartComponent.js";
-import "../components/dynamic/modal-popup.js";
-import "../components/static/changeIndicator.js";
-import "../components/dynamic/infoCard.js";
-import "../components/dynamic/doughnutChart.js";
-import encode from "../assets/js/utils/encode.js";
+import { ContainerTop } from '../components/ui/containerTop.js';
+import { LineChart } from '../components/ui/lineChart.js';
+import { DynamicElement } from '../core/dynamic-element.js';
+import { pollingService } from '../core/polling-service.js';
+import '../components/dynamic/chartComponent.js';
+import '../components/dynamic/modal-popup.js';
+import '../components/static/changeIndicator.js';
+import '../components/dynamic/infoCard.js';
+import '../components/dynamic/doughnutChart.js';
+import encode from '../assets/js/utils/encode.js';
 
 class AtmsDashboard extends DynamicElement {
-    constructor() {
-        super();
-        this.state = {
-            selectedRegion: null,
-            selectedCity: null,
-            summary: null,
-        };
+  constructor() {
+    super();
+    this.state = {
+      selectedRegion: null,
+      selectedCity: null,
+      summary: null,
+    };
 
-        this.incashmentChart = null;
-        this.commentsData = [];
-    }
+    this.incashmentChart = null;
+    this.commentsData = [];
+    this.worktimeChart = null;
+  }
 
-    onConnected() {
-        this.fetchSummary();
-        this.setupPolling();
-    }
+  onConnected() {
+    this.fetchSummary();
+    this.setupPolling();
+  }
 
-    setupPolling() {
-        // Register top-stats polling endpoint
-        pollingService.register("topStats", "/dashboard/top-stats", 2000);
+  setupPolling() {
+    // Register top-stats polling endpoint
+    pollingService.register('topStats', '/dashboard/top-stats', 2000);
 
-        // Subscribe to polling updates
-        this.unsubscribeTopStats = pollingService.subscribe("topStats", (data, error) => {
-            if (error) {
-                console.error("Top stats polling error:", error);
-                return;
-            }
-
-            if (data) {
-                console.log("Received top stats data:", data);
-                this.updateTopStats(data.data);
-                // You can handle the data here - update attributes, call methods, etc.
-                // For now, just logging so you can see it's working
-            }
-        });
-    }
-
-    updateTopStats(data) {
-        this.$("#total-balance").setAttribute("value", data.total_atm_balance);
-        this.$("#total-atms").setAttribute("value", data.total_atms);
-        this.$("#not-working-atms").setAttribute("value", data.not_working_atm_count);
-        this.$("#empty-cassettes").setAttribute("value", data.empty_cassettes_count);
-        this.$("#almost-empty-cassettes").setAttribute("value", data.almost_empty_cassettes_count);
-        this.$("#taken-cards").setAttribute("value", data.taken_cards_count);
-    }
-
-    updateIncashmentCards(data) {
-        this.$("#total-balance").setAttribute("value", data.total_atm_balance);
-        this.$("#total-atms").setAttribute("value", data.total_atms);
-        this.$("#not-working-atms").setAttribute("value", data.not_working_atm_count);
-        this.$("#empty-cassettes").setAttribute("value", data.empty_cassettes_count);
-        this.$("#almost-empty-cassettes").setAttribute("value", data.almost_empty_cassettes_count);
-        this.$("#taken-cards").setAttribute("value", data.taken_cards_count);
-    }
-
-    onDisconnected() {
-        // Clean up polling subscription
-        if (this.unsubscribeTopStats) {
-            this.unsubscribeTopStats();
+    // Subscribe to polling updates
+    this.unsubscribeTopStats = pollingService.subscribe(
+      'topStats',
+      (data, error) => {
+        if (error) {
+          console.error('Top stats polling error:', error);
+          return;
         }
+
+        if (data) {
+          console.log('Received top stats data:', data);
+          this.updateTopStats(data.data);
+          // You can handle the data here - update attributes, call methods, etc.
+          // For now, just logging so you can see it's working
+        }
+      }
+    );
+  }
+
+  updateTopStats(data) {
+    this.$('#total-balance').setAttribute('value', data.total_atm_balance);
+    this.$('#total-atms').setAttribute('value', data.total_atms);
+    this.$('#not-working-atms').setAttribute(
+      'value',
+      data.not_working_atm_count
+    );
+    this.$('#empty-cassettes').setAttribute(
+      'value',
+      data.empty_cassettes_count
+    );
+    this.$('#almost-empty-cassettes').setAttribute(
+      'value',
+      data.almost_empty_cassettes_count
+    );
+    this.$('#taken-cards').setAttribute('value', data.taken_cards_count);
+  }
+
+  updateIncashmentCards(data) {
+    this.$('#total-balance').setAttribute('value', data.total_atm_balance);
+    this.$('#total-atms').setAttribute('value', data.total_atms);
+    this.$('#not-working-atms').setAttribute(
+      'value',
+      data.not_working_atm_count
+    );
+    this.$('#empty-cassettes').setAttribute(
+      'value',
+      data.empty_cassettes_count
+    );
+    this.$('#almost-empty-cassettes').setAttribute(
+      'value',
+      data.almost_empty_cassettes_count
+    );
+    this.$('#taken-cards').setAttribute('value', data.taken_cards_count);
+  }
+
+  onDisconnected() {
+    // Clean up polling subscription
+    if (this.unsubscribeTopStats) {
+      this.unsubscribeTopStats();
+    }
+  }
+
+  onStoreChange(storeState) {
+    const region = storeState.selectedRegion;
+    const city = storeState.selectedCity;
+    if (
+      region !== this.state.selectedRegion ||
+      city !== this.state.selectedCity
+    ) {
+      this.fetchSummary(region, city);
+    }
+  }
+
+  async fetchSummary(region, city) {
+    const queryString = new URLSearchParams();
+
+    if (region) {
+      queryString.append('province', region);
+    }
+    if (city) {
+      queryString.append('city', city);
+    }
+    let url = `/dashboard/summary?${queryString}`;
+    url = url.endsWith('?') ? url.slice(0, -1) : url;
+
+    try {
+      const response = await this.fetchData(url);
+      this.setState({
+        selectedRegion: region,
+        selectedCity: city,
+        summary: response.data,
+      });
+    } catch (err) {
+      console.error('❌ Error fetching summary:', err);
+      this.setState({ summary: null });
+    }
+  }
+
+  async fetchComments() {
+    try {
+      const response = await this.fetchData('/dashboard/comments');
+      this.commentsData = response.data;
+    } catch (err) {
+      console.error('❌ Error fetching summary:', err);
+      this.setState({ summary: null });
+    }
+  }
+
+  onAfterRender() {
+    this.worktimeChart = this.$('#worktime-bar-chart');
+    this.incashmentChart = this.$('#line-chart-transit');
+  }
+
+  addEventListeners() {
+    if (this.incashmentChart) {
+      this.addListener(this.incashmentChart, 'chart-changed', (e) => {
+        let data = e.detail.data;
+
+        this.$('#inc_count').setAttribute('value', data.total_encashments);
+        this.$('#inc_collected').setAttribute(
+          'value',
+          data.total_collected_amount
+        );
+        this.$('#inc_amount').setAttribute('value', data.total_added_amount);
+        this.$('#inc_empty').setAttribute(
+          'value',
+          data.yesterday_marked_as_empty
+        );
+      });
     }
 
-    onStoreChange(storeState) {
-        const region = storeState.selectedRegion;
-        const city = storeState.selectedCity;
-        if (region !== this.state.selectedRegion || city !== this.state.selectedCity) {
-            this.fetchSummary(region, city);
-        }
+    if (this.worktimeChart) {
+      this.addListener(this.worktimeChart, 'chart-changed', (e) => {
+        console.log('!!!', e.detail);
+        let data = e.detail.data;
+        let atmWorkingPercent = this.$('#atm_working_percent');
+        let atmNonWorkingPercent = this.$('#atm_non_working_percent');
+        let atmLastDisconnect = this.$('#atm_last_disconnect');
+        let atmLastConnect = this.$('#atm_last_connect');
+        let atmLastStatusDuration = this.$('#atm_last_status_duration');
+
+        if (atmWorkingPercent)
+          atmWorkingPercent.setAttribute(
+            'value',
+            `${data.total_working_percent}%`
+          );
+
+        if (atmNonWorkingPercent)
+          atmNonWorkingPercent.setAttribute(
+            'value',
+            `${data.total_non_working_percent}%`
+          );
+
+        console.log('data.last_disconnect', data.last_disconnect);
+
+        console.log(
+          ' formatDate(data.last_disconnect)',
+          formatDate(data.last_disconnect)
+        );
+
+        if (atmLastDisconnect)
+          atmLastDisconnect.setAttribute(
+            'value',
+            formatDate(data.last_disconnect)
+          );
+
+        if (atmLastConnect)
+          atmLastConnect.setAttribute('value', formatDate(data.last_connect));
+
+        if (atmLastStatusDuration)
+          atmLastStatusDuration.setAttribute(
+            'value',
+            data.last_status_duration
+          );
+      });
     }
+  }
 
-    async fetchSummary(region, city) {
-        const queryString = new URLSearchParams();
-
-        if (region) {
-            queryString.append("province", region);
-        }
-        if (city) {
-            queryString.append("city", city);
-        }
-        let url = `/dashboard/summary?${queryString}`;
-        url = url.endsWith("?") ? url.slice(0, -1) : url;
-
-        try {
-            const response = await this.fetchData(url);
-            this.setState({
-                selectedRegion: region,
-                selectedCity: city,
-                summary: response.data,
-            });
-        } catch (err) {
-            console.error("❌ Error fetching summary:", err);
-            this.setState({ summary: null });
-        }
-    }
-
-    async fetchComments() {
-        try {
-            const response = await this.fetchData("/dashboard/comments");
-            this.commentsData = response.data;
-        } catch (err) {
-            console.error("❌ Error fetching summary:", err);
-            this.setState({ summary: null });
-        }
-    }
-
-    onAfterRender() {
-        this.incashmentChart = this.$("#line-chart-transit");
-    }
-
-    addEventListeners() {
-        if (this.incashmentChart) {
-            this.addListener(this.incashmentChart, "chart-changed", (e) => {
-                let data = e.detail.data;
-
-                this.$("#inc_count").setAttribute("value", data.total_encashments);
-                this.$("#inc_collected").setAttribute("value", data.total_collected_amount);
-                this.$("#inc_amount").setAttribute("value", data.total_added_amount);
-                this.$("#inc_empty").setAttribute("value", data.yesterday_marked_as_empty);
-            });
-        }
-    }
-
-    template() {
-        let generalData = this.state.summary;
-        if (!generalData) {
-            return /*html*/ `
+  template() {
+    let generalData = this.state.summary;
+    if (!generalData) {
+      return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
                     <div class="loading">
@@ -145,23 +223,23 @@ class AtmsDashboard extends DynamicElement {
                 </div>
             </div>
             `;
-        }
+    }
 
-        const transactionsData = generalData.transactionsInfo;
-        const encashmentData = generalData.encashmentInfo;
-        const atmWorkHours = generalData.atmWorkHours;
-        const totalWorkingTime = atmWorkHours.total_working_time
-            .replace("h", "ժ")
-            .replace("m", "ր");
-        const totalNonWorkingTime = atmWorkHours.total_non_working_time
-            .replace("h", "Ժ")
-            .replace("m", "ր");
+    const transactionsData = generalData.transactionsInfo;
+    const encashmentData = generalData.encashmentInfo;
+    const atmWorkHours = generalData.atmWorkHours;
+    const totalWorkingTime = atmWorkHours.total_working_time
+      .replace('h', 'ժ')
+      .replace('m', 'ր');
+    const totalNonWorkingTime = atmWorkHours.total_non_working_time
+      .replace('h', 'Ժ')
+      .replace('m', 'ր');
 
-        const transactionDaily = generalData.hourly_transactions;
-        const encashmentsDaily = generalData.hourly_encashments;
-        const atmPrductivityDaily = generalData.atmWorkHoursDaily;
+    const transactionDaily = generalData.hourly_transactions;
+    const encashmentsDaily = generalData.hourly_encashments;
+    const atmPrductivityDaily = generalData.atmWorkHoursDaily;
 
-        return /* html */ `
+    return /* html */ `
         <div class="row">
             <div class="column sm-2">
                 <info-card
@@ -235,7 +313,9 @@ class AtmsDashboard extends DynamicElement {
                             title="Կանխիկացված գումար"
                             value="${transactionsData.total_dispense_amount}"
                             value-currency="֏" value-color="color-green"
-                            trend="${transactionsData.dispense_amount_percent_change}"
+                            trend="${
+                              transactionsData.dispense_amount_percent_change
+                            }"
                             show-border="true">
                         </info-card>
                         <info-card
@@ -243,7 +323,9 @@ class AtmsDashboard extends DynamicElement {
                             value="${transactionsData.total_deposit_amount}"
                             value-currency="֏"
                             value-color="color-blue"
-                            trend="${transactionsData.deposit_amount_percent_change}"
+                            trend="${
+                              transactionsData.deposit_amount_percent_change
+                            }"
                             show-border="true">
                         </info-card>
                     </div>
@@ -252,8 +334,11 @@ class AtmsDashboard extends DynamicElement {
                         chart-type="line"
                         chart-data='${JSON.stringify(transactionDaily || {})}'
                         api-url="/dashboard/transactions-in-days"
-                        ${this.attrIf("city", this.state.selectedCity)}
-                        ${this.attrIf("region", this.state.selectedRegion)}></chart-component>
+                        ${this.attrIf('city', this.state.selectedCity)}
+                        ${this.attrIf(
+                          'region',
+                          this.state.selectedRegion
+                        )}></chart-component>
                 </div>
             </div>
             <div class="column sm-6">
@@ -264,8 +349,11 @@ class AtmsDashboard extends DynamicElement {
                         chart-type="doughnut"
                         api-url="/dashboard/transactions-in-days"
                         chart-data='${JSON.stringify(transactionsData || {})}'
-                        ${this.attrIf("city", this.state.selectedCity)}
-                        ${this.attrIf("region", this.state.selectedRegion)}></chart-component>
+                        ${this.attrIf('city', this.state.selectedCity)}
+                        ${this.attrIf(
+                          'region',
+                          this.state.selectedRegion
+                        )}></chart-component>
                 </div>
             </div>
         </div>
@@ -314,7 +402,9 @@ class AtmsDashboard extends DynamicElement {
                         id="line-chart-transit"
                         api-url="/dashboard/encashments-in-days"
                         chart-type="line"
-                        chart-data='${JSON.stringify(encashmentsDaily || {})}'></chart-component>
+                        chart-data='${JSON.stringify(
+                          encashmentsDaily || {}
+                        )}'></chart-component>
                 </div>
             </div>
         </div>
@@ -324,32 +414,34 @@ class AtmsDashboard extends DynamicElement {
                     <container-top icon="icon-trello" title="Բանկոմատի ցանցի արտադրողականություն"> </container-top>
                     <div class="infos infos_margin">
                         <info-card
-                            title="Այսօր աշխատաժամանակ"
+                            title="Աշխատաժամանակ"
+                            id= 'atm_working_percent'
                             value="${atmWorkHours.working_percent}"
-                            value-currency="%"
                             icon="icon icon-clock"
                             show-border="true"
                             duration="${totalWorkingTime}">
                         </info-card>
                         <info-card
-                            title="Այսօր պարապուրդ"
+                            title="Պարապուրդ"
+                            id= 'atm_non_working_percent'
                             value="${atmWorkHours.non_working_percent}"
-                            value-currency="%"
                             icon="icon icon-clock"
                             show-border="true"
                             duration="${totalNonWorkingTime}">
                         </info-card>
                     </div>
                     <chart-component
-                        id="bar-chart"
+                        id="worktime-bar-chart"
                         api-url="/dashboard/atm-worktime-in-days"
-                        chart-data='${JSON.stringify(atmPrductivityDaily || {})}'
+                        chart-data='${JSON.stringify(
+                          atmPrductivityDaily || {}
+                        )}'
                         chart-type="bar"></chart-component>
                 </div>
             </div>
         </div>
             `;
-    }
+  }
 }
 
-customElements.define("atms-dashboard", AtmsDashboard);
+customElements.define('atms-dashboard', AtmsDashboard);

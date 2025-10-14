@@ -207,6 +207,7 @@ export function prepareLineChartData(chartData) {
 }
 
 export function createLineChart(ctxId, chartData, containerID) {
+    console.log('libechart data',chartData);
     const ctx = document.getElementById(ctxId).getContext("2d");
 
     const datasetsWithColors = chartData ? prepareLineChartData(chartData) : null;

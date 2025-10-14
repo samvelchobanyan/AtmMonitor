@@ -48,10 +48,10 @@ const CHART_CONFIG = {
         "loan_payment",
         "deposit_replenishment",
     ],
-    inout_transactionDynamicsToInclude: ["deposit_amount", "dispense_amount", "exchange_amount"],
+    inout_transactionDynamicsToInclude: ["dispense_amount", "deposit_amount", "exchange_amount"],
 
     // Define which fields to include and their order
-    fieldsToInclude: ["deposit_amount", "dispense_amount"],
+    fieldsToInclude: ["dispense_amount", "deposit_amount"],
     encashmentFieldsToInclude: ["added_amount", "collected_amount"],
     inOutFieldsToInclude: ["with_card", "without_card"],
     doughnutFieldsToInclude: ["total_dispense_count", "total_deposit_count"],

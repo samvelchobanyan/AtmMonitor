@@ -74,7 +74,7 @@ class GeoAnalythics extends DynamicElement {
   }
 
   renderColumn(data, suffix) {
-    if (!data) return `<div class="loading">Loading...</div>`;
+    if (!data) return `<div class="loading">Տվյալները բեռնվում են…</div>`;
 
     const dispense = encode(data.dispense_summary);
     const deposit = encode(data.deposit_summary);

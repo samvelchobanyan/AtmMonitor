@@ -297,7 +297,7 @@ class ChartComponent extends DynamicElement {
 
   template() {
     if (this.isLoading()) {
-      return `<div>Loading chart…</div>`;
+      return `<div>Տվյալները բեռնվում են…</div>`;
     }
 
     let chartHTML = '';
@@ -345,7 +345,7 @@ class ChartComponent extends DynamicElement {
         break;
     }
     if (this.state.error) {
-      return `<div class="error">Failed to load chart data.</div>`;
+      return `<div class="error">Տվյալների բերնման սխալ</div>`;
     }
     this.classList.add('chart-container');
     const dateSelectorHTML = this.showDateSelector

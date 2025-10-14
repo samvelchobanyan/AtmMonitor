@@ -46,15 +46,15 @@ class Incassate extends DynamicElement {
       'value',
       data.failed_transactions_count
     );
-    // this.$('#inc_count').setAttribute('value', data.total); //todo continue here when talk with Arsen
-    // this.$('#collected_amount').setAttribute(
-    //   'value',
-    //   data.total_collected_amount
-    // );
-    // this.$('#encachment_amount').setAttribute(
-    //   'value',
-    //   data.total_encachment_amount
-    // );
+    this.$('#inc_count').setAttribute('value', data.total); //todo continue here when talk with Arsen
+    this.$('#collected_amount').setAttribute(
+      'value',
+      data.total_collected_amount
+    );
+    this.$('#encachment_amount').setAttribute(
+      'value',
+      data.total_encachment_amount
+    );
   }
 
   addEventListeners() {
@@ -83,9 +83,9 @@ class Incassate extends DynamicElement {
                     <div class="infos infos_margin">
                         <info-card title="Չկատարված գործարքների գումար" id='failed_amount' value-currency="֏"   value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Չկատարված գործարքների քանակ" id='failed_count' value-color="color-blue" show-border="true"> </info-card>
-                      <!--  <info-card title="Ինկասացիաների քանակ" id='inc_count' value-color="color-blue" show-border="true"> </info-card>
+                        <info-card title="Ինկասացիաների քանակ" id='inc_count' value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
-                        <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>-->
+                        <info-card title="Այսօր հետ բերված գումար" id='encachment_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
                     </div>
 
                     <simple-grid

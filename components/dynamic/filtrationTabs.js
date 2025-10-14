@@ -174,16 +174,20 @@ class FiltrationTabs extends DynamicElement {
       if (segments?.values?.length)
         segments.values.forEach((v) => queryString.append('segmentIds', v));
     } else if (this.activeTab === 'city') {
-      const values = this.selectCityBox.getAttribute('value')?.split(',') || [];
+      const rawValue = this.selectCityBox.getAttribute('value') || [];
+      let values = JSON.parse(rawValue);
+      if (values.length == 0) return;
       values.forEach((v) => queryString.append('cities', v));
+
       const segments = this.querySelector(
         "segment-block[name='city-segments']"
       );
       if (segments?.values?.length)
         segments.values.forEach((v) => queryString.append('segmentIds', v));
     } else if (this.activeTab === 'district') {
-      const values =
-        this.selectDistrictBox.getAttribute('value')?.split(',') || [];
+      const rawValue = this.selectDistrictBox.getAttribute('value') || [];
+      let values = JSON.parse(rawValue);
+      if (values.length == 0) return;
       values.forEach((v) => queryString.append('districts', v));
       const segments = this.querySelector(
         "segment-block[name='district-segments']"

@@ -123,7 +123,7 @@ class ChartComponent extends DynamicElement {
                     this.canvasId,
                     chartData,
                     this.legendId,
-                    stacked,
+                    false,
                     ({
                         label,
                         value,

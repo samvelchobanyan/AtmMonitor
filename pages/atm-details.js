@@ -305,7 +305,7 @@ class AtmDetails extends DynamicElement {
                             </div>
                             <chart-component id="bar-chart-1" chart-data="${encode(
                                 modelList
-                            )}" chart-type="bar" show-date-selector="false" stacked = false></chart-component>
+                            )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
                         </div>
 
                          <div class="column sm-6">

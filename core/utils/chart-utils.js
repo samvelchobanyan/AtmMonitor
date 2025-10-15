@@ -195,6 +195,7 @@ const baseDatasetOptions = {
 };
 
 const chartColors = ["#9BECB0", "#9BB3EE", "#BE9BEE", "#FCE2A8", "#EC9B9C", "#77E6FF"];
+const barChartColors = ["#9BB3EE", "#9BECB0", "#EAEAEA"];
 
 /* ====== LineChart ====== */
 
@@ -368,8 +369,8 @@ export function createBarChart(ctxId, chartData, containerID, stacked = false, o
 export function prepareBarChart(chartData) {
     return chartData.datasets.map((dataset, index) => ({
         ...dataset,
-        backgroundColor: chartColors[index % chartColors.length],
-        borderColor: chartColors[index % chartColors.length],
+        backgroundColor: barChartColors[index % barChartColors.length],
+        borderColor: barChartColors[index % barChartColors.length],
         borderWidth: 1,
         grouped: false,
         order: index +1

@@ -28,6 +28,19 @@ class SideBar extends DynamicElement {
             console.log("Sidebar: Route changed to:", event.detail.route);
             this.currentRoute = event.detail.route;
             this.updateActiveState();
+
+            setTimeout(() => {
+                const header = document.querySelector(".header");
+                if (header) {
+                    header.classList.add("no-transition");
+                    if (this.state.isExpanded) {
+                        header.classList.add("active");
+                    } else {
+                        header.classList.remove("active");
+                    }
+                    header.classList.remove("no-transition");
+                }
+            });
         });
     }
 

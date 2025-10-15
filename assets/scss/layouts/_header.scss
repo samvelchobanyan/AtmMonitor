@@ -2,16 +2,13 @@
     @extend %flex;
     @extend %align-middle;
     @extend %align-between;
-    transition: width 0.3s ease;
+    @extend %primary-transition;
     @include horizontal-decor("../img/decor/horizontal-gray.svg");
     position: fixed;
-    // background-color: map-get($color-scheme, "gray-50");
     right: rem(56);
     width: calc(100% - #{rem(224)});
     z-index: 3;
     height: rem(104);
-    // z-index: -1;
-    background-color: pink;
 
     &::after {
         bottom: 0;
@@ -62,5 +59,10 @@
     }
     &.active {
         width: calc(100% - #{rem(408)});
+    }
+    &.no-transition {
+        transition: none !important;
+        -webkit-transition: none !important;
+        -moz-transition: none !important;
     }
 }

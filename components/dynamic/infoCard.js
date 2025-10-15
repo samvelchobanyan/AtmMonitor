@@ -43,7 +43,7 @@ class InfoCard extends DynamicElement {
         this.addListener(linkButton, 'click', this.handleLinkClick);
       }
     }
-  }
+  } 
 
   _openMessagesPopup(messages) {
     const modal = document.createElement('modal-popup');

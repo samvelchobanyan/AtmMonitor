@@ -28,8 +28,10 @@ export class infoItem extends HTMLElement {
             `;
         } else {
             const isWorking = this.getAttribute("data-working") === "true";
-            const status = isWorking ? "Աշխատող" : "Չաշխատող";
-            const statusClass = isWorking ? "info-item__status_working" : "info-item__status_not-working";
+            const status = isWorking ? "Կապի մեջ" : "Կապից դուրս";
+            const statusClass = isWorking
+                ? "info-item__status_working"
+                : "info-item__status_not-working";
 
             this.innerHTML = `
                 <span>${text}</span>

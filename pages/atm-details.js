@@ -1,176 +1,162 @@
-import { DynamicElement } from '../core/dynamic-element.js';
-import '../components/ui/infoItem.js';
-import '../components/dynamic/chartComponent.js';
-import '../components/dynamic/doughnutTabs.js';
-import encode from '../assets/js/utils/encode.js';
-import '../components/ui/atmItem.js';
-import '../components/ui/infoItem.js';
-import '../components/dynamic/simpleTable.js';
-import formatDate from '../core/utils/date-transformer.js';
+import { DynamicElement } from "../core/dynamic-element.js";
+import "../components/ui/infoItem.js";
+import "../components/dynamic/chartComponent.js";
+import "../components/dynamic/doughnutTabs.js";
+import encode from "../assets/js/utils/encode.js";
+import "../components/ui/atmItem.js";
+import "../components/ui/infoItem.js";
+import "../components/dynamic/simpleTable.js";
+import formatDate from "../core/utils/date-transformer.js";
 
 class AtmDetails extends DynamicElement {
-  constructor() {
-    super();
+    constructor() {
+        super();
 
-    this.state = {
-      summary: null,
-    };
-    this.atmId = '';
-    this.exchangeDateBox = null;
-    this.encashmentDateBox = null;
-    this.depositChart = null;
-    this.worktimeChart = null;
-  }
-
-  onConnected() {}
-
-  onAfterRender() {
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    this.atmId = pathParts[pathParts.length - 1];
-    this.exchangeDateBox = this.$('#exchange-date');
-    this.encashmentDateBox = this.$('#encashment-date');
-    this.depositChart = this.$('#bar-chart-2');
-    this.worktimeChart = this.$('#worktime-bar-chart');
-
-    if (this.state.summary == null) {
-      this.fetchAtm();
-      this.fetchFailedEncashments();
+        this.state = {
+            summary: null,
+        };
+        this.atmId = "";
+        this.exchangeDateBox = null;
+        this.encashmentDateBox = null;
+        this.depositChart = null;
+        this.worktimeChart = null;
     }
-  }
 
-  addEventListeners() {
-    this.encashmentChanges();
-    this.workTimeChanges();
-
-    this.showDepositPopups();
-
-    if (this.exchangeDateBox) {
-      this.addListener(this.exchangeDateBox, 'date-range-change', (e) => {
-        const { startDate, endDate } = e.detail;
-        this.fetchExchangeData(startDate, endDate);
-      });
-    }
-  }
-
-  showDepositPopups() {
-    if (this.depositChart) {
-      this.addListener(this.depositChart, 'chart-bar-clicked', (e) => {
-        let label = e.detail.columnLabel.substring(
-          0,
-          e.detail.columnLabel.indexOf('-')
-        );
-
-        let link = '';
-        if (label == 'DC') {
-          link = '/atm/deposit-cassette-contents';
-        } else if (label == 'RJ1') {
-          link = '/atm/reject-cassette-contents';
-        } else if (label == 'RJ2') {
-          link = '/atm/retract-cassette-contents';
-        }
-
-        const labelName = e.detail.columnLabel.replace(/[^A-Za-z]/g, '');
-        console.log('labelName', labelName);
-
-        if (link) this.fetchPopUpData(link, labelName);
-      });
-    }
-  }
-
-  workTimeChanges() {
-    if (this.worktimeChart) {
-      this.addListener(this.worktimeChart, 'chart-changed', (e) => {
-        // console.log('!!!', e.detail);
-        let data = e.detail.data;
-        let atmWorkingPercent = this.$('#atm_working_percent');
-        let atmNonWorkingPercent = this.$('#atm_non_working_percent');
-        let atmLastDisconnect = this.$('#atm_last_disconnect');
-        let atmLastConnect = this.$('#atm_last_connect');
-        let atmLastStatusDuration = this.$('#atm_last_status_duration');
-
-        if (atmWorkingPercent)
-          atmWorkingPercent.setAttribute(
-            'value',
-            `${data.total_working_percent}%`
-          );
-
-        if (atmNonWorkingPercent)
-          atmNonWorkingPercent.setAttribute(
-            'value',
-            `${data.total_non_working_percent}%`
-          );
-
-        if (atmLastDisconnect)
-          atmLastDisconnect.setAttribute(
-            'value',
-            formatDate(data.last_disconnect)
-          );
-
-        if (atmLastConnect)
-          atmLastConnect.setAttribute('value', formatDate(data.last_connect));
-
-        if (atmLastStatusDuration)
-          atmLastStatusDuration.setAttribute(
-            'value',
-            data.last_status_duration
-          );
-      });
-    }
-  }
-
-  encashmentChanges() {
-    if (this.encashmentDateBox) {
-      this.addListener(this.encashmentDateBox, 'date-range-change', (e) => {
-        const { startDate, endDate } = e.detail;
-        let link = `/encashment/summary?atmId=${this.atmId}&startDate=${startDate}&endDate=${endDate}`;
-        this.$('simple-table').setAttribute('data-source', link);
+    onConnected() {
+        const pathParts = window.location.pathname.split("/").filter(Boolean);
+        this.atmId = pathParts[pathParts.length - 1];
+        this.fetchAtm(this.atmId);
         this.fetchFailedEncashments();
-      });
     }
-  }
 
-  async fetchExchangeData(startDate, endDate) {
-    const response = await this.fetchData(
-      `/analytics/exchange-summary-in-days?startDate=${startDate}&endDate=${endDate}&atmId=${this.atmId}`
-    );
-    const currencies = response.data.currency_details;
-
-    currencies.forEach((currency) => {
-      const el = this.$(`#${currency.currency_code}`);
-      if (el) {
-        el.setAttribute('value', currency.total_amount);
-        el.setAttribute('trend', currency.total_amount_percent_change);
-      }
-    });
-  }
-
-  async fetchPopUpData(link, popUpName) {
-    const response = await this.fetchData(`${link}?atmId=${this.atmId}`);
-    const data = response.data?.totals;
-    if (data) {
-      this.openPopUp(data, popUpName);
-    } else {
-      console.log('noo info!');
+    onAfterRender() {
+        this.exchangeDateBox = this.$("#exchange-date");
+        this.encashmentDateBox = this.$("#encashment-date");
+        this.depositChart = this.$("#bar-chart-2");
+        this.worktimeChart = this.$("#worktime-bar-chart");
     }
-  }
 
-  // todo ask Aram which one RJ is which title
-  openPopUp(data, name) {
-    const modal = document.createElement('modal-popup');
-    document.body.appendChild(modal);
+    addEventListeners() {
+        this.encashmentChanges();
+        this.workTimeChanges();
 
-    const cards = data
-      .map(
-        (item) => `
+        this.showDepositPopups();
+
+        if (this.exchangeDateBox) {
+            this.addListener(this.exchangeDateBox, "date-range-change", (e) => {
+                const { startDate, endDate } = e.detail;
+                this.fetchExchangeData(startDate, endDate);
+            });
+        }
+    }
+
+    showDepositPopups() {
+        if (this.depositChart) {
+            this.addListener(this.depositChart, "chart-bar-clicked", (e) => {
+                let label = e.detail.columnLabel.substring(0, e.detail.columnLabel.indexOf("-"));
+
+                let link = "";
+                if (label == "DC") {
+                    link = "/atm/deposit-cassette-contents";
+                } else if (label == "RJ1") {
+                    link = "/atm/reject-cassette-contents";
+                } else if (label == "RJ2") {
+                    link = "/atm/retract-cassette-contents";
+                }
+
+                const labelName = e.detail.columnLabel.replace(/[^A-Za-z]/g, "");
+                console.log("labelName", labelName);
+
+                if (link) this.fetchPopUpData(link, labelName);
+            });
+        }
+    }
+
+    workTimeChanges() {
+        if (this.worktimeChart) {
+            this.addListener(this.worktimeChart, "chart-changed", (e) => {
+                // console.log('!!!', e.detail);
+                let data = e.detail.data;
+                let atmWorkingPercent = this.$("#atm_working_percent");
+                let atmNonWorkingPercent = this.$("#atm_non_working_percent");
+                let atmLastDisconnect = this.$("#atm_last_disconnect");
+                let atmLastConnect = this.$("#atm_last_connect");
+                let atmLastStatusDuration = this.$("#atm_last_status_duration");
+
+                if (atmWorkingPercent)
+                    atmWorkingPercent.setAttribute("value", `${data.total_working_percent}%`);
+
+                if (atmNonWorkingPercent)
+                    atmNonWorkingPercent.setAttribute(
+                        "value",
+                        `${data.total_non_working_percent}%`
+                    );
+
+                if (atmLastDisconnect)
+                    atmLastDisconnect.setAttribute("value", formatDate(data.last_disconnect));
+
+                if (atmLastConnect)
+                    atmLastConnect.setAttribute("value", formatDate(data.last_connect));
+
+                if (atmLastStatusDuration)
+                    atmLastStatusDuration.setAttribute("value", data.last_status_duration);
+            });
+        }
+    }
+
+    encashmentChanges() {
+        if (this.encashmentDateBox) {
+            this.addListener(this.encashmentDateBox, "date-range-change", (e) => {
+                const { startDate, endDate } = e.detail;
+                let link = `/encashment/summary?atmId=${this.atmId}&startDate=${startDate}&endDate=${endDate}`;
+                this.$("simple-table").setAttribute("data-source", link);
+                this.fetchFailedEncashments();
+            });
+        }
+    }
+
+    async fetchExchangeData(startDate, endDate) {
+        const response = await this.fetchData(
+            `/analytics/exchange-summary-in-days?startDate=${startDate}&endDate=${endDate}&atmId=${this.atmId}`
+        );
+        const currencies = response.data.currency_details;
+
+        currencies.forEach((currency) => {
+            const el = this.$(`#${currency.currency_code}`);
+            if (el) {
+                el.setAttribute("value", currency.total_amount);
+                el.setAttribute("trend", currency.total_amount_percent_change);
+            }
+        });
+    }
+
+    async fetchPopUpData(link, popUpName) {
+        const response = await this.fetchData(`${link}?atmId=${this.atmId}`);
+        const data = response.data?.totals;
+        if (data) {
+            this.openPopUp(data, popUpName);
+        } else {
+            console.log("noo info!");
+        }
+    }
+
+    // todo ask Aram which one RJ is which title
+    openPopUp(data, name) {
+        const modal = document.createElement("modal-popup");
+        document.body.appendChild(modal);
+
+        const cards = data
+            .map(
+                (item) => `
             <info-card
                 title="${item.currency}"
                 value="${item.amount}"
                 show-border="true"
             ></info-card>
         `
-      )
-      .join('');
-    modal.setContent(`
+            )
+            .join("");
+        modal.setContent(`
             <div class="modal__header">
                 <div class="modal__title">${name}</div>
                 <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
@@ -182,78 +168,73 @@ class AtmDetails extends DynamicElement {
        
         `);
 
-    // Add close button listener
-    const closeBtn = modal.querySelector('.modal__close');
-    closeBtn?.addEventListener('click', () => modal.remove());
-  }
-
-  async fetchAtm() {
-    const id = parseInt(this.atmId, 10);
-    const today = new Date().toISOString().split('T')[0];
-
-    try {
-      const response = await this.fetchData(
-        `/atm/my-profile?atmId=${id}&StartDate=${today}`
-      );
-      this.setState({
-        summary: response.data,
-      });
-    } catch (err) {
-      console.error('❌ Error fetching summary:', err);
-      this.setState({ summary: null });
+        // Add close button listener
+        const closeBtn = modal.querySelector(".modal__close");
+        closeBtn?.addEventListener("click", () => modal.remove());
     }
-  }
 
-  async fetchFailedEncashments() {
-    try {
-      const response = await this.fetchData(`/encashment/failed-transactions`);
+    async fetchAtm(id) {
+        const today = new Date().toISOString().split("T")[0];
 
-      const data = response.data;
-
-      const failedCount = this.$('#failed-count');
-      const failedAmount = this.$('#failed-amount');
-      if (failedCount) {
-        failedCount.setAttribute('value', data.failed_transactions_count);
-      }
-      if (failedAmount) {
-        failedAmount.setAttribute('value', data.failed_transactions_amount);
-      }
-    } catch (err) {
-      console.error('❌ Error fetching summary:', err);
-      this.setState({ summary: null });
+        try {
+            const response = await this.fetchData(`/atm/my-profile?atmId=${id}&StartDate=${today}`);
+            this.setState({
+                summary: response.data,
+            });
+        } catch (err) {
+            console.error("❌ Error fetching summary:", err);
+            this.setState({ summary: null });
+        }
     }
-  }
 
-  getCassetteDifferences(before, after) {
-    const result = [];
+    async fetchFailedEncashments() {
+        try {
+            const response = await this.fetchData(`/encashment/failed-transactions`);
 
-    after.forEach((afterCassette) => {
-      const beforeCassette = before.find(
-        (b) => b.cassette_name === afterCassette.cassette_name
-      );
+            const data = response.data;
 
-      // Determine count difference
-      const countDiff = afterCassette.count - (beforeCassette?.count || 0);
+            const failedCount = this.$("#failed-count");
+            const failedAmount = this.$("#failed-amount");
+            if (failedCount) {
+                failedCount.setAttribute("value", data.failed_transactions_count);
+            }
+            if (failedAmount) {
+                failedAmount.setAttribute("value", data.failed_transactions_amount);
+            }
+        } catch (err) {
+            console.error("❌ Error fetching failed incashments:", err);
+            // this.setState({ summary: null });
+        }
+    }
 
-      // Extract the numeric part from the cassette name (e.g. "RECYCLE 10000" → 10000)
-      const match = afterCassette.cassette_name.match(/\d+/);
-      if (!match) return;
-      const banknoteName = match
-        ? Number(match[0])
-        : afterCassette.cassette_name;
-      result.push({
-        banknot_name: banknoteName,
-        count: countDiff,
-        result: banknoteName * countDiff,
-      });
-    });
+    getCassetteDifferences(before, after) {
+        const result = [];
 
-    return result;
-  }
+        after.forEach((afterCassette) => {
+            const beforeCassette = before.find(
+                (b) => b.cassette_name === afterCassette.cassette_name
+            );
 
-  template() {
-    if (!this.state.summary) {
-      return /*html*/ `
+            // Determine count difference
+            const countDiff = afterCassette.count - (beforeCassette?.count || 0);
+
+            // Extract the numeric part from the cassette name (e.g. "RECYCLE 10000" → 10000)
+            const match = afterCassette.cassette_name.match(/\d+/);
+            if (!match) return;
+            const banknoteName = match ? Number(match[0]) : afterCassette.cassette_name;
+            result.push({
+                banknot_name: banknoteName,
+                count: countDiff,
+                result: banknoteName * countDiff,
+            });
+        });
+
+        return result;
+    }
+
+    template() {
+        if (!this.state.summary) {
+            return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
                     <div class="loading">
@@ -263,37 +244,36 @@ class AtmDetails extends DynamicElement {
                 </div>
             </div>
             `;
-    }
+        }
 
-    const data = this.state.summary;
+        const data = this.state.summary;
 
-    const dispenseData = encode(data.transactions_summary.dispense_summary);
-    const depositData = encode(data.transactions_summary.deposit_summary);
-    const exchangeData =
-      data.transactions_summary.exchange_summary.currency_details;
+        const dispenseData = encode(data.transactions_summary.dispense_summary);
+        const depositData = encode(data.transactions_summary.deposit_summary);
+        const exchangeData = data.transactions_summary.exchange_summary.currency_details;
 
-    const balanceInfo = data.balance_info;
-    const nominalList = balanceInfo.cassettes.filter((c) => c.nominal === 0);
-    const modelList = balanceInfo.cassettes.filter((c) => c.nominal !== 0);
+        const balanceInfo = data.balance_info;
+        const nominalList = balanceInfo.cassettes.filter((c) => c.nominal === 0);
+        const modelList = balanceInfo.cassettes.filter((c) => c.nominal !== 0);
 
-    const transactionDynamics = encode(
-      data.transactions_summary.transaction_dynamics.overall_dynamic.hourly_data
-    );
+        const transactionDynamics = encode(
+            data.transactions_summary.transaction_dynamics.overall_dynamic.hourly_data
+        );
 
-    const incData =
-      data.encashments_summary.encashments.length === 0
-        ? 0
-        : encode(
-            this.getCassetteDifferences(
-              data.encashments_summary.encashments[0].cassettes_before,
-              data.encashments_summary.encashments[0].cassettes_after
-            )
-          );
+        const incData =
+            data.encashments_summary.encashments.length === 0
+                ? 0
+                : encode(
+                      this.getCassetteDifferences(
+                          data.encashments_summary.encashments[0].cassettes_before,
+                          data.encashments_summary.encashments[0].cassettes_after
+                      )
+                  );
 
-    const devicesData = data.devices;
-    const atmWorkHours = data.atm_work_hours;
+        const devicesData = data.devices;
+        const atmWorkHours = data.atm_work_hours;
 
-    return /*html*/ `
+        return /*html*/ `
           <div class="row align-middle" style="margin-bottom: 16px;">
             <div class="column shrink" style="margin-right: 16px;">
               <span class="atm-item__label">Քաղաք՝</span>
@@ -319,11 +299,11 @@ class AtmDetails extends DynamicElement {
                         <div class="column sm-6">
                             <div class="infos infos_margin">
                                 <info-card title="Մնացորդ" value="${
-                                  data.balance_info.total_balance
+                                    data.balance_info.total_balance
                                 }" value-currency="֏" value-color="color-green" trend="7" show-border="true"> </info-card>
                             </div>
                             <chart-component id="bar-chart-1" chart-data="${encode(
-                              modelList
+                                modelList
                             )}" chart-type="bar" show-date-selector="false" stacked = false></chart-component>
                         </div>
 
@@ -331,11 +311,9 @@ class AtmDetails extends DynamicElement {
                             <div class="infos infos_margin">
                                  <info-card
                                     title="Վերջին ինկասացիա (${formatDate(
-                                      data.balance_info.last_encashment_date
+                                        data.balance_info.last_encashment_date
                                     )})"
-                                    value="${
-                                      data.balance_info.last_encashment_amount
-                                    }"
+                                    value="${data.balance_info.last_encashment_amount}"
                                     value-currency="֏"
                                     value-color="color-blue"
                                     show-border="true"
@@ -345,7 +323,7 @@ class AtmDetails extends DynamicElement {
                                 </info-card>
                             </div>
                             <chart-component id="bar-chart-2" chart-data="${encode(
-                              nominalList
+                                nominalList
                             )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
                         </div>
                     </div>
@@ -373,8 +351,8 @@ class AtmDetails extends DynamicElement {
                         </div>
                            <div class="infos">
                                ${exchangeData
-                                 .map((exchange) => {
-                                   return `
+                                   .map((exchange) => {
+                                       return `
                                    <info-card
                                        id="${exchange.currency_code}"  
                                        title="${exchange.currency_code}"
@@ -382,8 +360,8 @@ class AtmDetails extends DynamicElement {
                                        trend="${exchange.total_amount_percent_change}"
                                        icon="icon icon-box"
                                        show-border="true"></info-card>`;
-                                 })
-                                 .join('')}
+                                   })
+                                   .join("")}
                            </div>
                          </div>
                     </div>
@@ -395,14 +373,9 @@ class AtmDetails extends DynamicElement {
                             id="line-chart-transactions" 
                             chart-type="line" 
                             chart-data='${transactionDynamics}' 
-                            api-url="/analytics/transactions-dynamic-in-days?atmIds=${
-                              this.atmId
-                            }" 
-                            ${this.attrIf('city', this.state.currentCity)} 
-                            ${this.attrIf(
-                              'region',
-                              this.state.currentRegion
-                            )}> </chart-component>
+                            api-url="/analytics/transactions-dynamic-in-days?atmIds=${this.atmId}" 
+                            ${this.attrIf("city", this.state.currentCity)} 
+                            ${this.attrIf("region", this.state.currentRegion)}> </chart-component>
                     </div>
                 </div>
 
@@ -413,14 +386,12 @@ class AtmDetails extends DynamicElement {
                     <container-top icon="icon-cpu" title="Սարքավորումներ"> </container-top>
                     <div class="info-items">
                     ${devicesData
-                      .map((device) => {
-                        return `<info-item text="${
-                          device.device_type
-                        }" data-working="${
-                          device.status == 1 ? true : false
-                        }"></info-item>`;
-                      })
-                      .join('')}
+                        .map((device) => {
+                            return `<info-item text="${device.device_type}" data-working="${
+                                device.status == 1 ? true : false
+                            }"></info-item>`;
+                        })
+                        .join("")}
                     </div>
                 </div>
             </div>
@@ -431,33 +402,28 @@ class AtmDetails extends DynamicElement {
                        <info-card
                             title="Աշխատաժամանակ" 
                             id= 'atm_working_percent'
-                            value="${
-                              atmWorkHours.work_hours_per_day[0].working_percent
-                            }%"
+                            value="${atmWorkHours.work_hours_per_day[0].working_percent}%"
                             icon="icon icon-clock"
                             show-border="true"></info-card>
                         <info-card
                             title="Խափանում"
                             id= 'atm_non_working_percent'
-                            value="${
-                              atmWorkHours.work_hours_per_day[0]
-                                .non_working_percent
-                            }%"
+                            value="${atmWorkHours.work_hours_per_day[0].non_working_percent}%"
                             icon="icon icon-clock"
                             show-border="true"></info-card>
                     </div>
                     <div class="info-items-container">
                         <div class="info-items info-items_col">
                          <info-item text="Վերջին Disconnect" id='atm_last_disconnect' value="${formatDate(
-                           atmWorkHours.last_disconnect
+                             atmWorkHours.last_disconnect
                          )}"></info-item>
                             <info-item text="Վերջին Connect" id='atm_last_connect' value="${formatDate(
-                              atmWorkHours.last_connect
+                                atmWorkHours.last_connect
                             )}"></info-item>
                         </div> 
                         <div class="info-items">
                             <info-item text="Վերջին ստատուսի տևողություն" id='atm_last_status_duration' value="${
-                              atmWorkHours.last_status_duration
+                                atmWorkHours.last_status_duration
                             }"></info-item>
                         </div>
 
@@ -480,8 +446,8 @@ class AtmDetails extends DynamicElement {
                 <container-top icon="icon-coins" title="Ինկասացիաներ"></container-top>
                 <select-box-date
                     id="encashment-date"
-                    start-date="${this.getAttr('start-date')}"
-                    end-date="${this.getAttr('end-date')}"
+                    start-date="${this.getAttr("start-date")}"
+                    end-date="${this.getAttr("end-date")}"
                 ></select-box-date>
                 </div> 
 
@@ -503,7 +469,7 @@ class AtmDetails extends DynamicElement {
             </div> 
             </div>
         `;
-  }
+    }
 }
 
-customElements.define('atm-details', AtmDetails);
+customElements.define("atm-details", AtmDetails);

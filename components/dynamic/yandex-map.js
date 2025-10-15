@@ -87,16 +87,16 @@ class YandexMap extends DynamicElement {
                         {
                             balloonContentHeader: `<a href="atms/${atm.id}">ATM #${atm.name}</a>`,
                             balloonContentBody: `
-                <div class="balloon__body">
-                  <div class="balloon__item"><div>ATM ID:</div> <div>${atm.id}</div></div>
-                  <div class="balloon__item"><div>City:</div> <div>${atm.city}</div></div>
-                  <div class="balloon__item"><div>District:</div> <div>${atm.district}</div></div>
-                  <div class="balloon__item"><div>Address:</div> <div>${atm.address}</div></div>
-                  <div class="balloon__item"><div>Status:</div> <div>${
-                      atm.connection_status_id === 1 ? "Working" : "Not Working"
-                  }</div></div>
-                </div>
-              `,
+                      <div class="balloon__body">
+                        <div class="balloon__item"><div>ATM ID:</div> <div>${atm.id}</div></div>
+                        <div class="balloon__item"><div>City:</div> <div>${atm.city}</div></div>
+                        <div class="balloon__item"><div>District:</div> <div>${atm.district}</div></div>
+                        <div class="balloon__item"><div>Address:</div> <div>${atm.address}</div></div>
+                        <div class="balloon__item"><div>Status:</div> <div>${
+                            atm.connection_status_id === 1 ? "Working" : "Not Working"
+                        }</div></div>
+                      </div>
+                    `,
                             hintContent: `ATM #${atm.name}`,
                         },
                         {

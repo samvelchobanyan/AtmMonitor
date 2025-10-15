@@ -227,3 +227,59 @@
         height: 24px;
     }
 }
+
+.segments-page {
+    padding: 20px;
+
+    .segments-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+
+        h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .add-segment-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+
+            &:hover {
+                background-color: #0056b3;
+            }
+        }
+    }
+
+    .segments-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+    }
+
+    .segment-card {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+        .segment-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .segment-id {
+            font-size: 13px;
+            color: #777;
+        }
+    }
+}

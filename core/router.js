@@ -202,5 +202,12 @@ export function startRouter() {
         mountComponent("create-atm-page", "Ստեղծել բանկոմատ", ctx.query, "/create-atm");
     });
 
+    page("/segments", async (ctx) => {
+        if (!customElements.get("segments-page")) {
+            await import("../pages/segments-page.js");
+        }
+        mountComponent("segments-page", "Սեգմենտների ցուցակ", ctx.query, "/segments");
+    });
+
     page();
 }

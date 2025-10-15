@@ -260,6 +260,20 @@ class SideBar extends DynamicElement {
                     console.log("Sidebar: Activated journal item", journalItem);
                 }
                 break;
+            case "/create-atm":
+                const createAtmItem = this.querySelector('a[href="create-atm"]');
+
+                if (createAtmItem) {
+                    createAtmItem.classList.add("active");
+                }
+                break;
+            case "/segments":
+                const segmentsItem = this.querySelector('a[href="segments"]');
+
+                if (segmentsItem) {
+                    segmentsItem.classList.add("active");
+                }
+                break;
         }
     }
 
@@ -300,7 +314,7 @@ class SideBar extends DynamicElement {
                     <a href="journal" class="sidebar__item"> <i class="icon icon-clipboard"></i><span>Մատյան</span> </a>
                 </div>
                     <a href="create-atm" class="sidebar__item"> <i class="icon icon-atm"></i><span>Ստեղծել բանկոմատ</span> </a>
-                    <a href="create-segment" class="sidebar__item"> <i class="icon icon-segment"></i><span>Ստեղծել սեգմենտ</span> </a>
+                    <a href="segments" class="sidebar__item"> <i class="icon icon-segment"></i><span>Սեգմենտների ցուցակ</span> </a>
                 <div class="sidebar__bottom">
                     <button id="logout-btn" class="btn btn_logout">
                         <i class="icon icon-log-out"></i>

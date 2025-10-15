@@ -27,11 +27,18 @@ class Incassate extends DynamicElement {
 
   async fetchInfoCardsData(queryString) {
     try {
-      const response = await this.fetchData(
+      const failedResponse = await this.fetchData(
         `/encashment/failed-transactions?${queryString}`
       );
 
-      this.updateInfoCards(response.data);
+      const totalsResponse = await this.fetchData(
+        `/encashment/totals?${queryString}`
+      );
+
+      let data = {... failedResponse.data, ... totalsResponse.data};
+      console.log('data ===>', data);
+
+      this.updateInfoCards(data);
     } catch (err) {
       console.error('❌ Error fetching info cards data:', err);
     }
@@ -46,7 +53,7 @@ class Incassate extends DynamicElement {
       'value',
       data.failed_transactions_count
     );
-    this.$('#inc_count').setAttribute('value', data.total); //todo continue here when talk with Arsen
+    this.$('#inc_count').setAttribute('value', data.total_count); //todo continue here when talk with Arsen
     this.$('#collected_amount').setAttribute(
       'value',
       data.total_collected_amount
@@ -84,8 +91,8 @@ class Incassate extends DynamicElement {
                         <info-card title="Չկատարված գործարքների գումար" id='failed_amount' value-currency="֏"   value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Չկատարված գործարքների քանակ" id='failed_count' value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Ինկասացիաների քանակ" id='inc_count' value-color="color-blue" show-border="true"> </info-card>
-                        <info-card title="Այսօր հետ բերված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
-                        <info-card title="Այսօր հետ բերված գումար" id='encachment_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
+                        <info-card title="Վերադարցված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
+                        <info-card title="Լիցքաորված գումար" id='encachment_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
                     </div>
 
                     <simple-grid

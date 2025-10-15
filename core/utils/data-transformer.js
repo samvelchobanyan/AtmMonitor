@@ -124,7 +124,7 @@ class ChartDataTransformer {
         if (!Array.isArray(apiResponse)) {
             throw new Error("Invalid data format: response must be an array");
         }
-
+        console.log('transformStackBarData');
         const { fieldLabels, stackBarFieldsToInclude } = this.config;
 
         // const labels = apiResponse.map((item) => item.nominal);

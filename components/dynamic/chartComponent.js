@@ -78,14 +78,14 @@ class ChartComponent extends DynamicElement {
 
                             break;
                         case "bar":
-                            const isStack = this.getAttribute("stacked");
-
-                            if (isStack != null) {
-                                this.transformedData = chartDataTransformer.transformStackBarData(
+                            const isGrouped = this.getAttribute("grouped");
+                            console.log('grouped',isGrouped);
+                            if (isGrouped != null) {
+                                this.transformedData = chartDataTransformer.transformBarData(
                                     parsed
                                 );
                             } else {
-                                this.transformedData = chartDataTransformer.transformBarData(
+                                this.transformedData = chartDataTransformer.transformStackBarData(
                                     parsed
                                 );
                             }
@@ -115,15 +115,15 @@ class ChartComponent extends DynamicElement {
                 this.chart = createDoughnutChart(this.canvasId, chartData, this.legendId);
                 break;
             case "bar":
-                const stacked = this.hasAttribute("stacked")
-                    ? this.getAttr("stacked") !== "false"
+                const isGrouped = this.hasAttribute("grouped")
+                    ? this.getAttr("grouped") !== "false"
                     : false;
 
                 this.chart = createBarChart(
                     this.canvasId,
                     chartData,
                     this.legendId,
-                    false,
+                    isGrouped,
                     ({
                         label,
                         value,
@@ -242,14 +242,17 @@ class ChartComponent extends DynamicElement {
                     this._updateChart();
                     break;
                 case "bar":
-                    const isStack = this.getAttribute("stacked");
+                    const isGrouped = this.hasAttribute("grouped")
+                        ? this.getAttr("grouped") !== "false"
+                        : false;
 
-                    if (isStack != null) {
-                        this.transformedData = chartDataTransformer.transformStackBarData(
+                    console.log('fetchAndRenderChart', isGrouped);
+                    if (isGrouped != null) {
+                        this.transformedData = chartDataTransformer.transformBarData(
                             response.data
                         );
                     } else {
-                        this.transformedData = chartDataTransformer.transformBarData(response.data);
+                        this.transformedData = chartDataTransformer.transformStackBarData(response.data);
                     }
                     this._updateChart();
                     break;
@@ -276,7 +279,10 @@ class ChartComponent extends DynamicElement {
                 updateDoughnutChart(this.chart, this.transformedData.chartData);
                 break;
             case "bar":
-                updateBarChart(this.chart, this.transformedData.chartData);
+                const isGrouped = this.hasAttribute("grouped")
+                    ? this.getAttr("grouped") !== "false"
+                    : false;
+                updateBarChart(this.chart, this.transformedData.chartData, isGrouped);
                 break;
         }
     }

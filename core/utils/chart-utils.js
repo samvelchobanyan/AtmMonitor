@@ -312,9 +312,9 @@ export function updateDoughnutChart(chart, chartData) {
 
 /* ====== BarChart ====== */
 
-export function createBarChart(ctxId, chartData, containerID, stacked = false, onBarClick) {
+export function createBarChart(ctxId, chartData, containerID, grouped = false, onBarClick) {
     const ctx = document.getElementById(ctxId).getContext("2d");
-    const datasetsWithColors = chartData ? prepareBarChart(chartData) : null;
+    const datasetsWithColors = chartData ? prepareBarChart(chartData,grouped) : null;
 
     return new Chart(ctx, {
         type: "bar",
@@ -338,13 +338,13 @@ export function createBarChart(ctxId, chartData, containerID, stacked = false, o
                     ticks: { maxTicksLimit: 6, autoSkip: true },
                     grid: { display: true, color: "#D9D9DD" },
                     border: { dash: [2, 4] },
-                    stacked: stacked,
+                    stacked: false,
                 },
                 x: {
                     grid: { display: true, color: "#D9D9DD" },
                     border: { dash: [2, 4] },
-                    ticks: { display: stacked },
-                    stacked: stacked,
+                    ticks: { display: true },
+                    stacked: false,
                 },
             },
             onClick(event, elements, chart) {
@@ -364,20 +364,20 @@ export function createBarChart(ctxId, chartData, containerID, stacked = false, o
     });
 }
 
-export function prepareBarChart(chartData) {
+export function prepareBarChart(chartData, isGrouped = false) {
     return chartData.datasets.map((dataset, index) => ({
         ...dataset,
         backgroundColor: barChartColors[index % barChartColors.length],
         borderColor: barChartColors[index % barChartColors.length],
         borderWidth: 1,
-        grouped: false,
+        grouped: isGrouped,
         order: index + 1,
     }));
 }
 
-export function updateBarChart(chart, chartData) {
+export function updateBarChart(chart, chartData, grouped = false) {
     chart.options.showLoading = false;
     chart.data.labels = chartData.labels;
-    chart.data.datasets = prepareBarChart(chartData);
+    chart.data.datasets = prepareBarChart(chartData,grouped);
     chart.update();
 }

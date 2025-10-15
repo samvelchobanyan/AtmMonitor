@@ -437,6 +437,7 @@ class AtmsDashboard extends DynamicElement {
                     <chart-component
                         id="worktime-bar-chart"
                         api-url="/dashboard/atm-worktime-in-days"
+                        grouped
                         chart-data='${JSON.stringify(
                           atmPrductivityDaily || {}
                         )}'

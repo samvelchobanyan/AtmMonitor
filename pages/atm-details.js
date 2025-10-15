@@ -324,7 +324,7 @@ class AtmDetails extends DynamicElement {
                             </div>
                             <chart-component id="bar-chart-1" chart-data="${encode(
                                 modelList
-                            )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
+                            )}" chart-type="bar" show-date-selector="false"></chart-component>
                         </div>
 
                          <div class="column sm-6">
@@ -344,7 +344,7 @@ class AtmDetails extends DynamicElement {
                             </div>
                             <chart-component id="bar-chart-2" chart-data="${encode(
                                 nominalList
-                            )}" chart-type="bar" show-date-selector="false" stacked></chart-component>
+                            )}" chart-type="bar" show-date-selector="false"></chart-component>
                         </div>
                     </div>
 
@@ -452,6 +452,7 @@ class AtmDetails extends DynamicElement {
                             id="worktime-bar-chart"
                             api-url="/dashboard/atm-worktime-in-days"
                             atm-id="${this.atmId}"
+                            grouped
                             chart-type="bar">
                         </chart-component>
                     </div>

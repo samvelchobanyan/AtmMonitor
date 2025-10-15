@@ -179,9 +179,28 @@ class AtmDetails extends DynamicElement {
             const response = await this.fetchData(
                 `/atm/my-profile?atmId=${this.atmId}&StartDate=${today}`
             );
+
             this.setState({
                 summary: response.data,
             });
+
+            let statusEl = document.querySelector(".atm-item__status");
+
+            const isWorking = response.data.connection_status_id == "1";
+            const status = isWorking ? "Աշխատող" : "Չաշխատող";
+            const statusClass = isWorking
+                ? "atm-item__status_working"
+                : "atm-item__status_not-working";
+            if (statusEl) {
+                // update the class
+                statusEl.className = `atm-item__status ${statusClass || ""}`;
+
+                // update the text inside the span
+                const span = statusEl.querySelector("span");
+                if (span) {
+                    span.textContent = status || "";
+                }
+            }
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });

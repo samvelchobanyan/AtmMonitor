@@ -121,15 +121,6 @@ class HeaderCustom extends DynamicElement {
             el.innerHTML = newHTML;
         }
     }
-    //  <!-- ${
-    //     hasIcon
-    //         ? `<div class="header__right">
-    //             <div class="atm-item__status ${statusClass}">
-    //                 <span>${status}</span>
-    //             </div>
-    //         </div>`
-    //         : ""
-    // } -->
 
     template() {
         const state = store.getState();
@@ -158,7 +149,15 @@ class HeaderCustom extends DynamicElement {
                                 </select-box>
                             </div>
 
-
+                                ${
+                                    hasIcon
+                                        ? `<div class="header__right">
+                                            <div class="atm-item__status">
+                                                <span></span>
+                                            </div>
+                                        </div>`
+                                        : ""
+                                } 
                         </div>
                     </div>
                 </div>

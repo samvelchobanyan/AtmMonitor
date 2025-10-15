@@ -207,7 +207,7 @@ export function prepareLineChartData(chartData) {
 }
 
 export function createLineChart(ctxId, chartData, containerID) {
-    console.log('libechart data',chartData);
+    console.log("libechart data", chartData);
     const ctx = document.getElementById(ctxId).getContext("2d");
 
     const datasetsWithColors = chartData ? prepareLineChartData(chartData) : null;
@@ -263,8 +263,6 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
     const hasCustomCutout = canvas.classList.contains("custom-cutout");
 
     const plugins = [htmlLegendPlugin, loadingPlugin];
-
-    console.log("filledDataset.data", filledDataset);
 
     // filledDataset.data = filledDataset.data.map((v) => (isNaN(v) || v == null ? 0 : v));
 
@@ -372,7 +370,7 @@ export function prepareBarChart(chartData) {
         borderColor: chartColors[index % chartColors.length],
         borderWidth: 1,
         grouped: false,
-        order: index +1
+        order: index + 1,
     }));
 }
 

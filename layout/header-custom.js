@@ -113,15 +113,27 @@ class HeaderCustom extends DynamicElement {
         if (!el) return;
 
         const iconHTML = this.icon ? `<a href='atms'> <i class="icon ${this.icon}"></i></a>` : "";
-        const newHTML = `${iconHTML} ${this.title}`;
+        const infoHTML = this.icon ? `<img src='assets/img/info.svg'/>` : "";
+
+        const newHTML = `${iconHTML} ${this.title} ${infoHTML}`;
 
         if (el.innerHTML !== newHTML) {
             el.innerHTML = newHTML;
         }
     }
+    //  <!-- ${
+    //     hasIcon
+    //         ? `<div class="header__right">
+    //             <div class="atm-item__status ${statusClass}">
+    //                 <span>${status}</span>
+    //             </div>
+    //         </div>`
+    //         : ""
+    // } -->
 
     template() {
         const state = store.getState();
+        const hasIcon = this.icon != null;
 
         return /* html */ `
             <div class="main-container">
@@ -145,6 +157,8 @@ class HeaderCustom extends DynamicElement {
                                     options='${JSON.stringify(this.state.cities)}'>
                                 </select-box>
                             </div>
+
+
                         </div>
                     </div>
                 </div>

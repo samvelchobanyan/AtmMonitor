@@ -46,7 +46,7 @@ export class AtmItem extends HTMLElement {
             <div class="atm-item__status ${statusClass}">
                 <span>${status}</span>
             </div>
-              </a>
+        </a>
         `;
     }
 }

@@ -23,9 +23,8 @@ class AtmDetails extends DynamicElement {
     }
 
     onConnected() {
-        const pathParts = window.location.pathname.split("/").filter(Boolean);
-        this.atmId = pathParts[pathParts.length - 1];
-        this.fetchAtm(this.atmId);
+        this.atmId = this.getAttribute("id");
+        this.fetchAtm();
         this.fetchFailedEncashments();
     }
 
@@ -173,11 +172,13 @@ class AtmDetails extends DynamicElement {
         closeBtn?.addEventListener("click", () => modal.remove());
     }
 
-    async fetchAtm(id) {
+    async fetchAtm() {
         const today = new Date().toISOString().split("T")[0];
 
         try {
-            const response = await this.fetchData(`/atm/my-profile?atmId=${id}&StartDate=${today}`);
+            const response = await this.fetchData(
+                `/atm/my-profile?atmId=${this.atmId}&StartDate=${today}`
+            );
             this.setState({
                 summary: response.data,
             });

@@ -113,7 +113,7 @@ class HeaderCustom extends DynamicElement {
         if (!el) return;
 
         const iconHTML = this.icon ? `<a href='atms'> <i class="icon ${this.icon}"></i></a>` : "";
-        const infoHTML = this.icon ? `<img src='assets/img/info.svg'/>` : "";
+        const infoHTML = this.icon ? `<img src='assets/img/info.svg' id="info"/>` : "";
 
         const newHTML = `${iconHTML} ${this.title} ${infoHTML}`;
 

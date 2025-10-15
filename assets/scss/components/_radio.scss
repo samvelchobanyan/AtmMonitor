@@ -28,7 +28,7 @@
         @extend %flex;
         @extend %align-middle;
         @extend %align-center;
-        background-color: map-get($color-scheme, "gray");
+        background-color: map-get($color-scheme, "gray-50");
         border-radius: rem(6);
         padding: 0 rem(12);
         height: rem(32);

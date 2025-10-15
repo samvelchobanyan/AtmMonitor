@@ -47,6 +47,13 @@ class AtmDetails extends DynamicElement {
                 this.fetchExchangeData(startDate, endDate);
             });
         }
+
+        let infoButton = document.querySelector("#info");
+        if (infoButton) {
+            this.addListener(infoButton, "click", () => {
+                this.openInfoPopup();
+            });
+        }
     }
 
     showDepositPopups() {
@@ -172,6 +179,47 @@ class AtmDetails extends DynamicElement {
         closeBtn?.addEventListener("click", () => modal.remove());
     }
 
+    openInfoPopup(messages) {
+      // todo continue here when Arsen fill all data
+        let data = this.state.summary;
+        const modal = document.createElement("modal-popup");
+        document.body.appendChild(modal);
+        modal.setContent(`
+        <div class="modal__header">
+            <div class="modal__title">
+              <div>ATM #${this.atmId}</div>
+                  <div class="flex flex-row align-middle location-line" style="margin-top:12px" >
+                    <p>
+                      <span class="atm-item__label">Քաղաք՝</span>
+                      <span class="atm-item__value">${data.balance_info.city}</span>
+                    </p>
+
+                    <p style="margin: 0 12px">
+                      <span class="atm-item__label">Համայնք՝</span>
+                      <span class="atm-item__value">${data.balance_info.district}</span>
+                    </p>
+
+                    <p>
+                      <span class="atm-item__label">Հասցե՝</span>
+                      <span class="atm-item__value">${data.balance_info.address}</span>
+                    </p>
+                  </div>
+            </div>
+            <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
+        </div>
+        <div class="modal__body">aaaa
+        </div>
+           
+      </div>
+    
+   
+    `);
+
+        // Add close button listener
+        const closeBtn = modal.querySelector(".modal__close");
+        closeBtn?.addEventListener("click", () => modal.remove());
+    }
+
     async fetchAtm() {
         const today = new Date().toISOString().split("T")[0];
 
@@ -187,7 +235,7 @@ class AtmDetails extends DynamicElement {
             let statusEl = document.querySelector(".atm-item__status");
 
             const isWorking = response.data.connection_status_id == "1";
-            const status = isWorking ? "Աշխատող" : "Չաշխատող";
+            const status = isWorking ? "Կապի մեջ" : "Կապից դուրս";
             const statusClass = isWorking
                 ? "atm-item__status_working"
                 : "atm-item__status_not-working";
@@ -422,13 +470,13 @@ class AtmDetails extends DynamicElement {
                        <info-card
                             title="Աշխատաժամանակ" 
                             id= 'atm_working_percent'
-                            value="${atmWorkHours.work_hours_per_day[0].working_percent}%"
+                            value="${atmWorkHours.work_hours_per_day[0]?.working_percent}%"
                             icon="icon icon-clock"
                             show-border="true"></info-card>
                         <info-card
                             title="Խափանում"
                             id= 'atm_non_working_percent'
-                            value="${atmWorkHours.work_hours_per_day[0].non_working_percent}%"
+                            value="${atmWorkHours.work_hours_per_day[0]?.non_working_percent}%"
                             icon="icon icon-clock"
                             show-border="true"></info-card>
                     </div>

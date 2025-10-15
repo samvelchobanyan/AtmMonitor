@@ -21,6 +21,10 @@
 @import "components/_form.scss";
 @import "components/_login.scss";
 
+main.main-container {
+    padding-top: rem(136);
+}
+
 .main-container {
     @extend %primary-transition;
     margin-left: rem(112);

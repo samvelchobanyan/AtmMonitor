@@ -31,7 +31,7 @@
 .list-search {
     @extend %flex;
     @extend %align-middle;
-    background-color: map-get($color-scheme, "gray");
+    background-color: map-get($color-scheme, "gray-50");
     border-radius: rem(8);
     height: rem(44);
     width: 100%;
@@ -74,7 +74,7 @@
         height: rem(72);
         width: rem(72);
         border-radius: rem(10);
-        background-color: map-get($color-scheme, "gray");
+        background-color: map-get($color-scheme, "gray-50");
         img {
             width: rem(48);
             height: rem(48);

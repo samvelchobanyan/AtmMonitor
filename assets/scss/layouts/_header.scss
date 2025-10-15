@@ -2,12 +2,26 @@
     @extend %flex;
     @extend %align-middle;
     @extend %align-between;
-    position: relative;
-    margin: rem(30) 0;
-    padding-bottom: rem(32);
+    @extend %primary-transition;
     @include horizontal-decor("../img/decor/horizontal-gray.svg");
+    position: fixed;
+    right: rem(56);
+    width: calc(100% - #{rem(224)});
+    z-index: 3;
+    height: rem(104);
+
     &::after {
         bottom: 0;
+    }
+
+    &::before {
+        position: absolute;
+        content: "";
+        height: rem(32);
+        width: 100%;
+        background: linear-gradient(180deg, #f8f8f8 9.38%, rgba(248, 248, 248, 0) 71.87%);
+        bottom: rem(-32);
+        left: 0;
     }
     &__title {
         @extend %flex;
@@ -27,5 +41,28 @@
                 margin-right: rem(12);
             }
         }
+    }
+    &__content {
+        @extend %flex;
+        @extend %align-middle;
+        @extend %align-between;
+        width: 100%;
+        position: relative;
+        &::before {
+            @include center-absolute("both");
+            content: "";
+            height: rem(104);
+            width: calc(100% + #{rem(112)});
+            background-color: map-get($color-scheme, "gray-50");
+            z-index: -1;
+        }
+    }
+    &.active {
+        width: calc(100% - #{rem(408)});
+    }
+    &.no-transition {
+        transition: none !important;
+        -webkit-transition: none !important;
+        -moz-transition: none !important;
     }
 }

@@ -1,7 +1,7 @@
 $gridBreakpoints: ("sm" 0, "md" $mediaMedium, "lg" $mediaLarge, "xl" $mediaXlLarge, "xxl" $mediaXxlLarge);
 
 .row {
-    max-width: 100%;
+    max-width: calc(100% - #{rem(88)});
     margin-right: auto;
     margin-left: auto;
     display: -ms-flexbox;
@@ -59,18 +59,6 @@ $gridBreakpoints: ("sm" 0, "md" $mediaMedium, "lg" $mediaLarge, "xl" $mediaXlLar
     margin-left: 0;
     padding-right: 0;
     padding-left: 0;
-}
-
-@media print, screen and (min-width: 768px) {
-    .row {
-        max-width: calc(100% - #{rem(96)});
-    }
-}
-
-@media print, screen and (min-width: 1024px) {
-    .row {
-        max-width: calc(100% - #{rem(88)});
-    }
 }
 
 @each $type in $gridBreakpoints {

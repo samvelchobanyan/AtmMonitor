@@ -3,7 +3,7 @@
     @extend %align-middle;
     @extend %align-between;
     height: rem(38);
-    background-color: map-get($color-scheme, "gray");
+    background-color: map-get($color-scheme, "gray-50");
     border-radius: rem(6);
     padding: 0 rem(12);
     margin-bottom: rem(20);

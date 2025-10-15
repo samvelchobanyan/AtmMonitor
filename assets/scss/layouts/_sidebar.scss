@@ -7,7 +7,7 @@
     width: rem(112);
     padding: rem(32);
     background-color: map-get($color-scheme, "white");
-    z-index: 2;
+    z-index: 4;
 
     &__logo {
         margin-bottom: rem(32);
@@ -40,7 +40,7 @@
         width: rem(48);
         border-radius: 100%;
         background-color: map-get($color-scheme, "white");
-        border: 2px solid map-get($color-scheme, "gray");
+        border: 2px solid map-get($color-scheme, "gray-50");
         @extend %user-cursor;
         @extend %flex;
         @extend %align-center;
@@ -103,7 +103,7 @@
         }
         &:hover {
             opacity: 1;
-            background-color: map-get($color-scheme, "gray");
+            background-color: map-get($color-scheme, "gray-50");
         }
     }
 
@@ -218,7 +218,7 @@
     width: rem(44);
     height: rem(44);
     border-radius: 100%;
-    background-color: map-get($color-scheme, "gray");
+    background-color: map-get($color-scheme, "gray-50");
     @extend %flex;
     @extend %align-center;
     @extend %align-middle;

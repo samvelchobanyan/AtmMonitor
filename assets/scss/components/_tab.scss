@@ -11,7 +11,7 @@
     @extend %align-center;
     height: rem(32);
     padding: 0 rem(12);
-    background-color: map-get($color-scheme, "gray");
+    background-color: map-get($color-scheme, "gray-50");
     border-radius: rem(6);
     &:not(:last-child) {
         margin-right: rem(8);

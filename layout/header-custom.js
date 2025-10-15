@@ -140,7 +140,8 @@ class HeaderCustom extends DynamicElement {
                 <div class="row">
                     <div class="column sm-12">
                         <div class="header">
-                            <div class="header__title">
+                            <div class="header__content">
+                             <div class="header__title">
                                 <div id="title-text" class="h1-font"></div>
                             </div>
                             <div class="header__right ${this.state.hideClass}">
@@ -156,9 +157,8 @@ class HeaderCustom extends DynamicElement {
                                     value="${state.selectedCity}"
                                     options='${JSON.stringify(this.state.cities)}'>
                                 </select-box>
+                            </div>  
                             </div>
-
-
                         </div>
                     </div>
                 </div>

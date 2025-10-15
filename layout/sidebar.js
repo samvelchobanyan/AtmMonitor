@@ -92,6 +92,8 @@ class SideBar extends DynamicElement {
             container.classList.toggle("active");
         });
 
+        document.querySelector(".header").classList.toggle("active");
+
         // Handle dropdown visibility based on sidebar state (matching jQuery logic)
         if (this.classList.contains("active")) {
             // When sidebar becomes expanded: close all dropdown sections and hide dropdowns instantly

@@ -107,7 +107,7 @@ class AtmList extends DynamicElement {
                           scroll
                           white
                           searchable
-                          search-fields="id,city,district,address"
+                          search-fields="name,city,district,address"
                           items='${JSON.stringify(this.state.atms)}'
                         >
                         <template>

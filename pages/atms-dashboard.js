@@ -159,15 +159,9 @@ class AtmsDashboard extends DynamicElement {
         let data = e.detail.data;
 
         this.$('#inc_count').setAttribute('value', data.total_encashments);
-        this.$('#inc_collected').setAttribute(
-          'value',
-          data.total_collected_amount
-        );
+        this.$('#inc_collected').setAttribute('value',data.total_collected_amount);
         this.$('#inc_amount').setAttribute('value', data.total_added_amount);
-        this.$('#inc_empty').setAttribute(
-          'value',
-          data.yesterday_marked_as_empty
-        );
+        this.$('#inc_empty').setAttribute('value',data.yesterday_marked_as_empty);
       });
     }
   }

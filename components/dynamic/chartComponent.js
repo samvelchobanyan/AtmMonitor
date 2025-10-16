@@ -198,6 +198,7 @@ class ChartComponent extends DynamicElement {
         } else {
             url += `?${params.toString()}`;
         }
+        console.log('url ===>', url);
 
         try {
             const response = await this.fetchData(url);

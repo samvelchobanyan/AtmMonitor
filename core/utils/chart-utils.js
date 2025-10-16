@@ -195,7 +195,7 @@ const baseDatasetOptions = {
 };
 
 const chartColors = ["#9BECB0", "#9BB3EE", "#BE9BEE", "#FCE2A8", "#EC9B9C", "#77E6FF"];
-const barChartColors = ["#9BB3EE", "#9BECB0", "#EAEAEA"];
+const barChartColors = ["#9BECB0", "#9BB3EE", "#EAEAEA"];
 
 /* ====== LineChart ====== */
 

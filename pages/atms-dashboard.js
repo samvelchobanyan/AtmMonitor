@@ -350,10 +350,8 @@ class AtmsDashboard extends DynamicElement {
                         api-url="/dashboard/transactions-in-days"
                         chart-data='${JSON.stringify(transactionsData || {})}'
                         ${this.attrIf('city', this.state.selectedCity)}
-                        ${this.attrIf(
-                          'region',
-                          this.state.selectedRegion
-                        )}></chart-component>
+                        ${this.attrIf('region',this.state.selectedRegion)}
+                      ></chart-component>
                 </div>
             </div>
         </div>
@@ -370,23 +368,23 @@ class AtmsDashboard extends DynamicElement {
                             show-border="true">
                         </info-card>
                         <info-card
-                            id='inc_collected'
-                            title="Հետ բերված գումար"
-                            value="${encashmentData.total_collected_amount}"
-                            value-currency="֏"
-                            value-color="color-green"
-                            icon="icon icon-arrow-down-left"
-                            show-border="true">
-                        </info-card>
-                        <info-card
                             id='inc_amount'
-                            title="Ինկասացիայի գումար"
+                            title="Լիցքաորված գումար"
                             value="${encashmentData.total_added_amount}"
                             value-currency="֏"
                             value-color="color-blue"
                             icon="icon icon-arrow-up-right"
                             show-border="true">
                         </info-card>
+                        <info-card
+                            id='inc_collected'
+                            title="Ապալիցքավորված գումար"
+                            value="${encashmentData.total_collected_amount}"
+                            value-currency="֏"
+                            value-color="color-green"
+                            icon="icon icon-arrow-down-left"
+                            show-border="true">
+                        </info-card>                        
                         <info-card
                             id='inc_empty'
                             title="Երեկ դատարկ բանկոմատներ"
@@ -402,9 +400,10 @@ class AtmsDashboard extends DynamicElement {
                         id="line-chart-transit"
                         api-url="/dashboard/encashments-in-days"
                         chart-type="line"
-                        chart-data='${JSON.stringify(
-                          encashmentsDaily || {}
-                        )}'></chart-component>
+                        chart-data='${JSON.stringify(encashmentsDaily || {})}'
+                        ${this.attrIf('city', this.state.selectedCity)}
+                        ${this.attrIf('region',this.state.selectedRegion)}
+                        ></chart-component>
                 </div>
             </div>
         </div>

@@ -31,6 +31,10 @@
             left: rem(12);
             background-color: map-get($color-scheme, "white");
         }
+
+        .combo-box {
+            width: 100%;
+        }
     }
 }
 

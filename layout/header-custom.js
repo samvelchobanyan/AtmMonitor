@@ -8,6 +8,7 @@ class HeaderCustom extends DynamicElement {
         super();
         this.state = {
             hideClass: "",
+            statusClass: "",
             province: [],
             cities: [],
         };
@@ -49,6 +50,7 @@ class HeaderCustom extends DynamicElement {
             if (title !== this.title) {
                 this.title = title;
                 this.icon = icon;
+                this.currentRoute = route;
                 this._applyTitle();
             }
 
@@ -69,8 +71,14 @@ class HeaderCustom extends DynamicElement {
                 ? "hide"
                 : "";
 
+            const statusHideClass = route.includes("/atms/") ? "" : "hide";
+
             if (newHideClass !== this.state.hideClass) {
                 this.state.hideClass = newHideClass;
+                this.render();
+            }
+            if (statusHideClass !== this.state.statusClass) {
+                this.state.statusClass = statusHideClass;
                 this.render();
             }
         });
@@ -124,7 +132,6 @@ class HeaderCustom extends DynamicElement {
 
     template() {
         const state = store.getState();
-        const hasIcon = this.icon != null;
 
         return /* html */ `
             <div class="main-container">
@@ -149,15 +156,11 @@ class HeaderCustom extends DynamicElement {
                                         options='${JSON.stringify(this.state.cities)}'>
                                     </select-box>
                                 </div>  
-                                ${
-                                    hasIcon
-                                        ? `<div class="header__right">
-                                            <div class="atm-item__status">
-                                                <span></span>
-                                            </div>
-                                        </div>`
-                                        : ""
-                                } 
+                                     <div class="header__right  ${this.state.statusClass}">
+                                        <div class="atm-item__status">
+                                            <span></span>
+                                        </div>
+                                    </div>
                             </div>
                         </div>
                     </div>

@@ -34,9 +34,9 @@ class Notifications extends DynamicElement {
 
         this.segments = null;
 
-        this.tableActiveTab = "Բորոլը";
+        this.tableActiveTab = "Բոլորը";
 
-        this.deviceTypes = [{ id: 0, type_name: "Բորոլը" }];
+        this.deviceTypes = [{ id: 0, type_name: "Բոլորը" }];
     }
 
     onConnected() {
@@ -180,7 +180,7 @@ class Notifications extends DynamicElement {
         const found = device_errors.filter((item) => item.device_name == this.tableActiveTab);
 
         const deviceErrors =
-            this.tableActiveTab == "Բորոլը"
+            this.tableActiveTab == "Բոլորը"
                 ? encode({ device_errors })
                 : encode({
                       device_errors: found,

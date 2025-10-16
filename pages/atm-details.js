@@ -20,6 +20,9 @@ class AtmDetails extends DynamicElement {
         this.encashmentDateBox = null;
         this.depositChart = null;
         this.worktimeChart = null;
+        this.models = null;
+        this.cimTypes = null;
+        this.types = null;
     }
 
     onConnected() {
@@ -46,13 +49,75 @@ class AtmDetails extends DynamicElement {
                 const { startDate, endDate } = e.detail;
                 this.fetchExchangeData(startDate, endDate);
             });
-        }
 
-        let infoButton = document.querySelector("#info");
-        if (infoButton) {
-            this.addListener(infoButton, "click", () => {
-                this.openInfoPopup();
-            });
+            // is in other element if, because otherwise it addes listener twice. Info element is not in this component, so this triggers twice
+            let infoButton = document.querySelector("#info");
+            if (infoButton) {
+                this.addListener(infoButton, "click", async () => {
+                    this.fetchModels();
+                    this.fetchCimTypes();
+                    this.fetchTypes();
+                    this.fetchAtmInfoData();
+                });
+            }
+        }
+    }
+
+    async fetchAtmInfoData() {
+        const response = await this.fetchData(`/atm/getatm/${this.atmId}`);
+
+        const data = response.data;
+        if (data) {
+            this.openInfoPopup(data);
+        } else {
+            console.log("noo info!");
+        }
+    }
+
+    async fetchModels() {
+        try {
+            const response = await this.fetchData(`/atm/models`);
+            const options = response.data.map((m) => ({
+                value: m.id,
+                label: m.model_name,
+            }));
+
+            this.models = options;
+        } catch (err) {
+            console.error("❌ Error fetching models:", err);
+            this.models = null;
+        }
+    }
+
+    async fetchCimTypes() {
+        try {
+            const response = await this.fetchData(`/atm/cim-types`);
+
+            const options = response.data.map((c) => ({
+                value: c.id,
+                label: c.name,
+            }));
+
+            this.cimTypes = options;
+        } catch (err) {
+            console.error("❌ Error fetching cimTypes:", err);
+            this.cimTypes = null;
+        }
+    }
+
+    async fetchTypes() {
+        try {
+            const response = await this.fetchData(`/atm/atm-types`);
+
+            const options = response.map((c) => ({
+                value: c.id,
+                label: c.type_Name,
+            }));
+
+            this.types = options;
+        } catch (err) {
+            console.error("❌ Error fetching types:", err);
+            this.types = null;
         }
     }
 
@@ -179,9 +244,16 @@ class AtmDetails extends DynamicElement {
         closeBtn?.addEventListener("click", () => modal.remove());
     }
 
-    openInfoPopup(messages) {
-        // todo continue here when Arsen fill all data
-        let data = this.state.summary;
+    openInfoPopup(info) {
+        const modelItem = this.models.find((m) => m.value === info.model_id);
+        const modelLabel = modelItem ? modelItem.label : "-";
+
+        const cimItem = this.cimTypes.find((c) => c.value === info.atm_cim_type);
+        const cimLabel = cimItem ? cimItem.label : "-";
+
+        const typeItem = this.types.find((c) => c.value === info.atm_type);
+        const typeLabel = typeItem ? typeItem.label : "-";
+
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
         modal.setContent(`
@@ -191,26 +263,40 @@ class AtmDetails extends DynamicElement {
                   <div class="flex flex-row align-middle location-line" style="margin-top:12px" >
                     <p>
                       <span class="atm-item__label">Քաղաք՝</span>
-                      <span class="atm-item__value">${data.balance_info.city}</span>
+                      <span class="atm-item__value">${info.city}</span>
                     </p>
 
                     <p style="margin: 0 12px">
                       <span class="atm-item__label">Համայնք՝</span>
-                      <span class="atm-item__value">${data.balance_info.district}</span>
+                      <span class="atm-item__value">${info.district}</span>
                     </p>
 
                     <p>
                       <span class="atm-item__label">Հասցե՝</span>
-                      <span class="atm-item__value">${data.balance_info.address}</span>
+                      <span class="atm-item__value">${info.address}</span>
                     </p>
                   </div>
             </div>
             <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
         </div>
-        <div class="modal__body">aaaa
-        </div>
-           
-      </div>
+         <div class="modal__body atm_info">
+            <div class="align-between row">
+                <p class="atm-item__label">Մոդել՝</p>
+                <p class="atm-item__value">${modelLabel}</p>
+            </div>
+            <div class="align-between row">
+                <p class="atm-item__label">IP հասցե՝</p>
+                <p class="atm-item__value">${info.ip_address ?? "-"}</p>
+            </div>
+            <div class="align-between row">
+                <p class="atm-item__label">Տեսակ՝</p>
+                <p class=" atm-item__value">${typeLabel}</p>
+            </div>
+            <div class="align-between row">
+                <p class="atm-item__label">CIM Տեսակ՝</p>
+                <p class="atm-item__value">${cimLabel}</p>
+            </div>
+            </div>
     
    
     `);
@@ -358,9 +444,6 @@ class AtmDetails extends DynamicElement {
 
         const devicesData = data.devices;
         const atmWorkHours = data.atm_work_hours;
-
-        const today = new Date();
-        const startDate = today.toISOString().split("T")[0];
 
         return /*html*/ `
           <div class="row align-middle" style="margin-bottom: 16px;">

@@ -122,3 +122,18 @@
         }
     }
 }
+
+.modal__body.atm_info {
+    .row {
+        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        &:after {
+            bottom: 0;
+        }
+        max-width: 100%;
+        padding: rem(24) 0; // optional spacing between rows
+    }
+
+    .row:first-child {
+        padding-top: 0; // remove top padding for the first row
+    }
+}

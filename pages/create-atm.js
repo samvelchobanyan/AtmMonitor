@@ -25,6 +25,7 @@ class CreateAtm extends DynamicElement {
             connectionStatusId: "",
             models: null,
             cimTypes: null,
+            types: null,
         };
 
         this.segments = null;
@@ -43,6 +44,7 @@ class CreateAtm extends DynamicElement {
     onConnected() {
         this.fetchModels();
         this.fetchCimTypes();
+        this.fetchTypes();
     }
 
     async fetchModels() {
@@ -76,101 +78,20 @@ class CreateAtm extends DynamicElement {
         }
     }
 
-    template() {
-        const segments = encode(this.segments);
-        const models = encode(this.state.models);
-        const cimTypes = encode(this.state.cimTypes);
+    async fetchTypes() {
+        try {
+            const response = await this.fetchData(`/atm/atm-types`);
 
-        console.log("this.state.models", this.state.models);
+            const options = response.map((c) => ({
+                value: c.id,
+                label: c.type_Name,
+            }));
 
-        return /* html */ `
-            <div class="row align-center">
-                <div class="column sm-12">
-                    <div class="create_form">
-                        <form id="create-atm-form" class="form">
-                            <div class="row">
-                                <div class="form__item column sm-6">
-                                    <label for="name">Atm name</label>
-                                    <input id="name" class="w-100" name="name" type="text" required />
-                                </div>
-                                  <div class="form__item column sm-6">
-                                    <select-box-search id='segmentId' placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
-                                </div>
-                              
-                            </div>
-
-
-                            <div class="row">
-                              <div class="form__item column sm-6">
-                                    <label for="atmType">atmType</label>
-                                    <input id="atmType" class="w-100" name="atmType" type="number" required />
-                                </div>
-                             
-                                <div class="form__item column sm-6">
-                                    <label for="ipAddress">ipAddress</label>
-                                    <input id="ipAddress" class="w-100" name="ipAddress" type="text" required />
-                                </div>
-                            </div>
-
-
-                            <div class="row">
-                               <div class="form__item column sm-2">
-                                    <p>modelId</p>
-                                    <select-box id="modelId" placeholder="Ընտրել մոդելը" options='${models}'></select-box>
-                                </div>
-                                <div class="form__item column sm-2">
-                                    <p>atmCimType</p>
-                                    <select-box id="atmCimType" placeholder="Ընտրել տեսակ" options='${cimTypes}'></select-box>
-                                </div>
-                                 <div class="form__item column sm-2 checkbox">
-                                    <custom-checkbox id="atmArchived" value="true">առխիվացված </custom-checkbox>
-                                </div>
-                                <div class="form__item column sm-6">
-                                    <label for="atmVersion">atmVersion</label>
-                                    <input id="atmVersion" class="w-100"  type='text' name="atmVersion" required />
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="column sm-6">
-                                    <div class="atm-map">
-                                    <yandex-address
-                                        center-lat="40.1772"
-                                        center-lng="44.50349"
-                                        zoom="14"
-                                        ></yandex-address> 
-                                    </div>
-                                </div>
-                                <div class="column sm-6">
-                                    <div class="form__item">
-                                        <label for="lat">Latitude</label>
-                                        <input id="lat" class="w-100" name="lat" type="text" readonly />
-                                    </div>
-                                    <div class="form__item">
-                                        <label for="lon">Longitude</label>
-                                        <input id="lon" class="w-100" name="lon" type="text" readonly />
-                                    </div>
-                                </div>
-                            </div>        
-                            ${
-                                this.state.error
-                                    ? `<div class="error color-red" style="margin-bottom:10px;">${this.state.error}</div>`
-                                    : ""
-                            }
-                            <div class="form__btn">
-                                <button id="login-btn" type="submit" class="btn btn_md btn_blue btn_full" ${
-                                    this.state.isLoading ? "disabled" : ""
-                                }>
-                                    <span>${
-                                        this.state.isLoading ? "Կատարվում է …" : "Ստեղծել"
-                                    }</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        `;
+            this.setState({ types: options });
+        } catch (err) {
+            console.error("❌ Error fetching cimTypes:", err);
+            this.setState({ types: null });
+        }
     }
 
     addEventListeners() {
@@ -286,6 +207,101 @@ class CreateAtm extends DynamicElement {
         } finally {
             this.setState({ isLoading: false });
         }
+    }
+    template() {
+        const segments = encode(this.segments);
+        const models = encode(this.state.models);
+        const cimTypes = encode(this.state.cimTypes);
+        const types = encode(this.state.types);
+
+        return /* html */ `
+            <div class="row align-center">
+                <div class="column sm-12">
+                    <div class="create_form">
+                        <form id="create-atm-form" class="form">
+                            <div class="row">
+                                <div class="form__item column sm-6">
+                                    <label for="name">Atm name</label>
+                                    <input id="name" class="w-100" name="name" type="text" required />
+                                </div>
+                                  <div class="form__item column sm-6">
+                                    <select-box-search id='segmentId' placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
+                                </div>
+                              
+                            </div>
+
+
+                            <div class="row">
+                                <div class="form__item column sm-6">
+                                    <p>atmType</p>
+                                    <select-box id="atmType" placeholder="Ընտրել տեսակը" options='${types}'></select-box>
+                                </div>
+                             
+                                <div class="form__item column sm-6">
+                                    <label for="ipAddress">ipAddress</label>
+                                    <input id="ipAddress" class="w-100" name="ipAddress" type="text" required />
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                               <div class="form__item column sm-2">
+                                    <p>modelId</p>
+                                    <select-box id="modelId" placeholder="Ընտրել մոդելը" options='${models}'></select-box>
+                                </div>
+                                <div class="form__item column sm-2">
+                                    <p>atmCimType</p>
+                                    <select-box id="atmCimType" placeholder="Ընտրել տեսակ" options='${cimTypes}'></select-box>
+                                </div>
+                                 <div class="form__item column sm-2 checkbox">
+                                    <custom-checkbox id="atmArchived" value="true">առխիվացված </custom-checkbox>
+                                </div>
+                                <div class="form__item column sm-6">
+                                    <label for="atmVersion">atmVersion</label>
+                                    <input id="atmVersion" class="w-100"  type='text' name="atmVersion" required />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="column sm-6">
+                                    <div class="atm-map">
+                                    <yandex-address
+                                        center-lat="40.1772"
+                                        center-lng="44.50349"
+                                        zoom="14"
+                                        ></yandex-address> 
+                                    </div>
+                                </div>
+                                <div class="column sm-6">
+                                    <div class="form__item">
+                                        <label for="lat">Latitude</label>
+                                        <input id="lat" class="w-100" name="lat" type="text" readonly />
+                                    </div>
+                                    <div class="form__item">
+                                        <label for="lon">Longitude</label>
+                                        <input id="lon" class="w-100" name="lon" type="text" readonly />
+                                    </div>
+                                </div>
+                            </div>        
+                            ${
+                                this.state.error
+                                    ? `<div class="error color-red" style="margin-bottom:10px;">${this.state.error}</div>`
+                                    : ""
+                            }
+                            <div class="form__btn">
+                                <button id="login-btn" type="submit" class="btn btn_md btn_blue btn_full" ${
+                                    this.state.isLoading ? "disabled" : ""
+                                }>
+                                    <span>${
+                                        this.state.isLoading ? "Կատարվում է …" : "Ստեղծել"
+                                    }</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 }
 

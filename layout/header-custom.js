@@ -132,24 +132,23 @@ class HeaderCustom extends DynamicElement {
                     <div class="column sm-12">
                         <div class="header">
                             <div class="header__content">
-                             <div class="header__title">
-                                <div id="title-text" class="h1-font"></div>
-                            </div>
-                            <div class="header__right ${this.state.hideClass}">
-                                <select-box    
-                                    id="province-selector" 
-                                    placeholder="Ընտրել մարզը" 
-                                    value="${state.selectedRegion}"
-                                    options='${JSON.stringify(this.state.province)}'>
-                                </select-box>
-                                <select-box   
-                                    id="city-selector" 
-                                    placeholder="Ընտրել քաղաքը" 
-                                    value="${state.selectedCity}"
-                                    options='${JSON.stringify(this.state.cities)}'>
-                                </select-box>
-                            </div>  
-                            </div>
+                                <div class="header__title">
+                                    <div id="title-text" class="h1-font"></div>
+                                </div>
+                                <div class="header__right ${this.state.hideClass}">
+                                    <select-box    
+                                        id="province-selector" 
+                                        placeholder="Ընտրել մարզը" 
+                                        value="${state.selectedRegion}"
+                                        options='${JSON.stringify(this.state.province)}'>
+                                    </select-box>
+                                    <select-box   
+                                        id="city-selector" 
+                                        placeholder="Ընտրել քաղաքը" 
+                                        value="${state.selectedCity}"
+                                        options='${JSON.stringify(this.state.cities)}'>
+                                    </select-box>
+                                </div>  
                                 ${
                                     hasIcon
                                         ? `<div class="header__right">
@@ -159,6 +158,7 @@ class HeaderCustom extends DynamicElement {
                                         </div>`
                                         : ""
                                 } 
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -437,11 +437,11 @@ class AtmsDashboard extends DynamicElement {
                     <chart-component
                         id="worktime-bar-chart"
                         api-url="/dashboard/atm-worktime-in-days"
+                        chart-data='${JSON.stringify(atmPrductivityDaily || {})}'
+                        chart-type="bar"
                         grouped
-                        chart-data='${JSON.stringify(
-                          atmPrductivityDaily || {}
-                        )}'
-                        chart-type="bar"></chart-component>
+                        ${this.attrIf("city", this.state.selectedCity)}
+                        ${this.attrIf("region", this.state.selectedRegion)}></chart-component>
                 </div>
             </div>
         </div>

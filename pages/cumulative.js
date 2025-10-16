@@ -10,6 +10,8 @@ class Cumulative extends DynamicElement {
     addEventListeners() {
         // listen to submit or date change in filtration-tabs
         this.addListener(this.$("filtration-tabs"), "filter-submit", (e) => {
+            console.log("listener");
+
             let link = `/analytics/cumulative-summary?${e.detail.query}`;
             const table = this.$("simple-table");
             table.setAttribute("data-source", link);

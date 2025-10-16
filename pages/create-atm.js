@@ -45,7 +45,7 @@ class CreateAtm extends DynamicElement {
     onConnected() {
         this.fetchModels();
         this.fetchCimTypes();
-        // this.fetchCdmTypes(); //add function
+        this.fetchCdmTypes();
         this.fetchTypes();
     }
 

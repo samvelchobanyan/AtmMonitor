@@ -19,12 +19,13 @@ class CreateAtm extends DynamicElement {
             lon: "",
             segmentId: "",
             atmType: "",
-            atmVersion: "",
             atmArchived: "",
             atmCimType: "",
+            atmCdmType: "",
             connectionStatusId: "",
             models: null,
             cimTypes: null,
+            cdmTypes: null,
             types: null,
         };
 
@@ -44,6 +45,7 @@ class CreateAtm extends DynamicElement {
     onConnected() {
         this.fetchModels();
         this.fetchCimTypes();
+        // this.fetchCdmTypes(); //add function
         this.fetchTypes();
     }
 
@@ -75,6 +77,22 @@ class CreateAtm extends DynamicElement {
         } catch (err) {
             console.error("❌ Error fetching cimTypes:", err);
             this.setState({ cimTypes: null });
+        }
+    }
+
+    async fetchCdmTypes() {
+        try {
+            const response = await this.fetchData(`/atm/cdm-types`);
+
+            const options = response.data.map((c) => ({
+                value: c.id,
+                label: c.name,
+            }));
+
+            this.setState({ cdmTypes: options });
+        } catch (err) {
+            console.error("❌ Error fetching cdmTypes:", err);
+            this.setState({ cdmTypes: null });
         }
     }
 
@@ -120,9 +138,9 @@ class CreateAtm extends DynamicElement {
         const ipAddressInput = this.$("#ipAddress");
         const segmentIdInput = this.$("#segmentId");
         const atmTypeInput = this.$("#atmType");
-        const atmVersionInput = this.$("#atmVersion");
         const atmArchivedInput = this.$("#atmArchived");
         const atmCimTypeInput = this.$("#atmCimType");
+        const atmCdmTypeInput = this.$("#atmCdmType");
         const lonInput = this.$("#lon");
         const latInput = this.$("#lat");
 
@@ -131,10 +149,10 @@ class CreateAtm extends DynamicElement {
         const ipAddress = ipAddressInput?.value.trim();
 
         const atmType = Number(atmTypeInput?.value);
-        const atmVersion = atmVersionInput?.value.trim();
         const atmArchived = atmArchivedInput?.hasAttribute("checked") || false;
 
         const atmCimType = Number(atmCimTypeInput?.value);
+        const atmCdmType = Number(atmCdmTypeInput?.value);
 
         const lon = lonInput?.value.trim();
         const lat = latInput?.value.trim();
@@ -146,9 +164,9 @@ class CreateAtm extends DynamicElement {
             modelId: modelIdInput?.value,
             ipAddress: ipAddressInput?.value,
             atmType: atmTypeInput?.value,
-            atmVersion: atmVersionInput?.value,
             atmArchived: atmArchived,
             atmCimType: atmCimTypeInput?.value,
+            atmCdmType: atmCdmTypeInput?.value,
             lon: lonInput?.value,
             lat: latInput?.value,
             segmentIdsRaw: segmentIdInput?.getAttribute("value"),
@@ -160,8 +178,8 @@ class CreateAtm extends DynamicElement {
             !ipAddress ||
             segmentIds.length == 0 ||
             !atmType ||
-            !atmVersion ||
             !atmCimType ||
+            !atmCdmType ||
             !lon ||
             !lat
         ) {
@@ -178,9 +196,9 @@ class CreateAtm extends DynamicElement {
                 ipAddress,
                 segmentIds,
                 atmType,
-                atmVersion,
                 atmArchived,
                 atmCimType,
+                atmCdmType,
                 lon,
                 lat,
 
@@ -192,7 +210,6 @@ class CreateAtm extends DynamicElement {
                 // lon: "40.333232332",
                 // segmentIds: [1, 5],
                 // atmType: 1,
-                // atmVersion: "string",
                 // atmArchived: true,
                 // atmCimType: 1
             });
@@ -212,6 +229,7 @@ class CreateAtm extends DynamicElement {
         const segments = encode(this.segments);
         const models = encode(this.state.models);
         const cimTypes = encode(this.state.cimTypes);
+        const cdmTypes = encode(this.state.cdmTypes) ?? "";
         const types = encode(this.state.types);
 
         return /* html */ `
@@ -221,7 +239,7 @@ class CreateAtm extends DynamicElement {
                         <form id="create-atm-form" class="form">
                             <div class="row">
                                 <div class="form__item column sm-6">
-                                    <label for="name">Atm name</label>
+                                    <label for="name">Բանկոմատի ID</label>
                                     <input id="name" class="w-100" name="name" type="text" required />
                                 </div>
                                   <div class="form__item column sm-6">
@@ -233,32 +251,34 @@ class CreateAtm extends DynamicElement {
 
                             <div class="row">
                                 <div class="form__item column sm-6">
-                                    <p>atmType</p>
+                                    <p>Մոնիտորի տեսակ</p>
                                     <select-box id="atmType" placeholder="Ընտրել տեսակը" options='${types}'></select-box>
                                 </div>
                              
                                 <div class="form__item column sm-6">
-                                    <label for="ipAddress">ipAddress</label>
+                                    <label for="ipAddress">IP հասցե</label>
                                     <input id="ipAddress" class="w-100" name="ipAddress" type="text" required />
                                 </div>
                             </div>
 
 
                             <div class="row">
-                               <div class="form__item column sm-2">
-                                    <p>modelId</p>
+                               <div class="form__item column sm-3">
+                                    <p>Բանկոմատի մոդել</p>
                                     <select-box id="modelId" placeholder="Ընտրել մոդելը" options='${models}'></select-box>
                                 </div>
-                                <div class="form__item column sm-2">
-                                    <p>atmCimType</p>
-                                    <select-box id="atmCimType" placeholder="Ընտրել տեսակ" options='${cimTypes}'></select-box>
+                                <div class="form__item column sm-3">
+                                    <p>CIM Տեսակ</p>
+                                    <select-box id="atmCimType" placeholder="Ընտրել CIM տեսակ" options='${cimTypes}'></select-box>
                                 </div>
-                                 <div class="form__item column sm-2 checkbox">
-                                    <custom-checkbox id="atmArchived" value="true">առխիվացված </custom-checkbox>
+                              
+                                <div class="form__item column sm-3">
+                                    <p>CDM Տեսակ</p>
+                                    <select-box id="atmCdmType" placeholder="Ընտրել CDM տեսակ" options='${cdmTypes}'></select-box>
                                 </div>
-                                <div class="form__item column sm-6">
-                                    <label for="atmVersion">atmVersion</label>
-                                    <input id="atmVersion" class="w-100"  type='text' name="atmVersion" required />
+                                
+                                <div class="form__item column sm-3 checkbox">
+                                    <custom-checkbox id="atmArchived" value="true">ԱՐԽԻՎԱՑՎԱԾ </custom-checkbox>
                                 </div>
                             </div>
 

@@ -57,7 +57,6 @@ export class SimpleTable extends DynamicElement {
     if (name === 'data' && oldVal !== newVal) {
       let raw = JSON.parse(newVal);
       this.transformData(raw);
-      this.transformData(raw);
     }
     if (name === 'columns' && oldVal !== newVal) {
       const parsed = this.parseColumnsAttr();

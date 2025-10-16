@@ -214,7 +214,13 @@ class ChartComponent extends DynamicElement {
 
             if (!isValid) throw new Error("Invalid API response format");
             const data_array_name = startDate === endDate ? "hourly_data" : "daily_data";
+            const dataset = response.data[data_array_name] || response.data.work_hours_per_day;
 
+            if (!Array.isArray(dataset) || dataset.length === 0) {
+                console.warn("No data returned for chart:", url);
+                this.setState({ chartData: null, error: "empty" });
+                return;
+            }
             switch (this.chartType) {
                 case "line":
                     if (
@@ -254,6 +260,7 @@ class ChartComponent extends DynamicElement {
                     this._updateChart();
                     break;
             }
+            this.setState({ error: null });
         } catch (err) {
             console.warn("Chart fetch error:", err);
             this.setState({ chartData: null, error: true });
@@ -326,8 +333,14 @@ class ChartComponent extends DynamicElement {
             default:
                 break;
         }
-        if (this.state.error) {
-            return `<div class="error">Տվյալների բերնման սխալ</div>`;
+
+        const errorType = this.state.error;
+        let errorHTML = "";
+
+        if (errorType === true) {
+            errorHTML = `<div class="error">Տվյալների բեռնման սխալ</div>`;
+        } else if (errorType === "empty") {
+            errorHTML = `<div class="error">Տվյալներ չկան ընտրած ժամանակահատվածի համար</div>`;
         }
         this.classList.add("chart-container");
         const dateSelectorHTML = this.showDateSelector
@@ -340,6 +353,7 @@ class ChartComponent extends DynamicElement {
 
         return `
       ${dateSelectorHTML}
+      ${errorHTML}
       ${chartHTML}
     `;
     }

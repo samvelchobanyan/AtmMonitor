@@ -81,7 +81,6 @@ class AtmDetails extends DynamicElement {
     workTimeChanges() {
         if (this.worktimeChart) {
             this.addListener(this.worktimeChart, "chart-changed", (e) => {
-                // console.log('!!!', e.detail);
                 let data = e.detail.data;
                 let atmWorkingPercent = this.$("#atm_working_percent");
                 let atmNonWorkingPercent = this.$("#atm_non_working_percent");
@@ -181,7 +180,7 @@ class AtmDetails extends DynamicElement {
     }
 
     openInfoPopup(messages) {
-      // todo continue here when Arsen fill all data
+        // todo continue here when Arsen fill all data
         let data = this.state.summary;
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
@@ -256,10 +255,14 @@ class AtmDetails extends DynamicElement {
         }
     }
 
-    async fetchEncashmentsInfocardData(date_query = '') {
+    async fetchEncashmentsInfocardData(date_query = "") {
         try {
-            const failedResponse = await this.fetchData(`/encashment/failed-transactions?atmId=${this.atmId}&${date_query}`);
-            const totalsResponse = await this.fetchData(`/encashment/totals?atmId=${this.atmId}&${date_query}`);
+            const failedResponse = await this.fetchData(
+                `/encashment/failed-transactions?atmId=${this.atmId}&${date_query}`
+            );
+            const totalsResponse = await this.fetchData(
+                `/encashment/totals?atmId=${this.atmId}&${date_query}`
+            );
 
             const data = { ...failedResponse.data, ...totalsResponse.data };
 
@@ -355,6 +358,9 @@ class AtmDetails extends DynamicElement {
 
         const devicesData = data.devices;
         const atmWorkHours = data.atm_work_hours;
+
+        const today = new Date();
+        const startDate = today.toISOString().split("T")[0];
 
         return /*html*/ `
           <div class="row align-middle" style="margin-bottom: 16px;">
@@ -543,12 +549,12 @@ class AtmDetails extends DynamicElement {
                 </div>
 
                 <simple-table
-                searchable="false"
-                data-source="/encashment/summary?atmId=${this.atmId}"
-                columns='["date_time", "atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
-                column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
-                "added_amount":"Ավելացած գումար","collected_amount":"Հավաքված գումար","marked_as_empty":"Դատարկ"}'
-                clickable-columns='["added_amount"]'>
+                    searchable="false"
+                    data=${data.encashments_summary.encashments}
+                    columns='["date_time", "atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+                    column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
+                    "added_amount":"Ավելացած գումար","collected_amount":"Հավաքված գումար","marked_as_empty":"Դատարկ"}'
+                    clickable-columns='["added_amount"]'>
                 </simple-table>
             </div> 
             </div>

@@ -216,7 +216,7 @@ class ChartComponent extends DynamicElement {
             switch (this.chartType) {
                 case "line":
                     const data_array_name = startDate === endDate ? "hourly_data" : "daily_data";
-               
+
                     if (
                         this.getAttribute("id") == "line-chart-transaction-dynamics1" ||
                         this.getAttribute("id") == "line-chart-transaction-dynamics2" ||
@@ -240,7 +240,7 @@ class ChartComponent extends DynamicElement {
                     this.transformedData = chartDataTransformer.transformDoughnutData(
                         response.data
                     );
-                    this.setState({ error: null });
+                    // this.setState({ error: null });
 
                     this._updateChart();
                     break;
@@ -276,7 +276,7 @@ class ChartComponent extends DynamicElement {
             case "doughnut":
                 this.$(
                     ".chart-info__number"
-                ).childNodes[0].textContent = this.transformedData.metaData.total.toLocaleString();
+                ).textContent = this.transformedData.metaData.total.toLocaleString();
                 this.$("change-indicator").setAttribute(
                     "value",
                     this.transformedData.metaData.percent

@@ -180,7 +180,7 @@ class AtmDetails extends DynamicElement {
             this.addListener(this.encashmentDateBox, "date-range-change", (e) => {
                 const { startDate, endDate } = e.detail;
                 let date_query = `startDate=${startDate}&endDate=${endDate}`;
-                let link = `/encashment/summary?atmId=${this.atmId}&${date_query}`;
+                let link = `/encashment/summary?atmIds=${this.atmId}&${date_query}`;
                 this.$("simple-grid").setAttribute("data-source", link);
                 this.fetchEncashmentsInfocardData(date_query);
             });

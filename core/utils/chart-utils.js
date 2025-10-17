@@ -258,7 +258,6 @@ export function updateLineChart(chart, chartData) {
 export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines = true) {
     const canvas = document.getElementById(ctxId);
     const ctx = canvas.getContext("2d");
-    console.log('createDoughnutChart', chartData);
     const filledDataset = chartData ? prepareDoughnutChart(chartData) : null;
     const hasCustomCutout = canvas.classList.contains("custom-cutout");
 
@@ -294,7 +293,6 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
 }
 
 export function prepareDoughnutChart(chartData) {
-    console.log('prepareDoughnutChart',chartData);
     const doughnutDataset = chartData.datasets[0];
     return {
         ...doughnutDataset,
@@ -304,11 +302,9 @@ export function prepareDoughnutChart(chartData) {
 }
 
 export function updateDoughnutChart(chart, chartData) {
-    console.log('updateDoughnutChart',chartData);
     chart.options.showLoading = false;
     chart.data.labels = chartData.labels;
     let tst = prepareDoughnutChart(chartData);
-    console.log('updateDoughnutChart after prepare',tst);
     chart.data.datasets = [tst];
     chart.update();
 }
@@ -317,7 +313,7 @@ export function updateDoughnutChart(chart, chartData) {
 
 export function createBarChart(ctxId, chartData, containerID, grouped = false, onBarClick) {
     const ctx = document.getElementById(ctxId).getContext("2d");
-    const datasetsWithColors = chartData ? prepareBarChart(chartData,grouped) : null;
+    const datasetsWithColors = chartData ? prepareBarChart(chartData, grouped) : null;
 
     return new Chart(ctx, {
         type: "bar",
@@ -381,6 +377,6 @@ export function prepareBarChart(chartData, isGrouped = false) {
 export function updateBarChart(chart, chartData, grouped = false) {
     chart.options.showLoading = false;
     chart.data.labels = chartData.labels;
-    chart.data.datasets = prepareBarChart(chartData,grouped);
+    chart.data.datasets = prepareBarChart(chartData, grouped);
     chart.update();
 }

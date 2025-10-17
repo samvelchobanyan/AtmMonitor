@@ -45,8 +45,6 @@ class AtmFailures extends DynamicElement {
             const queryString = e.detail.query;
             this.filtrationQuery = queryString;
 
-            console.log("this.tableActiveTab", this.tableActiveTab);
-
             if (this.tableActiveTab == 0) {
                 this.$("#bottom_table").setAttribute(
                     "data-source",

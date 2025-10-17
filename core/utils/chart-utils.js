@@ -258,6 +258,7 @@ export function updateLineChart(chart, chartData) {
 export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines = true) {
     const canvas = document.getElementById(ctxId);
     const ctx = canvas.getContext("2d");
+
     const filledDataset = chartData ? prepareDoughnutChart(chartData) : null;
     const hasCustomCutout = canvas.classList.contains("custom-cutout");
 
@@ -294,6 +295,7 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
 
 export function prepareDoughnutChart(chartData) {
     const doughnutDataset = chartData.datasets[0];
+
     return {
         ...doughnutDataset,
         backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
@@ -304,8 +306,8 @@ export function prepareDoughnutChart(chartData) {
 export function updateDoughnutChart(chart, chartData) {
     chart.options.showLoading = false;
     chart.data.labels = chartData.labels;
-    let tst = prepareDoughnutChart(chartData);
-    chart.data.datasets = [tst];
+    chart.data.datasets = [prepareDoughnutChart(chartData)];
+
     chart.update();
 }
 

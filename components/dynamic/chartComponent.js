@@ -242,6 +242,8 @@ class ChartComponent extends DynamicElement {
                     );
                     // this.setState({ error: null });
 
+                    // this.setState({ error: null });
+
                     this._updateChart();
                     break;
                 case "bar":

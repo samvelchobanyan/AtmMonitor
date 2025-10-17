@@ -28,7 +28,7 @@ export class infoItem extends HTMLElement {
             `;
         } else {
             const isWorking = this.getAttribute("data-working") === "true";
-            const status = isWorking ? "Կապի մեջ" : "Կապից դուրս";
+            const status = isWorking ? "Աշխատում է" : "Չի աշխատում";
             const statusClass = isWorking
                 ? "info-item__status_working"
                 : "info-item__status_not-working";

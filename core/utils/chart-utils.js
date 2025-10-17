@@ -270,6 +270,7 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
     if (useLabelLines) {
         plugins.push(doughnutLabelLinesPlugin);
     }
+    console.log("!!!!!!!!!!!!!", { labels: chartData.labels, datasets: [filledDataset] });
 
     return new Chart(ctx, {
         type: "doughnut",
@@ -296,6 +297,9 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
 
 export function prepareDoughnutChart(chartData) {
     const doughnutDataset = chartData.datasets[0];
+
+    console.log("doughnutDataset", doughnutDataset);
+
     return {
         ...doughnutDataset,
         backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
@@ -304,17 +308,22 @@ export function prepareDoughnutChart(chartData) {
 }
 
 export function updateDoughnutChart(chart, chartData) {
+    console.log("chartData", chartData);
+
     chart.options.showLoading = false;
     chart.data.labels = chartData.labels;
     chart.data.datasets = [prepareDoughnutChart(chartData)];
+    console.log('data.datas', chart.data.dataset);
+    
     chart.update();
+    console.log("updated");
 }
 
 /* ====== BarChart ====== */
 
 export function createBarChart(ctxId, chartData, containerID, grouped = false, onBarClick) {
     const ctx = document.getElementById(ctxId).getContext("2d");
-    const datasetsWithColors = chartData ? prepareBarChart(chartData,grouped) : null;
+    const datasetsWithColors = chartData ? prepareBarChart(chartData, grouped) : null;
 
     return new Chart(ctx, {
         type: "bar",
@@ -378,6 +387,6 @@ export function prepareBarChart(chartData, isGrouped = false) {
 export function updateBarChart(chart, chartData, grouped = false) {
     chart.options.showLoading = false;
     chart.data.labels = chartData.labels;
-    chart.data.datasets = prepareBarChart(chartData,grouped);
+    chart.data.datasets = prepareBarChart(chartData, grouped);
     chart.update();
 }

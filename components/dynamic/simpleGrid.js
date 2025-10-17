@@ -171,6 +171,28 @@ export class SimpleGrid extends DynamicElement {
     }
   }
 
+  parseColumnFormattersAttr() {
+    try {
+      const raw = this.getAttr('column-formatters');
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      console.warn('Invalid column-formatters attribute JSON', e);
+      return {};
+    }
+  }
+
+  getValueFormatter(colName, map) {
+    const spec = map[colName];
+    if (spec !== 'currency') return null;
+  
+    const formatCommas = (val) => {
+      return val.toLocaleString();
+    };
+    
+    
+    return (v) => formatCommas(v);
+  }
+
   onAfterRender() {
     // Destroy old grid if exists to avoid duplicates
     if (this.grid && typeof this.grid.destroy === 'function') {
@@ -192,16 +214,24 @@ export class SimpleGrid extends DynamicElement {
       const clickableColumns = this.parseClickableColumnsAttr();
       const clickableSet = new Set(clickableColumns);
       const labels = this.parseColumnLabelsAttr();
+      const formattersMap = this.parseColumnFormattersAttr();
 
-      const gridColumns = this.state.columns.map((colName, colIndex) => {
-        // use translations
+      const gridColumns = this.state.columns.map((colName) => {
         const displayName = labels[colName] || colName;
-        // Use formatter only for clickable columns
-        if (!clickableSet.has(colName)) return { name: displayName };
+        const valueFormatter = this.getValueFormatter(colName, formattersMap);
+
+        if (!clickableSet.has(colName)) {
+          if (!valueFormatter) return { name: displayName };
+          return {
+            name: displayName,
+            formatter: (cell) => valueFormatter(cell),
+          };
+        }
+
         return {
           name: displayName,
           formatter: (cell, row) => {
-            // Wrap in a clickable span; Grid.js "row" includes cell data array
+            const content = valueFormatter ? valueFormatter(cell) : (cell ?? '');
             return h(
               'span',
               {
@@ -217,8 +247,7 @@ export class SimpleGrid extends DynamicElement {
                   });
                 },
               },
-
-              cell ?? ''
+              content
             );
           },
         };

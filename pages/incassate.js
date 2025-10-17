@@ -100,6 +100,7 @@ class Incassate extends DynamicElement {
                         columns='["atm_id","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
                         column-labels='{"atm_id":"Բանկոմատի ID","date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
                           "added_amount":"Լիցքավորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'
+                        column-formatters='{"collected_amount":"currency","added_amount":"currency"}'
                         mode="server"
                         per-page="10">
                     </simple-grid>

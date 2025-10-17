@@ -208,7 +208,6 @@ export function prepareLineChartData(chartData) {
 }
 
 export function createLineChart(ctxId, chartData, containerID) {
-    console.log("libechart data", chartData);
     const ctx = document.getElementById(ctxId).getContext("2d");
 
     const datasetsWithColors = chartData ? prepareLineChartData(chartData) : null;
@@ -259,7 +258,7 @@ export function updateLineChart(chart, chartData) {
 export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines = true) {
     const canvas = document.getElementById(ctxId);
     const ctx = canvas.getContext("2d");
-
+    console.log('createDoughnutChart', chartData);
     const filledDataset = chartData ? prepareDoughnutChart(chartData) : null;
     const hasCustomCutout = canvas.classList.contains("custom-cutout");
 
@@ -295,6 +294,7 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
 }
 
 export function prepareDoughnutChart(chartData) {
+    console.log('prepareDoughnutChart',chartData);
     const doughnutDataset = chartData.datasets[0];
     return {
         ...doughnutDataset,
@@ -304,9 +304,12 @@ export function prepareDoughnutChart(chartData) {
 }
 
 export function updateDoughnutChart(chart, chartData) {
+    console.log('updateDoughnutChart',chartData);
     chart.options.showLoading = false;
     chart.data.labels = chartData.labels;
-    chart.data.datasets = [prepareDoughnutChart(chartData)];
+    let tst = prepareDoughnutChart(chartData);
+    console.log('updateDoughnutChart after prepare',tst);
+    chart.data.datasets = [tst];
     chart.update();
 }
 

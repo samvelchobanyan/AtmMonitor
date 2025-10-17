@@ -25,7 +25,7 @@ class SideBar extends DynamicElement {
     addGlobalEventListeners() {
         // Listen for route changes using the proper DynamicElement pattern
         this.addListener(document, "route-changed", (event) => {
-            console.log("Sidebar: Route changed to:", event.detail.route);
+            // console.log("Sidebar: Route changed to:", event.detail.route);
             this.currentRoute = event.detail.route;
             this.updateActiveState();
 
@@ -206,7 +206,7 @@ class SideBar extends DynamicElement {
     }
 
     updateActiveState() {
-        console.log("Sidebar: Updating active state for route:", this.currentRoute);
+        // console.log("Sidebar: Updating active state for route:", this.currentRoute);
 
         // Remove all active classes
         const allItems = this.querySelectorAll(".sidebar__item, .sidebar__dropdown a");
@@ -218,61 +218,61 @@ class SideBar extends DynamicElement {
                 const notificationsItem = this.querySelector('a[href="./notifications"]');
                 if (notificationsItem) {
                     notificationsItem.classList.add("active");
-                    console.log("Sidebar: Activated notifications item");
+                    // console.log("Sidebar: Activated notifications item");
                 }
                 break;
             case "/home":
                 const homeItem = this.querySelector('a[href="./home"]');
                 if (homeItem) {
                     homeItem.classList.add("active");
-                    console.log("Sidebar: Activated home item");
+                    // console.log("Sidebar: Activated home item");
                 }
                 break;
             case "/inout":
                 const inoutItem = this.querySelector('a[href="inout"]');
                 if (inoutItem) {
                     inoutItem.classList.add("active");
-                    console.log("Sidebar: Activated inout item");
+                    // console.log("Sidebar: Activated inout item");
                 }
                 break;
             case "/geo":
                 const geoItem = this.querySelector('a[href="geo"]');
                 if (geoItem) {
                     geoItem.classList.add("active");
-                    console.log("Sidebar: Activated geo item");
+                    // console.log("Sidebar: Activated geo item");
                 }
                 break;
             case "/cumulative":
                 const cumulativeItem = this.querySelector('a[href="cumulative"]');
                 if (cumulativeItem) {
                     cumulativeItem.classList.add("active");
-                    console.log("Sidebar: Activated cumulative item");
+                    // console.log("Sidebar: Activated cumulative item");
                 }
                 break;
             case "/atms":
                 const atmsItem = this.querySelector('a[href="atms"]');
                 if (atmsItem) {
                     atmsItem.classList.add("active");
-                    console.log("Sidebar: Activated atms item");
+                    // console.log("Sidebar: Activated atms item");
                 }
                 break;
             case "/failures":
                 const failuresItem = this.querySelector('a[href="failures"]');
                 const journalItemcheck = this.querySelector('a[href="journal"]');
-                console.log("failuresItem - check journalItem", journalItemcheck);
+                // console.log("failuresItem - check journalItem", journalItemcheck);
                 if (failuresItem) {
                     failuresItem.classList.add("active");
-                    console.log("Sidebar: Activated failures item", failuresItem);
+                    // console.log("Sidebar: Activated failures item", failuresItem);
                 }
                 break;
             case "/journal":
                 const journalItem = this.querySelector('a[href="journal"]');
                 const failuresItemcheck = this.querySelector('a[href="failures"]');
-                console.log("journalItem - check failuresItem", failuresItemcheck);
+                // console.log("journalItem - check failuresItem", failuresItemcheck);
 
                 if (journalItem) {
                     journalItem.classList.add("active");
-                    console.log("Sidebar: Activated journal item", journalItem);
+                    // console.log("Sidebar: Activated journal item", journalItem);
                 }
                 break;
             case "/create-atm":

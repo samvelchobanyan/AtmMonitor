@@ -79,7 +79,6 @@ class ChartComponent extends DynamicElement {
                             break;
                         case "bar":
                             const isGrouped = this.getAttribute("grouped");
-                            console.log("grouped", isGrouped);
                             if (isGrouped != null) {
                                 this.transformedData = chartDataTransformer.transformBarData(
                                     parsed
@@ -198,7 +197,6 @@ class ChartComponent extends DynamicElement {
         } else {
             url += `?${params.toString()}`;
         }
-        console.log('url ===>', url);
 
         try {
             const response = await this.fetchData(url);
@@ -234,7 +232,6 @@ class ChartComponent extends DynamicElement {
                             this.getAttr("id")
                         );
                     }
-                    console.log(" this.transformedData", this.transformedData);
                     this.setState({ error: null });
 
                     this._updateChart();
@@ -252,7 +249,6 @@ class ChartComponent extends DynamicElement {
                         ? this.getAttr("grouped") !== "false"
                         : false;
 
-                    console.log("fetchAndRenderChart", isGrouped);
                     if (isGrouped != null) {
                         this.transformedData = chartDataTransformer.transformBarData(response.data);
                     } else {

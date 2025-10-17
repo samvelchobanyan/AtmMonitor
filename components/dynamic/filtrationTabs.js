@@ -137,6 +137,7 @@ class FiltrationTabs extends DynamicElement {
 
         this.addListener(this.submitButton, "click", () => {
             const queryString = this.buildQueryString();
+
             this.dispatchEvent(
                 new CustomEvent("filter-submit", {
                     detail: { query: queryString?.toString() },
@@ -163,39 +164,39 @@ class FiltrationTabs extends DynamicElement {
         const queryString = new URLSearchParams();
 
         // Add tab-specific filters
-        if (this.activeTab === "province") {
+        if (this.activeTab == "province") {
             const checkedValues = Array.from(this.checkedValues);
             const segments = this.querySelector("segment-block[name='province-segments']");
             checkedValues.forEach((v) => queryString.append("provinces", v));
             if (segments?.values?.length)
                 segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "city") {
+        } else if (this.activeTab == "city") {
             const rawValue = this.selectCityBox.getAttribute("value") || [];
             let values = JSON.parse(rawValue);
-            if (values.length == 0) return;
-            values.forEach((v) => queryString.append("cities", v));
+            if (values.length !== 0) values.forEach((v) => queryString.append("cities", v));
 
             const segments = this.querySelector("segment-block[name='city-segments']");
             if (segments?.values?.length)
                 segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "district") {
+        } else if (this.activeTab == "district") {
             const rawValue = this.selectDistrictBox.getAttribute("value") || [];
             let values = JSON.parse(rawValue);
-            if (values.length == 0) return;
-            values.forEach((v) => queryString.append("districts", v));
+            if (values.length !== 0) values.forEach((v) => queryString.append("districts", v));
             const segments = this.querySelector("segment-block[name='district-segments']");
             if (segments?.values?.length)
                 segments.values.forEach((v) => queryString.append("segmentIds", v));
-        } else if (this.activeTab === "segment") {
+        } else if (this.activeTab == "segment") {
             const rawVal = this.selectSegmentBox.getAttribute("value") || "[]";
             JSON.parse(rawVal).forEach((v) => queryString.append("segmentIds", Number(v)));
-        } else if (this.activeTab === "atm") {
+        } else if (this.activeTab == "atm") {
             const rawVal = this.selectAtmsBox.getAttribute("value") || "[]";
             JSON.parse(rawVal).forEach((v) => queryString.append("atmIds", String(v)));
         }
 
         if (this.startDate) queryString.append("startDate", this.startDate);
         if (this.endDate) queryString.append("endDate", this.endDate);
+        console.log("this.startDate", this.startDate);
+        console.log("this.endDate", this.endDate);
 
         return queryString;
     }

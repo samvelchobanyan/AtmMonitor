@@ -208,7 +208,6 @@ export function prepareLineChartData(chartData) {
 }
 
 export function createLineChart(ctxId, chartData, containerID) {
-    console.log("libechart data", chartData);
     const ctx = document.getElementById(ctxId).getContext("2d");
 
     const datasetsWithColors = chartData ? prepareLineChartData(chartData) : null;
@@ -270,7 +269,6 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
     if (useLabelLines) {
         plugins.push(doughnutLabelLinesPlugin);
     }
-    console.log("!!!!!!!!!!!!!", { labels: chartData.labels, datasets: [filledDataset] });
 
     return new Chart(ctx, {
         type: "doughnut",
@@ -298,8 +296,6 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
 export function prepareDoughnutChart(chartData) {
     const doughnutDataset = chartData.datasets[0];
 
-    console.log("doughnutDataset", doughnutDataset);
-
     return {
         ...doughnutDataset,
         backgroundColor: chartColors.slice(0, doughnutDataset.data.length),
@@ -308,15 +304,10 @@ export function prepareDoughnutChart(chartData) {
 }
 
 export function updateDoughnutChart(chart, chartData) {
-    console.log("chartData", chartData);
-
     chart.options.showLoading = false;
     chart.data.labels = chartData.labels;
     chart.data.datasets = [prepareDoughnutChart(chartData)];
-    console.log('data.datas', chart.data.dataset);
-    
     chart.update();
-    console.log("updated");
 }
 
 /* ====== BarChart ====== */

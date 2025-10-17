@@ -25,12 +25,18 @@
     }
     &__title {
         @extend %flex;
+
         .h1-font {
             &:last-child:not(:only-child) {
                 margin-left: rem(14);
                 padding-left: rem(14);
                 border-left: rem(4) solid map-get($color-scheme, "gray-200");
             }
+        }
+
+        #title-text {
+            display: flex;
+            gap: 8px;
         }
     }
     &__right {

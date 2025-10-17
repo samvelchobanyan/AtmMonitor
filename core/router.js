@@ -180,7 +180,7 @@ export function startRouter() {
 
         mountComponent(
             "atm-details",
-            `ATM #${ctx.params.id}`,
+            `ATM #`,
             { id: ctx.params.id },
             `/atms/${ctx.params.id}`,
             "icon-arrow-left"

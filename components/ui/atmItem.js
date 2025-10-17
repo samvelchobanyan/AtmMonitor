@@ -19,6 +19,7 @@ export class AtmItem extends HTMLElement {
 
     render() {
         const id = this.getAttribute("id") || "";
+        const name = this.getAttribute("name") || "";
         const city = this.getAttribute("city") || "";
         const district = this.getAttribute("district") || "";
         const address = this.getAttribute("address") || "";
@@ -34,8 +35,9 @@ export class AtmItem extends HTMLElement {
                 <img src="assets/img/atm-icon.svg" alt="ATM Icon"/>
             </div>
             <div class="atm-item__info">
-                <div class="atm-item__id"><span class="atm-item__label">ATM ID:</span> <span class="atm-item__value">#<span class="font-black">${id}</span></span></div>
+                <div class="atm-item__id"><span class="atm-item__label">Անուն:</span> <span class="atm-item__value"><span class="font-black">${name}</span></span></div>
                 <div class="atm-item__location">
+                    <div><span class="atm-item__label">ATM ID:</span> <span class="atm-item__value">${id}</span></div>
                     <div><span class="atm-item__label">Քաղաք՝</span> <span class="atm-item__value">${city}</span></div>
                     <div><span class="atm-item__label">Համայնք՝</span> <span class="atm-item__value">${district}</span></div>
                 </div>

@@ -11,14 +11,14 @@ function transformFaultTableData(apiResponse) {
             code: event.code || "-",
             card_number: event.card_number,
             event_description: event.event_description,
-            atm_id: event.atm_id,
+            atm_id: event.name,
             transaction_id: event.transaction_id,
         }));
     }
     // Failures data structure
     else if (Array.isArray(apiResponse?.data) && apiResponse.data[0]?.total_faults) {
         return apiResponse.data?.map((data) => ({
-            atm_id: data.atm_id,
+            atm_id: data.name,
             address: data.address,
             total_faults: data.total_faults,
             faults_summary: data.device_faults
@@ -35,7 +35,7 @@ function transformFaultTableData(apiResponse) {
         );
 
         return allAtms.map((data) => ({
-            atm_id: data.atm_id,
+            atm_id: data.name,
             address: data.address,
             total_faults: data.error_count,
             faults_duration: data.duration,
@@ -44,7 +44,7 @@ function transformFaultTableData(apiResponse) {
     // Encashment data structure
     else if (apiResponse.data?.encashments) {
         return apiResponse.data.encashments.map((item) => ({
-            atm_id: item.atm_id,
+            atm_id: item.name,
             date_time: formatDate(item.date_time),
             atm_address: `${item.city}/${item.atm_address}`,
             added_amount: item.added_amount,
@@ -55,7 +55,7 @@ function transformFaultTableData(apiResponse) {
     // Notifications data
     else if (apiResponse?.device_errors) {
         return apiResponse.device_errors.map((item) => ({
-            atm_id: item.atm_id,
+            atm_id: item.atm_id, //for link
             date: formatDate(item.created_at),
             address: `${item.city}, ${item.address}`,
             fault_type: item.device_name,
@@ -63,14 +63,14 @@ function transformFaultTableData(apiResponse) {
         }));
     } else if (apiResponse?.taken_cards) {
         return apiResponse.taken_cards.map((item) => ({
-            atm_id: item.atm_id,
+            atm_id: item.name,
             date: formatDate(item.created_at),
             address: `${item.city}, ${item.address}`,
             card_number: item.card_number,
         }));
     } else if (apiResponse?.problematic_transactions) {
         return apiResponse.problematic_transactions.map((item) => ({
-            atm_id: item.atm_id,
+            atm_id: item.name,
             date: formatDate(item.created_at),
             address: `${item.city}, ${item.address}`,
             amount: item.amount,
@@ -86,7 +86,7 @@ function transformFaultTableData(apiResponse) {
             code: item.code,
             card_number: item.card_number,
             event_description: item.event_description,
-            atm_id: item.atm_id,
+            atm_id: item.name,
             transaction_id: item.transaction_id,
         }));
     } else if (Array.isArray(apiResponse.data)) {

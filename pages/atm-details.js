@@ -23,12 +23,14 @@ class AtmDetails extends DynamicElement {
         this.models = null;
         this.cimTypes = null;
         this.types = null;
+        this.atmInfo = null;
     }
 
     onConnected() {
         this.atmId = this.getAttribute("id");
         this.fetchAtm();
         this.fetchEncashmentsInfocardData();
+        this.fetchAtmInfoData();
     }
 
     onAfterRender() {
@@ -57,7 +59,8 @@ class AtmDetails extends DynamicElement {
                     this.fetchModels();
                     this.fetchCimTypes();
                     this.fetchTypes();
-                    this.fetchAtmInfoData();
+                    this.openInfoPopup();
+                    // this.fetchAtmInfoData();
                 });
             }
         }
@@ -66,12 +69,12 @@ class AtmDetails extends DynamicElement {
     async fetchAtmInfoData() {
         const response = await this.fetchData(`/atm/getatm/${this.atmId}`);
 
-        const data = response.data;
-        if (data) {
-            this.openInfoPopup(data);
-        } else {
-            console.log("noo info!");
-        }
+        this.atmInfo = response.data;
+        // if (data) {
+        //     this.openInfoPopup(data);
+        // } else {
+        //     console.log("noo info!");
+        // }
     }
 
     async fetchModels() {
@@ -244,7 +247,8 @@ class AtmDetails extends DynamicElement {
         closeBtn?.addEventListener("click", () => modal.remove());
     }
 
-    openInfoPopup(info) {
+    openInfoPopup() {
+        let info = this.atmInfo;
         const modelItem = this.models.find((m) => m.value === info.model_id);
         const modelLabel = modelItem ? modelItem.label : "-";
 
@@ -318,6 +322,11 @@ class AtmDetails extends DynamicElement {
                 summary: response.data,
             });
 
+            // add to header atm name instead of atm id
+            let pageTitle = document.querySelector("#title");
+            pageTitle.textContent = `ATM #${this.atmInfo.name}`;
+
+            // set to header correct connection status
             let statusEl = document.querySelector(".atm-item__status");
 
             const isWorking = response.data.connection_status_id == "1";

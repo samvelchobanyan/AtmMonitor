@@ -267,6 +267,7 @@ export class SimpleTable extends DynamicElement {
                 const cells = this.state.columns
                     .map((col) => {
                         let cellValue = row[col] ?? "";
+                        console.log("cellValue", cellValue);
 
                         // for notifications redirect
                         // If column is in link-columns → wrap in <a>

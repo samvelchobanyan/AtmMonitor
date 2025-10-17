@@ -6,9 +6,9 @@ class LoginPage extends DynamicElement {
         super();
         this.state = {
             isLoading: false,
-            error: '',
-            username: '',
-            password: ''
+            error: "",
+            username: "",
+            password: "",
         };
     }
 
@@ -33,10 +33,18 @@ class LoginPage extends DynamicElement {
                                 <label for="password">Գաղտնաբառ</label>
                                 <input id="password" class="w-100" name="password" type="password" autocomplete="current-password" required />
                             </div>
-                            ${this.state.error ? `<div class="error color-red" style="margin-bottom:10px;">${this.state.error}</div>` : ''}
+                            ${
+                                this.state.error
+                                    ? `<div class="error color-red" style="margin-bottom:10px;">${this.state.error}</div>`
+                                    : ""
+                            }
                             <div class="form__btn">
-                                <button id="login-btn" type="submit" class="btn btn_md btn_blue btn_full" ${this.state.isLoading ? 'disabled' : ''}>
-                                    <span>${this.state.isLoading ? 'Մուտք է կատարվում…' : 'Մուտք'}</span>
+                                <button id="login-btn" type="submit" class="btn btn_md btn_blue btn_full" ${
+                                    this.state.isLoading ? "disabled" : ""
+                                }>
+                                    <span>${
+                                        this.state.isLoading ? "Մուտք է կատարվում…" : "Մուտք"
+                                    }</span>
                                 </button>
                             </div>
                         </form>
@@ -47,56 +55,62 @@ class LoginPage extends DynamicElement {
     }
 
     onAfterRender() {
-        const username = this.$('#username');
-        const password = this.$('#password');
-        if (username) username.value = this.state.username || '';
-        if (password) password.value = this.state.password || '';
+        const username = this.$("#username");
+        const password = this.$("#password");
+        if (username) username.value = this.state.username || "";
+        if (password) password.value = this.state.password || "";
     }
 
     addEventListeners() {
-        const form = this.$('#login-form');
+        const form = this.$("#login-form");
         if (form) {
-            this.addListener(form, 'submit', this.handleSubmit);
+            this.addListener(form, "submit", this.handleSubmit);
         }
     }
 
     async handleSubmit(event) {
         event.preventDefault();
 
-        const usernameInput = this.$('#username');
-        const passwordInput = this.$('#password');
-        const username = usernameInput?.value.trim() || '';
-        const password = passwordInput?.value || '';
+        const usernameInput = this.$("#username");
+        const passwordInput = this.$("#password");
+        const username = usernameInput?.value.trim() || "";
+        const password = passwordInput?.value || "";
 
         if (!username || !password) {
-            this.setState({ error: 'Լրացրեք բոլոր դաշտերը' });
+            this.setState({ error: "Լրացրեք բոլոր դաշտերը" });
             return;
         }
 
-        this.setState({ isLoading: true, error: '' });
+        this.setState({ isLoading: true, error: "" });
 
         try {
-            const response = await api.post('/account/login', {"login": username, "password": password });
+            const response = await api.post(
+                `/account/login?login=${username}&password=${password}`
+            );
+
             // { success: true, data: { token, firstName, lastName } }
             if (!response?.success || !response?.data?.token) {
-                throw new Error(response?.errors || 'Սխալ մուտքագրում');
+                throw new Error(response?.errors || "Սխալ մուտքագրում");
             }
 
             const token = response.data.token;
-            sessionStorage.setItem('auth_token', token);
+            sessionStorage.setItem("auth_token", token);
 
             if (response.data.firstName || response.data.lastName) {
-                sessionStorage.setItem('auth_user', JSON.stringify({
-                    firstName: response.data.firstName || '',
-                    lastName: response.data.lastName || ''
-                }));
+                sessionStorage.setItem(
+                    "auth_user",
+                    JSON.stringify({
+                        firstName: response.data.firstName || "",
+                        lastName: response.data.lastName || "",
+                    })
+                );
             }
 
-            const nextAttr = this.getAttribute('next') || '';
-            const next = nextAttr && nextAttr.startsWith('/') ? nextAttr : '/home';
+            const nextAttr = this.getAttribute("next") || "";
+            const next = nextAttr && nextAttr.startsWith("/") ? nextAttr : "/home";
             window.location.href = `/ATM_monitor${next}`;
         } catch (err) {
-            const message = err?.message || 'Մուտքը ձախողվեց';
+            const message = err?.message || "Մուտքը ձախողվեց";
             this.setState({ error: message });
         } finally {
             this.setState({ isLoading: false });
@@ -104,6 +118,4 @@ class LoginPage extends DynamicElement {
     }
 }
 
-customElements.define('login-page', LoginPage);
-
-
+customElements.define("login-page", LoginPage);

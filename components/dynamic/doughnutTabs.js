@@ -58,7 +58,7 @@ export default class DoughnutTabs extends DynamicElement {
 
         this.transformData();
     }
- 
+
     onAttributeChange(name, oldValue, newValue) {
         if (name === "data" && oldValue !== newValue) {
             this._parseDataAttr(newValue);
@@ -113,7 +113,9 @@ export default class DoughnutTabs extends DynamicElement {
         const e = this.getAttr("end-date");
         if (s) params.append("startDate", s);
         if (e) params.append("endDate", e);
-        const url = `${endpoint}?${params.toString()}`;
+        const url = endpoint.includes("?")
+            ? `${endpoint}&${params.toString()}`
+            : `${endpoint}?${params.toString()}`;
 
         try {
             const response = await this.fetchData(url);

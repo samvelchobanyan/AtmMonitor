@@ -79,7 +79,7 @@ class ChartComponent extends DynamicElement {
                             break;
                         case "bar":
                             const isGrouped = this.getAttribute("grouped");
-                            console.log('grouped',isGrouped);
+                            console.log("grouped", isGrouped);
                             if (isGrouped != null) {
                                 this.transformedData = chartDataTransformer.transformBarData(
                                     parsed
@@ -213,16 +213,11 @@ class ChartComponent extends DynamicElement {
             const isValid = response && response.errors === null && response.data;
 
             if (!isValid) throw new Error("Invalid API response format");
-            const data_array_name = startDate === endDate ? "hourly_data" : "daily_data";
-            const dataset = response.data[data_array_name] || response.data.work_hours_per_day;
 
-            if (!Array.isArray(dataset) || dataset.length === 0) {
-                console.warn("No data returned for chart:", url);
-                this.setState({ chartData: null, error: "empty" });
-                return;
-            }
             switch (this.chartType) {
                 case "line":
+                    const data_array_name = startDate === endDate ? "hourly_data" : "daily_data";
+               
                     if (
                         this.getAttribute("id") == "line-chart-transaction-dynamics1" ||
                         this.getAttribute("id") == "line-chart-transaction-dynamics2" ||
@@ -238,6 +233,8 @@ class ChartComponent extends DynamicElement {
                             this.getAttr("id")
                         );
                     }
+                    console.log(" this.transformedData", this.transformedData);
+                    this.setState({ error: null });
 
                     this._updateChart();
                     break;
@@ -245,6 +242,8 @@ class ChartComponent extends DynamicElement {
                     this.transformedData = chartDataTransformer.transformDoughnutData(
                         response.data
                     );
+                    this.setState({ error: null });
+
                     this._updateChart();
                     break;
                 case "bar":
@@ -252,18 +251,20 @@ class ChartComponent extends DynamicElement {
                         ? this.getAttr("grouped") !== "false"
                         : false;
 
-                    console.log('fetchAndRenderChart', isGrouped);
+                    console.log("fetchAndRenderChart", isGrouped);
                     if (isGrouped != null) {
-                        this.transformedData = chartDataTransformer.transformBarData(
+                        this.transformedData = chartDataTransformer.transformBarData(response.data);
+                    } else {
+                        this.transformedData = chartDataTransformer.transformStackBarData(
                             response.data
                         );
-                    } else {
-                        this.transformedData = chartDataTransformer.transformStackBarData(response.data);
                     }
+
+                    this.setState({ error: null });
+
                     this._updateChart();
                     break;
             }
-            this.setState({ error: null });
         } catch (err) {
             console.warn("Chart fetch error:", err);
             this.setState({ chartData: null, error: true });

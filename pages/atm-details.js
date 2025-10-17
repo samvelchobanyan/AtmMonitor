@@ -506,12 +506,18 @@ class AtmDetails extends DynamicElement {
                     <div class='row'>
                         <div class="column sm-6">
                             <div class="container">
-                                <doughnut-tabs id="dispense" data="${dispenseData}" title="Կանխիկացում"></doughnut-tabs>
+                                <doughnut-tabs id="dispense" data="${dispenseData}" title="Կանխիկացում"
+                                api-url="/analytics/dispense-summary-in-days?atmId=${
+                                    this.atmId
+                                }"></doughnut-tabs>
                             </div>
                         </div>
                         <div class="column sm-6">
                             <div class="container">
-                                <doughnut-tabs id="deposit" data="${depositData}" title="Մուտքագրում"></doughnut-tabs>
+                                <doughnut-tabs id="deposit" data="${depositData}" title="Մուտքագրում"
+                                 api-url="/analytics/deposit-summary-in-days?atmId=${
+                                     this.atmId
+                                 }"></doughnut-tabs>
                             </div>
                     </div>
                    </div>

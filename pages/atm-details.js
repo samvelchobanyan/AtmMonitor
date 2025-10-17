@@ -634,8 +634,8 @@ class AtmDetails extends DynamicElement {
                     <info-card id='failed-amount' title="Չկատարված գործարքների գումար" show-border="true"></info-card>
                     <info-card id='failed-count' title="Չկատարված գործարքների քանակ" show-border="true"></info-card>
                     <info-card id='inc_count' title="Ինկասացիաների քանակ" value-color="color-blue" show-border="true"> </info-card>
-                    <info-card id='collected_amount' title="Վերադարցված գումար" value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
                     <info-card id='encachment_amount' title="Լիցքաորված գումար" value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
+                    <info-card id='collected_amount' title="Ապալիցքավորված գումար" value-currency="֏" value-color="color-blue" show-border="true"> </info-card>                   
                 </div>
 
                 <simple-table
@@ -643,7 +643,7 @@ class AtmDetails extends DynamicElement {
                     data=${data.encashments_summary.encashments}
                     columns='["date_time", "atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
                     column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
-                    "added_amount":"Ավելացած գումար","collected_amount":"Հավաքված գումար","marked_as_empty":"Դատարկ"}'
+                    "added_amount":"Լիցքաորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Դատարկ"}'
                     clickable-columns='["added_amount"]'>
                 </simple-table>
             </div> 

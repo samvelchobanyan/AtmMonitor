@@ -121,6 +121,8 @@ export class SimpleGrid extends DynamicElement {
       return;
     }
 
+    console.log('grid load data - mode',mode);
+
     if (mode === 'client') {
       try {
         const raw = await this.fetchData(url);
@@ -140,6 +142,7 @@ export class SimpleGrid extends DynamicElement {
         // Probe once to derive columns if not provided
         const definedColumns = this.parseColumnsAttr();
         let columns = definedColumns;
+        console.log('grid fetching', url);
         if (!columns.length) {
           try {
             const raw = await this.fetchData(url);
@@ -267,6 +270,7 @@ export class SimpleGrid extends DynamicElement {
           ...baseConfig,
           server: {
             url: absoluteUrl,
+            headers: api.getAuthHeaders(),
             then: (resp) => {
               // Expect API similar to existing transformer structures.
               // We reuse transformer for mapping shape. If the server already returns sliced data,

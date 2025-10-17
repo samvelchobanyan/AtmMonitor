@@ -307,6 +307,7 @@ export function updateDoughnutChart(chart, chartData) {
     chart.options.showLoading = false;
     chart.data.labels = chartData.labels;
     chart.data.datasets = [prepareDoughnutChart(chartData)];
+
     chart.update();
 }
 

@@ -240,8 +240,9 @@ class ChartComponent extends DynamicElement {
                     this.transformedData = chartDataTransformer.transformDoughnutData(
                         response.data
                     );
+                    // this.setState({ error: null });
 
-                    this.setState({ error: null });
+                    // this.setState({ error: null });
 
                     this._updateChart();
                     break;

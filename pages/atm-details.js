@@ -6,6 +6,7 @@ import encode from "../assets/js/utils/encode.js";
 import "../components/ui/atmItem.js";
 import "../components/ui/infoItem.js";
 import "../components/dynamic/simpleTable.js";
+import '../components/dynamic/simpleGrid.js';
 import formatDate from "../core/utils/date-transformer.js";
 
 class AtmDetails extends DynamicElement {
@@ -183,7 +184,7 @@ class AtmDetails extends DynamicElement {
                 const { startDate, endDate } = e.detail;
                 let date_query = `startDate=${startDate}&endDate=${endDate}`;
                 let link = `/encashment/summary?atmIds=${this.atmId}&${date_query}`;
-                this.$("simple-table").setAttribute("data-source", link);
+                this.$("simple-grid").setAttribute("data-source", link);
                 this.fetchEncashmentsInfocardData(date_query);
             });
         }
@@ -647,14 +648,14 @@ class AtmDetails extends DynamicElement {
                     <info-card id='collected_amount' title="Ապալիցքավորված գումար" value-currency="֏" value-color="color-blue" show-border="true"> </info-card>                   
                 </div>
 
-                <simple-table
-                    searchable="false"
-                    data=${data.encashments_summary.encashments}
-                    columns='["date_time", "atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+                <simple-grid
+                    data-source="/encashment/summary?atmId=${this.atmId}"
+                    columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
                     column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
-                    "added_amount":"Լիցքաորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Դատարկ"}'
-                    clickable-columns='["added_amount"]'>
-                </simple-table>
+                      "added_amount":"Լիցքավորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'
+                    mode="server"
+                    per-page="10">
+                </simple-grid>
             </div> 
             </div>
         `;

@@ -85,7 +85,7 @@ class ChartComponent extends DynamicElement {
                                 );
                             } else {
                                 this.transformedData = chartDataTransformer.transformStackBarData(
-                                    parsed
+                                    parsed, this.getAttr("id")
                                 );
                             }
                             break;
@@ -255,7 +255,8 @@ class ChartComponent extends DynamicElement {
                         this.transformedData = chartDataTransformer.transformBarData(response.data);
                     } else {
                         this.transformedData = chartDataTransformer.transformStackBarData(
-                            response.data
+                            response.data,
+                            this.getAttr("id")
                         );
                     }
 

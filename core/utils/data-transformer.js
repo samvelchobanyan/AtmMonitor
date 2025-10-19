@@ -60,6 +60,7 @@ const CHART_CONFIG = {
     ownOtherFieldsToInclude: ["own_card", "other_card"],
 
     stackBarFieldsToInclude: ["current_count", "last_encashment_count","capacity"],
+    stackBarFieldsToInclude_rj: ["current_count", "capacity"],
 
     dateFormat: {
         locale: "hy-AM", // Armenian locale
@@ -92,7 +93,7 @@ class ChartDataTransformer {
     }
 
     // === BarChart transformation ===
-    transformBarData(apiResponse) {
+    transformBarData(apiResponse, filedNamesconfig = null) {
         const { work_hours_per_day } = apiResponse;
 
         if (!Array.isArray(work_hours_per_day)) {
@@ -120,14 +121,15 @@ class ChartDataTransformer {
         };
     }
 
-    transformStackBarData(apiResponse) {
+    transformStackBarData(apiResponse, filedNamesconfig = null) {
         if (!Array.isArray(apiResponse)) {
             throw new Error("Invalid data format: response must be an array");
         }
-        console.log('transformStackBarData');
-        const { fieldLabels, stackBarFieldsToInclude } = this.config;
 
-        // const labels = apiResponse.map((item) => item.nominal);
+        const fieldLabels = this.config.fieldLabels;
+        const fieldsToInclude = (filedNamesconfig && filedNamesconfig === 'bar-chart-2') ? this.config.stackBarFieldsToInclude_rj : this.config.stackBarFieldsToInclude
+        // const { fieldLabels, stackBarFieldsToInclude } = this.config;
+
         const labels = apiResponse.map((item) => {
             let lbl = '';
 
@@ -169,8 +171,7 @@ class ChartDataTransformer {
             return lbl;
         });
 
-        
-        const datasets = stackBarFieldsToInclude.map((field) => {
+        const datasets = fieldsToInclude.map((field) => {
 
             return {
                 label: fieldLabels[field] || field,
@@ -246,7 +247,6 @@ class ChartDataTransformer {
 
     transformDoughnutData(apiResponse) {
         const data = apiResponse;
-        // console.log("data", data);
 
         if (!data || typeof data !== "object") {
             throw new Error("Invalid data format: data must be an object");

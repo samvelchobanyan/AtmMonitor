@@ -11,7 +11,7 @@ function transformFaultTableData(apiResponse) {
       code: event.code || '-',
       card_number: event.card_number,
       event_description: event.event_description,
-      atm_id: event.name,
+      atm_id: event.atm_name,
       transaction_id: event.transaction_id,
     }));
   }

@@ -123,6 +123,7 @@ class ChartComponent extends DynamicElement {
                     chartData,
                     this.legendId,
                     isGrouped,
+                    this.getAttr("id"),
                     ({
                         label,
                         value,

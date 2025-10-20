@@ -91,7 +91,7 @@ class Incassate extends DynamicElement {
                         <info-card title="Չկատարված գործարքների գումար" id='failed_amount' value-currency="֏"   value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Չկատարված գործարքների քանակ" id='failed_count' value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Ինկասացիաների քանակ" id='inc_count' value-color="color-blue" show-border="true"> </info-card>
-                        <info-card title="Լիցքաորված գումար" id='encachment_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
+                        <info-card title="Լիցքավորված գումար" id='encachment_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
                         <info-card title="Ապալիցքավորված գումար" id='collected_amount' value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
                     </div>
 

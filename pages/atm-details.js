@@ -206,7 +206,7 @@ class AtmDetails extends DynamicElement {
     }
 
     async fetchPopUpData(link, popUpName) {
-        const response = await this.fetchData(`${link}?atmId=${this.atmId}`);
+        const response = await this.fetchData(`${link}?atmIds=${this.atmId}`);
         const data = response.data?.totals;
         if (data) {
             this.openPopUp(data, popUpName);
@@ -644,7 +644,7 @@ class AtmDetails extends DynamicElement {
                     <info-card id='failed-amount' title="Չկատարված գործարքների գումար" show-border="true"></info-card>
                     <info-card id='failed-count' title="Չկատարված գործարքների քանակ" show-border="true"></info-card>
                     <info-card id='inc_count' title="Ինկասացիաների քանակ" value-color="color-blue" show-border="true"> </info-card>
-                    <info-card id='encachment_amount' title="Լիցքաորված գումար" value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
+                    <info-card id='encachment_amount' title="Լիցքավորված գումար" value-currency="֏" value-color="color-blue" show-border="true"> </info-card>
                     <info-card id='collected_amount' title="Ապալիցքավորված գումար" value-currency="֏" value-color="color-blue" show-border="true"> </info-card>                   
                 </div>
 

@@ -313,9 +313,9 @@ export function updateDoughnutChart(chart, chartData) {
 
 /* ====== BarChart ====== */
 
-export function createBarChart(ctxId, chartData, containerID, grouped = false, onBarClick) {
+export function createBarChart(ctxId, chartData, containerID, grouped = false,chartId = null, onBarClick) {
     const ctx = document.getElementById(ctxId).getContext("2d");
-    const datasetsWithColors = chartData ? prepareBarChart(chartData, grouped) : null;
+    const datasetsWithColors = chartData ? prepareBarChart(chartData, grouped, chartId) : null;
 
     return new Chart(ctx, {
         type: "bar",
@@ -365,15 +365,31 @@ export function createBarChart(ctxId, chartData, containerID, grouped = false, o
     });
 }
 
-export function prepareBarChart(chartData, isGrouped = false) {
-    return chartData.datasets.map((dataset, index) => ({
-        ...dataset,
-        backgroundColor: barChartColors[index % barChartColors.length],
-        borderColor: barChartColors[index % barChartColors.length],
-        borderWidth: 1,
-        grouped: isGrouped,
-        order: index + 1,
-    }));
+export function prepareBarChart(chartData, isGrouped = false, chartId = null) {
+    let colorByLabel = null;
+    if (chartId !== null) {        
+        colorByLabel = {
+            'Առկա գումար': '#9BECB0',       // red
+            'capacity': '#EAEAEA',          // blue
+            'Վերջին ինկասացիա': '#9BB3EE', // green
+        };
+    }
+    console.log('chartId ===>', chartId);
+    console.log('prepareBarChart ===>', chartData.datasets);
+    console.log('colorByLabel ===>', colorByLabel);
+    
+    return chartData.datasets.map((dataset, index) => {
+        const color = chartId !== null ? colorByLabel[dataset.label] : barChartColors[index % barChartColors.length];
+        return {
+            ...dataset,
+            backgroundColor: color,
+            borderColor: color,
+            borderWidth: 1,
+            grouped: isGrouped,
+            order: index + 1,
+        }
+        
+    });
 }
 
 export function updateBarChart(chart, chartData, grouped = false) {

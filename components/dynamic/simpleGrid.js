@@ -164,6 +164,7 @@ export class SimpleGrid extends DynamicElement {
   parseColumnLabelsAttr() {
     try {
       const raw = this.getAttr('column-labels');
+      console.log(raw);
       return raw ? JSON.parse(raw) : {};
     } catch (e) {
       console.warn('Invalid column-labels attribute JSON', e);
@@ -217,6 +218,7 @@ export class SimpleGrid extends DynamicElement {
       const formattersMap = this.parseColumnFormattersAttr();
 
       const gridColumns = this.state.columns.map((colName) => {
+        console.log(colName);
         const displayName = labels[colName] || colName;
         const valueFormatter = this.getValueFormatter(colName, formattersMap);
 
@@ -324,6 +326,7 @@ export class SimpleGrid extends DynamicElement {
                   transformed = Array.isArray(resp) ? resp : [];
                 }
               }
+              console.log('transformed ===>', transformed);
               return transformed.map((item) =>
                 this.state.columns.map((c) => item?.[c] ?? '')
               );

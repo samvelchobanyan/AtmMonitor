@@ -321,7 +321,7 @@ class AtmsDashboard extends DynamicElement {
                         </info-card>
                         <info-card
                             id='inc_amount'
-                            title="Լիցքաորված գումար"
+                            title="Լիցքավորված գումար"
                             value="${encashmentData.total_added_amount}"
                             value-currency="֏"
                             value-color="color-blue"

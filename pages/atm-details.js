@@ -321,7 +321,7 @@ class AtmDetails extends DynamicElement {
     // Add close button listener
     const closeBtn = modal.querySelector('.modal__close');
     closeBtn?.addEventListener('click', () => modal.remove());
-  }
+  } 
 
   async fetchAtm() {
     const today = new Date().toISOString().split('T')[0];
@@ -433,7 +433,7 @@ class AtmDetails extends DynamicElement {
     const incData = balanceInfo.cassettes
       .filter((item) => item && item.nominal !== 0)
       .map((item) => {
-        const banknoteName = item.nominal; // or item.banknoteName if that’s the same
+        const banknoteName = item.nominal;
         const countDiff = item.last_encashment_count ?? 0;
         console.log(banknoteName);
         console.log(countDiff);

@@ -386,7 +386,7 @@ export function prepareBarChart(chartData, isGrouped = false, chartId = null) {
             case "worktime-bar-chart":
                 colorByLabel = {
                     'Աշխատաժամանակ': '#9BECB0',
-                    'Պարապուրդ' : '#EAEAEA'
+                    'Պարապուրդ' : '#EC9B9C'
                 };
                 break;
             break;

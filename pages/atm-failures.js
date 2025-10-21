@@ -53,7 +53,7 @@ class AtmFailures extends DynamicElement {
             } else {
                 this.$("#bottom_table").setAttribute(
                     "data-source",
-                    `/device-faults/by-device-type?deviceId=${this.tableActiveTab}&${queryString}`
+                    `/device-faults/by-device-type?deviceIds=${this.tableActiveTab}&${queryString}`
                 );
             }
         });
@@ -112,7 +112,7 @@ class AtmFailures extends DynamicElement {
                 } else {
                     this.bottomTable.setAttribute(
                         "data-source",
-                        `/device-faults/by-device-type?deviceId=${selectedTab}${
+                        `/device-faults/by-device-type?deviceIds=${selectedTab}${
                             this.filtrationQuery ? `&${this.filtrationQuery}` : ""
                         }`
                     );

@@ -367,12 +367,31 @@ export function createBarChart(ctxId, chartData, containerID, grouped = false,ch
 
 export function prepareBarChart(chartData, isGrouped = false, chartId = null) {
     let colorByLabel = null;
-    if (chartId !== null) {        
-        colorByLabel = {
-            'Առկա գումար': '#9BECB0',       // red
-            'capacity': '#EAEAEA',          // blue
-            'Վերջին ինկասացիա': '#9BB3EE', // green
-        };
+    if (chartId !== null) {
+        switch (chartId) {
+            case "bar-chart-2":
+                colorByLabel = {
+                    'Առկա գումար': '#9BECB0',       // red
+                    'capacity': '#EAEAEA',          // blue
+                    'Վերջին ինկասացիա': '#9BB3EE', // green
+                };
+                break;
+            case "bar-chart-1":
+                colorByLabel = {
+                    'Առկա գումար': '#9BECB0',       // red
+                    'capacity': '#EAEAEA',          // blue
+                    'Վերջին ինկասացիա': '#9BB3EE', // green
+                };
+                break;
+            case "worktime-bar-chart":
+                colorByLabel = {
+                    'Աշխատաժամանակ': '#9BECB0',
+                    'Պարապուրդ' : '#EAEAEA'
+                };
+                break;
+            break;
+        }
+
     }
     console.log('chartId ===>', chartId);
     console.log('prepareBarChart ===>', chartData.datasets);

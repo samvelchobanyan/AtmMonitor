@@ -146,7 +146,7 @@ class ChartDataTransformer {
                 case "RECYCLE 20000":
                     lbl = `20k-${item.current_count}/${item.last_encashment_count}`;
                     break;
-                case "Reject":
+                case "Reject Cassette":
                     lbl = `RJ-${item.current_count}/${item.capacity}`;
                     break;                        
                 case "Retract":

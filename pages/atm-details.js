@@ -439,12 +439,11 @@ class AtmDetails extends DynamicElement {
         console.log(countDiff);
 
         return {
-          banknot_name: banknoteName,
+          banknot_name: banknoteName.toLocaleString(),
           count: countDiff,
           result: `${(banknoteName * countDiff).toLocaleString()} ֏`,
         };
       });
-    console.log('incdata', incData);
 
     const devicesData = data.devices;
     const atmWorkHours = data.atm_work_hours;

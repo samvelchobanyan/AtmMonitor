@@ -313,6 +313,7 @@ export class SimpleGrid extends DynamicElement {
                     data: resp.data,
                   });
                   transformed = Array.isArray(maybe) ? maybe : resp.data;
+                  console.log('trasformed', transformed);
                 } catch (_) {
                   transformed = resp.data;
                 }

@@ -58,12 +58,11 @@ export class ApiClient {
     const type = res.headers.get('Content-Type') || '';
     const isJson = type.includes('application/json');
     const data = isJson ? await res.json() : await res.text();
-    console.log('res', res);
 
     if (res.status === 401) {
       sessionStorage.removeItem('auth_token'); // clear invalid token
       window.location.href = 'signin'; // redirect to sign-in page
-      return; // stop execution
+      return; 
     }
     if (!res.ok) {
       const err = new Error(`API ${res.status}`);

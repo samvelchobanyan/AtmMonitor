@@ -121,7 +121,7 @@ export class SimpleGrid extends DynamicElement {
       return;
     }
 
-    console.log('grid load data - mode',mode);
+    console.log('grid load data - mode', mode);
 
     if (mode === 'client') {
       try {
@@ -185,12 +185,11 @@ export class SimpleGrid extends DynamicElement {
   getValueFormatter(colName, map) {
     const spec = map[colName];
     if (spec !== 'currency') return null;
-  
+
     const formatCommas = (val) => {
       return val.toLocaleString();
     };
-    
-    
+
     return (v) => formatCommas(v);
   }
 
@@ -233,7 +232,7 @@ export class SimpleGrid extends DynamicElement {
         return {
           name: displayName,
           formatter: (cell, row) => {
-            const content = valueFormatter ? valueFormatter(cell) : (cell ?? '');
+            const content = valueFormatter ? valueFormatter(cell) : cell ?? '';
             return h(
               'span',
               {
@@ -361,7 +360,9 @@ export class SimpleGrid extends DynamicElement {
                 const col = columns[0];
                 const dir = col.direction === 1 ? 'asc' : 'desc';
                 const colName = this.state.columns[col.index];
+
                 const join = prev.includes('?') ? '&' : '?';
+                
                 return `${prev}${join}sort=${encodeURIComponent(
                   colName
                 )}&order=${dir}`;

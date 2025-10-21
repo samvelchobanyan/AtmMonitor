@@ -35,7 +35,7 @@ class Incassate extends DynamicElement {
         `/encashment/totals?${queryString}`
       );
 
-      let data = {... failedResponse.data, ... totalsResponse.data};
+      let data = { ...failedResponse.data, ...totalsResponse.data };
       console.log('data ===>', data);
 
       this.updateInfoCards(data);
@@ -97,8 +97,8 @@ class Incassate extends DynamicElement {
 
                     <simple-grid
                         data-source="/encashment/summary?${this.initQuery}"
-                        columns='["atm_name","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
-                        column-labels='{"atm_name":"Բանկոմատի ID","date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
+                        columns='["atm_id","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+                        column-labels='{"atm_id":"Բանկոմատի ID","date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
                           "added_amount":"Լիցքավորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'
                         column-formatters='{"collected_amount":"currency","added_amount":"currency"}'
                         mode="server"

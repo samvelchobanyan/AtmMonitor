@@ -369,7 +369,7 @@ class AtmDetails extends DynamicElement {
         `/encashment/failed-transactions?atmId=${this.atmId}&${date_query}`
       );
       const totalsResponse = await this.fetchData(
-        `/encashment/totals?atmId=${this.atmId}&${date_query}`
+        `/encashment/totals?atmIds=${this.atmId}&${date_query}`
       );
 
       const data = { ...failedResponse.data, ...totalsResponse.data };

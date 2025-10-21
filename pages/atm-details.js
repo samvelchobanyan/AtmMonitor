@@ -401,33 +401,6 @@ class AtmDetails extends DynamicElement {
     }
   }
 
-  getCassetteDifferences(before, after) {
-    const result = [];
-
-    after.forEach((afterCassette) => {
-      const beforeCassette = before.find(
-        (b) => b.cassette_name === afterCassette.cassette_name
-      );
-
-      // Determine count difference
-      const countDiff = afterCassette.count - (beforeCassette?.count || 0);
-
-      // Extract the numeric part from the cassette name (e.g. "RECYCLE 10000" → 10000)
-      const match = afterCassette.cassette_name.match(/\d+/);
-      if (!match) return;
-      const banknoteName = match
-        ? Number(match[0])
-        : afterCassette.cassette_name;
-      result.push({
-        banknot_name: banknoteName,
-        count: countDiff,
-        result: banknoteName * countDiff,
-      });
-    });
-
-    return result;
-  }
-
   template() {
     if (!this.state.summary) {
       return /*html*/ `
@@ -457,15 +430,21 @@ class AtmDetails extends DynamicElement {
       data.transactions_summary.transaction_dynamics.overall_dynamic.hourly_data
     );
 
-    const incData =
-      data.encashments_summary.encashments.length === 0
-        ? 0
-        : encode(
-            this.getCassetteDifferences(
-              data.encashments_summary.encashments[0].cassettes_before,
-              data.encashments_summary.encashments[0].cassettes_after
-            )
-          );
+    const incData = balanceInfo.cassettes
+      .filter((item) => item && item.nominal !== 0)
+      .map((item) => {
+        const banknoteName = item.nominal; // or item.banknoteName if that’s the same
+        const countDiff = item.last_encashment_count ?? 0;
+        console.log(banknoteName);
+        console.log(countDiff);
+
+        return {
+          banknot_name: banknoteName,
+          count: countDiff,
+          result: banknoteName * countDiff,
+        };
+      });
+    console.log('incdata', incData);
 
     const devicesData = data.devices;
     const atmWorkHours = data.atm_work_hours;
@@ -517,7 +496,7 @@ class AtmDetails extends DynamicElement {
                                     value-color="color-blue"
                                     show-border="true"
                                     button-text="Մանրամասն"
-                                    incashment-data='${incData}'
+                                    incashment-data='${encode(incData)}'
                                 >
                                 </info-card>
                             </div>

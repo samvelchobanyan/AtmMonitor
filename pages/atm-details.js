@@ -441,7 +441,7 @@ class AtmDetails extends DynamicElement {
         return {
           banknot_name: banknoteName,
           count: countDiff,
-          result: banknoteName * countDiff,
+          result: `${(banknoteName * countDiff).toLocaleString()} ֏`,
         };
       });
     console.log('incdata', incData);

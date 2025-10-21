@@ -206,7 +206,7 @@ class AtmDetails extends DynamicElement {
     }
 
     async fetchPopUpData(link, popUpName) {
-        const response = await this.fetchData(`${link}?atmIds=${this.atmId}`);
+        const response = await this.fetchData(`${link}?atmId=${this.atmId}`);
         const data = response.data?.totals;
         if (data) {
             this.openPopUp(data, popUpName);

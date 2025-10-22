@@ -1,38 +1,38 @@
-import { DynamicElement } from '../core/dynamic-element.js';
-import { api } from '../core/api-client.js';
-import '../components/dynamic/select-box-search.js';
-import encode from '../assets/js/utils/encode.js';
-import '../components/dynamic/yandex-address.js';
-import '../components/ui/customCheck.js';
-import '../components/ui/selectBox.js';
+import { DynamicElement } from "../core/dynamic-element.js";
+import { api } from "../core/api-client.js";
+import "../components/dynamic/select-box-search.js";
+import encode from "../assets/js/utils/encode.js";
+import "../components/dynamic/yandex-address.js";
+import "../components/ui/customCheck.js";
+import "../components/ui/selectBox.js";
 
 class SegmentsPage extends DynamicElement {
-  constructor() {
-    super();
-    this.state = { segments: null };
-  }
+    constructor() {
+        super();
+        this.state = { segments: null };
+    }
 
-  onStoreChange(storeState) {
-    this.setState({
-      segments: storeState.segments.map((item) => ({
-        value: item.id,
-        text: item.name,
-      })),
-    });
-  }
+    onStoreChange(storeState) {
+        this.setState({
+            segments: storeState.segments.map((item) => ({
+                value: item.id,
+                text: item.name,
+            })),
+        });
+    }
 
-  addEventListeners() {
-    const addBtn = this.$('.add-segment-btn');
-    if (addBtn)
-      addBtn.addEventListener('click', () => {
-        this.openCreatePopup();
-      });
-  }
+    addEventListeners() {
+        const addBtn = this.$(".add-segment-btn");
+        if (addBtn)
+            addBtn.addEventListener("click", () => {
+                this.openCreatePopup();
+            });
+    }
 
-  openCreatePopup() {
-    const modal = document.createElement('modal-popup');
-    document.body.appendChild(modal);
-    modal.setContent(`
+    openCreatePopup() {
+        const modal = document.createElement("modal-popup");
+        document.body.appendChild(modal);
+        modal.setContent(`
         <div class="modal__header">
             <div class="modal__title">
               <div>Ստեղծել սեգմենտ</div>
@@ -46,39 +46,39 @@ class SegmentsPage extends DynamicElement {
             </div>
         </div>
         <div class="modal__footer">
-            <button class="btn btn_blue submit-segment-btn">Պահպանել</button>
+          <button type="submit" class="btn btn_fit btn_blue btn_md" id='submit_button'>Հաստատել</button>
         </div>
     
    
     `);
 
-    // Add close button listener
-    const closeBtn = modal.querySelector('.modal__close');
-    closeBtn?.addEventListener('click', () => modal.remove());
+        // Add close button listener
+        const closeBtn = modal.querySelector(".modal__close");
+        closeBtn?.addEventListener("click", () => modal.remove());
 
-    const submitBtn = modal.querySelector('.submit-segment-btn');
-    submitBtn?.addEventListener('click', async () => {
-      const nameInput = modal.querySelector('#name');
-      const segmentName = nameInput?.value.trim();
+        const submitBtn = modal.querySelector(".submit-segment-btn");
+        submitBtn?.addEventListener("click", async () => {
+            const nameInput = modal.querySelector("#name");
+            const segmentName = nameInput?.value.trim();
 
-      try {
-        // Example API call
-        const response = await api.post(`/atm/add-segment?name=${segmentName}`);
-        console.log('Segment created:', response);
+            try {
+                // Example API call
+                const response = await api.post(`/atm/add-segment?name=${segmentName}`);
+                console.log("Segment created:", response);
 
-        // Optionally refresh segments or update UI
-        // this.dispatchEvent(new CustomEvent('segments-updated'));
+                // Optionally refresh segments or update UI
+                // this.dispatchEvent(new CustomEvent('segments-updated'));
 
-        modal.remove(); // close popup
-      } catch (err) {
-        console.error('Failed to create segment:', err);
-      }
-    });
-  }
+                modal.remove(); // close popup
+            } catch (err) {
+                console.error("Failed to create segment:", err);
+            }
+        });
+    }
 
-  template() {
-    if (this.segments?.length == 0) {
-      return /*html*/ `
+    template() {
+        if (this.segments?.length == 0) {
+            return /*html*/ `
             <div class="row">
                 <div class="column sm-12">
                     <div class="loading">
@@ -88,9 +88,9 @@ class SegmentsPage extends DynamicElement {
                 </div>
             </div>
             `;
-    }
+        }
 
-    return /* html */ `
+        return /* html */ `
         <div class="row">
             <div class="column">
 
@@ -103,15 +103,15 @@ class SegmentsPage extends DynamicElement {
 
                         <div class="segments-list">
                             ${this.state.segments
-                              .map(
-                                (seg) => `
+                                .map(
+                                    (seg) => `
                                     <div class="segment-card">
                                         <div class="segment-name">${seg.text}</div>
                                         <div class="segment-id">ID: ${seg.value}</div>
                                     </div>
                                 `
-                              )
-                              .join('')}
+                                )
+                                .join("")}
                         </div>
                     </div>
                 </div>
@@ -119,7 +119,7 @@ class SegmentsPage extends DynamicElement {
             
         </div>
         `;
-  }
+    }
 }
 
-customElements.define('segments-page', SegmentsPage);
+customElements.define("segments-page", SegmentsPage);

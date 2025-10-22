@@ -220,6 +220,18 @@ export function startRouter() {
     );
   });
 
+  page('/all-atms', async (ctx) => {
+    if (!customElements.get('all-atms-page')) {
+      await import('../pages/all-atms.js');
+    }
+    mountComponent(
+      'all-atms-page',
+      'Բանկոմատների ցուցակ',
+      ctx.query,
+      '/all-atms'
+    );
+  });
+
   page('/create-atm', async (ctx) => {
     if (!customElements.get('create-atm-page')) {
       await import('../pages/create-atm.js');

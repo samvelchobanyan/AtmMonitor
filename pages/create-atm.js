@@ -215,9 +215,8 @@ class CreateAtm extends DynamicElement {
             });
             console.log("creation response", response);
 
-            // const nextAttr = this.getAttribute("next") || "";
-            // const next = nextAttr && nextAttr.startsWith("/") ? nextAttr : "/home";
-            // window.location.href = `/ATM_monitor${next}`;
+            // todo check
+            window.location.href = `atms`;
         } catch (err) {
             const message = err?.message || "Ստեղծել ձախողվեց";
             this.setState({ error: message });

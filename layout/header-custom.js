@@ -8,13 +8,12 @@ class HeaderCustom extends DynamicElement {
         super();
         this.state = {
             hideClass: "",
-            statusClass: "",
+            connectionStatusClass: "",
+            workingStatusClass: "",
             province: [],
             cities: [],
         };
-        this.title = ""; // current known title
-        // this.province = [];
-        // this.cities = [];
+        this.title = ""; 
     }
 
     onConnected() {
@@ -78,8 +77,8 @@ class HeaderCustom extends DynamicElement {
                 this.state.hideClass = newHideClass;
                 this.render();
             }
-            if (statusHideClass !== this.state.statusClass) {
-                this.state.statusClass = statusHideClass;
+            if (statusHideClass !== this.state.connectionStatusClass) {
+                this.state.connectionStatusClass = statusHideClass;
                 this.render();
             }
         });
@@ -158,10 +157,16 @@ class HeaderCustom extends DynamicElement {
                                         options='${JSON.stringify(this.state.cities)}'>
                                     </select-box>
                                 </div>  
-                                     <div class="header__right  ${this.state.statusClass}">
-                                        <div class="atm-item__status">
+                                     <div class="header__right  ${
+                                         this.state.connectionStatusClass
+                                     }">
+                                        <div class="atm-item__status" id='connection_status' style='margin-right:8px'>
                                             <span></span>
                                         </div>
+                                        <div class="atm-item__status" id='working_status'>
+                                            <span></span>
+                                        </div>
+                                    
                                     </div>
                             </div>
                         </div>

@@ -62,6 +62,7 @@ class HeaderCustom extends DynamicElement {
                 "/atms/",
                 "/create-atm",
                 "/failures",
+                "/segments",
             ];
 
             // check this way to detect atms detail page as well

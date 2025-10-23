@@ -5,6 +5,7 @@ import encode from "../assets/js/utils/encode.js";
 import "../components/dynamic/yandex-address.js";
 import "../components/ui/customCheck.js";
 import "../components/ui/selectBox.js";
+import { store } from "../core/store/store.js";
 
 class SegmentsPage extends DynamicElement {
     constructor() {
@@ -27,6 +28,16 @@ class SegmentsPage extends DynamicElement {
             addBtn.addEventListener("click", () => {
                 this.openCreatePopup();
             });
+
+        this.addEventListener("click", (e) => {
+            const editBtn = e.target.closest(".edit-segment-btn");
+
+            if (editBtn) {
+                const id = editBtn.dataset.id;
+                const name = editBtn.dataset.name;
+                this.openEditPopup({ id, name });
+            }
+        });
     }
 
     openCreatePopup() {
@@ -46,7 +57,7 @@ class SegmentsPage extends DynamicElement {
             </div>
         </div>
         <div class="modal__footer">
-          <button type="submit" class="btn btn_fit btn_blue btn_md" id='submit_button'>Հաստատել</button>
+          <button type="submit" class="btn btn_fit btn_blue btn_md" id='add-segment-btn'>Հաստատել</button>
         </div>
     
    
@@ -56,22 +67,63 @@ class SegmentsPage extends DynamicElement {
         const closeBtn = modal.querySelector(".modal__close");
         closeBtn?.addEventListener("click", () => modal.remove());
 
-        const submitBtn = modal.querySelector(".submit-segment-btn");
+        // Add submit button listener
+        const submitBtn = modal.querySelector("#add-segment-btn");
         submitBtn?.addEventListener("click", async () => {
             const nameInput = modal.querySelector("#name");
             const segmentName = nameInput?.value.trim();
 
             try {
-                // Example API call
-                const response = await api.post(`/atm/add-segment?name=${segmentName}`);
-                console.log("Segment created:", response);
+                await api.post(`/atm/add-segment?name=${segmentName}`);
+                const responseSegments = await api.get("/atm/segments");
 
-                // Optionally refresh segments or update UI
-                // this.dispatchEvent(new CustomEvent('segments-updated'));
+                store.setState({
+                    segments: responseSegments.data,
+                });
 
-                modal.remove(); // close popup
+                modal.remove();
             } catch (err) {
                 console.error("Failed to create segment:", err);
+            }
+        });
+    }
+
+    openEditPopup(segment) {
+        const modal = document.createElement("modal-popup");
+        document.body.appendChild(modal);
+        modal.setContent(`
+        <div class="modal__header">
+            <div class="modal__title">Խմբագրել սեգմենտ</div>
+            <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
+        </div>
+        <div class="modal__body atm_info">
+            <div class="form__item column sm-12">
+                <label for="edit-name">Անուն</label>
+                <input id="edit-name" class="w-100" name="name" type="text" value="${segment.name}" required />
+            </div>
+        </div>
+        <div class="modal__footer">
+            <button class="btn btn_fit btn_blue btn_md save-edit-btn" data-id="${segment.id}">Պահպանել</button>
+        </div>
+        `);
+
+        modal.querySelector(".modal__close")?.addEventListener("click", () => modal.remove());
+
+        const saveBtn = modal.querySelector(".save-edit-btn");
+        saveBtn?.addEventListener("click", async () => {
+            const newName = modal.querySelector("#edit-name")?.value.trim();
+            if (!newName || newName == segment.name) modal.remove();
+
+            try {
+                await api.post("/atm/edit-segment", { id: Number(segment.id), name: newName });
+                const responseSegments = await api.get("/atm/segments");
+
+                store.setState({
+                    segments: responseSegments.data,
+                });
+                modal.remove();
+            } catch (err) {
+                console.error("Failed to update segment:", err);
             }
         });
     }
@@ -106,8 +158,15 @@ class SegmentsPage extends DynamicElement {
                                 .map(
                                     (seg) => `
                                     <div class="segment-card">
-                                        <div class="segment-name">${seg.text}</div>
-                                        <div class="segment-id">ID: ${seg.value}</div>
+                                        <div class="segment-name align-between">
+                                            <p>${seg.text}</p>
+                                            <img src='assets/img/icons/edit.png' 
+                                            class="edit-segment-btn" 
+                                            data-id="${seg.value}" 
+                                            data-name="${seg.text}"/>
+                                       </div>
+                                        
+                                       <div class="segment-id">ID: ${seg.value}</div>
                                     </div>
                                 `
                                 )

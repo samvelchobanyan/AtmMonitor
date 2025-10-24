@@ -109,6 +109,20 @@
         }
     }
 
+    &__exch {
+        @include horizontal-decor("../img/decor/horizontal-gray.svg");
+        &:after {
+            bottom: 0;
+        }
+        padding: rem(16) 0;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+
+        &:first-child {
+            padding-top: 0;
+        }
+    }
+
     &__chart {
         display: grid;
         grid-template-columns: repeat(2, 1fr);

@@ -23,23 +23,19 @@ const CHART_CONFIG = {
         own_card: "Անձնական քարտ",
         other_card: "Ուրիշի քարտ",
 
-
-        card_replenishment: 'Մուտքագրում քարտին',
-        card_transfer: 'Փոխանցում քարտին',
-        pers_account_replenishment: 'Անձնական հաշվի համալրում',
-        org_account_replenishment: 'Կազմակերպության հաշվի համալրում',
-        loan_payment: 'Վարկի մարում',
-        deposit_replenishment: 'Ավանդի համալրում',
+        card_replenishment: "Մուտքագրում քարտին",
+        card_transfer: "Փոխանցում քարտին",
+        pers_account_replenishment: "Անձնական հաշվի համալրում",
+        org_account_replenishment: "Կազմակերպության հաշվի համալրում",
+        loan_payment: "Վարկի մարում",
+        deposit_replenishment: "Ավանդի համալրում",
 
         // atm detail page
         current_count: "Առկա գումար",
         last_encashment_count: "Վերջին ինկասացիա",
     },
 
-    inout_dispenseDynamicsToInclude: [
-        "with_card_amount",
-        "without_card_amount",
-    ],
+    inout_dispenseDynamicsToInclude: ["with_card_amount", "without_card_amount"],
     inout_depositDynamicsToInclude: [
         "card_replenishment",
         "card_transfer",
@@ -59,7 +55,7 @@ const CHART_CONFIG = {
     byMethodFieldsToInclude: ["visa", "master", "arca"],
     ownOtherFieldsToInclude: ["own_card", "other_card"],
 
-    stackBarFieldsToInclude: ["current_count", "last_encashment_count","capacity"],
+    stackBarFieldsToInclude: ["current_count", "last_encashment_count", "capacity"],
     stackBarFieldsToInclude_rj: ["current_count", "capacity"],
 
     dateFormat: {
@@ -74,7 +70,7 @@ class ChartDataTransformer {
     }
 
     // === LineChart transformation  - default ===
-    transformData(daily_data,filedNamesconfig = null) {
+    transformData(daily_data, filedNamesconfig = null) {
         // const { daily_data } = apiResponse;
         if (!Array.isArray(daily_data)) {
             throw new Error("Invalid data format: daily_data must be an array");
@@ -127,11 +123,14 @@ class ChartDataTransformer {
         }
 
         const fieldLabels = this.config.fieldLabels;
-        const fieldsToInclude = (filedNamesconfig && filedNamesconfig === 'bar-chart-2') ? this.config.stackBarFieldsToInclude_rj : this.config.stackBarFieldsToInclude
+        const fieldsToInclude =
+            filedNamesconfig && filedNamesconfig === "bar-chart-2"
+                ? this.config.stackBarFieldsToInclude_rj
+                : this.config.stackBarFieldsToInclude;
         // const { fieldLabels, stackBarFieldsToInclude } = this.config;
 
         const labels = apiResponse.map((item) => {
-            let lbl = '';
+            let lbl = "";
 
             switch (item.cassette_type_name) {
                 case "RECYCLE 1000":
@@ -148,7 +147,7 @@ class ChartDataTransformer {
                     break;
                 case "Reject Cassette":
                     lbl = `RJ-${item.current_count}/${item.capacity}`;
-                    break;                        
+                    break;
                 case "Retract":
                     lbl = `RT-${item.current_count}/${item.capacity}`;
                     break;
@@ -157,12 +156,18 @@ class ChartDataTransformer {
                     break;
                 case "Reject Cassette 1":
                     lbl = `RJ1-${item.current_count}/${item.capacity}`;
-                    break;                        
+                    break;
                 case "Reject Cassette 2":
                     lbl = `RJ2-${item.current_count}/${item.capacity}`;
                     break;
                 case "Retract Cassette":
                     lbl = `RT-${item.current_count}/${item.capacity}`;
+                    break;
+                case "Retract 1":
+                    lbl = `RT1-${item.current_count}/${item.capacity}`;
+                    break;
+                case "Retract 2":
+                    lbl = `RT2-${item.current_count}/${item.capacity}`;
                     break;
                 default:
                     break;
@@ -172,7 +177,6 @@ class ChartDataTransformer {
         });
 
         const datasets = fieldsToInclude.map((field) => {
-
             return {
                 label: fieldLabels[field] || field,
                 data: apiResponse.map((item) => item[field] ?? 0),
@@ -185,6 +189,9 @@ class ChartDataTransformer {
             chartData: {
                 labels,
                 datasets,
+                extraMeta: apiResponse.map((item) => ({
+                    cassette_type_id: item.cassette_type_id,
+                })), //stores cassette_type_id
             },
         };
     }
@@ -228,10 +235,13 @@ class ChartDataTransformer {
         } else {
             fields = fieldsToInclude;
         }
-        
-        if(filedNamesconfig !== null) {
-            
-            if(filedNamesconfig === 'line-chart-dispense-dynamics' || filedNamesconfig === 'line-chart-dispense-dynamics1' || filedNamesconfig === 'line-chart-dispense-dynamics2') {
+
+        if (filedNamesconfig !== null) {
+            if (
+                filedNamesconfig === "line-chart-dispense-dynamics" ||
+                filedNamesconfig === "line-chart-dispense-dynamics1" ||
+                filedNamesconfig === "line-chart-dispense-dynamics2"
+            ) {
                 fields = inout_dispenseDynamicsToInclude;
             }
         }

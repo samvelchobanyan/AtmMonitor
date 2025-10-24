@@ -16,7 +16,7 @@ class LoginPage extends DynamicElement {
         return ["next"]; // optional redirect target after login
     }
 
-    template() {
+    template() {        
         return /* html */ `
             <div class="row align-center">
                 <div class="column sm-6">
@@ -104,6 +104,8 @@ class LoginPage extends DynamicElement {
                         lastName: response.data.lastName || "",
                     })
                 );
+
+                window.dispatchEvent(new Event("auth_success"));
             }
 
             const nextAttr = this.getAttribute("next") || "";

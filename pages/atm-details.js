@@ -128,21 +128,25 @@ class AtmDetails extends DynamicElement {
     showDepositPopups() {
         if (this.depositChart) {
             this.addListener(this.depositChart, "chart-bar-clicked", (e) => {
+                console.log(" e.detail", e.detail);
+                let cassetteId = e.detail.cassette_id;
                 let label = e.detail.columnLabel.substring(0, e.detail.columnLabel.indexOf("-"));
+                console.log("labr", label);
 
                 let link = "";
                 if (label == "DC") {
                     link = "/atm/deposit-cassette-contents";
-                } else if (label == "RJ1") {
+                } else if (label.includes("RJ")) {
                     link = "/atm/reject-cassette-contents";
-                } else if (label == "RJ2") {
+                } else if (label.includes("RT")) {
                     link = "/atm/retract-cassette-contents";
                 }
 
                 const labelName = e.detail.columnLabel.replace(/[^A-Za-z]/g, "");
                 console.log("labelName", labelName);
+                console.log("link", link);
 
-                if (link) this.fetchPopUpData(link, labelName);
+                if (link) this.fetchPopUpData(link, labelName, cassetteId);
             });
         }
     }
@@ -205,43 +209,114 @@ class AtmDetails extends DynamicElement {
         });
     }
 
-    async fetchPopUpData(link, popUpName) {
-        const response = await this.fetchData(`${link}?atmId=${this.atmId}`);
+    async fetchPopUpData(link, popUpName, cassetteId) {
+        const response = await this.fetchData(`${link}?atmId=${this.atmId}&type=${cassetteId}`);
         const data = response.data?.totals;
-        if (data) {
-            this.openPopUp(data, popUpName);
-        } else {
-            console.log("noo info!");
-        }
+
+        console.log("data", data);
+
+        // if (data) {
+        this.openPopUp(data, popUpName);
+        // } else {
+        //     console.log("noo info!");
+        // }
     }
 
-    // todo ask Aram which one RJ is which title
     openPopUp(data, name) {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
+        let title = "";
+        if (name == "RT") {
+            title = "Retract casset";
+        } else if (name == "RJ") {
+            title = "Reject casset";
+        } else if (name == "DC") {
+            title = "Deposit casset";
+        }
 
         const cards = data
-            .map(
-                (item) => `
-            <info-card
-                title="${item.currency}"
-                value="${item.amount}"
-                show-border="true"
-            ></info-card>
-        `
-            )
+            ?.map((item) => {
+                const buttonAttr = name === "DC" ? `button-text="Մանրամասն"` : "";
+                return `
+                <info-card
+                    title="${item.currency}"
+                    value="${item.amount}"
+                    show-border="true"
+                    ${buttonAttr}
+                ></info-card>
+            `;
+            })
             .join("");
         modal.setContent(`
             <div class="modal__header">
-                <div class="modal__title">${name}</div>
+                <div class="modal__title">${title}</div>
                 <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
             </div>
             <div class="modal__chart">
-                     ${cards}
+                     ${data != undefined && data.length != 0 ? cards : "Տվյալներ չկան"}
             </div>
         
        
         `);
+
+        // Add close button listener
+        const closeBtn = modal.querySelector(".modal__close");
+        closeBtn?.addEventListener("click", () => modal.remove());
+
+        if (name === "DC") {
+            const infoCards = modal.querySelectorAll("info-card");
+
+            infoCards.forEach((card) => {
+                card.addEventListener("click", async () => {
+                    const currency = card.getAttribute("title");
+
+                    if (!this.atmId || !currency) return;
+
+                    try {
+                        const response = await this.fetchData(
+                            `/atm/deposit-notes-info?atmId=${this.atmId}&currencyCode=${currency}`
+                        );
+
+                        this._openCasseteExchangePopup(response.data);
+                    } catch (error) {
+                        console.error("Failed to fetch incashment data:", error);
+                    }
+                });
+            });
+        }
+    }
+
+    _openCasseteExchangePopup(data) {
+        const modal = document.createElement("modal-popup");
+        document.body.appendChild(modal);
+
+        const processedData = data?.map((item) => ({
+            ...item,
+            result: (item.denomination ?? 0) * (item.count ?? 0),
+        }));
+
+        modal.setContent(`
+        <div class="modal__header">
+            <div class="modal__title">Մանրամասն</div>
+            <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
+        </div>
+        <div class="modal__body">
+                <list-view
+                    items='${JSON.stringify(processedData)}'
+                >
+                    <template>
+                        <div class="modal__exch">
+                            <div class="modal__incashment-text">{{denomination}}</div>
+                            <div class="modal__incashment-text">{{count}} հատ</div>
+                            <div class="modal__incashment-text">{{result}}</div>
+                            <div class="modal__incashment-text">{{description}}</div>
+                        </div>
+                    </template>
+                </list-view>
+      </div>
+    
+   
+    `);
 
         // Add close button listener
         const closeBtn = modal.querySelector(".modal__close");
@@ -331,12 +406,13 @@ class AtmDetails extends DynamicElement {
             // set to header correct connection status
             let connectionStatusEl = document.querySelector("#connection_status");
             let workingStatusEl = document.querySelector("#working_status");
-            console.log("ATM", atm);
 
             const isConnected = atm.connection_status_id == "1";
             const isWorking = atm.working_status_id == "1";
+
             const connectedStatus = isConnected ? "Կապի մեջ" : "Կապից դուրս";
             const workingStatus = isWorking ? "Աշխատում է" : "Չի աշխատում";
+
             const connectionStatusClass = isConnected
                 ? "atm-item__status_working"
                 : "atm-item__status_not-working";

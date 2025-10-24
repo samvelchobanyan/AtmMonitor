@@ -85,7 +85,8 @@ class ChartComponent extends DynamicElement {
                                 );
                             } else {
                                 this.transformedData = chartDataTransformer.transformStackBarData(
-                                    parsed, this.getAttr("id")
+                                    parsed,
+                                    this.getAttr("id")
                                 );
                             }
                             break;
@@ -124,19 +125,12 @@ class ChartComponent extends DynamicElement {
                     this.legendId,
                     isGrouped,
                     this.getAttr("id"),
-                    ({
-                        label,
-                        value,
-                        dataset,
-                        datasetIndex,
-                        dataIndex,
-                        columnLabel,
-                        datasetLabel,
-                    }) => {
+                    ({ columnLabel, cassette_id }) => {
                         // click on chart in atm details
+
                         this.dispatchEvent(
                             new CustomEvent("chart-bar-clicked", {
-                                detail: { columnLabel },
+                                detail: { columnLabel, cassette_id },
                                 bubbles: true,
                             })
                         );

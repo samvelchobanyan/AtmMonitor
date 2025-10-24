@@ -313,7 +313,14 @@ export function updateDoughnutChart(chart, chartData) {
 
 /* ====== BarChart ====== */
 
-export function createBarChart(ctxId, chartData, containerID, grouped = false,chartId = null, onBarClick) {
+export function createBarChart(
+    ctxId,
+    chartData,
+    containerID,
+    grouped = false,
+    chartId = null,
+    onBarClick
+) {
     const ctx = document.getElementById(ctxId).getContext("2d");
     const datasetsWithColors = chartData ? prepareBarChart(chartData, grouped, chartId) : null;
 
@@ -323,6 +330,7 @@ export function createBarChart(ctxId, chartData, containerID, grouped = false,ch
             ? {
                   labels: chartData.labels,
                   datasets: datasetsWithColors,
+                  extraMeta: chartData.extraMeta, //stores cassette_type_id
               }
             : {},
         options: {
@@ -353,10 +361,11 @@ export function createBarChart(ctxId, chartData, containerID, grouped = false,ch
                 const element = elements[0];
                 const dataIndex = element.index;
                 const columnLabel = chart.data.labels[dataIndex];
-
+                const extraMeta = chart.data.extraMeta ? chart.data.extraMeta[dataIndex] : null;
                 if (typeof onBarClick === "function") {
                     onBarClick({
                         columnLabel,
+                        cassette_id: extraMeta.cassette_type_id,
                     });
                 }
             },
@@ -371,34 +380,36 @@ export function prepareBarChart(chartData, isGrouped = false, chartId = null) {
         switch (chartId) {
             case "bar-chart-2":
                 colorByLabel = {
-                    'Առկա գումար': '#9BECB0',       // red
-                    'capacity': '#EAEAEA',          // blue
-                    'Վերջին ինկասացիա': '#9BB3EE', // green
+                    "Առկա գումար": "#9BECB0", // red
+                    capacity: "#EAEAEA", // blue
+                    "Վերջին ինկասացիա": "#9BB3EE", // green
                 };
                 break;
             case "bar-chart-1":
                 colorByLabel = {
-                    'Առկա գումար': '#9BECB0',       // red
-                    'capacity': '#EAEAEA',          // blue
-                    'Վերջին ինկասացիա': '#9BB3EE', // green
+                    "Առկա գումար": "#9BECB0", // red
+                    capacity: "#EAEAEA", // blue
+                    "Վերջին ինկասացիա": "#9BB3EE", // green
                 };
                 break;
             case "worktime-bar-chart":
                 colorByLabel = {
-                    'Աշխատաժամանակ': '#9BECB0',
-                    'Պարապուրդ' : '#EC9B9C'
+                    Աշխատաժամանակ: "#9BECB0",
+                    Պարապուրդ: "#EC9B9C",
                 };
                 break;
-            break;
+                break;
         }
-
     }
-    console.log('chartId ===>', chartId);
-    console.log('prepareBarChart ===>', chartData.datasets);
-    console.log('colorByLabel ===>', colorByLabel);
-    
+    console.log("chartId ===>", chartId);
+    console.log("prepareBarChart ===>", chartData.datasets);
+    console.log("colorByLabel ===>", colorByLabel);
+
     return chartData.datasets.map((dataset, index) => {
-        const color = chartId !== null ? colorByLabel[dataset.label] : barChartColors[index % barChartColors.length];
+        const color =
+            chartId !== null
+                ? colorByLabel[dataset.label]
+                : barChartColors[index % barChartColors.length];
         return {
             ...dataset,
             backgroundColor: color,
@@ -406,8 +417,7 @@ export function prepareBarChart(chartData, isGrouped = false, chartId = null) {
             borderWidth: 1,
             grouped: isGrouped,
             order: index + 1,
-        }
-        
+        };
     });
 }
 

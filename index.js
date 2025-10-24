@@ -5,7 +5,7 @@ import { startRouter } from "./core/router.js";
 
 async function initializeApp() {
     try {
-        // Fetch whatever initial data you need, for example, user info or settings
+        // Fetch initial data 
         const responseLocations = await api.get("/dashboard/cities-with-districts");
         const responseSegments = await api.get("/atm/segments");
 

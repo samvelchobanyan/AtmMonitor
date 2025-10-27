@@ -60,8 +60,6 @@ class GeoAnalythics extends DynamicElement {
 
     let tabs2 = this.$('#tabs2');
     tabs2?.addEventListener('geo-submit', (e) => {
-      console.log('e.detail', e.detail);
-
       this.fetchSecondSummary(e.detail);
     });
   }

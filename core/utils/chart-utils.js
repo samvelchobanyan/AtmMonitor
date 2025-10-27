@@ -401,9 +401,6 @@ export function prepareBarChart(chartData, isGrouped = false, chartId = null) {
                 break;
         }
     }
-    console.log("chartId ===>", chartId);
-    console.log("prepareBarChart ===>", chartData.datasets);
-    console.log("colorByLabel ===>", colorByLabel);
 
     return chartData.datasets.map((dataset, index) => {
         const color =

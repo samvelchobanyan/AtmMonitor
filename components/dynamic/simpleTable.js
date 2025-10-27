@@ -102,9 +102,6 @@ export class SimpleTable extends DynamicElement {
 
         try {
             const raw = await this.fetchData(url);
-
-            console.log("raw", raw);
-
             this.transformData(raw);
             // const transformed = tableTransformer.transformFaultTableData(raw);
 
@@ -180,7 +177,6 @@ export class SimpleTable extends DynamicElement {
                     /\.csv$/i,
                     ""
                 );
-                console.log("this.sdtLib", this.sdtLib);
 
                 if (this.sdtLib?.exportCSV && this.datatableInstance) {
                     this.sdtLib.exportCSV(this.datatableInstance, {
@@ -267,7 +263,6 @@ export class SimpleTable extends DynamicElement {
                 const cells = this.state.columns
                     .map((col) => {
                         let cellValue = row[col] ?? "";
-                        console.log("cellValue", cellValue);
 
                         // for notifications redirect
                         // If column is in link-columns → wrap in <a>

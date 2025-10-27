@@ -1,83 +1,65 @@
-import { DynamicElement } from '../core/dynamic-element.js';
-import '../components/dynamic/segment.js';
-import '../components/dynamic/simpleGrid.js';
-import '../components/dynamic/filtrationTabs.js';
+import { DynamicElement } from "../core/dynamic-element.js";
+import "../components/dynamic/segment.js";
+import "../components/dynamic/simpleGrid.js";
+import "../components/dynamic/filtrationTabs.js";
 
 class Incassate extends DynamicElement {
-  constructor() {
-    super();
-    this.filtrationTabs = null;
-    this.table = null;
+    constructor() {
+        super();
+        this.filtrationTabs = null;
+        this.table = null;
 
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    this.initQuery = `startDate=${year}-${month}-${day}`;
-  }
-
-  onConnected() {
-    this.fetchInfoCardsData(this.initQuery);
-  }
-
-  onAfterRender() {
-    this.filtrationTabs = this.$('filtration-tabs');
-    this.table = this.$('simple-grid');
-  }
-
-  async fetchInfoCardsData(queryString) {
-    try {
-      const failedResponse = await this.fetchData(
-        `/encashment/failed-transactions?${queryString}`
-      );
-
-      const totalsResponse = await this.fetchData(
-        `/encashment/totals?${queryString}`
-      );
-
-      let data = { ...failedResponse.data, ...totalsResponse.data };
-      console.log('data ===>', data);
-
-      this.updateInfoCards(data);
-    } catch (err) {
-      console.error('❌ Error fetching info cards data:', err);
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+        this.initQuery = `startDate=${year}-${month}-${day}`;
     }
-  }
 
-  updateInfoCards(data) {
-    this.$('#failed_amount').setAttribute(
-      'value',
-      data.failed_transactions_amount
-    );
-    this.$('#failed_count').setAttribute(
-      'value',
-      data.failed_transactions_count
-    );
-    this.$('#inc_count').setAttribute('value', data.total_count); //todo continue here when talk with Arsen
-    this.$('#collected_amount').setAttribute(
-      'value',
-      data.total_collected_amount
-    );
-    this.$('#encachment_amount').setAttribute(
-      'value',
-      data.total_encachment_amount
-    );
-  }
+    onConnected() {
+        this.fetchInfoCardsData(this.initQuery);
+    }
 
-  addEventListeners() {
-    this.addListener(this.filtrationTabs, 'filter-submit', (e) => {
-      const queryString = e.detail.query;
-      this.table.setAttribute(
-        'data-source',
-        `/encashment/summary?${queryString}`
-      );
+    onAfterRender() {
+        this.filtrationTabs = this.$("filtration-tabs");
+        this.table = this.$("simple-grid");
+    }
 
-      this.fetchInfoCardsData(queryString);
-    });
-  }
+    async fetchInfoCardsData(queryString) {
+        try {
+            const failedResponse = await this.fetchData(
+                `/encashment/failed-transactions?${queryString}`
+            );
 
-  template() {
-    return /*html*/ `
+            const totalsResponse = await this.fetchData(`/encashment/totals?${queryString}`);
+
+            let data = { ...failedResponse.data, ...totalsResponse.data };
+
+            this.updateInfoCards(data);
+        } catch (err) {
+            console.error("❌ Error fetching info cards data:", err);
+        }
+    }
+
+    updateInfoCards(data) {
+        this.$("#failed_amount").setAttribute("value", data.failed_transactions_amount);
+        this.$("#failed_count").setAttribute("value", data.failed_transactions_count);
+        this.$("#inc_count").setAttribute("value", data.total_count); //todo continue here when talk with Arsen
+        this.$("#collected_amount").setAttribute("value", data.total_collected_amount);
+        this.$("#encachment_amount").setAttribute("value", data.total_encachment_amount);
+    }
+
+    addEventListeners() {
+        this.addListener(this.filtrationTabs, "filter-submit", (e) => {
+            const queryString = e.detail.query;
+            this.table.setAttribute("data-source", `/encashment/summary?${queryString}`);
+
+            this.fetchInfoCardsData(queryString);
+        });
+    }
+
+    template() {
+        return /*html*/ `
         <filtration-tabs showAtm='true'></filtration-tabs>
         <div class="row">
             <div class="column sm-12">
@@ -108,20 +90,20 @@ class Incassate extends DynamicElement {
             </div>
         </div>
         `;
-  }
+    }
 
-  // old
-  //  <simple-table
-  //                 data-source="/encashment/summary"
-  //                 columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
-  //                 column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի ID և հասցե",
-  //                 "added_amount":"Ավելացված գումար","collected_amount":"Հավաքված գումար",
-  //                 "marked_as_empty":"Դատարկ"}'
-  //                 exportable
-  //                 export-filename="incassate"
-  //                 export-label="Ներբեռնել CSV-ն"
-  //                 >
-  //             </simple-table>
+    // old
+    //  <simple-table
+    //                 data-source="/encashment/summary"
+    //                 columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+    //                 column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի ID և հասցե",
+    //                 "added_amount":"Ավելացված գումար","collected_amount":"Հավաքված գումար",
+    //                 "marked_as_empty":"Դատարկ"}'
+    //                 exportable
+    //                 export-filename="incassate"
+    //                 export-label="Ներբեռնել CSV-ն"
+    //                 >
+    //             </simple-table>
 }
 
-customElements.define('incassate-analythics', Incassate);
+customElements.define("incassate-analythics", Incassate);

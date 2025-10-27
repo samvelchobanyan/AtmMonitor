@@ -159,18 +159,6 @@ class CreateAtm extends DynamicElement {
 
         const rawVal = segmentIdInput.getAttribute("value") || "[]";
         const segmentIds = JSON.parse(rawVal).map((v) => Number(v));
-        console.log("Input values:", {
-            name: nameInput?.value,
-            modelId: modelIdInput?.value,
-            ipAddress: ipAddressInput?.value,
-            atmType: atmTypeInput?.value,
-            atmArchived: atmArchived,
-            atmCimType: atmCimTypeInput?.value,
-            atmCdmType: atmCdmTypeInput?.value,
-            lon: lonInput?.value,
-            lat: latInput?.value,
-            segmentIdsRaw: segmentIdInput?.getAttribute("value"),
-        });
 
         if (
             !name ||
@@ -190,7 +178,7 @@ class CreateAtm extends DynamicElement {
         this.setState({ isLoading: true, error: "" });
 
         try {
-            const response = await api.post("/atm/add-atm", {
+            await api.post("/atm/add-atm", {
                 name,
                 modelId,
                 ipAddress,
@@ -201,21 +189,8 @@ class CreateAtm extends DynamicElement {
                 atmCdmType,
                 lon,
                 lat,
-
-                // for test
-                // modelId: 1,
-                // name: "string",
-                // ipAddress: "string",
-                // lat: "44.3333333",
-                // lon: "40.333232332",
-                // segmentIds: [1, 5],
-                // atmType: 1,
-                // atmArchived: true,
-                // atmCimType: 1
             });
-            console.log("creation response", response);
 
-            // todo check
             window.location.href = `atms`;
         } catch (err) {
             const message = err?.message || "Ստեղծել ձախողվեց";

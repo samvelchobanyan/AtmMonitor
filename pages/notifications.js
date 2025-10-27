@@ -40,8 +40,6 @@ class Notifications extends DynamicElement {
     }
 
     onConnected() {
-        console.log("connected");
-
         const state = store.getState();
 
         this.province = state.regionsData.map((item) => ({
@@ -160,8 +158,6 @@ class Notifications extends DynamicElement {
     }
 
     template() {
-        console.log("template");
-
         if (!this.state.summary) {
             return /*html*/ `
             <div class="row">

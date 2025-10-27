@@ -23,8 +23,6 @@ class AllAtmsPage extends DynamicElement {
             this.setState({
                 atms: response.data.atms,
             });
-
-            console.log("respo", response.data.atms);
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ atms: null });
@@ -32,8 +30,6 @@ class AllAtmsPage extends DynamicElement {
     }
 
     template() {
-        console.log("this.state.atms", this.state.atms);
-
         if (this.state.atms == null || this.state.atms.length == 0) {
             return /*html*/ `
             <div class="row">

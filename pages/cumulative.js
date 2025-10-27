@@ -1,21 +1,25 @@
 import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/simpleTable.js";
-import '../components/dynamic/simpleGrid.js';
+import "../components/dynamic/simpleGrid.js";
 import "../components/dynamic/filtrationTabs.js";
 
 class Cumulative extends DynamicElement {
     constructor() {
         super();
+        this.fetchQuery = "";
     }
 
     addEventListeners() {
         // listen to submit or date change in filtration-tabs
         this.addListener(this.$("filtration-tabs"), "filter-submit", (e) => {
-            console.log("listener");
-
             let link = `/analytics/cumulative-summary?${e.detail.query}`;
             const table = this.$("simple-grid");
+            this.fetchQuery = e.detail.query;
             table.setAttribute("data-source", link);
+        });
+
+        this.addEventListener("export-clicked", (e) => {
+            e.detail.url = `/analytics/cumulative-export?${this.fetchQuery}`;
         });
     }
 
@@ -35,7 +39,8 @@ class Cumulative extends DynamicElement {
                                 "exchange_rub_amount":"Փոխանակված RUB գումար","exchange_usd_amount":"Փոխանակված USD գումար"}'
                                 column-formatters='{"deposit_amount":"currency","dispense_amount":"currency","exchange_eur_amount":"currency","exchange_rub_amount":"currency","exchange_usd_amount":"currency"}'
                                 mode="server"
-                                per-page="10">
+                                per-page="10"
+                                exportable>
                             </simple-grid>
                         </div>
                     </div>

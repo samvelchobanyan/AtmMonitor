@@ -22,9 +22,14 @@ export class ApiClient {
         return { ...authHeader, ...extraHeaders };
     }
 
-    async get(endpoint, params = {}, headers = {}) {
+    async get(endpoint, params = {}, headers = {}, asBlob) {
         const url = this.buildUrl(endpoint, params);
         const res = await fetch(url, { headers: this.getAuthHeaders(headers) });
+        // if file
+        if (asBlob) {
+            return res;
+        }
+
         return this.handle(res);
     }
 
@@ -56,7 +61,7 @@ export class ApiClient {
         const isJson = type.includes("application/json");
         const data = isJson ? await res.json() : await res.text();
 
-        if (res.status === 401 && sessionStorage.getItem('auth_token')) {
+        if (res.status === 401 && sessionStorage.getItem("auth_token")) {
             sessionStorage.removeItem("auth_token"); // clear invalid token
             // if (!window.location.pathname.includes("signin")) {
             window.location.href = "signin";

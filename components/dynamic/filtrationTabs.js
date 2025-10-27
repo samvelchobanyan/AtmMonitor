@@ -195,8 +195,6 @@ class FiltrationTabs extends DynamicElement {
 
         if (this.startDate) queryString.append("startDate", this.startDate);
         if (this.endDate) queryString.append("endDate", this.endDate);
-        console.log("this.startDate", this.startDate);
-        console.log("this.endDate", this.endDate);
 
         return queryString;
     }

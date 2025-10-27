@@ -21,9 +21,6 @@ class AtmDetails extends DynamicElement {
         this.encashmentDateBox = null;
         this.depositChart = null;
         this.worktimeChart = null;
-        this.models = null;
-        this.cimTypes = null;
-        this.types = null;
         this.atmInfo = null;
     }
 
@@ -53,85 +50,58 @@ class AtmDetails extends DynamicElement {
                 this.fetchExchangeData(startDate, endDate);
             });
 
-            // is in other element if, because otherwise it addes listener twice. Info element is not in this component, so this triggers twice
+            // element is in header, but needs call here
             let infoButton = document.querySelector("#info");
-            if (infoButton) {
+            if (infoButton)
                 this.addListener(infoButton, "click", async () => {
-                    this.fetchModels();
-                    this.fetchCimTypes();
-                    this.fetchTypes();
-                    this.openInfoPopup();
-                    // this.fetchAtmInfoData();
+                    await this.fetchModels();
+                    await this.fetchCimTypes();
+                    await this.fetchTypes();
+                    this.openAtmInfoPopup();
                 });
-            }
         }
     }
 
     async fetchAtmInfoData() {
         const response = await this.fetchData(`/atm/getatm/${this.atmId}`);
-
         this.atmInfo = response.data;
-        // if (data) {
-        //     this.openInfoPopup(data);
-        // } else {
-        //     console.log("noo info!");
-        // }
     }
 
     async fetchModels() {
         try {
             const response = await this.fetchData(`/atm/models`);
-            const options = response.data.map((m) => ({
-                value: m.id,
-                label: m.model_name,
-            }));
-
-            this.models = options;
+            const model = response.data.find((m) => m.id === this.atmInfo.model_id);
+            this.atmInfo.model_id = model ? model.model_name : "-";
         } catch (err) {
             console.error("❌ Error fetching models:", err);
-            this.models = null;
         }
     }
 
     async fetchCimTypes() {
         try {
             const response = await this.fetchData(`/atm/cim-types`);
-
-            const options = response.data.map((c) => ({
-                value: c.id,
-                label: c.name,
-            }));
-
-            this.cimTypes = options;
+            const cim = response.data.find((c) => c.id === this.atmInfo.atm_cim_type);
+            this.atmInfo.atm_cim_type = cim ? cim.name : "-";
         } catch (err) {
             console.error("❌ Error fetching cimTypes:", err);
-            this.cimTypes = null;
         }
     }
 
     async fetchTypes() {
         try {
             const response = await this.fetchData(`/atm/atm-types`);
-
-            const options = response.map((c) => ({
-                value: c.id,
-                label: c.type_Name,
-            }));
-
-            this.types = options;
+            const type = response.find((c) => c.id === this.atmInfo.atm_type);
+            this.atmInfo.atm_type = type ? type.type_Name : "-";
         } catch (err) {
             console.error("❌ Error fetching types:", err);
-            this.types = null;
         }
     }
 
     showDepositPopups() {
         if (this.depositChart) {
             this.addListener(this.depositChart, "chart-bar-clicked", (e) => {
-                console.log(" e.detail", e.detail);
                 let cassetteId = e.detail.cassette_id;
                 let label = e.detail.columnLabel.substring(0, e.detail.columnLabel.indexOf("-"));
-                console.log("labr", label);
 
                 let link = "";
                 if (label == "DC") {
@@ -143,10 +113,7 @@ class AtmDetails extends DynamicElement {
                 }
 
                 const labelName = e.detail.columnLabel.replace(/[^A-Za-z]/g, "");
-                console.log("labelName", labelName);
-                console.log("link", link);
-
-                if (link) this.fetchPopUpData(link, labelName, cassetteId);
+                if (link) this.fetchRejectedCasPopUpData(link, labelName, cassetteId);
             });
         }
     }
@@ -161,23 +128,11 @@ class AtmDetails extends DynamicElement {
                 let atmLastConnect = this.$("#atm_last_connect");
                 let atmLastStatusDuration = this.$("#atm_last_status_duration");
 
-                if (atmWorkingPercent)
-                    atmWorkingPercent.setAttribute("value", `${data.total_working_percent}%`);
-
-                if (atmNonWorkingPercent)
-                    atmNonWorkingPercent.setAttribute(
-                        "value",
-                        `${data.total_non_working_percent}%`
-                    );
-
-                if (atmLastDisconnect)
-                    atmLastDisconnect.setAttribute("value", formatDate(data.last_disconnect));
-
-                if (atmLastConnect)
-                    atmLastConnect.setAttribute("value", formatDate(data.last_connect));
-
-                if (atmLastStatusDuration)
-                    atmLastStatusDuration.setAttribute("value", data.last_status_duration);
+                atmWorkingPercent?.setAttribute("value", `${data.total_working_percent}%`);
+                atmNonWorkingPercent?.setAttribute("value", `${data.total_non_working_percent}%`);
+                atmLastDisconnect?.setAttribute("value", formatDate(data.last_disconnect));
+                atmLastConnect?.setAttribute("value", formatDate(data.last_connect));
+                atmLastStatusDuration?.setAttribute("value", data.last_status_duration);
             });
         }
     }
@@ -209,20 +164,14 @@ class AtmDetails extends DynamicElement {
         });
     }
 
-    async fetchPopUpData(link, popUpName, cassetteId) {
+    async fetchRejectedCasPopUpData(link, popUpName, cassetteId) {
         const response = await this.fetchData(`${link}?atmId=${this.atmId}&type=${cassetteId}`);
         const data = response.data?.totals;
 
-        console.log("data", data);
-
-        // if (data) {
-        this.openPopUp(data, popUpName);
-        // } else {
-        //     console.log("noo info!");
-        // }
+        this.openRejectedPopUp(data, popUpName);
     }
 
-    openPopUp(data, name) {
+    openRejectedPopUp(data, name) {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
         let title = "";
@@ -247,22 +196,14 @@ class AtmDetails extends DynamicElement {
             `;
             })
             .join("");
-        modal.setContent(`
-            <div class="modal__header">
-                <div class="modal__title">${title}</div>
-                <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
-            </div>
-            <div class="modal__chart">
-                     ${data != undefined && data.length != 0 ? cards : "Տվյալներ չկան"}
-            </div>
-        
-       
-        `);
 
-        // Add close button listener
-        const closeBtn = modal.querySelector(".modal__close");
-        closeBtn?.addEventListener("click", () => modal.remove());
-
+        modal.renderModal({
+            title,
+            bodyClass: "modal__chart",
+            bodyContent: `
+               ${data != undefined && data.length != 0 ? cards : "Տվյալներ չկան"}
+                `,
+        });
         if (name === "DC") {
             const infoCards = modal.querySelectorAll("info-card");
 
@@ -290,49 +231,30 @@ class AtmDetails extends DynamicElement {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
 
-        const processedData = data?.map((item) => ({
+        const processedData = data.map((item) => ({
             ...item,
             result: (item.denomination ?? 0) * (item.count ?? 0),
         }));
 
-        modal.setContent(`
-        <div class="modal__header">
-            <div class="modal__title">Մանրամասն</div>
-            <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
-        </div>
-        <div class="modal__body">
-                <list-view
-                    items='${JSON.stringify(processedData)}'
-                >
+        modal.renderModal({
+            title: "Մանրամասն",
+            bodyContent: `
+                <list-view items='${JSON.stringify(processedData)}'>
                     <template>
-                        <div class="modal__exch">
-                            <div class="modal__incashment-text">{{denomination}}</div>
-                            <div class="modal__incashment-text">{{count}} հատ</div>
-                            <div class="modal__incashment-text">{{result}}</div>
-                            <div class="modal__incashment-text">{{description}}</div>
-                        </div>
+                    <div class="modal__exch">
+                        <div class="modal__incashment-text">{{denomination}}</div>
+                        <div class="modal__incashment-text">{{count}} հատ</div>
+                        <div class="modal__incashment-text">{{result}}</div>
+                        <div class="modal__incashment-text">{{description}}</div>
+                    </div>
                     </template>
                 </list-view>
-      </div>
-    
-   
-    `);
-
-        // Add close button listener
-        const closeBtn = modal.querySelector(".modal__close");
-        closeBtn?.addEventListener("click", () => modal.remove());
+                `,
+        });
     }
 
-    openInfoPopup() {
+    openAtmInfoPopup() {
         let info = this.atmInfo;
-        const modelItem = this.models.find((m) => m.value === info.model_id);
-        const modelLabel = modelItem ? modelItem.label : "-";
-
-        const cimItem = this.cimTypes.find((c) => c.value === info.atm_cim_type);
-        const cimLabel = cimItem ? cimItem.label : "-";
-
-        const typeItem = this.types.find((c) => c.value === info.atm_type);
-        const typeLabel = typeItem ? typeItem.label : "-";
 
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
@@ -362,7 +284,7 @@ class AtmDetails extends DynamicElement {
          <div class="modal__body atm_info">
             <div class="align-between row">
                 <p class="atm-item__label">Մոդել՝</p>
-                <p class="atm-item__value">${modelLabel}</p>
+                <p class="atm-item__value">${this.atmInfo.model_id}</p>
             </div>
             <div class="align-between row">
                 <p class="atm-item__label">IP հասցե՝</p>
@@ -370,11 +292,11 @@ class AtmDetails extends DynamicElement {
             </div>
             <div class="align-between row">
                 <p class="atm-item__label">Տեսակ՝</p>
-                <p class=" atm-item__value">${typeLabel}</p>
+                <p class=" atm-item__value">${this.atmInfo.atm_type}</p>
             </div>
             <div class="align-between row">
                 <p class="atm-item__label">CIM Տեսակ՝</p>
-                <p class="atm-item__value">${cimLabel}</p>
+                <p class="atm-item__value">${this.atmInfo.atm_cim_type}</p>
             </div>
             </div>
     
@@ -398,50 +320,51 @@ class AtmDetails extends DynamicElement {
                 summary: response.data,
             });
 
-            let atm = this.atmInfo;
             // add to header atm name instead of atm id
-            let pageTitle = document.querySelector("#title");
-            pageTitle.textContent = `ATM #${atm.name}`;
-
-            // set to header correct connection status
-            let connectionStatusEl = document.querySelector("#connection_status");
-            let workingStatusEl = document.querySelector("#working_status");
-
-            const isConnected = atm.connection_status_id == "1";
-            const isWorking = atm.working_status_id == "1";
-
-            const connectedStatus = isConnected ? "Կապի մեջ" : "Կապից դուրս";
-            const workingStatus = isWorking ? "Աշխատում է" : "Չի աշխատում";
-
-            const connectionStatusClass = isConnected
-                ? "atm-item__status_working"
-                : "atm-item__status_not-working";
-            const workingStatusClass = isWorking
-                ? "atm-item__status_working"
-                : "atm-item__status_not-working";
-            if (connectionStatusEl) {
-                // update the class
-                connectionStatusEl.className = `atm-item__status ${connectionStatusClass || ""}`;
-
-                // update the text inside the span
-                const span = connectionStatusEl.querySelector("span");
-                if (span) {
-                    span.textContent = connectedStatus || "";
-                }
-            }
-            if (workingStatusEl) {
-                // update the class
-                workingStatusEl.className = `atm-item__status ${workingStatusClass || ""}`;
-
-                // update the text inside the span
-                const span = workingStatusEl.querySelector("span");
-                if (span) {
-                    span.textContent = workingStatus || "";
-                }
-            }
+            this.setHeaderInfo();
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });
+        }
+    }
+
+    setHeaderInfo() {
+        let atm = this.atmInfo;
+
+        let pageTitle = document.querySelector("#title");
+        pageTitle.textContent = `ATM #${atm.name}`;
+
+        // set to header correct connection status
+        let connectionStatusEl = document.querySelector("#connection_status");
+        const isConnected = atm.connection_status_id == "1";       
+        const connectedStatus = isConnected ? "Կապի մեջ" : "Կապից դուրս";
+        const connectionStatusClass = isConnected
+        ? "atm-item__status_working"
+        : "atm-item__status_not-working";
+        
+        
+        if (connectionStatusEl) {
+            connectionStatusEl.className = `atm-item__status ${connectionStatusClass || ""}`;
+            const span = connectionStatusEl.querySelector("span");
+            if (span) {
+                span.textContent = connectedStatus || "";
+            }
+        } 
+        
+        // set to header correct working status
+        let workingStatusEl = document.querySelector("#working_status");
+        const isWorking = atm.working_status_id == "1";
+        const workingStatus = isWorking ? "Աշխատում է" : "Չի աշխատում";
+        const workingStatusClass = isWorking
+        ? "atm-item__status_working"
+        : "atm-item__status_not-working";
+
+        if (workingStatusEl) {
+            workingStatusEl.className = `atm-item__status ${workingStatusClass || ""}`;
+            const span = workingStatusEl.querySelector("span");
+            if (span) {
+                span.textContent = workingStatus || "";
+            }
         }
     }
 
@@ -462,21 +385,11 @@ class AtmDetails extends DynamicElement {
             const collectedAmount = this.$("#collected_amount");
             const encachmentAmount = this.$("#encachment_amount");
 
-            if (failedCount) {
-                failedCount.setAttribute("value", data.failed_transactions_count);
-            }
-            if (failedAmount) {
-                failedAmount.setAttribute("value", data.failed_transactions_amount);
-            }
-            if (incCount) {
-                incCount.setAttribute("value", data.total_count);
-            }
-            if (collectedAmount) {
-                collectedAmount.setAttribute("value", data.total_collected_amount);
-            }
-            if (encachmentAmount) {
-                encachmentAmount.setAttribute("value", data.total_encachment_amount);
-            }
+            failedCount?.setAttribute("value", data.failed_transactions_count);
+            failedAmount?.setAttribute("value", data.failed_transactions_amount);
+            incCount?.setAttribute("value", data.total_count);
+            collectedAmount?.setAttribute("value", data.total_collected_amount);
+            encachmentAmount?.setAttribute("value", data.total_encachment_amount);
         } catch (err) {
             console.error("❌ Error fetching failed incashments:", err);
             // this.setState({ summary: null });
@@ -516,8 +429,6 @@ class AtmDetails extends DynamicElement {
             .map((item) => {
                 const banknoteName = item.nominal;
                 const countDiff = item.last_encashment_count ?? 0;
-                console.log(banknoteName);
-                console.log(countDiff);
 
                 return {
                     banknot_name: banknoteName.toLocaleString(),

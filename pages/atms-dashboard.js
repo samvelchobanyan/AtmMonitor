@@ -22,7 +22,6 @@ class AtmsDashboard extends DynamicElement {
         this.commentsData = [];
         this.worktimeChart = null;
         this.transactionsAmountChart = null;
-       
     }
 
     onConnected() {
@@ -59,15 +58,6 @@ class AtmsDashboard extends DynamicElement {
         this.$("#taken-cards").setAttribute("value", data.taken_cards_count);
     }
 
-    updateIncashmentCards(data) {
-        this.$("#total-balance").setAttribute("value", data.total_atm_balance);
-        this.$("#total-atms").setAttribute("value", data.total_atms);
-        this.$("#not-working-atms").setAttribute("value", data.not_working_atm_count);
-        this.$("#empty-cassettes").setAttribute("value", data.empty_cassettes_count);
-        this.$("#almost-empty-cassettes").setAttribute("value", data.almost_empty_cassettes_count);
-        this.$("#taken-cards").setAttribute("value", data.taken_cards_count);
-    }
-
     onDisconnected() {
         // Clean up polling subscription
         if (this.unsubscribeTopStats) {
@@ -86,12 +76,10 @@ class AtmsDashboard extends DynamicElement {
     async fetchSummary(region, city) {
         const queryString = new URLSearchParams();
 
-        if (region) {
-            queryString.append("province", region);
-        }
-        if (city) {
-            queryString.append("city", city);
-        }
+        if (region) queryString.append("province", region);
+
+        if (city) queryString.append("city", city);
+
         let url = `/dashboard/summary?${queryString}`;
         url = url.endsWith("?") ? url.slice(0, -1) : url;
 
@@ -113,8 +101,8 @@ class AtmsDashboard extends DynamicElement {
             const response = await this.fetchData("/dashboard/comments");
             this.commentsData = response.data;
         } catch (err) {
-            console.error("❌ Error fetching summary:", err);
-            this.setState({ summary: null });
+            console.error("❌ Error fetching comments:", err);
+            this.commentsData = [];
         }
     }
 

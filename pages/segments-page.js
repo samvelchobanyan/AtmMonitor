@@ -29,50 +29,45 @@ class SegmentsPage extends DynamicElement {
                 this.openCreatePopup();
             });
 
-        this.addEventListener("click", (e) => {
-            const editBtn = e.target.closest(".edit-segment-btn");
-
-            if (editBtn) {
-                const id = editBtn.dataset.id;
-                const name = editBtn.dataset.name;
-                this.openEditPopup({ id, name });
-            }
-        });
+        if (!this._editListenerAttached) {
+            this.addEventListener("click", (e) => {
+                const editBtn = e.target.closest(".edit-segment-btn");
+                if (editBtn) {
+                    const id = editBtn.dataset.id;
+                    const name = editBtn.dataset.name;
+                    this.openEditPopup({ id, name });
+                }
+            });
+            this._editListenerAttached = true;
+        }
     }
 
     openCreatePopup() {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
-        modal.setContent(`
-        <div class="modal__header">
-            <div class="modal__title">
-              <div>Ստեղծել սեգմենտ</div>
-            </div>
-            <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
-        </div>
-         <div class="modal__body atm_info">
-           <div class="form__item column sm-12">
-                <label for="name">Անուն</label>
-                <input id="name" class="w-100" name="name" type="text" required />
-            </div>
-        </div>
-        <div class="modal__footer">
-          <button type="submit" class="btn btn_fit btn_blue btn_md" id='add-segment-btn'>Հաստատել</button>
-        </div>
-    
-   
-    `);
 
-        // Add close button listener
-        const closeBtn = modal.querySelector(".modal__close");
-        closeBtn?.addEventListener("click", () => modal.remove());
+        modal.renderModal({
+            title: "Ստեղծել սեգմենտ",
+            bodyContent: `
+               <div class="form__item column sm-12">
+                    <label for="name">Անուն</label>
+                    <input id="name" class="w-100" name="name" type="text" required />
+                </div>
+            `,
+            footerContent: `<button type="submit" class="btn btn_fit btn_blue btn_md" id='add-segment-btn' disabled>Հաստատել</button>`,
+        });
 
+        const nameInput = modal.querySelector("#name");
+        nameInput?.addEventListener("input", () => {
+            const hasValue = nameInput.value.trim().length > 0;
+            submitBtn.disabled = !hasValue;
+        });
         // Add submit button listener
         const submitBtn = modal.querySelector("#add-segment-btn");
         submitBtn?.addEventListener("click", async () => {
-            const nameInput = modal.querySelector("#name");
             const segmentName = nameInput?.value.trim();
-
+            if (!segmentName) return;
+            submitBtn.disabled = true;
             try {
                 await api.post(`/atm/add-segment?name=${segmentName}`);
                 const responseSegments = await api.get("/atm/segments");
@@ -84,6 +79,7 @@ class SegmentsPage extends DynamicElement {
                 modal.remove();
             } catch (err) {
                 console.error("Failed to create segment:", err);
+                submitBtn.disabled = false;
             }
         });
     }
@@ -91,31 +87,27 @@ class SegmentsPage extends DynamicElement {
     openEditPopup(segment) {
         const modal = document.createElement("modal-popup");
         document.body.appendChild(modal);
-        modal.setContent(`
-        <div class="modal__header">
-            <div class="modal__title">Խմբագրել սեգմենտ</div>
-            <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="" />
-        </div>
-        <div class="modal__body atm_info">
-            <div class="form__item column sm-12">
-                <label for="edit-name">Անուն</label>
-                <input id="edit-name" class="w-100" name="name" type="text" value="${segment.name}" required />
-            </div>
-        </div>
-        <div class="modal__footer">
-            <button class="btn btn_fit btn_blue btn_md save-edit-btn" data-id="${segment.id}">Պահպանել</button>
-        </div>
-        `);
 
-        modal.querySelector(".modal__close")?.addEventListener("click", () => modal.remove());
-
-        const saveBtn = modal.querySelector(".save-edit-btn");
+        modal.renderModal({
+            title: "Խմբագրել սեգմենտտ",
+            bodyContent: `
+               <div class="form__item column sm-12">
+                    <label for="edit-name">Անուն</label>
+                    <input id="edit-name" class="w-100" name="name" type="text" value="${segment.name}" required />
+                </div> 
+            `,
+            footerContent: `<button class="btn btn_fit btn_blue btn_md" id='save-edit-btn' data-id="${segment.id}">Պահպանել</button>`,
+        });
+        const saveBtn = modal.querySelector("#save-edit-btn");
         saveBtn?.addEventListener("click", async () => {
             const newName = modal.querySelector("#edit-name")?.value.trim();
-            if (!newName || newName == segment.name) modal.remove();
-
+            if (!newName || newName === segment.name) {
+                modal.remove();
+                return;
+            }
             try {
                 await api.post("/atm/edit-segment", { id: Number(segment.id), name: newName });
+
                 const responseSegments = await api.get("/atm/segments");
 
                 store.setState({

@@ -55,12 +55,9 @@ class SegmentBlock extends DynamicElement {
         document.body.appendChild(modal);
         const items = this.segmentItems;
 
-        modal.setContent(`
-            <div class="modal__header">
-                <div class="modal__title">Ավելացնել սեգմենտ</div>
-                <img class="modal__close" src="assets/img/icons/x-circle.svg" alt="Close" />
-            </div>
-            <div class="modal__body">
+        modal.renderModal({
+            title: "Ավելացնել սեգմենտ",
+            bodyContent: `
                 <list-view
                     searchable
                     search-fields="text"
@@ -71,20 +68,13 @@ class SegmentBlock extends DynamicElement {
                         <custom-checkbox id="{{value}}" value="{{value}}">{{text}}</custom-checkbox>
                     </template>
                 </list-view>
-            </div>
-            <div class="modal__buttons">
-                <button class="ok btn btn_md btn_blue btn_full"><span>Ընտրել</span></button>
-            </div>
-        `);
+            `,
+            footerContent: `<button class="ok btn btn_md btn_blue btn_full"><span>Ընտրել</span></button>`,
+        });
 
         const listView = modal.querySelector("list-view");
 
         this._syncCheckboxesWithSelectedSegments(listView);
-
-        const closeBtn = modal.querySelector(".modal__close");
-        if (closeBtn) {
-            this.addListener(closeBtn, "click", () => modal.remove());
-        }
 
         const okBtn = modal.querySelector(".ok");
         if (okBtn) {

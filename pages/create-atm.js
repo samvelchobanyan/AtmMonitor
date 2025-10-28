@@ -139,6 +139,7 @@ class CreateAtm extends DynamicElement {
         const segmentIdInput = this.$("#segmentId");
         const atmTypeInput = this.$("#atmType");
         const atmArchivedInput = this.$("#atmArchived");
+        const atmVersionInput = this.$("#atmVersion");
         const atmCimTypeInput = this.$("#atmCimType");
         const atmCdmTypeInput = this.$("#atmCdmType");
         const lonInput = this.$("#lon");
@@ -148,11 +149,12 @@ class CreateAtm extends DynamicElement {
         const modelId = Number(modelIdInput?.value);
         const ipAddress = ipAddressInput?.value.trim();
 
+        const atmVersion = atmVersionInput?.value.trim();
         const atmType = Number(atmTypeInput?.value);
         const atmArchived = atmArchivedInput?.hasAttribute("checked") || false;
 
         const atmCimType = Number(atmCimTypeInput?.value);
-        const atmCdmType = Number(atmCdmTypeInput?.value);
+        const atmCdmType = Number(atmCdmTypeInput?.value) || 0;
 
         const lon = lonInput?.value.trim();
         const lat = latInput?.value.trim();
@@ -166,10 +168,10 @@ class CreateAtm extends DynamicElement {
             !ipAddress ||
             segmentIds.length == 0 ||
             !atmType ||
-            !atmCimType ||
             !atmCdmType ||
             !lon ||
-            !lat
+            !lat ||
+            atmArchived
         ) {
             this.setState({ error: "Լրացրեք բոլոր դաշտերը" });
             return;
@@ -185,13 +187,14 @@ class CreateAtm extends DynamicElement {
                 segmentIds,
                 atmType,
                 atmArchived,
+                ...(atmVersion != "" && { atmVersion }),
                 atmCimType,
                 atmCdmType,
                 lon,
                 lat,
             });
 
-            window.location.href = `atms`;
+            window.location.href = "all-atms";
         } catch (err) {
             const message = err?.message || "Ստեղծել ձախողվեց";
             this.setState({ error: message });
@@ -245,7 +248,13 @@ class CreateAtm extends DynamicElement {
                                     <p>CIM Տեսակ</p>
                                     <select-box id="atmCimType" placeholder="Ընտրել CIM տեսակ" options='${cimTypes}'></select-box>
                                 </div>
-                              
+                                <div class="form__item column sm-6">
+                                    <label for="atmVersion">Վերսիա</label>
+                                    <input id="atmVersion" class="w-100" name="atmVersion" type="text" />
+                                </div>
+                            </div>
+
+                            <div class='row'>
                                 <div class="form__item column sm-3">
                                     <p>CDM Տեսակ</p>
                                     <select-box id="atmCdmType" placeholder="Ընտրել CDM տեսակ" options='${cdmTypes}'></select-box>

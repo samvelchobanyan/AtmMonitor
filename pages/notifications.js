@@ -2,7 +2,7 @@ import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/chartComponent.js";
 import "../components/dynamic/infoCard.js";
 import "../components/ui/customTab.js";
-import "../components/dynamic/simpleTable.js";
+import "../components/dynamic/simpleGrid.js";
 import "../components/dynamic/select-box.js";
 import "../components/dynamic/select-box-date.js";
 import "../components/ui/customTab.js";
@@ -215,41 +215,40 @@ class Notifications extends DynamicElement {
                          )
                          .join("")}
                   </div>
-                 <simple-table 
+                 <simple-grid 
                     data='${deviceErrors}' 
                     columns='["atm_id", "date","address","fault_type","message"]'
                     link-columns='{"atm_id": "atms/:id"}'
-                    searchable="false"
                     column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե",
                     "fault_type":"Սարքի տեսակ","message":"Նկարագրություն"}'
                     id='device-errors-table'
                     >
-                 </simple-table>
+                 </simple-grid>
                 </div>
 
                 <div class="container">
                     <container-top icon="icon-x-octagon" title="Առգրավված քարտեր" number='${
                         taken_cards.length
                     }'> </container-top>
-                    <simple-table
+                    <simple-grid
                         data='${takenCards}' 
                         columns='["atm_id", "date","address","card_number"]'
                         column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե", "card_number": "Քարտի համար"}'
                         searchable="false">
-                    </simple-table>
+                    </simple-grid>
                 </div>
 
                  <div class="container">
                     <container-top icon="icon-x-octagon" title="Խնդրահարույց գործարքներ" number='${
                         problematic_transactions.length
                     }'> </container-top>
-                    <simple-table
+                    <simple-grid
                         data='${problematicTransactions}' 
                         columns='["atm_id", "date","address","amount", "message", "transaction_id"]'
                         column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե", 
                         "amount": "Գումար", "message": "Նկարագրություն","transaction_id": "Գործարքի ID"}'
                         searchable="false">
-                    </simple-table>
+                    </simple-grid>
                 </div>
             </div>
       `;

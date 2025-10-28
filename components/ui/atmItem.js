@@ -25,7 +25,7 @@ export class AtmItem extends HTMLElement {
         const address = this.getAttribute("address") || "";
         const isConnected = this.getAttribute("connection-status") == "1";
         const isWorking = this.getAttribute("data-working") == "1";
-        const connectionStatus = isWorking ? "Կապի մեջ" : "Կապից դուրս";
+        const connectionStatus = isConnected ? "Կապի մեջ" : "Կապից դուրս";
         const workingStatus = isWorking ? "Աշխատում է" : "Չի աշխատում";
         const connectionStatusClass = isConnected
             ? "atm-item__status_working"

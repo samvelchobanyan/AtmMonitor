@@ -97,19 +97,6 @@ class Incassate extends DynamicElement {
         </div>
         `;
     }
-
-    // old
-    //  <simple-table
-    //                 data-source="/encashment/summary"
-    //                 columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
-    //                 column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի ID և հասցե",
-    //                 "added_amount":"Ավելացված գումար","collected_amount":"Հավաքված գումար",
-    //                 "marked_as_empty":"Դատարկ"}'
-    //                 exportable
-    //                 export-filename="incassate"
-    //                 export-label="Ներբեռնել CSV-ն"
-    //                 >
-    //             </simple-table>
 }
 
 customElements.define("incassate-analythics", Incassate);

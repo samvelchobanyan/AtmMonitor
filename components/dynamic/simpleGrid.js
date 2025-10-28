@@ -42,11 +42,24 @@ export class SimpleGrid extends DynamicElement {
     }
 
     static get observedAttributes() {
-        return ["data-source", "columns", "clickable-columns", "mode", "per-page", "exportable"];
+        return [
+            "data-source",
+            "columns",
+            "clickable-columns",
+            "mode",
+            "per-page",
+            "exportable",
+            "data",
+        ];
     }
 
     async onConnected() {
         ensureGridJsCss();
+        const dataAttr = this.getAttr("data");
+        if (dataAttr) {
+            this.handleDataAttribute(dataAttr);
+            return;
+        }
         const url = this.getAttr("data-source");
         if (url) await this.loadData();
     }
@@ -75,7 +88,6 @@ export class SimpleGrid extends DynamicElement {
                         headers: { Accept: "*/*" },
                         asBlob: true, // 👈 Important
                     });
-
 
                     const blob = await response.blob();
 
@@ -109,6 +121,10 @@ export class SimpleGrid extends DynamicElement {
             await this.loadData();
             return;
         }
+        if (name === "data") {
+            this.handleDataAttribute(newVal);
+            return;
+        }
         if (name === "columns") {
             const parsed = this.parseColumnsAttr();
             if (parsed) this.setState({ columns: parsed });
@@ -131,6 +147,24 @@ export class SimpleGrid extends DynamicElement {
         } catch (e) {
             console.warn("Invalid columns attribute JSON", e);
             return [];
+        }
+    }
+
+    handleDataAttribute(raw) {
+        try {
+            const data = tableTransformer.transformFaultTableData(JSON.parse(raw));
+            const columns = JSON.parse(this.getAttr("columns"));
+            if (!data.length) return;
+
+            this.setState({
+                data,
+                columns,
+                loading: false,
+                error: false,
+            });
+        } catch (err) {
+            console.warn("Invalid 'data' attribute JSON", err);
+            this.setState({ error: true, loading: false });
         }
     }
 
@@ -189,7 +223,6 @@ export class SimpleGrid extends DynamicElement {
                 // Probe once to derive columns if not provided
                 const definedColumns = this.parseColumnsAttr();
                 let columns = definedColumns;
-                console.log("grid fetching", url);
                 if (!columns.length) {
                     try {
                         const raw = await this.fetchData(url);
@@ -210,7 +243,6 @@ export class SimpleGrid extends DynamicElement {
     parseColumnLabelsAttr() {
         try {
             const raw = this.getAttr("column-labels");
-            console.log(raw);
             return raw ? JSON.parse(raw) : {};
         } catch (e) {
             console.warn("Invalid column-labels attribute JSON", e);

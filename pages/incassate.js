@@ -14,6 +14,8 @@ class Incassate extends DynamicElement {
         const month = String(today.getMonth() + 1).padStart(2, "0");
         const day = String(today.getDate()).padStart(2, "0");
         this.initQuery = `startDate=${year}-${month}-${day}`;
+
+        this.tableQuery = null;
     }
 
     onConnected() {
@@ -44,17 +46,20 @@ class Incassate extends DynamicElement {
     updateInfoCards(data) {
         this.$("#failed_amount").setAttribute("value", data.failed_transactions_amount);
         this.$("#failed_count").setAttribute("value", data.failed_transactions_count);
-        this.$("#inc_count").setAttribute("value", data.total_count); //todo continue here when talk with Arsen
+        this.$("#inc_count").setAttribute("value", data.total_count);
         this.$("#collected_amount").setAttribute("value", data.total_collected_amount);
         this.$("#encachment_amount").setAttribute("value", data.total_encachment_amount);
     }
 
     addEventListeners() {
         this.addListener(this.filtrationTabs, "filter-submit", (e) => {
-            const queryString = e.detail.query;
-            this.table.setAttribute("data-source", `/encashment/summary?${queryString}`);
+            this.tableQuery = e.detail.query;
+            this.table.setAttribute("data-source", `/encashment/summary?${this.tableQuery}`);
+            this.fetchInfoCardsData(this.tableQuery);
+        });
 
-            this.fetchInfoCardsData(queryString);
+        this.addListener(this.table, "export-clicked", (e) => {
+            e.detail.url = `/encashment/export?${this.tableQuery}`;
         });
     }
 
@@ -84,7 +89,8 @@ class Incassate extends DynamicElement {
                           "added_amount":"Լիցքավորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'
                         column-formatters='{"collected_amount":"currency","added_amount":"currency"}'
                         mode="server"
-                        per-page="10">
+                        per-page="10"
+                        exportable>
                     </simple-grid>
                 </div>
             </div>

@@ -2,7 +2,7 @@ import { DynamicElement } from "../core/dynamic-element.js";
 import "../components/dynamic/chartComponent.js";
 import "../components/dynamic/infoCard.js";
 import "../components/ui/customTab.js";
-import "../components/dynamic/simpleTable.js";
+import "../components/dynamic/simpleGrid.js";
 import "../components/dynamic/select-box.js";
 import "../components/dynamic/select-box-date.js";
 import "../components/ui/customTab.js";
@@ -57,6 +57,14 @@ class AtmFailures extends DynamicElement {
                 );
             }
         });
+
+        this.addListener(this.$("#top_table"), "export-clicked", (e) => {
+            e.detail.url = `/device-faults/top-export?startDate=${this.topStartDate}&endDate=${this.topEndDate}`;
+        });
+
+        this.addListener(this.bottomTable, "export-clicked", (e) => {
+            e.detail.url = `/device-faults/by-device-type-export?${this.filtrationQuery}`;
+        });
     }
 
     async fetchTopSummary() {
@@ -110,11 +118,11 @@ class AtmFailures extends DynamicElement {
                         }`
                     );
                 } else {
+                    this.filtrationQuery = `${this.filtrationQuery}&deviceIds=${selectedTab}`;
+
                     this.bottomTable.setAttribute(
                         "data-source",
-                        `/device-faults/by-device-type?deviceIds=${selectedTab}${
-                            this.filtrationQuery ? `&${this.filtrationQuery}` : ""
-                        }`
+                        `/device-faults/by-device-type?${this.filtrationQuery}`
                     );
                 }
             });
@@ -148,8 +156,8 @@ class AtmFailures extends DynamicElement {
                                 ></select-box-date>
                             </div>
 
-                            <div class="container top_table">
-                                <simple-table
+                            <div class="container top_table"> 
+                                <simple-grid
                                     id='top_table'
                                     data-source = '/device-faults/top'
                                     columns='["atm_id", "address", "total_faults", "faults_summary"]'
@@ -160,7 +168,10 @@ class AtmFailures extends DynamicElement {
                                         "faults_summary": "Խափանումների նկարագրություն"
                                         }'
                                     searchable="false"
-                                ></simple-table>
+                                    mode="server" 
+                                    exportable
+                                ></simple-grid>
+                                  
                             </div>
                     </div>
                   </div>
@@ -184,7 +195,7 @@ class AtmFailures extends DynamicElement {
 
                         
                         <div class="container bottom_table">
-                            <simple-table
+                            <simple-grid
                                 id='bottom_table'
                                 columns='["atm_id", "address", "total_faults", "faults_duration"]'
                                 data-source='/device-faults/by-device-type'
@@ -194,9 +205,10 @@ class AtmFailures extends DynamicElement {
                                     "total_faults": "Խափանումների քանակ",
                                     "faults_duration": "Խափանումների տևողություն"
                                     }'
-
+                                mode="server" 
+                                exportable
                                 searchable="false">
-                            </simple-table>
+                            </simple-grid>
                         </div>
 
                     </div>

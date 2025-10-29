@@ -124,6 +124,13 @@ class Notifications extends DynamicElement {
     addEventListeners() {
         this.selectDateListener();
         this.tableTabsListener();
+
+        this.addEventListener("cell-click", (e) => {
+            const atmid = e.detail?.cellValue;
+            if (atmid) {
+                window.location.href = `atms/${atmid}`;
+            }
+        });
     }
 
     tableTabsListener() {
@@ -221,6 +228,7 @@ class Notifications extends DynamicElement {
                     link-columns='{"atm_id": "atms/:id"}'
                     column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե",
                     "fault_type":"Սարքի տեսակ","message":"Նկարագրություն"}'
+                    clickable-columns = ${encode(["atm_id"])}
                     id='device-errors-table'
                     >
                  </simple-grid>

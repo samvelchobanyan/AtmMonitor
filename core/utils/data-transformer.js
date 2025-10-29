@@ -286,7 +286,7 @@ class ChartDataTransformer {
         return {
             metaData: {
                 total: data.total_deposit_count + data.total_dispense_count,
-                percent: 7,
+                percent: data.count_percent_change,
             },
             chartData: {
                 labels,

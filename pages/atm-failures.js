@@ -10,6 +10,7 @@ import "../components/dynamic/select-box-search.js";
 import "../components/ui/customCheck.js";
 import "../components/dynamic/segment.js";
 import "../components/dynamic/filtrationTabs.js";
+import "../components/dynamic/doughnutChart.js";
 
 class AtmFailures extends DynamicElement {
     constructor() {
@@ -22,7 +23,7 @@ class AtmFailures extends DynamicElement {
         this.filtrationTabs = null;
         this.bottomTable = null;
         this.filtrationQuery = null;
-
+        this.chartSummary = null;
         this.deviceTypes = [{ id: 0, type_name: "Բոլորը" }];
     }
 
@@ -36,6 +37,7 @@ class AtmFailures extends DynamicElement {
         this.bottomTable = this.$("#bottom_table");
 
         this.fetchTopSummary();
+        this.fetchBottomSummary();
     }
 
     addEventListeners() {
@@ -44,6 +46,8 @@ class AtmFailures extends DynamicElement {
         this.addListener(this.filtrationTabs, "filter-submit", (e) => {
             const queryString = e.detail.query;
             this.filtrationQuery = queryString;
+
+            this.fetchBottomSummary(queryString);
 
             if (this.tableActiveTab == 0) {
                 this.$("#bottom_table").setAttribute(
@@ -76,6 +80,36 @@ class AtmFailures extends DynamicElement {
             this.$("#top_table").setAttribute("data-source", `/device-faults/top?${queryString}`);
         } catch (err) {
             console.error("❌ Error fetching top summary:", err);
+        }
+    }
+
+    async fetchBottomSummary(queryString) {
+        //todo uncomment - right one
+        // let url = queryString
+        //     ? `/device-faults/by-device-type?${queryString}`
+        //     : "/device-faults/by-device-type";
+
+        // for test
+        let url = queryString
+            ? `/device-faults/by-device-type?${queryString}`
+            : "/device-faults/by-device-type?startDate=2025-05-10&endDate=2025-10-05";
+
+        try {
+            const res = await this.fetchData(url);
+            this.chartSummary = res.data;
+            const labels = this.chartSummary.map((item) => item.device_type);
+            const dataValues = this.chartSummary.map((item) => item.atms.length);
+
+            const chartPayload = {
+                chartData: {
+                    labels,
+                    datasets: [{ data: dataValues }],
+                },
+            };
+
+            this.$("#failures-chart").setAttribute("data", JSON.stringify(chartPayload));
+        } catch (err) {
+            console.error("❌ Error fetching chart summary:", err);
         }
     }
 
@@ -182,6 +216,7 @@ class AtmFailures extends DynamicElement {
             <div class='row'>
                 <div class="column sm-12">
                     <div class="container">
+                       <doughnut-chart id="failures-chart" labels-right></doughnut-chart>
                         <div class="tabs table_tabs">
                          ${this.deviceTypes
                              .map(

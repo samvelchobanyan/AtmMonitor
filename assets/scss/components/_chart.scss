@@ -75,6 +75,15 @@
             }
         }
     }
+    ul.two-columns {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: rem(8) rem(16); // row-gap 8px, column-gap 16px (adjust as you wish)
+
+        li {
+            margin-right: 0; // avoid flex spacing conflicts
+        }
+    }
 }
 
 .chart-container {

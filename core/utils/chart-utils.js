@@ -70,6 +70,9 @@ const htmlLegendPlugin = {
                             item.text
                         }  <div>${percent}% / ${value.toLocaleString()}</div>`;
                     }
+                } else if (customLegendEl.hasClass("custom-legend_right")) {
+                    // Labels-right: only show label name
+                    textContainer.textContent = item.text;
                 } else {
                     // Default: label text only
                     textContainer.textContent = `${item.text}`;
@@ -81,6 +84,16 @@ const htmlLegendPlugin = {
 
             ul.appendChild(li);
         });
+        // ✅ Add 2-column layout for right legends with >4 items
+        const customLegendEl = $(chart.canvas)
+            .parents(".chart-container")
+            .children(".custom-legend");
+
+        if (customLegendEl.hasClass("custom-legend_right") && items.length > 4) {
+            ul.classList.add("two-columns");
+        } else {
+            ul.classList.remove("two-columns");
+        }
     },
 };
 const loadingPlugin = {
@@ -179,6 +192,11 @@ const getOrCreateLegendList = (chart, id) => {
 
     if (!listContainer) {
         listContainer = document.createElement("ul");
+
+        if (legendContainer.classList.contains("custom-legend_right")) {
+            listContainer.classList.add("flex", "flex-column");
+        }
+
         legendContainer.appendChild(listContainer);
     }
 
@@ -194,7 +212,19 @@ const baseDatasetOptions = {
     pointRadius: 4,
 };
 
-const chartColors = ["#9BECB0", "#9BB3EE", "#BE9BEE", "#FCE2A8", "#EC9B9C", "#77E6FF"];
+const chartColors = [
+    "#9BECB0",
+    "#9BB3EE",
+    "#BE9BEE",
+    "#FCE2A8",
+    "#EC9B9C",
+    "#77E6FF",
+    "#FFD700", // gold
+    "#90EE90", // light green
+    "#FFB6C1", // light pink
+    "#87CEFA", // light sky blue
+    "#DDA0DD",
+];
 const barChartColors = ["#9BECB0", "#9BB3EE", "#EAEAEA"];
 
 /* ====== LineChart ====== */
@@ -256,6 +286,8 @@ export function updateLineChart(chart, chartData) {
 /* ====== DoughnutChart ====== */
 
 export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines = true) {
+    console.log("chartData", chartData);
+
     const canvas = document.getElementById(ctxId);
     const ctx = canvas.getContext("2d");
 
@@ -269,6 +301,8 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
     if (useLabelLines) {
         plugins.push(doughnutLabelLinesPlugin);
     }
+
+    console.log("chartData", chartData);
 
     return new Chart(ctx, {
         type: "doughnut",

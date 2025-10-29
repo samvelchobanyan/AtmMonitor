@@ -1,6 +1,7 @@
 .tabs {
     @extend %flex;
-    margin-bottom: rem(20);
+    justify-content: center;
+    margin: rem(20) 0;
 }
 
 .tab {

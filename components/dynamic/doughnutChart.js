@@ -25,34 +25,31 @@ class DoughnutChartComponent extends DynamicElement {
     onAttributeChange(name, oldValue, newValue) {
         if (name === "data" && oldValue !== newValue) {
             try {
-                console.log("yes");
-
                 const parsed = JSON.parse(newValue);
-                console.log("parsed", parsed);
-
                 this.chartData = parsed.chartData || null;
                 this.total = parsed.total || 0;
                 this.dailyAvg = parsed.dailyAvg || null;
                 this.transactionAvg = parsed.transactionAvg || null;
                 this.changeValue = parsed.changeValue || 0;
+
+                // Trigger a re-render to update the chart
+                this.setState({});
             } catch (err) {
                 console.warn("[doughnut-chart] Invalid data attribute:", err);
                 this.chartData = null;
+                this.setState({});
             }
         }
     }
 
     onAfterRender() {
-        console.log("this.chartData", this.chartData);
-        console.log("this.chart", this.chart);
-
         if (!this.chartData) return;
+
         if (!this.chart) {
             this.chart = createDoughnutChart(this.canvasId, this.chartData, this.legendId, false);
         } else {
-            console.log("else");
-
-            updateDoughnutChart(this.chart, this.chartData);
+            this.chart.destroy();
+            this.chart = createDoughnutChart(this.canvasId, this.chartData, this.legendId, false);
         }
 
         const indicator = this.$("change-indicator");
@@ -85,18 +82,8 @@ class DoughnutChartComponent extends DynamicElement {
                   ${this.total.toLocaleString() + suffix}
                 </div>
                 <div class="badges">
-                  ${
-                      this.dailyAvg
-                          ? `<badge-item text="Օրական միջին՝ ${this.dailyAvg.toLocaleString() +
-                                suffix}"></badge-item>`
-                          : ""
-                  }
-                  ${
-                      this.transactionAvg
-                          ? `<badge-item text="Միջին գործարք՝ ${this.transactionAvg.toLocaleString() +
-                                suffix}"></badge-item>`
-                          : ""
-                  }
+                  ${this.dailyAvg ? `<badge-item text="Օրական միջին՝ ${this.dailyAvg.toLocaleString() + suffix}"></badge-item>` : ""}
+                  ${this.transactionAvg ? `<badge-item text="Միջին գործարք՝ ${this.transactionAvg.toLocaleString() + suffix}"></badge-item>` : ""}
                 </div>
               </div>
             </div>

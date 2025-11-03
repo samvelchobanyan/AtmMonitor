@@ -301,7 +301,6 @@ class ChartComponent extends DynamicElement {
                 const dataAttr = this.getAttr("chart-data");
                 const parsed = JSON.parse(dataAttr);
                 this.transformedData = chartDataTransformer.transformDoughnutData(parsed);
-                console.log(" this.transformedData", this.transformedData);
 
                 chartHTML = `
                   <div class="chart-container chart-container_between">

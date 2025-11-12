@@ -11,6 +11,7 @@ import "../components/ui/customCheck.js";
 import "../components/dynamic/segment.js";
 import "../components/dynamic/filtrationTabs.js";
 import "../components/dynamic/doughnutChart.js";
+import { getTodayDate } from "../core/utils/date-utils.js";
 
 class AtmFailures extends DynamicElement {
     constructor() {
@@ -22,9 +23,12 @@ class AtmFailures extends DynamicElement {
         this.tableActiveTab = null;
         this.filtrationTabs = null;
         this.bottomTable = null;
+        this.repairSummaryTable = null;
         this.filtrationQuery = null;
         this.chartSummary = null;
         this.deviceTypes = [{ id: 0, type_name: "Բոլորը" }];
+
+        this.todayDate = getTodayDate();
     }
 
     onConnected() {
@@ -35,14 +39,13 @@ class AtmFailures extends DynamicElement {
         this.topDateSelectBox = this.$("#top-date");
         this.filtrationTabs = this.$("filtration-tabs");
         this.bottomTable = this.$("#bottom_table");
+        this.repairSummaryTable = this.$("#repair_summary_table");
+        this.topTable = this.$("#top_table");
 
-        this.fetchTopSummary();
         this.fetchBottomSummary();
     }
 
     addEventListeners() {
-        this.selectTopDateListener();
-
         this.addListener(this.filtrationTabs, "filter-submit", (e) => {
             const queryString = e.detail.query;
             this.filtrationQuery = queryString;
@@ -60,27 +63,33 @@ class AtmFailures extends DynamicElement {
                     `/device-faults/by-device-type?deviceIds=${this.tableActiveTab}&${queryString}`
                 );
             }
+
+            if (this.repairSummaryTable) {
+                this.repairSummaryTable.setAttribute(
+                    "data-source",
+                    `/device-faults/repair-summary?${queryString}`
+                );
+            }
+
+            if (this.topTable) {
+                this.topTable.setAttribute(
+                    "data-source",
+                    `/device-faults/top?${queryString}`
+                );
+            }
         });
 
         this.addListener(this.$("#top_table"), "export-clicked", (e) => {
-            e.detail.url = `/device-faults/top-export?startDate=${this.topStartDate}&endDate=${this.topEndDate}`;
+            e.detail.url = `/device-faults/top-export?${this.filtrationQuery}`;
         });
 
         this.addListener(this.bottomTable, "export-clicked", (e) => {
             e.detail.url = `/device-faults/by-device-type-export?${this.filtrationQuery}`;
         });
-    }
 
-    async fetchTopSummary() {
-        const queryString = new URLSearchParams();
-        if (this.topStartDate) queryString.append("startDate", this.topStartDate);
-        if (this.topEndDate) queryString.append("endDate", this.topEndDate);
-
-        try {
-            this.$("#top_table").setAttribute("data-source", `/device-faults/top?${queryString}`);
-        } catch (err) {
-            console.error("❌ Error fetching top summary:", err);
-        }
+        // this.addListener(this.repairSummaryTable, "export-clicked", (e) => {
+        //     e.detail.url = `/device-faults/repair-summary?${this.filtrationQuery}`;
+        // });
     }
 
     async fetchBottomSummary(queryString) {
@@ -90,10 +99,13 @@ class AtmFailures extends DynamicElement {
         //     : "/device-faults/by-device-type";
 
         // for test
+        console.log('fetching bottom summary',queryString);
+        
         let url = queryString
             ? `/device-faults/by-device-type?${queryString}`
             : "/device-faults/by-device-type?startDate=2025-05-10&endDate=2025-10-05";
 
+            
         try {
             const res = await this.fetchData(url);
             this.chartSummary = res.data;
@@ -163,37 +175,21 @@ class AtmFailures extends DynamicElement {
         });
     }
 
-    selectTopDateListener() {
-        if (this.topDateSelectBox) {
-            this.addListener(this.topDateSelectBox, "date-range-change", (e) => {
-                const { startDate, endDate } = e.detail || {};
-                if (!startDate || !endDate) return;
-                this.topStartDate = startDate;
-                this.topEndDate = endDate;
-
-                this.fetchTopSummary();
-            });
-        }
-    }
-
     template() {
         return /*html*/ `
+            <filtration-tabs showAtm='true'></filtration-tabs>
+
             <div class="row">
                 <div class="column sm-12">
                     <div class="container">
                             <div class="select-container">
                                 <container-top icon="icon-x-octagon" title="Ամենահաճախ փչացող 10 բանկոմատները"> </container-top>
-                                <select-box-date
-                                    start-date="${this.topStartDate ? this.topStartDate : ""}"
-                                    end-date="${this.topEndDate ? this.topEndDate : ""}"
-                                    id='top-date'
-                                ></select-box-date>
                             </div>
 
                             <div class="container top_table"> 
                                 <simple-grid
                                     id='top_table'
-                                    data-source = '/device-faults/top'
+                                    data-source = '/device-faults/top?startDate=${this.todayDate}&endDate=${this.todayDate}'
                                     columns='["atm_id", "address", "total_faults", "faults_summary"]'
                                     column-labels='{
                                         "atm_id": "Բանկոմատի ID",
@@ -210,8 +206,6 @@ class AtmFailures extends DynamicElement {
                     </div>
                   </div>
             </div>
-
-            <filtration-tabs showAtm='true'></filtration-tabs>
 
             <div class='row'>
                 <div class="column sm-12">
@@ -233,7 +227,7 @@ class AtmFailures extends DynamicElement {
                             <simple-grid
                                 id='bottom_table'
                                 columns='["atm_id", "address", "total_faults", "faults_duration"]'
-                                data-source='/device-faults/by-device-type'
+                                data-source='/device-faults/by-device-type?startDate=${this.todayDate}&endDate=${this.todayDate}'
                                 column-labels='{
                                     "atm_id": "Բանկոմատի ID",
                                     "address": "Հասցե",
@@ -244,12 +238,48 @@ class AtmFailures extends DynamicElement {
                                 exportable
                                 searchable="false">
                             </simple-grid>
+                        </div>                       
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="column sm-12">
+                    <div class="container">
+                    <container-top icon="icon-x-octagon" title="Անսարքությունների վերանորգման ժամանակ"> </container-top>
+                        <simple-grid
+                            id="repair_summary_table"
+                            data-source="/device-faults/repair-summary?startDate=${this.todayDate}&endDate=${this.todayDate}"
+                            columns='[
+                                "atm_name",
+                                "error_date",
+                                "mail_sent_at",
+                                "fixed_at",
+                                "actual_repair_hours",
+                                "repair_time",
+                                "device_type",
+                                "description"
+                            ]'
+                            column-labels='{
+                                "atm_name": "Բանկոմատի ID",
+                                "error_date": "խափանման ամսաթիվ",
+                                "mail_sent_at": "տեղեկացում",
+                                "fixed_at": "վերկանգնում",
+                                "actual_repair_hours": "վերանորգման ժամանակ",
+                                "repair_time": "վերանարոգման սահմանաչափ",
+                                "device_type": "սարքի տեսակ",
+                                "description": "նկարագրություն"
+                            }'
+                            mode="server"
+                            per-page="10"
+                            searchable="false">
+                        </simple-grid>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
+        
       `;
     }
 }

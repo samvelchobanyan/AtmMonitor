@@ -43,6 +43,22 @@ function transformFaultTableData(apiResponse) {
       total_faults: data.error_count,
       faults_duration: data.duration,
     }));
+  } 
+  // Repair summary data structure
+  else if (
+    Array.isArray(apiResponse?.data) &&
+    (apiResponse.data[0]?.error_date || apiResponse.data[0]?.fixed_at)
+  ) {
+    return apiResponse.data.map((item) => ({
+      atm_name: item.atm_name,
+      error_date: formatCompactDate(item.error_date),
+      mail_sent_at: item.mail_sent_at ? formatCompactDate(item.mail_sent_at) : '',
+      fixed_at: formatCompactDate(item.fixed_at),
+      actual_repair_hours: item.actual_repair_hours,
+      repair_time: item.repair_time,
+      device_type: item.device_type,
+      description: item.description || '',
+    }));
   }
   // Encashment data structure
   else if (apiResponse.data?.encashments) {

@@ -260,6 +260,76 @@ export class SimpleGrid extends DynamicElement {
         }
     }
 
+    // NEW: Hidden columns parser
+    parseHiddenColumnsAttr() {
+        try {
+            const raw = this.getAttr("hidden-columns");
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+            console.warn("Invalid hidden-columns attribute JSON", e);
+            return [];
+        }
+    }
+
+    // NEW: Column conditions parser
+    parseColumnConditionsAttr() {
+        try {
+            const raw = this.getAttr("column-conditions");
+            return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+            console.warn("Invalid column-conditions attribute JSON", e);
+            return {};
+        }
+    }
+
+    // NEW: Minimal evaluator for simple conditions
+    evaluateSimple(when, value) {
+        if (when === "isTrue") {
+            return value === true || value === "true" || value === 1 || value === "1";
+        }
+        if (when === "notNull") {
+            return value !== null && value !== undefined && String(value).trim() !== "";
+        }
+        if (when === "isNull") {
+            return value === null || value === undefined || String(value).trim() === "";
+        }
+        return false;
+    }
+
+    // NEW: Build conditional formatter per column
+    getConditionalFormatter(colName, conditionsMap, h) {
+        const rules = conditionsMap[colName];
+        if (!Array.isArray(rules) || !rules.length) return null;
+
+        return (cell, rowObj) => {
+            for (const rule of rules) {
+                const key = (rule?.field || "").replace(/^row\./, "");
+                const v = rowObj[key];
+                if (!this.evaluateSimple(rule?.when, v)) continue;
+
+                const tag = rule.tag || "span";
+                const cls = rule.class || "";
+                const text = (rule.text ?? String(cell ?? "")).replaceAll("{{value}}", String(cell ?? ""));
+
+                if (tag === "button") {
+                    return h("button", {
+                        className: cls,
+                        onclick: () => {
+                            this.dispatch("cell-action", {
+                                column: colName,
+                                cellValue: rowObj[colName],
+                                rowData: rowObj,
+                                rule,
+                            });
+                        },
+                    }, text);
+                }
+                return h(tag, { className: cls }, text);
+            }
+            return null;
+        };
+    }
+
     getValueFormatter(colName, map) {
         const spec = map[colName];
         if (spec !== "currency") return null;
@@ -294,30 +364,36 @@ export class SimpleGrid extends DynamicElement {
             const labels = this.parseColumnLabelsAttr();
             const formattersMap = this.parseColumnFormattersAttr();
 
+            const conditionsMap = this.parseColumnConditionsAttr();
+
             const gridColumns = this.state.columns.map((colName) => {
                 const displayName = labels[colName] || colName;
                 const valueFormatter = this.getValueFormatter(colName, formattersMap);
+                const conditionalFormatter = this.getConditionalFormatter(colName, conditionsMap, h);
 
                 if (!clickableSet.has(colName)) {
-                    if (!valueFormatter) return { name: displayName };
                     return {
                         name: displayName,
-                        formatter: (cell) => valueFormatter(cell),
+                        formatter: (cell, row) => {
+                            const rowObj = this.rowArrayToObject(row.cells.map((c) => c.data));
+                            const conditional = conditionalFormatter ? conditionalFormatter(cell, rowObj) : null;
+                            if (conditional) return conditional;
+                            return valueFormatter ? valueFormatter(cell, row) : (cell ?? "");
+                        },
                     };
                 }
 
                 return {
                     name: displayName,
                     formatter: (cell, row) => {
-                        const content = valueFormatter ? valueFormatter(cell) : cell ?? "";
+                        const rowObj = this.rowArrayToObject(row.cells.map((c) => c.data));
+                        const conditional = conditionalFormatter ? conditionalFormatter(cell, rowObj) : null;
+                        const content = conditional || (valueFormatter ? valueFormatter(cell, row) : (cell ?? ""));
                         return h(
                             "span",
                             {
                                 className: "clickable",
                                 onclick: () => {
-                                    const rowObj = this.rowArrayToObject(
-                                        row.cells.map((c) => c.data)
-                                    );
                                     this.dispatch("cell-click", {
                                         column: colName,
                                         cellValue: rowObj[colName],
@@ -454,6 +530,28 @@ export class SimpleGrid extends DynamicElement {
             }
 
             this.grid.render(mountPoint);
+
+            // Hide selected columns by name (using nth-child selectors)
+            const hidden = this.parseHiddenColumnsAttr();
+            if (Array.isArray(hidden) && hidden.length) {
+                const idxs = this.state.columns
+                    .map((c, i) => (hidden.includes(c) ? i + 1 : null))
+                    .filter(Boolean);
+                const old = mountPoint.querySelector("style[data-hidden-cols]");
+                if (old) old.remove();
+                if (idxs.length) {
+                    const style = document.createElement("style");
+                    style.setAttribute("data-hidden-cols", "1");
+                    style.textContent = idxs
+                        .map(
+                            (n) => `
+.grid-container thead tr th:nth-child(${n}),
+.grid-container tbody tr td:nth-child(${n}) { display: none; }`
+                        )
+                        .join("\n");
+                    mountPoint.appendChild(style);
+                }
+            }
         });
     }
 

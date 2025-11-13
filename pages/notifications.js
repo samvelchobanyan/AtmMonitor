@@ -23,8 +23,8 @@ class Notifications extends DynamicElement {
         this.selectedCity = null;
         this.selectedRegion = null;
 
-        this.startDate = null;
-        this.endDate = null;
+        this.startDate = '2025-09-01';
+        this.endDate = '2025-11-14';
 
         this.province = [];
         this.cities = [];
@@ -40,6 +40,7 @@ class Notifications extends DynamicElement {
     }
 
     onConnected() {
+        console.log('onConnected ===>');
         const state = store.getState();
 
         this.province = state.regionsData.map((item) => ({
@@ -84,7 +85,7 @@ class Notifications extends DynamicElement {
 
         try {
             const res = await this.fetchData(`/notifications/summary?${queryString}`);
-
+            console.log('summary ===>', res.data);
             this.setState({
                 summary: res.data,
             });
@@ -98,6 +99,8 @@ class Notifications extends DynamicElement {
         try {
             const res = await this.fetchData(`/device-faults/all-device-types`);
             this.deviceTypes = [...this.deviceTypes, ...res.data];
+            console.log('deviceTypes ===>', this.deviceTypes);
+            
             // this.tableActiveTab = res.data[0].type_name;
         } catch (err) {
             console.error("❌ Failed to init table tabs:", err);
@@ -119,52 +122,93 @@ class Notifications extends DynamicElement {
 
     onAfterRender() {
         this.dateSelectBox = this.$("#date-selector");
+        console.log('onAfterRender ===>', this.dateSelectBox);
     }
 
-    addEventListeners() {
-        this.selectDateListener();
-        this.tableTabsListener();
+    // addEventListeners() {
+    //     this.selectDateListener();
+    //     this.tableTabsListener();
 
+    //     this.addEventListener("cell-click", (e) => {
+    //         const atmid = e.detail?.cellValue;
+    //         if (atmid) {
+    //             window.location.href = `atms/${atmid}`;
+    //         }
+    //     });
+    // }
+
+    addGlobalEventListeners() {
+        // Date range (delegated) - attach once
+        this.addEventListener("date-range-change", (e) => {
+            const { startDate, endDate } = e.detail || {};
+            if (!startDate || !endDate) return;
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.fetchSummary();
+        });
+
+        // Tabs (delegated) - attach once
+        this.addEventListener("click", (e) => {
+            const tab = e.target.closest("custom-tab");
+            if (!tab) return;
+            const selectedTab = tab.getAttribute("name");
+            if (this.tableActiveTab === selectedTab) return;
+            this.tableActiveTab = selectedTab;
+            this.setState({ summary: this.state.summary });
+        });
+
+        // Row navigation - attach once
         this.addEventListener("cell-click", (e) => {
             const atmid = e.detail?.cellValue;
-            if (atmid) {
-                window.location.href = `atms/${atmid}`;
+            if (atmid) window.location.href = `atms/${atmid}`;
+        });
+
+        // Button click from simple-grid (mail_sent_at) - attach once
+        this.addEventListener("cell-action", (e) => {
+            const { column, rowData } = e.detail || {};
+            if (column === "mail_sent_at") {
+                console.log("notification_id:", rowData?.notification_id);
             }
         });
     }
 
-    tableTabsListener() {
-        const tableTabs = this.$$("custom-tab");
-
-        tableTabs.forEach((tab) => {
-            this.addListener(tab, "click", async () => {
-                const selectedTab = tab.getAttribute("name");
-
-                if (this.tableActiveTab === selectedTab) return;
-
-                this.tableActiveTab = selectedTab;
-
-                this.setState({
-                    summary: this.state.summary,
-                });
-            });
-        });
+    addEventListeners() {
+        // Intentionally left empty; delegated listeners are global and attached once
     }
 
-    selectDateListener() {
-        if (this.dateSelectBox) {
-            this.addListener(this.dateSelectBox, "date-range-change", (e) => {
-                const { startDate, endDate } = e.detail || {};
-                if (!startDate || !endDate) return;
-                this.startDate = startDate;
-                this.endDate = endDate;
+    // tableTabsListener() {
+    //     const tableTabs = this.$$("custom-tab");
 
-                this.fetchSummary();
-            });
-        }
-    }
+    //     tableTabs.forEach((tab) => {
+    //         this.addListener(tab, "click", async () => {
+    //             const selectedTab = tab.getAttribute("name");
+
+    //             if (this.tableActiveTab === selectedTab) return;
+
+    //             this.tableActiveTab = selectedTab;
+
+    //             this.setState({
+    //                 summary: this.state.summary,
+    //             });
+    //         });
+    //     });
+    // }
+
+    // selectDateListener() {
+    //     if (this.dateSelectBox) {
+    //         this.addListener(this.dateSelectBox, "date-range-change", (e) => {
+    //             const { startDate, endDate } = e.detail || {};
+    //             if (!startDate || !endDate) return;
+    //             this.startDate = startDate;
+    //             this.endDate = endDate;
+
+    //             this.fetchSummary();
+    //         });
+    //     }
+    // }
 
     template() {
+        console.log('template ===>');
         if (!this.state.summary) {
             return /*html*/ `
             <div class="row">
@@ -223,13 +267,25 @@ class Notifications extends DynamicElement {
                          .join("")}
                   </div>
                  <simple-grid 
-                    data='${deviceErrors}' 
-                    columns='["atm_id", "date","address","fault_type","message"]'
-                    link-columns='{"atm_id": "atms/:id"}'
-                    column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե",
-                    "fault_type":"Սարքի տեսակ","message":"Նկարագրություն"}'
-                    clickable-columns = ${encode(["atm_id"])}
                     id='device-errors-table'
+                    data='${deviceErrors}' 
+                    columns='["atm_id","date","address","fault_type","message","notification_id","mail_sent_at"]'
+                    hidden-columns='["notification_id"]'
+                    link-columns='{"atm_id": "atms/:id"}'
+                    column-labels='{
+                        "atm_id":"Բանկոմատ",
+                        "date":"Ամսաթիվ",
+                        "address":"Հասցե",
+                        "fault_type":"Սարքի տեսակ",
+                        "message":"Նկարագրություն",
+                        "mail_sent_at":"Նամակ ուղարկված է"
+                    }'
+                    column-conditions='{
+                        "mail_sent_at": [
+                            { "field": "row.mail_sent_at", "when": "isNull",  "tag": "button", "class": "btn btn_blue btn_sm", "text": "Ուղարկել նամակ" }
+                        ]
+                    }'
+                    clickable-columns = ${encode(["atm_id"])}
                     >
                  </simple-grid>
                 </div>

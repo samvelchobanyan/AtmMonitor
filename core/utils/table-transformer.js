@@ -79,6 +79,8 @@ function transformFaultTableData(apiResponse) {
       address: `${item.city}, ${item.address}`,
       fault_type: item.device_name,
       message: item.message,
+      notification_id: item.notification_id, // or item.id if your API uses 'id'
+      mail_sent_at: item.mail_sent_at ? formatCompactDate(item.mail_sent_at) : "",
     }));
   } else if (apiResponse?.taken_cards) {
     return apiResponse.taken_cards.map((item) => ({

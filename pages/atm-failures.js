@@ -157,18 +157,22 @@ class AtmFailures extends DynamicElement {
                 if (this.tableActiveTab === selectedTab) return;
                 this.tableActiveTab = selectedTab;
                 if (selectedTab == 0) {
+                    const params = new URLSearchParams(this.filtrationQuery || "");
+                    params.delete("deviceIds");
+                    const qs = params.toString();
+                    this.filtrationQuery = qs;
                     this.bottomTable.setAttribute(
                         "data-source",
-                        `/device-faults/by-device-type?${
-                            this.filtrationQuery ? `&${this.filtrationQuery}` : ""
-                        }`
+                        qs ? `/device-faults/by-device-type?${qs}` : `/device-faults/by-device-type`
                     );
                 } else {
-                    this.filtrationQuery = `${this.filtrationQuery}&deviceIds=${selectedTab}`;
-
+                    const params = new URLSearchParams(this.filtrationQuery || "");
+                    params.set("deviceIds", selectedTab);
+                    const qs = params.toString();
+                    this.filtrationQuery = qs;
                     this.bottomTable.setAttribute(
                         "data-source",
-                        `/device-faults/by-device-type?${this.filtrationQuery}`
+                        `/device-faults/by-device-type?${qs}`
                     );
                 }
             });

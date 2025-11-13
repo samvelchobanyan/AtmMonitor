@@ -412,8 +412,13 @@ export class SimpleGrid extends DynamicElement {
                                 return resp.data.total_count;
                             if (typeof resp?.total === "number") return resp.total;
                             if (typeof resp?.data?.total === "number") return resp.data.total;
+                            // Some APIs return total_count on the first element of the data array
+                            if (typeof resp?.data?.[0]?.total_count === "number")
+                                return resp.data[0].total_count;
                             if (Array.isArray(resp?.data)) return resp.data.length;
                             if (Array.isArray(resp)) return resp.length;
+                            if (typeof resp?.data[0].total_count === "number")
+                                return resp.data.total_count;
                             return 0;
                         },
                     },

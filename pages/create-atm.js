@@ -144,6 +144,8 @@ class CreateAtm extends DynamicElement {
         const atmCdmTypeInput = this.$("#atmCdmType");
         const lonInput = this.$("#lon");
         const latInput = this.$("#lat");
+        const encashmentԼimitInut = this.$("#encashmentԼimit");
+        const repairTimeInput = this.$("#repairTime");
 
         const name = nameInput?.value.trim();
         const modelId = Number(modelIdInput?.value);
@@ -159,6 +161,9 @@ class CreateAtm extends DynamicElement {
         const lon = lonInput?.value.trim();
         const lat = latInput?.value.trim();
 
+        const encashmentԼimit = encashmentԼimitInut?.value.trim();
+        const repairTime = repairTimeInput?.value.trim();
+
         const rawVal = segmentIdInput.getAttribute("value") || "[]";
         const segmentIds = JSON.parse(rawVal).map((v) => Number(v));
 
@@ -171,6 +176,8 @@ class CreateAtm extends DynamicElement {
             !atmCdmType ||
             !lon ||
             !lat ||
+            !encashmentԼimit ||
+            !repairTime ||
             atmArchived
         ) {
             this.setState({ error: "Լրացրեք բոլոր դաշտերը" });
@@ -192,6 +199,8 @@ class CreateAtm extends DynamicElement {
                 atmCdmType,
                 lon,
                 lat,
+                encashmentԼimit,
+                repairTime,
             });
 
             window.location.href = "all-atms";
@@ -262,6 +271,16 @@ class CreateAtm extends DynamicElement {
                                 
                                 <div class="form__item column sm-3 checkbox">
                                     <custom-checkbox id="atmArchived" value="true">ԱՐԽԻՎԱՑՎԱԾ </custom-checkbox>
+                                </div>
+
+                                <div class="form__item column sm-3">
+                                    <label for="repairTime">Վերոնորգման ժամկետ (ժամ)</label>
+                                    <input id="repairTime" class="w-50" name="repairTime" type="text" />
+                                </div>
+
+                                <div class="form__item column sm-3">
+                                    <label for="encashmentԼimit ">Լիցքաորման սահմանաչափ</label>
+                                    <input id="encashmentԼimit " class="w-50" name="encashmentԼimit " type="text" />
                                 </div>
                             </div>
 

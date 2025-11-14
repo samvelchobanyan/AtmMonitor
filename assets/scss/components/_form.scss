@@ -3,29 +3,18 @@
         margin-bottom: rem(32);
         position: relative;
         input {
-            height: rem(48);
-            border: 1px solid #ccc;
+            height: rem(44);
+            border: 1px solid map-get($color-scheme, "gray-200");
             border-radius: rem(8);
             padding: rem(12) rem(16);
-        }
-        label {
-            top: rem(-10);
-            position: absolute;
+            width: 100%;
         }
         label,
         p {
             @extend %flex;
             @extend %align-middle;
-            @include font(
-                bold,
-                11,
-                1.5,
-                map-get($color-scheme, "gray-700"),
-                uppercase,
-                $fontPrimary
-            );
+            @include font(bold, 11, 1.5, map-get($color-scheme, "gray-700"), uppercase, $fontPrimary);
             letter-spacing: 0.02em;
-
             height: rem(20);
             padding: 0 rem(4);
             left: rem(12);

@@ -298,3 +298,12 @@ main.main-container {
         }
     }
 }
+
+.highlight-bg {
+    background-color: #ffe6e6;
+    display: inline-block;
+}
+
+.gridjs-td:has(.highlight-bg) {
+    background-color: #ffe6e6;
+}

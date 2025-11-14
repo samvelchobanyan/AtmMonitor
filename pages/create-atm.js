@@ -229,6 +229,7 @@ class CreateAtm extends DynamicElement {
                                     <input id="name" class="w-100" name="name" type="text" required />
                                 </div>
                                   <div class="form__item column sm-6">
+                                    <label for="segmentId"></label>
                                     <select-box-search id='segmentId' placeholder="Որոնել Սեգմենտ" options='${segments}' id='segments-search'></select-box-search>
                                 </div>
                               

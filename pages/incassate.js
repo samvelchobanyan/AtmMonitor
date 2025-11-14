@@ -84,10 +84,14 @@ class Incassate extends DynamicElement {
 
                     <simple-grid
                         data-source="/encashment/summary?${this.initQuery}"
-                        columns='["atm_id","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
+                        columns='["atm_id","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty", "limit_exceeded"]'
                         column-labels='{"atm_id":"Բանկոմատի ID","date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
                           "added_amount":"Լիցքավորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'
                         column-formatters='{"collected_amount":"currency","added_amount":"currency"}'
+                        hidden-columns='["marked_as_empty"]'
+                        row-conditions='[
+                            { "field": "row.limit_exceeded", "when": "isTrue", "class": "highlight-bg" }
+                        ]'
                         mode="server"
                         per-page="10"
                         exportable>

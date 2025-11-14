@@ -67,6 +67,7 @@ function transformFaultTableData(apiResponse) {
       added_amount: item.added_amount,
       collected_amount: item.collected_amount,
       marked_as_empty: item.marked_as_empty,
+      limit_exceeded: item.limit_exceeded,
     }));
   }
   // Notifications data

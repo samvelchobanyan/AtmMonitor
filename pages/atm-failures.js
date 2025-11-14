@@ -265,6 +265,7 @@ class AtmFailures extends DynamicElement {
                                 "description",
                                 "is_late"
                             ]'
+                            hidden-columns='["is_late"]'
                             column-labels='{
                                 "atm_name": "Բանկոմատի ID",
                                 "error_date": "խափանման ամսաթիվ",

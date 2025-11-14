@@ -45,19 +45,17 @@ function transformFaultTableData(apiResponse) {
     }));
   } 
   // Repair summary data structure
-  else if (
-    Array.isArray(apiResponse?.data) &&
-    (apiResponse.data[0]?.error_date || apiResponse.data[0]?.fixed_at)
-  ) {
-    return apiResponse.data.map((item) => ({
+  else if (Array.isArray(apiResponse?.data?.repairs)) {
+    return apiResponse.data.repairs.map((item) => ({
       atm_name: item.atm_name,
-      error_date: formatCompactDate(item.error_date),
+      error_date: item.error_date ? formatCompactDate(item.error_date) : '',
       mail_sent_at: item.mail_sent_at ? formatCompactDate(item.mail_sent_at) : '',
-      fixed_at: formatCompactDate(item.fixed_at),
+      fixed_at: item.fixed_at ? formatCompactDate(item.fixed_at) : '',
       actual_repair_hours: item.actual_repair_hours,
       repair_time: item.repair_time,
       device_type: item.device_type,
       description: item.description || '',
+      is_late: item.is_late,
     }));
   }
   // Encashment data structure

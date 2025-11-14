@@ -282,24 +282,39 @@ export class SimpleGrid extends DynamicElement {
         }
     }
 
-    // NEW: Minimal evaluator for simple conditions
-    evaluateSimple(when, value) {
-        if (when === "isTrue") {
-            return value === true || value === "true" || value === 1 || value === "1";
+    // NEW: Row conditions parser (universal row-level rules)
+    parseRowConditionsAttr() {
+        try {
+            const raw = this.getAttr("row-conditions");
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+            console.warn("Invalid row-conditions attribute JSON", e);
+            return [];
         }
-        if (when === "notNull") {
-            return value !== null && value !== undefined && String(value).trim() !== "";
-        }
-        if (when === "isNull") {
-            return value === null || value === undefined || String(value).trim() === "";
-        }
-        return false;
     }
 
-    // NEW: Build conditional formatter per column
-    getConditionalFormatter(colName, conditionsMap, h) {
-        const rules = conditionsMap[colName];
-        if (!Array.isArray(rules) || !rules.length) return null;
+	// NEW: Minimal evaluator for simple conditions (used by column-conditions)
+	evaluateSimple(when, value) {
+		if (when === "isTrue") {
+			return value === true || value === "true" || value === 1 || value === "1";
+		}
+		if (when === "notNull") {
+			return value !== null && value !== undefined && String(value).trim() !== "";
+		}
+		if (when === "isNull") {
+			return value === null || value === undefined || String(value).trim() === "";
+		}
+		return false;
+	}
+
+    // Build conditional formatter per column
+    getConditionalFormatter(colName, conditionsMap, rowConditions, h) {
+        const colRules = conditionsMap[colName] || [];
+        const rowRules = Array.isArray(rowConditions) ? rowConditions : [];
+
+        // row rules first so they take precedence, then column-specific rules
+        const rules = [...rowRules, ...colRules];
+        if (!rules.length) return null;
 
         return (cell, rowObj) => {
             for (const rule of rules) {
@@ -311,9 +326,14 @@ export class SimpleGrid extends DynamicElement {
                 const cls = rule.class || "";
                 const text = (rule.text ?? String(cell ?? "")).replaceAll("{{value}}", String(cell ?? ""));
 
+                // row-conditions get full-cell inline sizing; color comes from the class
+                const isRowRule = rule.__rowRule === true;
+                const style = isRowRule ? "display:block;width:100%;height:100%;" : undefined;
+
                 if (tag === "button") {
                     return h("button", {
                         className: cls,
+                        style,
                         onclick: () => {
                             this.dispatch("cell-action", {
                                 column: colName,
@@ -324,7 +344,7 @@ export class SimpleGrid extends DynamicElement {
                         },
                     }, text);
                 }
-                return h(tag, { className: cls }, text);
+                return h(tag, { className: cls, style }, text);
             }
             return null;
         };
@@ -366,10 +386,16 @@ export class SimpleGrid extends DynamicElement {
 
             const conditionsMap = this.parseColumnConditionsAttr();
 
+            // mark row conditions so we can treat them specially in formatters
+            const rawRowConditions = this.parseRowConditionsAttr();
+            const rowConditions = Array.isArray(rawRowConditions)
+                ? rawRowConditions.map((r) => ({ ...r, __rowRule: true }))
+                : [];
+
             const gridColumns = this.state.columns.map((colName) => {
                 const displayName = labels[colName] || colName;
                 const valueFormatter = this.getValueFormatter(colName, formattersMap);
-                const conditionalFormatter = this.getConditionalFormatter(colName, conditionsMap, h);
+                const conditionalFormatter = this.getConditionalFormatter(colName, conditionsMap, rowConditions, h);
 
                 if (!clickableSet.has(colName)) {
                     return {
@@ -565,7 +591,7 @@ export class SimpleGrid extends DynamicElement {
 
     template() {
         if (this.state.error) {
-            return `<div class="error">Տվյալների բերնման սխալ</div>`;
+            return `<div class="error">Տվյալների բեռնման սխալ</div>`;
         }
 
         if (this.state.loading) {

@@ -262,7 +262,8 @@ class AtmFailures extends DynamicElement {
                                 "actual_repair_hours",
                                 "repair_time",
                                 "device_type",
-                                "description"
+                                "description",
+                                "is_late"
                             ]'
                             column-labels='{
                                 "atm_name": "Բանկոմատի ID",
@@ -272,8 +273,12 @@ class AtmFailures extends DynamicElement {
                                 "actual_repair_hours": "վերանորգման ժամանակ",
                                 "repair_time": "վերանարոգման սահմանաչափ",
                                 "device_type": "սարքի տեսակ",
-                                "description": "նկարագրություն"
+                                "description": "նկարագրություն",
+                                "is_late": "ուշացե՞լ է"
                             }'
+                            row-conditions='[
+                                { "field": "row.is_late", "when": "isTrue", "class": "highlight-bg" }
+                            ]'
                             mode="server"
                             per-page="10"
                             searchable="false">

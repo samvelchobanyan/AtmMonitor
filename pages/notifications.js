@@ -164,11 +164,61 @@ class Notifications extends DynamicElement {
         });
 
         // Button click from simple-grid (mail_sent_at) - attach once
-        this.addEventListener("cell-action", (e) => {
+        this.addEventListener("cell-action", async (e) => {
             const { column, rowData } = e.detail || {};
-            if (column === "mail_sent_at") {
-                console.log("notification_id:", rowData?.notification_id);
+            if (column !== "mail_sent_at") return;
+
+            console.log('cell-action ===>', e.detail);
+            
+
+            const btn = document.activeElement;
+            if (btn && btn.tagName === "BUTTON") {
+                btn.disabled = true;
+                btn.textContent = "Ուղարկվում է…";
             }
+
+            // Get notification id (hidden column is included in rowData)
+            const notification_id = rowData?.notification_id;
+            if (!notification_id) {
+                alert("Չկա ծանուցման ID");
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = "Ուղարկել նամակ";
+                }
+                return;
+            }
+
+            const text = rowData?.message || '';
+          
+            try {
+                await this.fetchData(`/notifications/send-mail`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: {
+                        notification_id,
+                        text,
+                    },
+                });
+        
+                // Keep disabled after success
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = "Ուղարկված է";
+                }
+
+            } catch (err) {
+                console.error("❌ նամակը չի ուղարկվել:", err);
+                alert("Չհաջողվեց ուղարկել նամակը");
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = "Ուղարկել նամակ";
+                }
+            }
+
+
+            // if (column === "mail_sent_at") {
+            //     console.log("notification_id:", rowData?.notification_id);
+            // }
         });
     }
 

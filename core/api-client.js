@@ -86,5 +86,4 @@ export const api = new ApiClient({
     // baseUrl: 'http://37.186.122.133:3393/api',
     // baseUrl: 'http://localhost/ATM_monitor',
     useProxy: true,
-    delay: 0.5,
 });

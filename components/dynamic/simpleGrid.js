@@ -88,7 +88,7 @@ export class SimpleGrid extends DynamicElement {
                         headers: { Accept: "*/*" },
                         asBlob: true, // 👈 Important
                     });
-                    console.log('finalUrl',finalUrl);
+                    console.log('finalUrl222',finalUrl);
                     console.log('response.blob',response);
                     
 
@@ -388,6 +388,8 @@ export class SimpleGrid extends DynamicElement {
         loadGridJsModule().then((module) => {
             const { Grid, h } = module;
 
+            const includeSerial = this.hasAttribute("serial");
+
             const clickableColumns = this.parseClickableColumnsAttr();
             const clickableSet = new Set(clickableColumns);
             const labels = this.parseColumnLabelsAttr();
@@ -466,18 +468,18 @@ export class SimpleGrid extends DynamicElement {
                 };
             });
 
+            const columnsForGrid = includeSerial
+                ? [{ name: "№", sort: false, width: "30px" }, ...gridColumns]
+                : gridColumns;
+
             const baseConfig = {
-                columns: gridColumns,
+                columns: columnsForGrid,
                 pagination: {
                     enabled: true,
                     limit: this.state.perPage,
                 },
                 sort: true,
                 search: false,
-                className: {
-                    td: "gridjs-td",
-                    th: "gridjs-th",
-                },
                 language: {
                     search: {
                         placeholder: "🔍 Որոնել...",
@@ -498,8 +500,10 @@ export class SimpleGrid extends DynamicElement {
             let endpoint = this.getAttr("data-source");
 
             if (mode === "client") {
-                const dataArray = this.state.data.map((row) =>
-                    this.state.columns.map((c) => row[c] ?? "")
+                const dataArray = this.state.data.map((row, i) =>
+                    includeSerial
+                        ? [i + 1, ...this.state.columns.map((c) => row[c] ?? "")]
+                        : this.state.columns.map((c) => row[c] ?? "")
                 );
                 this.grid = new Grid({
                     ...baseConfig,
@@ -537,9 +541,13 @@ export class SimpleGrid extends DynamicElement {
                                     transformed = Array.isArray(resp) ? resp : [];
                                 }
                             }
-                            return transformed.map((item) =>
-                                this.state.columns.map((c) => item?.[c] ?? "")
-                            );
+                            return transformed.map((item, i) => {
+                                const rowVals = this.state.columns.map((c) => item?.[c] ?? "");
+                                if (!includeSerial) return rowVals;
+                                const page = this._currentPage || 0; // 0-based
+                                const offset = page * this.state.perPage;
+                                return [offset + i + 1, ...rowVals];
+                            });
                         },
                         total: (resp) => {
                             // Try common fields for total records
@@ -562,6 +570,7 @@ export class SimpleGrid extends DynamicElement {
                         limit: this.state.perPage,
                         server: {
                             url: (prev, page, limit) => {
+                                this._currentPage = page; // track 0-based page
                                 const join = prev.includes("?") ? "&" : "?";
                                 // API expects pageSize and 1-based pageNumber
                                 return `${prev}${join}pageSize=${limit}&pageNumber=${page + 1}`;
@@ -575,7 +584,10 @@ export class SimpleGrid extends DynamicElement {
                                 if (!columns?.length) return prev;
                                 const col = columns[0];
                                 const dir = col.direction === 1 ? "asc" : "desc";
-                                const colName = this.state.columns[col.index];
+                                // If serial column is present and selected, ignore server sort
+                                if (includeSerial && col.index === 0) return prev;
+                                const indexOffset = includeSerial ? 1 : 0;
+                                const colName = this.state.columns[col.index - indexOffset];
 
                                 const join = prev.includes("?") ? "&" : "?";
 
@@ -590,11 +602,31 @@ export class SimpleGrid extends DynamicElement {
 
             this.grid.render(mountPoint);
 
+            // Fix serial column width to 30px
+            if (includeSerial) {
+                const old = mountPoint.querySelector("style[data-serial-col]");
+                if (old) old.remove();
+                const style = document.createElement("style");
+                style.setAttribute("data-serial-col", "1");
+                style.textContent = `
+.grid-container thead tr th:nth-child(1),
+.grid-container tbody tr td:nth-child(1) {
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  text-align: center;
+}`;
+                mountPoint.appendChild(style);
+            }
+
             // Hide selected columns by name (using nth-child selectors)
             const hidden = this.parseHiddenColumnsAttr();
             if (Array.isArray(hidden) && hidden.length) {
+                const offset = includeSerial ? 1 : 0;
                 const idxs = this.state.columns
-                    .map((c, i) => (hidden.includes(c) ? i + 1 : null))
+                    .map((c, i) => (hidden.includes(c) ? i + 1 + offset : null))
                     .filter(Boolean);
                 const old = mountPoint.querySelector("style[data-hidden-cols]");
                 if (old) old.remove();
@@ -615,9 +647,14 @@ export class SimpleGrid extends DynamicElement {
     }
 
     rowArrayToObject(rowArray) {
+        const arr =
+            rowArray.length === this.state.columns.length + 1
+                ? rowArray.slice(1)
+                : rowArray;
+
         const obj = {};
         for (let i = 0; i < this.state.columns.length; i++) {
-            obj[this.state.columns[i]] = rowArray[i];
+            obj[this.state.columns[i]] = arr[i];
         }
         return obj;
     }

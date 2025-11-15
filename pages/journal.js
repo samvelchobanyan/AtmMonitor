@@ -98,6 +98,7 @@ class JournalPage extends DynamicElement {
 
             <div class="table-container">
                 <simple-grid
+                    serial
                     data-source="/journal/events-journal"
                     columns='["atm_id","date","server_date","transaction_id","code","card_number","event_description"]'
                     column-labels='{"atm_id":"Բանկոմատի ID","date":"Ամսաթիվ","server_date":"Սերվերի ամսաթիվ","transaction_id":"Գործարքի ID","code":"Կոդ","card_number":"Քարտի համար","event_description":"Միջոցառման նկարագրություն"}'

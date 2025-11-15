@@ -317,6 +317,7 @@ class Notifications extends DynamicElement {
                          .join("")}
                   </div>
                  <simple-grid 
+                    serial
                     id='device-errors-table'
                     data='${deviceErrors}' 
                     columns='["atm_id","date","address","fault_type","message","notification_id","mail_sent_at"]'
@@ -345,6 +346,7 @@ class Notifications extends DynamicElement {
                         taken_cards.length
                     }'> </container-top>
                     <simple-grid
+                        serial
                         data='${takenCards}' 
                         columns='["atm_id", "date","address","card_number"]'
                         column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե", "card_number": "Քարտի համար"}'
@@ -357,6 +359,7 @@ class Notifications extends DynamicElement {
                         problematic_transactions.length
                     }'> </container-top>
                     <simple-grid
+                        serial
                         data='${problematicTransactions}' 
                         columns='["atm_id", "date","address","amount", "message", "transaction_id"]'
                         column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե", 

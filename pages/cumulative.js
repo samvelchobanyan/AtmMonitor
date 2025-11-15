@@ -90,6 +90,7 @@ class Cumulative extends DynamicElement {
                         <div class="container">     
                             <doughnut-chart id="cumulative-chart" labels-right></doughnut-chart>
                             <simple-grid
+                                serial
                                 data-source="/analytics/cumulative-summary"
                                 columns='["province","deposit_amount","deposit_count","dispense_amount","dispense_count","exchange_eur_amount","exchange_rub_amount","exchange_usd_amount"]'
                                 column-labels='{"province":"Մարզ","deposit_amount":"Մուտքագրված գումար",

@@ -192,6 +192,7 @@ class AtmFailures extends DynamicElement {
 
                             <div class="container top_table"> 
                                 <simple-grid
+                                    serial
                                     id='top_table'
                                     data-source = '/device-faults/top?startDate=${this.todayDate}&endDate=${this.todayDate}'
                                     columns='["atm_id", "address", "total_faults", "faults_summary"]'
@@ -229,6 +230,7 @@ class AtmFailures extends DynamicElement {
                         
                         <div class="container bottom_table">
                             <simple-grid
+                                serial
                                 id='bottom_table'
                                 columns='["atm_id", "address", "total_faults", "faults_duration"]'
                                 data-source='/device-faults/by-device-type?startDate=${this.todayDate}&endDate=${this.todayDate}'
@@ -252,6 +254,7 @@ class AtmFailures extends DynamicElement {
                     <div class="container">
                     <container-top icon="icon-x-octagon" title="Անսարքությունների վերանորգման ժամանակ"> </container-top>
                         <simple-grid
+                            serial
                             id="repair_summary_table"
                             data-source="/device-faults/repair-summary?startDate=${this.todayDate}&endDate=${this.todayDate}"
                             columns='[

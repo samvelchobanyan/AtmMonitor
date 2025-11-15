@@ -83,6 +83,7 @@ class Incassate extends DynamicElement {
                     </div>
 
                     <simple-grid
+                        serial
                         data-source="/encashment/summary?${this.initQuery}"
                         columns='["atm_id","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty", "limit_exceeded"]'
                         column-labels='{"atm_id":"Բանկոմատի ID","date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",

@@ -88,7 +88,7 @@ class Incassate extends DynamicElement {
                         column-labels='{"atm_id":"Բանկոմատի ID","date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
                           "added_amount":"Լիցքավորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'
                         column-formatters='{"collected_amount":"currency","added_amount":"currency"}'
-                        hidden-columns='["marked_as_empty"]'
+                        hidden-columns='["limit_exceeded"]'
                         row-conditions='[
                             { "field": "row.limit_exceeded", "when": "isTrue", "class": "highlight-bg" }
                         ]'

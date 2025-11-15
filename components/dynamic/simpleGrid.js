@@ -88,6 +88,9 @@ export class SimpleGrid extends DynamicElement {
                         headers: { Accept: "*/*" },
                         asBlob: true, // 👈 Important
                     });
+                    console.log('finalUrl',finalUrl);
+                    console.log('response.blob',response);
+                    
 
                     const blob = await response.blob();
 
@@ -355,7 +358,13 @@ export class SimpleGrid extends DynamicElement {
         if (spec !== "currency") return null;
 
         const formatCommas = (val) => {
-            return val.toLocaleString();
+            if (val === null || val === undefined || val === "") return "";
+            const num =
+                typeof val === "number"
+                    ? val
+                    : Number(String(val).replace(/\s/g, "").replace(/,/g, ""));
+            if (Number.isNaN(num)) return val;
+            return num.toLocaleString();
         };
 
         return (v) => formatCommas(v);
@@ -385,8 +394,6 @@ export class SimpleGrid extends DynamicElement {
             const formattersMap = this.parseColumnFormattersAttr();
 
             const conditionsMap = this.parseColumnConditionsAttr();
-
-            // mark row conditions so we can treat them specially in formatters
             const rawRowConditions = this.parseRowConditionsAttr();
             const rowConditions = Array.isArray(rawRowConditions)
                 ? rawRowConditions.map((r) => ({ ...r, __rowRule: true }))
@@ -395,16 +402,31 @@ export class SimpleGrid extends DynamicElement {
             const gridColumns = this.state.columns.map((colName) => {
                 const displayName = labels[colName] || colName;
                 const valueFormatter = this.getValueFormatter(colName, formattersMap);
-                const conditionalFormatter = this.getConditionalFormatter(colName, conditionsMap, rowConditions, h);
+                const conditionalFormatter = this.getConditionalFormatter(
+                    colName,
+                    conditionsMap,
+                    rowConditions,
+                    h
+                );
 
                 if (!clickableSet.has(colName)) {
                     return {
                         name: displayName,
                         formatter: (cell, row) => {
-                            const rowObj = this.rowArrayToObject(row.cells.map((c) => c.data));
-                            const conditional = conditionalFormatter ? conditionalFormatter(cell, rowObj) : null;
+                            const rowObj = this.rowArrayToObject(
+                                row.cells.map((c) => c.data)
+                            );
+
+                            const display = valueFormatter
+                                ? valueFormatter(cell, row)
+                                : cell ?? "";
+
+                            const conditional = conditionalFormatter
+                                ? conditionalFormatter(display, rowObj)
+                                : null;
+
                             if (conditional) return conditional;
-                            return valueFormatter ? valueFormatter(cell, row) : (cell ?? "");
+                            return display;
                         },
                     };
                 }
@@ -412,9 +434,20 @@ export class SimpleGrid extends DynamicElement {
                 return {
                     name: displayName,
                     formatter: (cell, row) => {
-                        const rowObj = this.rowArrayToObject(row.cells.map((c) => c.data));
-                        const conditional = conditionalFormatter ? conditionalFormatter(cell, rowObj) : null;
-                        const content = conditional || (valueFormatter ? valueFormatter(cell, row) : (cell ?? ""));
+                        const rowObj = this.rowArrayToObject(
+                            row.cells.map((c) => c.data)
+                        );
+
+                        const display = valueFormatter
+                            ? valueFormatter(cell, row)
+                            : cell ?? "";
+
+                        const conditional = conditionalFormatter
+                            ? conditionalFormatter(display, rowObj)
+                            : null;
+
+                        const content = conditional || display;
+
                         return h(
                             "span",
                             {

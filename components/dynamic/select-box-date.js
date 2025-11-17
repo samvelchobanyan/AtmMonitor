@@ -50,7 +50,7 @@ class SelectBoxDate extends DynamicElement {
     }
 
     onSelectChange(e) {
-        console.log("onSelectChange", e.target.value);
+        // console.log("onSelectChange", e.target.value);
     }
 
     onSelectClick(e) {

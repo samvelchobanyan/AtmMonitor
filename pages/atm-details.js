@@ -371,7 +371,7 @@ class AtmDetails extends DynamicElement {
     async fetchEncashmentsInfocardData(date_query = "") {
         try {
             const failedResponse = await this.fetchData(
-                `/encashment/failed-transactions?atmId=${this.atmId}&${date_query}`
+                `/encashment/failed-transactions?atmIds=${this.atmId}&${date_query}`
             );
             const totalsResponse = await this.fetchData(
                 `/encashment/totals?atmIds=${this.atmId}&${date_query}`
@@ -634,8 +634,7 @@ class AtmDetails extends DynamicElement {
                 </div>
 
                 <simple-grid
-                    serial
-                    data-source="/encashment/summary?atmId=${this.atmId}"
+                    data-source="/encashment/summary?atmIds=${this.atmId}"
                     columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
                     column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
                       "added_amount":"Լիցքավորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'

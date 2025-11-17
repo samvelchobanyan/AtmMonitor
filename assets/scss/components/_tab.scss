@@ -1,7 +1,10 @@
 .tabs {
     @extend %flex;
-    justify-content: center;
     margin: rem(20) 0;
+}
+
+.failures .tabs {
+    justify-content: center;
 }
 
 .tab {

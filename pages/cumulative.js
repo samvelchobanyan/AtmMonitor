@@ -60,6 +60,8 @@ class Cumulative extends DynamicElement {
                 },
             };
 
+            console.log("chartpayload", chartPayload);
+
             this.$("#cumulative-chart").setAttribute("data", JSON.stringify(chartPayload));
         } catch (err) {
             console.error("❌ Error fetching chart summary:", err);

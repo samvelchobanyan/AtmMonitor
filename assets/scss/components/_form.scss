@@ -13,7 +13,14 @@
         p {
             @extend %flex;
             @extend %align-middle;
-            @include font(bold, 11, 1.5, map-get($color-scheme, "gray-700"), uppercase, $fontPrimary);
+            @include font(
+                bold,
+                11,
+                1.5,
+                map-get($color-scheme, "gray-700"),
+                uppercase,
+                $fontPrimary
+            );
             letter-spacing: 0.02em;
             height: rem(20);
             padding: 0 rem(4);
@@ -24,6 +31,12 @@
         .combo-box {
             width: 100%;
         }
+    }
+
+    &__btn {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
     }
 }
 

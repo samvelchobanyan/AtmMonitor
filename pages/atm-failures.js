@@ -109,15 +109,20 @@ class AtmFailures extends DynamicElement {
         try {
             const res = await this.fetchData(url);
             this.chartSummary = res.data;
+            console.log(res.data);
+
             const labels = this.chartSummary.map((item) => item.device_type);
             const dataValues = this.chartSummary.map((item) => item.atms.length);
 
             const chartPayload = {
                 chartData: {
                     labels,
-                    datasets: [{ data: dataValues }],
+                    datasets: [{ data: [dataValues] }],
                 },
             };
+
+            console.log("chartPayload", chartPayload);
+            console.log("!!!!");
 
             this.$("#failures-chart").setAttribute("data", JSON.stringify(chartPayload));
         } catch (err) {
@@ -214,7 +219,7 @@ class AtmFailures extends DynamicElement {
 
             <div class='row'>
                 <div class="column sm-12">
-                    <div class="container">
+                    <div class="container failures">
                        <doughnut-chart id="failures-chart" labels-right></doughnut-chart>
                         <div class="tabs table_tabs">
                          ${this.deviceTypes

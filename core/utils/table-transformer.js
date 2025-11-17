@@ -1,41 +1,38 @@
-import { formatDate, formatCompactDate } from './date-transformer.js';
+import { formatDate, formatCompactDate } from "./date-transformer.js";
 
 function transformFaultTableData(apiResponse) {
-  console.log('table transformer ===>', apiResponse);
+    console.log("table transformer ===>", apiResponse);
 
-  // Journal data structure
-  if (apiResponse.data?.events) {
-    return apiResponse.data.events.map((event) => ({
-      date: formatCompactDate(event.date),
-      server_date: formatCompactDate(event.server_date),
-      code: event.code || '-',
-      card_number: event.card_number,
-      event_description: event.event_description,
-      atm_id: event.atm_name,
-      transaction_id: event.transaction_id,
-    }));
-  }
-  // Failures data structure
-  else if (
-    Array.isArray(apiResponse?.data) &&
-    apiResponse.data[0]?.total_faults
-  ) {
-    return apiResponse.data?.map((data) => ({
-      atm_id: data.atm_name,
-      address: data.address,
-      total_faults: data.total_faults,
-      faults_summary: data.device_faults
-        .map((df) => `${df.device_type}(${df.fault_count})`)
-        .join(', '),
-    }));
-  } else if (Array.isArray(apiResponse?.data) && apiResponse.data[0]?.atms) {
-    const allAtms = apiResponse.data.flatMap((device) =>
-      device.atms.map((atm) => ({
-        device_type: device.device_type,
-        device_type_id: device.device_type_id,
-        ...atm,
-      }))
-    );
+    // Journal data structure
+    if (apiResponse.data?.events) {
+        return apiResponse.data.events.map((event) => ({
+            date: formatCompactDate(event.date),
+            server_date: formatCompactDate(event.server_date),
+            code: event.code || "-",
+            card_number: event.card_number,
+            event_description: event.event_description,
+            atm_id: event.atm_name,
+            transaction_id: event.transaction_id,
+        }));
+    }
+    // Failures data structure
+    else if (Array.isArray(apiResponse?.data) && apiResponse.data[0]?.total_faults) {
+        return apiResponse.data?.map((data) => ({
+            atm_id: data.atm_name,
+            address: data.address,
+            total_faults: data.total_faults,
+            faults_summary: data.device_faults
+                .map((df) => `${df.device_type}(${df.fault_count})`)
+                .join(", "),
+        }));
+    } else if (Array.isArray(apiResponse?.data) && apiResponse.data[0]?.atms) {
+        const allAtms = apiResponse.data.flatMap((device) =>
+            device.atms.map((atm) => ({
+                device_type: device.device_type,
+                device_type_id: device.device_type_id,
+                ...atm,
+            }))
+        );
 
     return allAtms.map((data) => ({
       atm_id: data.atm_name,
@@ -124,5 +121,5 @@ function transformFaultTableData(apiResponse) {
 }
 
 export default {
-  transformFaultTableData,
+    transformFaultTableData,
 };

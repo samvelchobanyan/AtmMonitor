@@ -319,6 +319,8 @@ class CreateAtm extends DynamicElement {
                                         this.state.isLoading ? "Կատարվում է …" : "Ստեղծել"
                                     }</span>
                                 </button>
+                                
+                               <a href='all-atms'class="cancel btn btn_md btn_white btn_full">Չեղարկել</a>
                             </div>
                         </form>
                     </div>

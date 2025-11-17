@@ -292,6 +292,9 @@ export function createDoughnutChart(ctxId, chartData, containerID, useLabelLines
     const ctx = canvas.getContext("2d");
 
     const filledDataset = chartData ? prepareDoughnutChart(chartData) : null;
+
+    console.log("filledDataset", filledDataset);
+
     const hasCustomCutout = canvas.classList.contains("custom-cutout");
 
     const plugins = [htmlLegendPlugin, loadingPlugin];

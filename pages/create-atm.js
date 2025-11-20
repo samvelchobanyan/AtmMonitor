@@ -144,7 +144,7 @@ class CreateAtm extends DynamicElement {
         const atmCdmTypeInput = this.$("#atmCdmType");
         const lonInput = this.$("#lon");
         const latInput = this.$("#lat");
-        const encashmentԼimitInut = this.$("#encashmentԼimit");
+        const encashmentLimitInput = this.$("#encashmentLimit");
         const repairTimeInput = this.$("#repairTime");
 
         const name = nameInput?.value.trim();
@@ -160,12 +160,15 @@ class CreateAtm extends DynamicElement {
 
         const lon = lonInput?.value.trim();
         const lat = latInput?.value.trim();
+        console.log("encashmentLimitInput", encashmentLimitInput);
 
-        const encashmentԼimit = encashmentԼimitInut?.value.trim();
-        const repairTime = repairTimeInput?.value.trim();
+        const encashmentLimit = Number(encashmentLimitInput?.value.trim());
+        const repairTime = Number(repairTimeInput?.value.trim());
 
         const rawVal = segmentIdInput.getAttribute("value") || "[]";
         const segmentIds = JSON.parse(rawVal).map((v) => Number(v));
+        console.log("encashmentLimit", encashmentLimit);
+        console.log("repairTime", repairTime);
 
         if (
             !name ||
@@ -176,7 +179,7 @@ class CreateAtm extends DynamicElement {
             !atmCdmType ||
             !lon ||
             !lat ||
-            !encashmentԼimit ||
+            !encashmentLimit ||
             !repairTime ||
             atmArchived
         ) {
@@ -199,7 +202,7 @@ class CreateAtm extends DynamicElement {
                 atmCdmType,
                 lon,
                 lat,
-                encashmentԼimit,
+                encashmentLimit,
                 repairTime,
             });
 
@@ -280,8 +283,8 @@ class CreateAtm extends DynamicElement {
                                 </div>
 
                                 <div class="form__item column sm-3">
-                                    <label for="encashmentԼimit ">Լիցքաորման սահմանաչափ</label>
-                                    <input id="encashmentԼimit " class="w-50" name="encashmentԼimit " type="text" />
+                                    <label for="encashmentLimit">Լիցքաորման սահմանաչափ</label>
+                                    <input id="encashmentLimit" class="w-50" name="encashmentLimit" type="text" />
                                 </div>
                             </div>
 

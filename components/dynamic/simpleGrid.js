@@ -331,6 +331,7 @@ export class SimpleGrid extends DynamicElement {
                 const cls = rule.class || "";
                 const text = (rule.text ?? String(cell ?? "")).replaceAll("{{value}}", String(cell ?? ""));
 
+
                 // row-conditions get full-cell inline sizing; color comes from the class
                 const isRowRule = rule.__rowRule === true;
                 const style = isRowRule ? "display:block;width:100%;height:100%;" : undefined;

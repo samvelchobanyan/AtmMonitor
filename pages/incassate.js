@@ -8,6 +8,7 @@ class Incassate extends DynamicElement {
         super();
         this.filtrationTabs = null;
         this.table = null;
+        this.atmDayBalanceTable = null;
 
         const today = new Date();
         const year = today.getFullYear();
@@ -25,6 +26,7 @@ class Incassate extends DynamicElement {
     onAfterRender() {
         this.filtrationTabs = this.$("filtration-tabs");
         this.table = this.$("simple-grid");
+        this.atmDayBalanceTable = this.$("#atm-day-balance");
     }
 
     async fetchInfoCardsData(queryString) {
@@ -55,12 +57,29 @@ class Incassate extends DynamicElement {
         this.addListener(this.filtrationTabs, "filter-submit", (e) => {
             this.tableQuery = e.detail.query;
             this.table.setAttribute("data-source", `/encashment/summary?${this.tableQuery}`);
+            if (this.atmDayBalanceTable) {
+                
+                
+                this.atmDayBalanceTable.setAttribute(
+                    "data-source",
+                    `/atm/balance-by-date?${this.tableQuery}`
+                );
+            }
             this.fetchInfoCardsData(this.tableQuery);
         });
+
+        console.log("this.tableQuery", this.tableQuery);
 
         this.addListener(this.table, "export-clicked", (e) => {
             e.detail.url = `/encashment/export?${this.tableQuery}`;
         });
+
+        if (this.atmDayBalanceTable) {
+            let query = this.tableQuery ? this.tableQuery : this.initQuery;
+            this.addListener(this.atmDayBalanceTable, "export-clicked", (e) => {
+                e.detail.url = `/atm/balance-by-date-export?${query}`;
+            });
+        }
     }
 
     template() {
@@ -97,7 +116,41 @@ class Incassate extends DynamicElement {
                         per-page="10"
                         exportable>
                     </simple-grid>
+
+                    
                 </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column sm-12">
+            <div class="container">
+                 <div class="select-container">
+                    <container-top icon="icon-coins" title="Օրվա վերջի մնացորդ"> </container-top>
+                </div>
+                <simple-grid
+                        id="atm-day-balance"
+                        serial
+                        data-source="/atm/balance-by-date?${this.initQuery}"
+                        columns='["atm_id","date","atm_address","balance_amd","balance_usd","balance_eur","balance_rub"]'
+                        column-labels='{
+                            "atm_id":"Բանկոմատի ID",
+                            "date":"Ամսաթիվ",
+                            "atm_address":"Բանկոմատի հասցե",
+                            "balance_amd":"Մնացորդ AMD",
+                            "balance_usd":"Մնացորդ USD",
+                            "balance_eur":"Մնացորդ EUR",
+                            "balance_rub":"Մնացորդ RUB"
+                        }'
+                        column-formatters='{
+                            "balance_amd":"currency",
+                            "balance_usd":"currency",
+                            "balance_eur":"currency",
+                            "balance_rub":"currency"
+                        }'
+                        mode="client"
+                        per-page="10"
+                        exportable>
+                    </simple-grid>
             </div>
         </div>
         `;

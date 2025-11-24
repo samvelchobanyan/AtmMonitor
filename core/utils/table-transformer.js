@@ -94,18 +94,30 @@ function transformFaultTableData(apiResponse) {
       transaction_id: item.transaction_id,
       message: item.message,
     }));
-    // }
-    // Journal data
-    // else if (apiResponse.data?.events) {
-    //   return apiResponse.data.events.map((item) => ({
-    //     date: formatCompactDate(item.date),
-    //     server_date: formatCompactDate(item.server_date),
-    //     code: item.code,
-    //     card_number: item.card_number,
-    //     event_description: item.event_description,
-    //     atm_name: item.atm_name,
-    //     transaction_id: item.transaction_id,
-    //   }));
+  } else if (apiResponse?.data?.date && Array.isArray(apiResponse?.data?.atms)) {
+    const formattedDate = formatCompactDate(apiResponse.data.date);
+
+    return apiResponse.data.atms.map((atm) => {
+      const currencyMap = { AMD: 0, USD: 0, EUR: 0, RUB: 0 };
+
+      if (Array.isArray(atm.totals)) {
+        atm.totals.forEach((t) => {
+          if (currencyMap.hasOwnProperty(t.currency)) {
+            currencyMap[t.currency] = t.amount;
+          }
+        });
+      }
+
+      return {
+        atm_id: atm.atm_name,
+        date: formattedDate,
+        atm_address: atm.atm_address,
+        balance_amd: currencyMap.AMD,
+        balance_usd: currencyMap.USD,
+        balance_eur: currencyMap.EUR,
+        balance_rub: currencyMap.RUB,
+      };
+    });
   } else if (Array.isArray(apiResponse.data)) {
     return apiResponse.data.map((item) => ({
       province: item.province,

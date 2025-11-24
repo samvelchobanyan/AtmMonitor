@@ -211,6 +211,8 @@ export class SimpleGrid extends DynamicElement {
             try {
                 const raw = await this.fetchData(url);
                 const transformed = tableTransformer.transformFaultTableData(raw) || [];
+                console.log('transformed',transformed);
+                
                 const definedColumns = this.parseColumnsAttr();
                 const columns = definedColumns.length
                     ? definedColumns
@@ -385,6 +387,17 @@ export class SimpleGrid extends DynamicElement {
         const mountPoint = this.$(".grid-container");
         if (!mountPoint) return;
 
+        // Generate unique scope class once per instance
+        if (!this._scopeClass) {
+            const hostId = this.id?.trim();
+            if (hostId) {
+                this._scopeClass = `grid-scope-${hostId}`;
+            } else {
+                this._scopeClass = `grid-scope-${Math.random().toString(36).slice(2)}`;
+            }
+            mountPoint.classList.add(this._scopeClass);
+        }
+
         loadGridJsModule().then((module) => {
             const { Grid, h } = module;
 
@@ -401,6 +414,16 @@ export class SimpleGrid extends DynamicElement {
                 ? rawRowConditions.map((r) => ({ ...r, __rowRule: true }))
                 : [];
 
+            // Fixed/narrow widths for specific columns (others use auto width)
+            const fixedWidths = {
+                // atm_id: "80px",
+                // date: "100px",
+                // balance_amd: "50px",
+                // balance_usd: "50px",
+                // balance_eur: "50px",
+                // balance_rub: "50px",               
+            };
+
             const gridColumns = this.state.columns.map((colName) => {
                 const displayName = labels[colName] || colName;
                 const valueFormatter = this.getValueFormatter(colName, formattersMap);
@@ -411,9 +434,17 @@ export class SimpleGrid extends DynamicElement {
                     h
                 );
 
+                const baseConfig = {
+                    name: displayName,
+                };
+
+                if (fixedWidths[colName]) {
+                    baseConfig.width = fixedWidths[colName];
+                }
+
                 if (!clickableSet.has(colName)) {
                     return {
-                        name: displayName,
+                        ...baseConfig,
                         formatter: (cell, row) => {
                             const rowObj = this.rowArrayToObject(
                                 row.cells.map((c) => c.data)
@@ -434,7 +465,7 @@ export class SimpleGrid extends DynamicElement {
                 }
 
                 return {
-                    name: displayName,
+                    ...baseConfig,
                     formatter: (cell, row) => {
                         const rowObj = this.rowArrayToObject(
                             row.cells.map((c) => c.data)
@@ -609,15 +640,15 @@ export class SimpleGrid extends DynamicElement {
                 const style = document.createElement("style");
                 style.setAttribute("data-serial-col", "1");
                 style.textContent = `
-.grid-container thead tr th:nth-child(1),
-.grid-container tbody tr td:nth-child(1) {
-  width: 30px !important;
-  min-width: 30px !important;
-  max-width: 30px !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  text-align: center;
-}`;
+                .grid-container thead tr th:nth-child(1),
+                .grid-container tbody tr td:nth-child(1) {
+                  width: 30px !important;
+                  min-width: 30px !important;
+                  max-width: 30px !important;
+                  padding-left: 0 !important;
+                  padding-right: 0 !important;
+                  text-align: center;
+                }`;
                 mountPoint.appendChild(style);
             }
 
@@ -636,8 +667,8 @@ export class SimpleGrid extends DynamicElement {
                     style.textContent = idxs
                         .map(
                             (n) => `
-.grid-container thead tr th:nth-child(${n}),
-.grid-container tbody tr td:nth-child(${n}) { display: none; }`
+                                        .${this._scopeClass} thead tr th:nth-child(${n}),
+                                        .${this._scopeClass} tbody tr td:nth-child(${n}) { display: none; }`
                         )
                         .join("\n");
                     mountPoint.appendChild(style);

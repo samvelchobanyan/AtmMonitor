@@ -162,13 +162,8 @@ class CreateAtm extends DynamicElement {
         const lat = latInput?.value.trim();
         console.log("encashmentLimitInput", encashmentLimitInput);
 
-<<<<<<< Updated upstream
         const encashmentLimit = Number(encashmentLimitInput?.value.trim());
         const repairTime = Number(repairTimeInput?.value.trim());
-=======
-        const encashmentLimit = encashmentLimitInput?.value.trim();
-        const repairTime = repairTimeInput?.value.trim();
->>>>>>> Stashed changes
 
         const rawVal = segmentIdInput.getAttribute("value") || "[]";
         const segmentIds = JSON.parse(rawVal).map((v) => Number(v));

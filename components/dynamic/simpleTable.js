@@ -266,6 +266,7 @@ export class SimpleTable extends DynamicElement {
 
                         // for notifications redirect
                         // If column is in link-columns → wrap in <a>
+                        
                         if (linkCols[col]) {
                             // extract ID (first part before "/")
                             const id = String(cellValue)

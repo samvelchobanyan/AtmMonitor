@@ -322,7 +322,7 @@ class Notifications extends DynamicElement {
                     data='${deviceErrors}' 
                     columns='["atm_id","date","address","fault_type","message","notification_id","mail_sent_at"]'
                     hidden-columns='["notification_id"]'
-                    link-columns='{"atm_id": "atms/:id"}'
+                    link-columns='{"atm_id": "atms/:id"}' 
                     column-labels='{
                         "atm_id":"Բանկոմատ",
                         "date":"Ամսաթիվ",

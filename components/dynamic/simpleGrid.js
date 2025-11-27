@@ -88,9 +88,6 @@ export class SimpleGrid extends DynamicElement {
                         headers: { Accept: "*/*" },
                         asBlob: true, // 👈 Important
                     });
-                    console.log('finalUrl222',finalUrl);
-                    console.log('response.blob',response);
-                    
 
                     const blob = await response.blob();
 
@@ -155,7 +152,8 @@ export class SimpleGrid extends DynamicElement {
 
     handleDataAttribute(raw) {
         try {
-            const data = tableTransformer.transformFaultTableData(JSON.parse(raw));
+            const dataSource = this.getAttr("data-source") || '';
+            const data = tableTransformer.transformTableData(JSON.parse(raw), dataSource);
             const columns = JSON.parse(this.getAttr("columns"));
             if (!data.length) return;
 
@@ -210,9 +208,8 @@ export class SimpleGrid extends DynamicElement {
         if (mode === "client") {
             try {
                 const raw = await this.fetchData(url);
-                const transformed = tableTransformer.transformFaultTableData(raw) || [];
-                console.log('transformed',transformed);
-                
+                const transformed = tableTransformer.transformTableData(raw, url) || [];
+
                 const definedColumns = this.parseColumnsAttr();
                 const columns = definedColumns.length
                     ? definedColumns
@@ -231,7 +228,7 @@ export class SimpleGrid extends DynamicElement {
                 if (!columns.length) {
                     try {
                         const raw = await this.fetchData(url);
-                        const transformed = tableTransformer.transformFaultTableData(raw) || [];
+                        const transformed = tableTransformer.transformTableData(raw, url) || [];
                         columns = Object.keys(transformed[0] || {});
                     } catch (_) {
                         // ignore probe error; grid server mode may still work
@@ -396,7 +393,6 @@ export class SimpleGrid extends DynamicElement {
             } else {
                 this._scopeClass = `grid-scope-${Math.random().toString(36).slice(2)}`;
             }
-            mountPoint.classList.add(this._scopeClass);
         }
 
         loadGridJsModule().then((module) => {
@@ -557,17 +553,17 @@ export class SimpleGrid extends DynamicElement {
                             if (resp && resp.data) {
                                 // Try transform helper
                                 try {
-                                    const maybe = tableTransformer.transformFaultTableData({
-                                        data: resp.data,
-                                    });
+                                    const maybe = tableTransformer.transformTableData(
+                                        { data: resp.data },
+                                        endpoint
+                                    );
                                     transformed = Array.isArray(maybe) ? maybe : resp.data;
                                 } catch (_) {
                                     transformed = resp.data;
                                 }
                             } else {
                                 try {
-                                    const maybe =
-                                        tableTransformer.transformFaultTableData(resp) || [];
+                                    const maybe = tableTransformer.transformTableData(resp, endpoint) || [];
                                     transformed = maybe;
                                 } catch (_) {
                                     transformed = Array.isArray(resp) ? resp : [];
@@ -634,6 +630,9 @@ export class SimpleGrid extends DynamicElement {
 
             this.grid.render(mountPoint);
 
+            // Add scope class to mountPoint for scoped hidden-columns CSS
+            mountPoint.classList.add(this._scopeClass);
+
             // Fix serial column width to 30px
             if (includeSerial) {
                 const old = mountPoint.querySelector("style[data-serial-col]");
@@ -669,7 +668,7 @@ export class SimpleGrid extends DynamicElement {
                         .map(
                             (n) => `
                                         .${this._scopeClass} thead tr th:nth-child(${n}),
-                                        .${this._scopeClass} tbody tr td:nth-child(${n}) { display: none; }`
+                                        .${this._scopeClass} tbody tr td:nth-child(${n}) { display: none !important; }`
                         )
                         .join("\n");
                     mountPoint.appendChild(style);

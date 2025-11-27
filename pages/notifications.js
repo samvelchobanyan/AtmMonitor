@@ -159,8 +159,9 @@ class Notifications extends DynamicElement {
 
         // Row navigation - attach once
         this.addEventListener("cell-click", (e) => {
+            console.log('asdasdasda',e.detail);
             const atmid = e.detail?.cellValue;
-            if (atmid) window.location.href = `atms/${atmid}`;
+            // if (atmid) window.location.href = `atms/${atmid}`;
         });
 
         // Button click from simple-grid (mail_sent_at) - attach once
@@ -321,10 +322,11 @@ class Notifications extends DynamicElement {
                     id='device-errors-table'
                     data='${deviceErrors}'
                     data-type="notifications"
-                    columns='["atm_id","date","address","fault_type","message","notification_id","mail_sent_at"]'
-                    hidden-columns='["notification_id"]'
+                    columns='["atm_name","atm_id","date","address","fault_type","message","notification_id","mail_sent_at"]'
+                    hidden-columns='["notification_id","atm_id"]'
                     link-columns='{"atm_id": "atms/:id"}' 
                     column-labels='{
+                        "atm_name":"Բանկոմատ",
                         "atm_id":"Բանկոմատ",
                         "date":"Ամսաթիվ",
                         "address":"Հասցե",
@@ -337,7 +339,7 @@ class Notifications extends DynamicElement {
                             { "field": "row.mail_sent_at", "when": "isNull",  "tag": "button", "class": "btn btn_blue btn_sm", "text": "Ուղարկել նամակ" }
                         ]
                     }'
-                    clickable-columns = ${encode(["atm_id"])}
+                    clickable-columns = ${encode(["atm_name"])}
                     >
                  </simple-grid>
                 </div>

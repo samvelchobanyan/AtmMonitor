@@ -76,6 +76,7 @@ function transformEncashmentsData(apiResponse) {
 function transformNotificationsData(apiResponse) {
     if (!apiResponse?.device_errors) return [];
     return apiResponse.device_errors.map((item) => ({
+        atm_name: item.atm_name,
         atm_id: item.atm_id,
         date: formatCompactDate(item.created_at),
         address: `${item.city}, ${item.address}`,

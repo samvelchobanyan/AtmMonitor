@@ -670,7 +670,7 @@ export class SimpleGrid extends DynamicElement {
                     style.setAttribute("data-hidden-cols", "1");
                     style.textContent = idxs
                         .map(
-                            (n) => `
+                            (n) => ` 
                                         .${this._scopeClass} thead tr th:nth-child(${n}),
                                         .${this._scopeClass} tbody tr td:nth-child(${n}) { display: none !important; }`
                         )

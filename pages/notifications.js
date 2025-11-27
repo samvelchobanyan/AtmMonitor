@@ -23,8 +23,8 @@ class Notifications extends DynamicElement {
         this.selectedCity = null;
         this.selectedRegion = null;
 
-        this.startDate = '2025-09-01';
-        this.endDate = '2025-11-14';
+        this.startDate = "2025-09-01";
+        this.endDate = "2025-11-14";
 
         this.province = [];
         this.cities = [];
@@ -40,7 +40,7 @@ class Notifications extends DynamicElement {
     }
 
     onConnected() {
-        console.log('onConnected ===>');
+        console.log("onConnected ===>");
         const state = store.getState();
 
         this.province = state.regionsData.map((item) => ({
@@ -85,7 +85,7 @@ class Notifications extends DynamicElement {
 
         try {
             const res = await this.fetchData(`/notifications/summary?${queryString}`);
-            console.log('summary ===>', res.data);
+            console.log("summary ===>", res.data);
             this.setState({
                 summary: res.data,
             });
@@ -99,8 +99,8 @@ class Notifications extends DynamicElement {
         try {
             const res = await this.fetchData(`/device-faults/all-device-types`);
             this.deviceTypes = [...this.deviceTypes, ...res.data];
-            console.log('deviceTypes ===>', this.deviceTypes);
-            
+            console.log("deviceTypes ===>", this.deviceTypes);
+
             // this.tableActiveTab = res.data[0].type_name;
         } catch (err) {
             console.error("❌ Failed to init table tabs:", err);
@@ -122,20 +122,8 @@ class Notifications extends DynamicElement {
 
     onAfterRender() {
         this.dateSelectBox = this.$("#date-selector");
-        console.log('onAfterRender ===>', this.dateSelectBox);
+        console.log("onAfterRender ===>", this.dateSelectBox);
     }
-
-    // addEventListeners() {
-    //     this.selectDateListener();
-    //     this.tableTabsListener();
-
-    //     this.addEventListener("cell-click", (e) => {
-    //         const atmid = e.detail?.cellValue;
-    //         if (atmid) {
-    //             window.location.href = `atms/${atmid}`;
-    //         }
-    //     });
-    // }
 
     addGlobalEventListeners() {
         // Date range (delegated) - attach once
@@ -159,9 +147,8 @@ class Notifications extends DynamicElement {
 
         // Row navigation - attach once
         this.addEventListener("cell-click", (e) => {
-            console.log('asdasdasda',e.detail);
-            const atmid = e.detail?.cellValue;
-            // if (atmid) window.location.href = `atms/${atmid}`;
+            const atmid = e.detail?.rowData.atm_id;
+            if (atmid) window.location.href = `atms/${atmid}`;
         });
 
         // Button click from simple-grid (mail_sent_at) - attach once
@@ -169,8 +156,7 @@ class Notifications extends DynamicElement {
             const { column, rowData } = e.detail || {};
             if (column !== "mail_sent_at") return;
 
-            console.log('cell-action ===>', e.detail);
-            
+            console.log("cell-action ===>", e.detail);
 
             const btn = document.activeElement;
             if (btn && btn.tagName === "BUTTON") {
@@ -189,8 +175,8 @@ class Notifications extends DynamicElement {
                 return;
             }
 
-            const text = rowData?.message || '';
-          
+            const text = rowData?.message || "";
+
             try {
                 await this.fetchData(`/notifications/send-mail`, {
                     method: "POST",
@@ -200,13 +186,12 @@ class Notifications extends DynamicElement {
                         text,
                     },
                 });
-        
+
                 // Keep disabled after success
                 if (btn) {
                     btn.disabled = true;
                     btn.textContent = "Ուղարկված է";
                 }
-
             } catch (err) {
                 console.error("❌ նամակը չի ուղարկվել:", err);
                 alert("Չհաջողվեց ուղարկել նամակը");
@@ -215,11 +200,6 @@ class Notifications extends DynamicElement {
                     btn.textContent = "Ուղարկել նամակ";
                 }
             }
-
-
-            // if (column === "mail_sent_at") {
-            //     console.log("notification_id:", rowData?.notification_id);
-            // }
         });
     }
 
@@ -227,39 +207,8 @@ class Notifications extends DynamicElement {
         // Intentionally left empty; delegated listeners are global and attached once
     }
 
-    // tableTabsListener() {
-    //     const tableTabs = this.$$("custom-tab");
-
-    //     tableTabs.forEach((tab) => {
-    //         this.addListener(tab, "click", async () => {
-    //             const selectedTab = tab.getAttribute("name");
-
-    //             if (this.tableActiveTab === selectedTab) return;
-
-    //             this.tableActiveTab = selectedTab;
-
-    //             this.setState({
-    //                 summary: this.state.summary,
-    //             });
-    //         });
-    //     });
-    // }
-
-    // selectDateListener() {
-    //     if (this.dateSelectBox) {
-    //         this.addListener(this.dateSelectBox, "date-range-change", (e) => {
-    //             const { startDate, endDate } = e.detail || {};
-    //             if (!startDate || !endDate) return;
-    //             this.startDate = startDate;
-    //             this.endDate = endDate;
-
-    //             this.fetchSummary();
-    //         });
-    //     }
-    // }
-
     template() {
-        console.log('template ===>');
+        console.log("template ===>");
         if (!this.state.summary) {
             return /*html*/ `
             <div class="row">

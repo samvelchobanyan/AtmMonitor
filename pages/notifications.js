@@ -319,7 +319,8 @@ class Notifications extends DynamicElement {
                  <simple-grid 
                     serial
                     id='device-errors-table'
-                    data='${deviceErrors}' 
+                    data='${deviceErrors}'
+                    data-type="notifications"
                     columns='["atm_id","date","address","fault_type","message","notification_id","mail_sent_at"]'
                     hidden-columns='["notification_id"]'
                     link-columns='{"atm_id": "atms/:id"}' 
@@ -347,7 +348,8 @@ class Notifications extends DynamicElement {
                     }'> </container-top>
                     <simple-grid
                         serial
-                        data='${takenCards}' 
+                        data='${takenCards}'
+                        data-type="taken_cards"
                         columns='["atm_id", "date","address","card_number"]'
                         column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե", "card_number": "Քարտի համար"}'
                         searchable="false">
@@ -360,7 +362,8 @@ class Notifications extends DynamicElement {
                     }'> </container-top>
                     <simple-grid
                         serial
-                        data='${problematicTransactions}' 
+                        data='${problematicTransactions}'
+                        data-type="problematic_transactions"
                         columns='["atm_id", "date","address","amount", "message", "transaction_id"]'
                         column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե", 
                         "amount": "Գումար", "message": "Նկարագրություն","transaction_id": "Գործարքի ID"}'

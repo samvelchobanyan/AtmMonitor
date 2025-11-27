@@ -68,7 +68,7 @@ function transformEncashmentsData(apiResponse) {
         atm_address: `${item.city}/${item.atm_address}`,
         added_amount: item.added_amount,
         collected_amount: item.collected_amount,
-        marked_as_empty: formatCompactDate(item.marked_as_empty),
+        marked_as_empty: item.marked_as_empty ? formatCompactDate(item.marked_as_empty) : '',
         limit_exceeded: item.limit_exceeded,
     }));
 }
@@ -149,63 +149,39 @@ function transformCumulativeData(apiResponse) {
     }));
 }
 
-// === URL Detection & Routing ===
+// === Type-Based Routing ===
 
-function transformTableData(apiResponse, url = '') {
-    const lower = url.toLowerCase();
-
-    // Journal events
-    if (lower.includes('/journal') || lower.includes('events-journal')) {
-        return transformJournalData(apiResponse);
+function transformTableData(apiResponse, dataType = '') {
+    if (!dataType) {
+        console.error('data-type attribute is required for simple-grid');
+        return [];
     }
 
-    // Encashments
-    if (lower.includes('/encashment')) {
-        return transformEncashmentsData(apiResponse);
-    }
-
-    // Repairs
-    if (lower.includes('/repairs')) {
-        return transformRepairsData(apiResponse);
-    }
-
-    // Notifications & device errors
-    if (lower.includes('device-errors')) {
-        return transformNotificationsData(apiResponse);
-    }
-
-    // Taken cards
-    if (lower.includes('taken-cards')) {
-        return transformTakenCardsData(apiResponse);
-    }
-
-    // Problematic transactions
-    if (lower.includes('problematic-transactions')) {
-        return transformProblematicTransactionsData(apiResponse);
-    }
-
-    // Balance data
-    if (lower.includes('balance')) {
-        return transformBalanceData(apiResponse);
-    }
-
-    // Cumulative/analytics
-    if (lower.includes('/cumulative') || lower.includes('cumulative-summary')) {
-        return transformCumulativeData(apiResponse);
-    }
-
-    // ATM failures - check for device faults structure first
-    if (lower.includes('/atm-failures') || lower.includes('/failures')) {
-        // Try device faults structure first
-        if (Array.isArray(apiResponse?.data) && apiResponse.data[0]?.atms) {
+    switch(dataType) {
+        case 'journal':
+            return transformJournalData(apiResponse);
+        case 'encashments':
+            return transformEncashmentsData(apiResponse);
+        case 'repairs':
+            return transformRepairsData(apiResponse);
+        case 'notifications':
+            return transformNotificationsData(apiResponse);
+        case 'taken_cards':
+            return transformTakenCardsData(apiResponse);
+        case 'problematic_transactions':
+            return transformProblematicTransactionsData(apiResponse);
+        case 'balance':
+            return transformBalanceData(apiResponse);
+        case 'cumulative':
+            return transformCumulativeData(apiResponse);
+        case 'device_faults':
             return transformDeviceFaultsData(apiResponse);
-        }
-        // Fall back to regular failures
-        return transformFailuresData(apiResponse);
+        case 'failures':
+            return transformFailuresData(apiResponse);
+        default:
+            console.warn('Unknown data-type:', dataType);
+            return [];
     }
-
-    console.warn('Unknown URL pattern, returning empty array', url);
-    return [];
 }
 
 export default {

@@ -94,6 +94,7 @@ class Cumulative extends DynamicElement {
                             <simple-grid
                                 serial
                                 data-source="/analytics/cumulative-summary"
+                                data-type="cumulative"
                                 columns='["province","deposit_amount","deposit_count","dispense_amount","dispense_count","exchange_eur_amount","exchange_rub_amount","exchange_usd_amount"]'
                                 column-labels='{"province":"Մարզ","deposit_amount":"Մուտքագրված գումար",
                                 "deposit_count":"Մուտքագրված քանակ","dispense_amount":"Կանխիկացված գումար",

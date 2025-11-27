@@ -104,6 +104,7 @@ class Incassate extends DynamicElement {
                     <simple-grid
                         serial
                         data-source="/encashment/summary?${this.initQuery}"
+                        data-type="encashments"
                         columns='["atm_id","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty", "limit_exceeded"]'
                         column-labels='{"atm_id":"Բանկոմատի ID","date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
                           "added_amount":"Լիցքավորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'
@@ -131,6 +132,7 @@ class Incassate extends DynamicElement {
                         id="atm-day-balance"
                         serial
                         data-source="/atm/balance-by-date?${this.initQuery}"
+                        data-type="balance"
                         columns='["atm_id","date","atm_address","balance_amd","balance_usd","balance_eur","balance_rub"]'
                         column-labels='{
                             "atm_id":"Բանկոմատի ID",

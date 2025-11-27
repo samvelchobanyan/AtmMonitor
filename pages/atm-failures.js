@@ -200,6 +200,7 @@ class AtmFailures extends DynamicElement {
                                     serial
                                     id='top_table'
                                     data-source = '/device-faults/top?startDate=${this.todayDate}&endDate=${this.todayDate}'
+                                    data-type="failures"
                                     columns='["atm_id", "address", "total_faults", "faults_summary"]'
                                     column-labels='{
                                         "atm_id": "Բանկոմատի ID",
@@ -239,6 +240,7 @@ class AtmFailures extends DynamicElement {
                                 id='bottom_table'
                                 columns='["atm_id", "address", "total_faults", "faults_duration"]'
                                 data-source='/device-faults/by-device-type?startDate=${this.todayDate}&endDate=${this.todayDate}'
+                                data-type="device_faults"
                                 column-labels='{
                                     "atm_id": "Բանկոմատի ID",
                                     "address": "Հասցե",
@@ -262,6 +264,7 @@ class AtmFailures extends DynamicElement {
                             serial
                             id="repair_summary_table"
                             data-source="/device-faults/repair-summary?startDate=${this.todayDate}&endDate=${this.todayDate}"
+                            data-type="repairs"
                             columns='[
                                 "atm_name",
                                 "error_date",

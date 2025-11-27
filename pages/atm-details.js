@@ -635,6 +635,7 @@ class AtmDetails extends DynamicElement {
 
                 <simple-grid
                     data-source="/encashment/summary?atmIds=${this.atmId}"
+                    data-type="encashments"
                     columns='["date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty"]'
                     column-labels='{"date_time":"Ամսաթիվ և ժամ","atm_address":"Բանկոմատի հասցե",
                       "added_amount":"Լիցքավորված գումար","collected_amount":"Ապալիցքավորված գումար","marked_as_empty":"Նշվել է որպես դատարկ"}'

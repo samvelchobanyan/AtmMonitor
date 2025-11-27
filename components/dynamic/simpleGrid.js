@@ -44,6 +44,7 @@ export class SimpleGrid extends DynamicElement {
     static get observedAttributes() {
         return [
             "data-source",
+            "data-type",
             "columns",
             "clickable-columns",
             "mode",
@@ -117,7 +118,7 @@ export class SimpleGrid extends DynamicElement {
 
     async onAttributeChange(name, oldVal, newVal) {
         if (oldVal === newVal) return;
-        if (name === "data-source") {
+        if (name === "data-source" || name === "data-type") {
             await this.loadData();
             return;
         }
@@ -152,8 +153,8 @@ export class SimpleGrid extends DynamicElement {
 
     handleDataAttribute(raw) {
         try {
-            const dataSource = this.getAttr("data-source") || '';
-            const data = tableTransformer.transformTableData(JSON.parse(raw), dataSource);
+            const dataType = this.getAttr("data-type") || '';
+            const data = tableTransformer.transformTableData(JSON.parse(raw), dataType);
             const columns = JSON.parse(this.getAttr("columns"));
             if (!data.length) return;
 
@@ -208,7 +209,8 @@ export class SimpleGrid extends DynamicElement {
         if (mode === "client") {
             try {
                 const raw = await this.fetchData(url);
-                const transformed = tableTransformer.transformTableData(raw, url) || [];
+                const dataType = this.getAttr("data-type") || '';
+                const transformed = tableTransformer.transformTableData(raw, dataType) || [];
 
                 const definedColumns = this.parseColumnsAttr();
                 const columns = definedColumns.length
@@ -228,7 +230,8 @@ export class SimpleGrid extends DynamicElement {
                 if (!columns.length) {
                     try {
                         const raw = await this.fetchData(url);
-                        const transformed = tableTransformer.transformTableData(raw, url) || [];
+                        const dataType = this.getAttr("data-type") || '';
+                        const transformed = tableTransformer.transformTableData(raw, dataType) || [];
                         columns = Object.keys(transformed[0] || {});
                     } catch (_) {
                         // ignore probe error; grid server mode may still work
@@ -549,13 +552,14 @@ export class SimpleGrid extends DynamicElement {
                             // Expect API similar to existing transformer structures.
                             // We reuse transformer for mapping shape. If the server already returns sliced data,
                             // use it directly; otherwise, transform known formats.
+                            const dataType = this.getAttr("data-type") || '';
                             let transformed;
                             if (resp && resp.data) {
                                 // Try transform helper
                                 try {
                                     const maybe = tableTransformer.transformTableData(
                                         { data: resp.data },
-                                        endpoint
+                                        dataType
                                     );
                                     transformed = Array.isArray(maybe) ? maybe : resp.data;
                                 } catch (_) {
@@ -563,7 +567,7 @@ export class SimpleGrid extends DynamicElement {
                                 }
                             } else {
                                 try {
-                                    const maybe = tableTransformer.transformTableData(resp, endpoint) || [];
+                                    const maybe = tableTransformer.transformTableData(resp, dataType) || [];
                                     transformed = maybe;
                                 } catch (_) {
                                     transformed = Array.isArray(resp) ? resp : [];

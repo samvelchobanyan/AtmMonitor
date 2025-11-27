@@ -107,7 +107,7 @@ class InfoCard extends DynamicElement {
                             </div>
                             <div class="atm-item__id">
                                 <span class="atm-item__label">ATM ID:</span>
-                                <span class="atm-item__value">#<span class="font-black">{{atm_id}}</span></span>
+                                <span class="atm-item__value">#<span class="font-black">{{atm_name}}</span></span>
                             </div>
                             <div class="atm-item__address">
                                 <span class="atm-item__value">Քարտի համար։ {{card_number}}</span>
@@ -131,7 +131,7 @@ class InfoCard extends DynamicElement {
                         </div>
                         <div class="atm-item__id">
                             <span class="atm-item__label">ATM ID:</span>
-                            <span class="atm-item__value">#{{atm_id}}</span>
+                            <span class="atm-item__value">#{{atm_name}}</span>
                         </div>
                         <div class="atm-item__address">
                             <span class="atm-item__value">Կասետի տիպ : {{cassette_type}}</span>
@@ -155,7 +155,7 @@ class InfoCard extends DynamicElement {
                     <div class="atm-item__info">
                         <div class="atm-item__id">
                             <span class="atm-item__label">ATM ID:</span>
-                            <span class="atm-item__value">#{{atm_id}}</span>
+                            <span class="atm-item__value">#{{atm_name}}</span>
                         </div>
                         <div class="atm-item__address">
                             <span class="atm-item__value">Կասետի տիպ : {{cassette_type}}</span>
@@ -174,7 +174,7 @@ class InfoCard extends DynamicElement {
                         <img src="assets/img/atm-icon.svg" alt="ATM Icon"/>
                     </div>
                     <div class="atm-item__info">
-                        <div class="atm-item__id"><span class="atm-item__label">ATM ID:</span> <span class="atm-item__value">#<span class="font-black">{{atm_id}}</span></span></div>
+                        <div class="atm-item__id"><span class="atm-item__label">ATM ID:</span> <span class="atm-item__value">#<span class="font-black">{{atm_name}}</span></span></div>
                         <div class="atm-item__location">
                             <div><span class="atm-item__label">Քաղաք՝</span> <span class="atm-item__value">{{city}}</span></div>
                             <div><span class="atm-item__label">Համայնք՝</span> <span class="atm-item__value">{{district}}</span></div>

@@ -283,15 +283,9 @@ class CreateAtm extends DynamicElement {
                                 </div>
 
                                 <div class="form__item column sm-3">
-<<<<<<< Updated upstream
-                                    <label for="encashmentLimit">Լիցքաորման սահմանաչափ</label>
-                                    <input id="encashmentLimit" class="w-50" name="encashmentLimit" type="text" />
-                                </div>
-=======
                                     <label for="encashmentLimit ">Լիցքաորման սահմանաչափ</label>
                                     <input id="encashmentLimit " class="w-50" name="encashmentLimit " type="text" />
                                 </div>L
->>>>>>> Stashed changes
                             </div>
 
                             <div class="row">

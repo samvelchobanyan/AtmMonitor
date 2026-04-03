@@ -1,6 +1,7 @@
 import { DynamicElement } from "../core/dynamic-element.js";
 import { store } from "../core/store/store.js";
 import { memoryStore } from "../core/memory-store.js";
+import { pollingService } from "../core/polling-service.js";
 
 class SideBar extends DynamicElement {
     constructor() {
@@ -20,6 +21,8 @@ class SideBar extends DynamicElement {
 
         // Set initial active state
         this.updateActiveState();
+
+        this.setupPolling();
     }
 
     addGlobalEventListeners() {
@@ -292,6 +295,41 @@ class SideBar extends DynamicElement {
         }
     }
 
+    setupPolling() {
+        pollingService.register("notificationsCount", "/notifications/count", 5000);
+
+        this.unsubscribeNotifications = pollingService.subscribe(
+            "notificationsCount",
+            (data, error) => {
+                if (error) {
+                    console.error("Notifications polling error:", error);
+                    return;
+                }
+
+                if (data) {
+                    // 👇 IMPORTANT: adjust based on API response shape
+                    const count = data?.data ?? 0;
+
+                    this.updateNotificationCount(count);
+                }
+            },
+        );
+    }
+
+    updateNotificationCount(count) {
+        const el = this.$(".notification__count");
+        if (!el) return;
+
+        const safeCount = Number(count) || 0;
+
+        if (safeCount <= 0) {
+            el.style.display = "none";
+        } else {
+            el.style.display = "flex";
+            el.textContent = safeCount;
+        }
+    }
+
     template() {
         return /* html */ `
             <aside class="sidebar">
@@ -304,7 +342,7 @@ class SideBar extends DynamicElement {
                     <div class="notification">
                         <a href="./notifications">
                             <i class="icon icon-bell"></i>
-                            <div class="notification__count">10</div>
+                            <div class="notification__count"></div>
                         <a>
                     </div>
                 </div>

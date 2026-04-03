@@ -23,8 +23,8 @@ class Notifications extends DynamicElement {
         this.selectedCity = null;
         this.selectedRegion = null;
 
-        this.startDate = "2025-09-01";
-        this.endDate = "2025-11-14";
+        this.startDate = "";
+        this.endDate = "";
 
         this.province = [];
         this.cities = [];

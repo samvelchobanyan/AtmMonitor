@@ -9,6 +9,11 @@ async function initializeApp() {
         const responseLocations = await api.get("/dashboard/cities-with-districts");
         const responseSegments = await api.get("/atm/segments");
 
+        console.log("[init] responseLocations:", responseLocations);
+        console.log("[init] responseLocations isArray:", Array.isArray(responseLocations));
+        console.log("[init] responseLocations.data isArray:", Array.isArray(responseLocations?.data));
+        console.log("[init] responseLocations keys:", Object.keys(responseLocations || {}));
+
         store.setState({
             regionsData: responseLocations,
             segments: responseSegments.data,

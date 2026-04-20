@@ -1,4 +1,4 @@
-import page from "https://unpkg.com/page/page.mjs";
+import page from '../../assets/js/libs/page.js';
 
 export class AtmItem extends HTMLElement {
     static get observedAttributes() {

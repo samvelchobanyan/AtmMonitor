@@ -23,6 +23,12 @@ class Notifications extends DynamicElement {
         this.selectedCity = null;
         this.selectedRegion = null;
 
+        this.selectedNotificationFilter = "Նոր Ծանուցումները";
+        this.notificationFilterOptions = [
+            { label: "Բոլոր Ծանուցումները", value: "Բոլորը Ծանուցումները" },
+            { label: "Նոր Ծանուցումները", value: "Նոր Ծանուցումները" },
+        ];
+
         this.startDate = "";
         this.endDate = "";
 
@@ -86,12 +92,41 @@ class Notifications extends DynamicElement {
         try {
             const res = await this.fetchData(`/notifications/summary?${queryString}`);
             console.log("summary ===>", res.data);
+
             this.setState({
                 summary: res.data,
             });
+
+            // Extract notification_id from all array properties in the response object
+            const notificationIds = res.data
+                ? Object.values(res.data)
+                      .filter(Array.isArray)
+                      .flat()
+                      .map((item) => item.notification_id)
+                      .filter((id) => id !== undefined && id !== null)
+                : [];
+
+            if (notificationIds.length > 0) {
+                await this.markReadNotifications(notificationIds);
+            }
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });
+        }
+    }
+
+    async markReadNotifications(notificationIds) {
+        console.log("notificationIds ", notificationIds);
+
+        try {
+            await this.fetchData(`/notifications/read`, {
+                method: "POST",
+                body: {
+                    notification_ids: notificationIds,
+                },
+            });
+        } catch (err) {
+            console.error("❌ Error reading notifications:", err);
         }
     }
 
@@ -112,6 +147,9 @@ class Notifications extends DynamicElement {
         // for test
         queryString.append("userId", "1");
 
+        const onlyUnread = this.selectedNotificationFilter === "Նոր Ծանուցումները";
+        queryString.append("onlyUnread", onlyUnread);
+
         if (this.startDate) queryString.append("startDate", this.startDate);
         if (this.endDate) queryString.append("endDate", this.endDate);
         if (this.selectedCity) queryString.append("city", this.selectedCity);
@@ -126,6 +164,34 @@ class Notifications extends DynamicElement {
     }
 
     addGlobalEventListeners() {
+        // this.addEventListener("change", (e) => {
+        //     const notificationTypeSelect = e.target.closest("select-box");
+        //     if (!notificationTypeSelect) return;
+        //     const selectedValue = notificationTypeSelect.getAttribute("value");
+        //     if (this.selectedNotificationFilter === selectedValue) return;
+        //     this.selectedNotificationFilter = selectedValue;
+        //     this.fetchSummary();
+        // });
+
+        const handleSelectChange = (e) => {
+            const notificationTypeSelect = e.target.closest("#notifications-type");
+            if (!notificationTypeSelect) return;
+
+            // Get selected value from custom event detail, property, or attribute
+            const selectedValue =
+                e.detail?.value ??
+                notificationTypeSelect.value ??
+                notificationTypeSelect.getAttribute("value");
+
+            if (!selectedValue || this.selectedNotificationFilter === selectedValue) return;
+
+            this.selectedNotificationFilter = selectedValue;
+            this.fetchSummary();
+        };
+
+        this.addEventListener("change", handleSelectChange);
+        // this.addEventListener("select-change", handleSelectChange); // handles custom select events if emitted as 'select-change'
+
         // Date range (delegated) - attach once
         this.addEventListener("date-range-change", (e) => {
             const { startDate, endDate } = e.detail || {};
@@ -249,11 +315,19 @@ class Notifications extends DynamicElement {
                             <container-top icon="icon-x-octagon" title="Անսարքություններ" number='${
                                 device_errors.length
                             }'> </container-top>
-                             <select-box-date
-                                start-date="${this.startDate ? this.startDate : ""}"
-                                end-date="${this.endDate ? this.endDate : ""}"
-                                id='date-selector'
-                            ></select-box-date>
+                            <div class='header__right'>
+                               <select-box id="notifications-type" 
+                                    value="${this.selectedNotificationFilter}" 
+                                    placeholder="${this.selectedNotificationFilter}" 
+                                    options='${JSON.stringify(this.notificationFilterOptions)}'>
+                                </select-box>
+                                <select-box-date
+                                    start-date="${this.startDate ? this.startDate : ""}"
+                                    end-date="${this.endDate ? this.endDate : ""}"
+                                    id='date-selector'
+                                ></select-box-date>
+
+                            </div>
                          </div>  
                         
                   <div class="tabs table_tabs">
@@ -262,7 +336,7 @@ class Notifications extends DynamicElement {
                              (type) =>
                                  `<custom-tab name="${type.type_name}" ${
                                      type.type_name == this.tableActiveTab ? "active" : ""
-                                 }>${type.type_name}</custom-tab>`
+                                 }>${type.type_name}</custom-tab>`,
                          )
                          .join("")}
                   </div>

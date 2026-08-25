@@ -21,6 +21,7 @@ async function initializeApp() {
         });
 
         console.log("✅ Initial app data loaded into store.");
+        console.log("✅ updateed at Jun 23, 2026");
 
         startRouter();
     } catch (error) {

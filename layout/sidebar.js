@@ -2,6 +2,7 @@ import { DynamicElement } from "../core/dynamic-element.js";
 import { store } from "../core/store/store.js";
 import { memoryStore } from "../core/memory-store.js";
 import { pollingService } from "../core/polling-service.js";
+import { BASE_PATH } from "../core/config.js";
 
 class SideBar extends DynamicElement {
     constructor() {
@@ -14,7 +15,7 @@ class SideBar extends DynamicElement {
 
     onConnected() {
         // Set initial route
-        this.currentRoute = window.location.pathname.replace("/ATM_monitor", "") || "/home";
+        this.currentRoute = window.location.pathname.replace(BASE_PATH, "") || "/home";
 
         // Check if sidebar is already expanded (from CSS)
         this.state.isExpanded = this.classList.contains("active");
@@ -80,7 +81,7 @@ class SideBar extends DynamicElement {
                 try {
                     memoryStore.clear();
                 } catch {}
-                window.location.href = "/ATM_monitor/signin";
+                window.location.href = `${BASE_PATH}/signin`;
             });
         }
     }

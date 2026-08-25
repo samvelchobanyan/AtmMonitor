@@ -1,4 +1,6 @@
 // api-client.js
+import { BASE_PATH } from "./config.js";
+
 export class ApiClient {
     constructor({ baseUrl, useProxy = false, delay = null }) {
         this.baseUrl = baseUrl;
@@ -12,7 +14,7 @@ export class ApiClient {
         const full = qs ? `${base}?${qs}` : base;
         const delay = this.delay !== null ? `delay=${this.delay}&` : "";
         return this.useProxy
-            ? `http://localhost/ATM_monitor/proxy.php?${delay}url=${encodeURIComponent(full)}`
+            ? `${window.location.origin}${BASE_PATH}/proxy.php?${delay}url=${encodeURIComponent(full)}`
             : full;
     }
 
@@ -85,6 +87,6 @@ export const api = new ApiClient({
     baseUrl: "monitoring.ardshinbank.am/backend",
     // baseUrl: "https://atmmonitorapi-production.up.railway.app/api",
     // baseUrl: 'http://37.186.122.133:3393/api',
-    // baseUrl: 'http://localhost/ATM_monitor',
+    // baseUrl: `${window.location.origin}${BASE_PATH}`,
     useProxy: false,
 });

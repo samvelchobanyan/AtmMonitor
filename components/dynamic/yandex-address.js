@@ -38,19 +38,50 @@ class YandexAddress extends DynamicElement {
   }
 
   onAfterRender() {
-    if (window.ymaps && !this.map) {
-      try {
-        window.ymaps.ready(() => {
-          if (this.isDestroyed || this.map) return;
+    this.loadYandexMaps().then(() => {
+      if (window.ymaps && !this.map) {
+        try {
+          window.ymaps.ready(() => {
+            if (this.isDestroyed || this.map) return;
+            this.createMapWithSearch();
+          });
+        } catch (e) {
+          // Fallback if ready is not available for some reason
           this.createMapWithSearch();
-        });
-      } catch (e) {
-        // Fallback if ready is not available for some reason
-        this.createMapWithSearch();
+        }
       }
-    } else if (!window.ymaps) {
+    }).catch(err => {
       this.setState({ error: "Yandex Maps not loaded" });
-    }
+    });
+  }
+
+  loadYandexMaps() {
+    return new Promise((resolve, reject) => {
+      if (window.ymaps) {
+        resolve();
+        return;
+      }
+      
+      const scriptId = 'yandex-maps-api-script';
+      if (document.getElementById(scriptId)) {
+        // Script is already injecting, wait for it to load
+        const interval = setInterval(() => {
+          if (window.ymaps) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, 100);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.id = scriptId;
+      script.type = 'text/javascript';
+      script.src = 'https://api-maps.yandex.ru/2.1/?apikey=60e4e405-9c2a-4959-b638-40d6874b8702&lang=hy_RU';
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load Yandex Maps API'));
+      document.head.appendChild(script);
+    });
   }
 
   onAttributeChange(name, oldValue, newValue) {

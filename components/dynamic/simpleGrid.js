@@ -3,11 +3,15 @@ import { DynamicElement } from "../../core/dynamic-element.js";
 import tableTransformer from "../../core/utils/table-transformer.js";
 import { api } from "../../core/api-client.js";
 
+const GRID_JS_MODULE_URL = new URL("../../assets/js/libs/gridjs.module.js", import.meta.url)
+    .href;
+const GRID_JS_CSS_URL = new URL("../../assets/css/mermaid.min.css", import.meta.url).href;
+
 // Lazy-load Grid.js once for all instances
 let gridJsModulePromise = null;
 function loadGridJsModule() {
     if (!gridJsModulePromise) {
-        gridJsModulePromise = import("https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.module.js");
+        gridJsModulePromise = import(GRID_JS_MODULE_URL);
     }
     return gridJsModulePromise;
 }
@@ -21,7 +25,7 @@ function ensureGridJsCss() {
         const link = document.createElement("link");
         link.id = id;
         link.rel = "stylesheet";
-        link.href = "https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css";
+        link.href = GRID_JS_CSS_URL;
         document.head.appendChild(link);
     }
     gridJsCssInjected = true;

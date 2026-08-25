@@ -18,8 +18,6 @@ class YandexMap extends DynamicElement {
     }
 
     onConnected() {
-        // Yandex Maps is loaded globally, no need to load script here
-
         // Add resize listener for responsive behavior
         this.handleResize = this.handleResize.bind(this);
         window.addEventListener("resize", this.handleResize);
@@ -45,12 +43,46 @@ class YandexMap extends DynamicElement {
     }
 
     onAfterRender() {
-        // DOM is ready, create the map if Yandex Maps is available
-        if (window.ymaps && !this.map) {
-            this.createSimpleMap();
-        } else if (!window.ymaps) {
+        // DOM is ready, load the API then create the map
+        this.loadYandexMaps().then(() => {
+            if (window.ymaps && !this.map) {
+                // Ensure ymaps.ready is called before creating map instances
+                ymaps.ready(() => {
+                    this.createSimpleMap();
+                });
+            }
+        }).catch(err => {
             this.setState({ error: "Yandex Maps not loaded" });
-        }
+        });
+    }
+
+    loadYandexMaps() {
+        return new Promise((resolve, reject) => {
+            if (window.ymaps) {
+                resolve();
+                return;
+            }
+            
+            const scriptId = 'yandex-maps-api-script';
+            if (document.getElementById(scriptId)) {
+                // Script is already injecting, wait for it to load
+                const interval = setInterval(() => {
+                    if (window.ymaps) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 100);
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.id = scriptId;
+            script.type = 'text/javascript';
+            script.src = 'https://api-maps.yandex.ru/2.1/?apikey=60e4e405-9c2a-4959-b638-40d6874b8702&lang=hy_RU';
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load Yandex Maps API'));
+            document.head.appendChild(script);
+        });
     }
 
     onAttributeChange(name, oldValue, newValue) {

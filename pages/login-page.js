@@ -1,5 +1,6 @@
 import { DynamicElement } from "../core/dynamic-element.js";
 import { api } from "../core/api-client.js";
+import { BASE_PATH } from "../core/config.js";
 
 class LoginPage extends DynamicElement {
     constructor() {
@@ -110,7 +111,7 @@ class LoginPage extends DynamicElement {
 
             const nextAttr = this.getAttribute("next") || "";
             const next = nextAttr && nextAttr.startsWith("/") ? nextAttr : "/home";
-            window.location.href = `/ATM_monitor${next}`;
+            window.location.href = `${BASE_PATH}${next}`;
         } catch (err) {
             const message = err?.message || "Մուտքը ձախողվեց";
             this.setState({ error: message });

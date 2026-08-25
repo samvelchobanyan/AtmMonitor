@@ -2,13 +2,16 @@
 import { DynamicElement } from "../../core/dynamic-element.js";
 import tableTransformer from "../../core/utils/table-transformer.js";
 
+const SIMPLE_DATATABLES_MODULE_URL = new URL(
+    "../../assets/js/libs/simple-datatables-module.js",
+    import.meta.url
+).href;
+
 // Lazy-load Simple-DataTables once for all instances
 let dataTableModulePromise = null;
 function loadDataTableModule() {
     if (!dataTableModulePromise) {
-        dataTableModulePromise = import(
-            "https://cdn.jsdelivr.net/npm/simple-datatables@9.0.4/dist/module.js"
-        ).then((mod) => {
+        dataTableModulePromise = import(SIMPLE_DATATABLES_MODULE_URL).then((mod) => {
             // Normalize the exports
             const DataTable = mod.DataTable || mod.default;
             const { exportCSV, exportJSON, exportSQL } = mod;

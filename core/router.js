@@ -1,4 +1,5 @@
 import page from '../assets/js/libs/page.js';
+import { BASE_PATH } from './config.js';
 
 const mount = document.querySelector('main');
 
@@ -55,7 +56,7 @@ function mountComponent(
 }
 
 export function startRouter() {
-  page.base('/ATM_monitor');
+  page.base(BASE_PATH);
 
   // ——— Auth helpers and global guard ———
   function isAuthenticated() {

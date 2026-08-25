@@ -142,7 +142,7 @@ class FiltrationTabs extends DynamicElement {
                 new CustomEvent("filter-submit", {
                     detail: { query: queryString?.toString() },
                     bubbles: true,
-                })
+                }),
             );
         });
     }
@@ -241,7 +241,7 @@ class FiltrationTabs extends DynamicElement {
                             ${this.province
                                 .map(
                                     (el) =>
-                                        `<custom-checkbox id="${el.value}" value="${el.value}">${el.label}</custom-checkbox>`
+                                        `<custom-checkbox id="${el.value}" value="${el.value}">${el.label}</custom-checkbox>`,
                                 )
                                 .join("")}
                         </div>  

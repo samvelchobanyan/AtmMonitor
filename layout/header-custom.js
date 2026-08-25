@@ -19,6 +19,7 @@ class HeaderCustom extends DynamicElement {
     onConnected() {
         console.log("header connected");
         const state = store.getState();
+        console.log("state", state);
 
         this.province = state.regionsData.map((item) => ({
             label: item.province,

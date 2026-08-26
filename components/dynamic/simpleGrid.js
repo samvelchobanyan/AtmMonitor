@@ -3,8 +3,7 @@ import { DynamicElement } from "../../core/dynamic-element.js";
 import tableTransformer from "../../core/utils/table-transformer.js";
 import { api } from "../../core/api-client.js";
 
-const GRID_JS_MODULE_URL = new URL("../../assets/js/libs/gridjs.module.js", import.meta.url)
-    .href;
+const GRID_JS_MODULE_URL = new URL("../../assets/js/libs/gridjs.module.js", import.meta.url).href;
 const GRID_JS_CSS_URL = new URL("../../assets/css/mermaid.min.css", import.meta.url).href;
 
 // Lazy-load Grid.js once for all instances
@@ -157,7 +156,7 @@ export class SimpleGrid extends DynamicElement {
 
     handleDataAttribute(raw) {
         try {
-            const dataType = this.getAttr("data-type") || '';
+            const dataType = this.getAttr("data-type") || "";
             const data = tableTransformer.transformTableData(JSON.parse(raw), dataType);
             const columns = JSON.parse(this.getAttr("columns"));
             if (!data.length) return;
@@ -213,7 +212,7 @@ export class SimpleGrid extends DynamicElement {
         if (mode === "client") {
             try {
                 const raw = await this.fetchData(url);
-                const dataType = this.getAttr("data-type") || '';
+                const dataType = this.getAttr("data-type") || "";
                 const transformed = tableTransformer.transformTableData(raw, dataType) || [];
 
                 const definedColumns = this.parseColumnsAttr();
@@ -234,8 +233,9 @@ export class SimpleGrid extends DynamicElement {
                 if (!columns.length) {
                     try {
                         const raw = await this.fetchData(url);
-                        const dataType = this.getAttr("data-type") || '';
-                        const transformed = tableTransformer.transformTableData(raw, dataType) || [];
+                        const dataType = this.getAttr("data-type") || "";
+                        const transformed =
+                            tableTransformer.transformTableData(raw, dataType) || [];
                         columns = Object.keys(transformed[0] || {});
                     } catch (_) {
                         // ignore probe error; grid server mode may still work
@@ -302,19 +302,19 @@ export class SimpleGrid extends DynamicElement {
         }
     }
 
-	// NEW: Minimal evaluator for simple conditions (used by column-conditions)
-	evaluateSimple(when, value) {
-		if (when === "isTrue") {
-			return value === true || value === "true" || value === 1 || value === "1";
-		}
-		if (when === "notNull") {
-			return value !== null && value !== undefined && String(value).trim() !== "";
-		}
-		if (when === "isNull") {
-			return value === null || value === undefined || String(value).trim() === "";
-		}
-		return false;
-	}
+    // NEW: Minimal evaluator for simple conditions (used by column-conditions)
+    evaluateSimple(when, value) {
+        if (when === "isTrue") {
+            return value === true || value === "true" || value === 1 || value === "1";
+        }
+        if (when === "notNull") {
+            return value !== null && value !== undefined && String(value).trim() !== "";
+        }
+        if (when === "isNull") {
+            return value === null || value === undefined || String(value).trim() === "";
+        }
+        return false;
+    }
 
     // Build conditional formatter per column
     getConditionalFormatter(colName, conditionsMap, rowConditions, h) {
@@ -333,26 +333,32 @@ export class SimpleGrid extends DynamicElement {
 
                 const tag = rule.tag || "span";
                 const cls = rule.class || "";
-                const text = (rule.text ?? String(cell ?? "")).replaceAll("{{value}}", String(cell ?? ""));
-
+                const text = (rule.text ?? String(cell ?? "")).replaceAll(
+                    "{{value}}",
+                    String(cell ?? ""),
+                );
 
                 // row-conditions get full-cell inline sizing; color comes from the class
                 const isRowRule = rule.__rowRule === true;
                 const style = isRowRule ? "display:block;width:100%;height:100%;" : undefined;
 
                 if (tag === "button") {
-                    return h("button", {
-                        className: cls,
-                        style,
-                        onclick: () => {
-                            this.dispatch("cell-action", {
-                                column: colName,
-                                cellValue: rowObj[colName],
-                                rowData: rowObj,
-                                rule,
-                            });
+                    return h(
+                        "button",
+                        {
+                            className: cls,
+                            style,
+                            onclick: () => {
+                                this.dispatch("cell-action", {
+                                    column: colName,
+                                    cellValue: rowObj[colName],
+                                    rowData: rowObj,
+                                    rule,
+                                });
+                            },
                         },
-                    }, text);
+                        text,
+                    );
                 }
                 return h(tag, { className: cls, style }, text);
             }
@@ -369,7 +375,11 @@ export class SimpleGrid extends DynamicElement {
             const num =
                 typeof val === "number"
                     ? val
-                    : Number(String(val).replace(/\s/g, "").replace(/,/g, ""));
+                    : Number(
+                          String(val)
+                              .replace(/\s/g, "")
+                              .replace(/,/g, ""),
+                      );
             if (Number.isNaN(num)) return val;
             return num.toLocaleString();
         };
@@ -398,7 +408,9 @@ export class SimpleGrid extends DynamicElement {
             if (hostId) {
                 this._scopeClass = `grid-scope-${hostId}`;
             } else {
-                this._scopeClass = `grid-scope-${Math.random().toString(36).slice(2)}`;
+                this._scopeClass = `grid-scope-${Math.random()
+                    .toString(36)
+                    .slice(2)}`;
             }
         }
 
@@ -425,7 +437,7 @@ export class SimpleGrid extends DynamicElement {
                 // balance_amd: "50px",
                 // balance_usd: "50px",
                 // balance_eur: "50px",
-                // balance_rub: "50px",               
+                // balance_rub: "50px",
             };
 
             const gridColumns = this.state.columns.map((colName) => {
@@ -435,7 +447,7 @@ export class SimpleGrid extends DynamicElement {
                     colName,
                     conditionsMap,
                     rowConditions,
-                    h
+                    h,
                 );
 
                 const baseConfig = {
@@ -450,13 +462,9 @@ export class SimpleGrid extends DynamicElement {
                     return {
                         ...baseConfig,
                         formatter: (cell, row) => {
-                            const rowObj = this.rowArrayToObject(
-                                row.cells.map((c) => c.data)
-                            );
+                            const rowObj = this.rowArrayToObject(row.cells.map((c) => c.data));
 
-                            const display = valueFormatter
-                                ? valueFormatter(cell, row)
-                                : cell ?? "";
+                            const display = valueFormatter ? valueFormatter(cell, row) : cell ?? "";
 
                             const conditional = conditionalFormatter
                                 ? conditionalFormatter(display, rowObj)
@@ -471,13 +479,9 @@ export class SimpleGrid extends DynamicElement {
                 return {
                     ...baseConfig,
                     formatter: (cell, row) => {
-                        const rowObj = this.rowArrayToObject(
-                            row.cells.map((c) => c.data)
-                        );
+                        const rowObj = this.rowArrayToObject(row.cells.map((c) => c.data));
 
-                        const display = valueFormatter
-                            ? valueFormatter(cell, row)
-                            : cell ?? "";
+                        const display = valueFormatter ? valueFormatter(cell, row) : cell ?? "";
 
                         const conditional = conditionalFormatter
                             ? conditionalFormatter(display, rowObj)
@@ -497,7 +501,7 @@ export class SimpleGrid extends DynamicElement {
                                     });
                                 },
                             },
-                            content
+                            content,
                         );
                     },
                 };
@@ -538,8 +542,11 @@ export class SimpleGrid extends DynamicElement {
                 const dataArray = this.state.data.map((row, i) =>
                     includeSerial
                         ? [i + 1, ...this.state.columns.map((c) => row[c] ?? "")]
-                        : this.state.columns.map((c) => row[c] ?? "")
+                        : this.state.columns.map((c) => row[c] ?? ""),
                 );
+
+                console.log("dataArray", dataArray);
+
                 this.grid = new Grid({
                     ...baseConfig,
                     data: dataArray,
@@ -556,14 +563,14 @@ export class SimpleGrid extends DynamicElement {
                             // Expect API similar to existing transformer structures.
                             // We reuse transformer for mapping shape. If the server already returns sliced data,
                             // use it directly; otherwise, transform known formats.
-                            const dataType = this.getAttr("data-type") || '';
+                            const dataType = this.getAttr("data-type") || "";
                             let transformed;
                             if (resp && resp.data) {
                                 // Try transform helper
                                 try {
                                     const maybe = tableTransformer.transformTableData(
                                         { data: resp.data },
-                                        dataType
+                                        dataType,
                                     );
                                     transformed = Array.isArray(maybe) ? maybe : resp.data;
                                 } catch (_) {
@@ -571,12 +578,16 @@ export class SimpleGrid extends DynamicElement {
                                 }
                             } else {
                                 try {
-                                    const maybe = tableTransformer.transformTableData(resp, dataType) || [];
+                                    const maybe =
+                                        tableTransformer.transformTableData(resp, dataType) || [];
                                     transformed = maybe;
                                 } catch (_) {
                                     transformed = Array.isArray(resp) ? resp : [];
                                 }
                             }
+
+                            console.log("transformeddata", transformed);
+
                             return transformed.map((item, i) => {
                                 const rowVals = this.state.columns.map((c) => item?.[c] ?? "");
                                 if (!includeSerial) return rowVals;
@@ -628,7 +639,7 @@ export class SimpleGrid extends DynamicElement {
                                 const join = prev.includes("?") ? "&" : "?";
 
                                 return `${prev}${join}sort=${encodeURIComponent(
-                                    colName
+                                    colName,
                                 )}&order=${dir}`;
                             },
                         },
@@ -636,7 +647,32 @@ export class SimpleGrid extends DynamicElement {
                 });
             }
 
+            // this.grid.render(mountPoint);
+
+            // const visibleRows = this.grid.config.pipeline.visibleRows.current || [];
+            // const visibleData = visibleRows.map((row) => {
+            //     return this.rowArrayToObject(row.cells.map((c) => c.data));
+            // });
+
+            // this.dispatch("page-visible-data", {
+            //     dataType: this.getAttr("data-type"),
+            //     rows: visibleData,
+            // });
+
             this.grid.render(mountPoint);
+
+            // Process the pipeline to get current page rows safely
+            // this.grid.config.pipeline.process().then((data) => {
+            //     // data.rows contains the visible row objects for the current page/state
+            //     const visibleData = data.rows.map((row) =>
+            //         this.rowArrayToObject(row.cells.map((c) => c.data)),
+            //     );
+
+            //     this.dispatch("page-visible-data", {
+            //         dataType: JSON.parse(this.getAttr("data")),
+            //         rows: visibleData,
+            //     });
+            // });
 
             // Add scope class to mountPoint for scoped hidden-columns CSS
             mountPoint.classList.add(this._scopeClass);
@@ -676,7 +712,7 @@ export class SimpleGrid extends DynamicElement {
                         .map(
                             (n) => ` 
                                         .${this._scopeClass} thead tr th:nth-child(${n}),
-                                        .${this._scopeClass} tbody tr td:nth-child(${n}) { display: none !important; }`
+                                        .${this._scopeClass} tbody tr td:nth-child(${n}) { display: none !important; }`,
                         )
                         .join("\n");
                     mountPoint.appendChild(style);
@@ -685,11 +721,22 @@ export class SimpleGrid extends DynamicElement {
         });
     }
 
+    getCurrentPageData() {
+        const currentPage = this._currentPage || 0;
+        const perPage = this.state.perPage;
+
+        const startIndex = currentPage * perPage;
+        const endIndex = startIndex + perPage;
+
+        // Returns array of raw objects for the current page
+        const visibleData = this.state.data.slice(startIndex, endIndex);
+
+        return visibleData;
+    }
+
     rowArrayToObject(rowArray) {
         const arr =
-            rowArray.length === this.state.columns.length + 1
-                ? rowArray.slice(1)
-                : rowArray;
+            rowArray.length === this.state.columns.length + 1 ? rowArray.slice(1) : rowArray;
 
         const obj = {};
         for (let i = 0; i < this.state.columns.length; i++) {

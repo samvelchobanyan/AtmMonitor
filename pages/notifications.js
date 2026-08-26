@@ -106,9 +106,9 @@ class Notifications extends DynamicElement {
                       .filter((id) => id !== undefined && id !== null)
                 : [];
 
-            if (notificationIds.length > 0) {
-                await this.markReadNotifications(notificationIds);
-            }
+            // if (notificationIds.length > 0) {
+            //     await this.markReadNotifications(notificationIds);
+            // }
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });
@@ -171,6 +171,30 @@ class Notifications extends DynamicElement {
         //     if (this.selectedNotificationFilter === selectedValue) return;
         //     this.selectedNotificationFilter = selectedValue;
         //     this.fetchSummary();
+        // });
+
+        // Track read IDs in memory to avoid duplicate API requests per session
+        this.markedReadSet = new Set();
+
+        // this.addEventListener("page-visible-data", (e) => {
+        //     console.log("triggererd", e.detail);
+
+        //     const { rows } = e.detail || {};
+        //     if (!Array.isArray(rows) || rows.length === 0) return;
+        //     console.log("rows", rows);
+
+        //     // Filter notification_ids that haven't been marked read yet
+        //     const unreadIdsOnPage = rows
+        //         .map((row) => row.notification_id)
+        //         .filter((id) => id !== undefined && id !== null && !this.markedReadSet.has(id));
+
+        //     if (unreadIdsOnPage.length > 0) {
+        //         // Track them locally to avoid repeated calls when re-rendering
+        //         unreadIdsOnPage.forEach((id) => this.markedReadSet.add(id));
+
+        //         // Send POST request only for active page IDs
+        //         this.markReadNotifications(unreadIdsOnPage);
+        //     }
         // });
 
         const handleSelectChange = (e) => {

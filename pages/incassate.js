@@ -6,8 +6,7 @@ import "../components/dynamic/filtrationTabs.js";
 class Incassate extends DynamicElement {
     constructor() {
         super();
-        this.filtrationTabs = null;
-        this.table = null;
+        this.encashmentTable = null;
         this.atmDayBalanceTable = null;
 
         const today = new Date();
@@ -24,15 +23,14 @@ class Incassate extends DynamicElement {
     }
 
     onAfterRender() {
-        this.filtrationTabs = this.$("filtration-tabs");
-        this.table = this.$("simple-grid");
+        this.encashmentTable = this.$("#encashment-table");
         this.atmDayBalanceTable = this.$("#atm-day-balance");
     }
 
     async fetchInfoCardsData(queryString) {
         try {
             const failedResponse = await this.fetchData(
-                `/encashment/failed-transactions?${queryString}`
+                `/encashment/failed-transactions?${queryString}`,
             );
 
             const totalsResponse = await this.fetchData(`/encashment/totals?${queryString}`);
@@ -54,32 +52,39 @@ class Incassate extends DynamicElement {
     }
 
     addEventListeners() {
-        this.addListener(this.filtrationTabs, "filter-submit", (e) => {
+        this.addListener(this.$("filtration-tabs"), "filter-submit", (e) => {
             this.tableQuery = e.detail.query;
-            this.table.setAttribute("data-source", `/encashment/summary?${this.tableQuery}`);
-            if (this.atmDayBalanceTable) {
-                
-                
-                this.atmDayBalanceTable.setAttribute(
-                    "data-source",
-                    `/atm/balance-by-date?${this.tableQuery}`
-                );
-            }
+            console.log("AAAAAAAAAAAAAAAAA");
+
+            this.encashmentTable.setAttribute(
+                "data-source",
+                `/encashment/summary?${this.tableQuery}`,
+            );
+
+            this.atmDayBalanceTable.setAttribute(
+                "data-source",
+                `/atm/balance-by-date?${this.tableQuery}`,
+            );
+
             this.fetchInfoCardsData(this.tableQuery);
         });
 
-        console.log("this.tableQuery", this.tableQuery);
-
-        this.addListener(this.table, "export-clicked", (e) => {
-            e.detail.url = `/encashment/export?${this.tableQuery}`;
+        // Primary Table Export
+        this.addListener(this.encashmentTable, "export-clicked", (e) => {
+            let query = this.tableQuery ? this.tableQuery : this.initQuery;
+            e.detail.url = `/encashment/export?${query}`;
         });
 
-        if (this.atmDayBalanceTable) {
-            let query = this.tableQuery ? this.tableQuery : this.initQuery;
-            this.addListener(this.atmDayBalanceTable, "export-clicked", (e) => {
-                e.detail.url = `/atm/balance-by-date-export?${query}`;
-            });
-        }
+        this.addListener(this.atmDayBalanceTable, "export-clicked", (e) => {
+            // needs only startDate
+            let rawQuery = this.tableQuery ? this.tableQuery : this.initQuery;
+
+            const searchParams = new URLSearchParams(rawQuery);
+            searchParams.delete("endDate");
+            const query = searchParams.toString();
+
+            e.detail.url = `/atm/balance-by-date-export?${query}`;
+        });
     }
 
     template() {
@@ -103,6 +108,7 @@ class Incassate extends DynamicElement {
 
                     <simple-grid
                         serial
+                        id='encashment-table'
                         data-source="/encashment/summary?${this.initQuery}"
                         data-type="encashments"
                         columns='["atm_id","date_time","atm_address", "added_amount", "collected_amount", "marked_as_empty", "limit_exceeded"]'

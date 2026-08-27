@@ -82,11 +82,11 @@ export class ApiClient {
 
 // export default client for most use-cases
 export const api = new ApiClient({
-    // baseUrl: "monitoring.ardshinbank.am/backend", //prod
-    baseUrl: "https://atmmonitorapi-production.up.railway.app/api", //local
+    baseUrl: "monitoring.ardshinbank.am/backend", //prod
+    // baseUrl: "https://atmmonitorapi-production.up.railway.app/api", //local
     // baseUrl: 'http://37.186.122.133:3393/api', //demo
     // baseUrl: 'http://localhost/ATM_monitor',
     
-    useProxy: true, //local
-    // useProxy: false, //prod
+    // useProxy: true, //local
+    useProxy: false, //prod
 });

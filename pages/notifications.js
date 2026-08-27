@@ -38,6 +38,10 @@ class Notifications extends DynamicElement {
 
         this.dateSelectBox = null;
 
+        this.deviceGrid = null;
+        this.takenCardsGrid = null;
+        this.problematicTransactionsGrid = null;
+
         this.segments = null;
 
         this.tableActiveTab = "Բոլորը";
@@ -105,10 +109,6 @@ class Notifications extends DynamicElement {
                       .map((item) => item.notification_id)
                       .filter((id) => id !== undefined && id !== null)
                 : [];
-
-            // if (notificationIds.length > 0) {
-            //     await this.markReadNotifications(notificationIds);
-            // }
         } catch (err) {
             console.error("❌ Error fetching summary:", err);
             this.setState({ summary: null });
@@ -116,8 +116,6 @@ class Notifications extends DynamicElement {
     }
 
     async markReadNotifications(notificationIds) {
-        console.log("notificationIds ", notificationIds);
-
         try {
             await this.fetchData(`/notifications/read`, {
                 method: "POST",
@@ -160,42 +158,42 @@ class Notifications extends DynamicElement {
 
     onAfterRender() {
         this.dateSelectBox = this.$("#date-selector");
+
+        this.deviceGrid = this.$("#device-errors-table");
+        this.takenCardsGrid = this.$("#taken-cards-table");
+        this.problematicTransactionsGrid = this.$("#problematic-transactions-table");
+
         console.log("onAfterRender ===>", this.dateSelectBox);
     }
 
     addGlobalEventListeners() {
-        // this.addEventListener("change", (e) => {
-        //     const notificationTypeSelect = e.target.closest("select-box");
-        //     if (!notificationTypeSelect) return;
-        //     const selectedValue = notificationTypeSelect.getAttribute("value");
-        //     if (this.selectedNotificationFilter === selectedValue) return;
-        //     this.selectedNotificationFilter = selectedValue;
-        //     this.fetchSummary();
-        // });
+        //      WORKED
+        // this.addEventListener("visible-data-change", (e) => {
+        //     console.log("heeelloo");
 
-        // Track read IDs in memory to avoid duplicate API requests per session
-        this.markedReadSet = new Set();
+        //     const ids = e.target.getVisibleIds("notification_id");
 
-        // this.addEventListener("page-visible-data", (e) => {
-        //     console.log("triggererd", e.detail);
+        //     console.log("device page changed, ids:", ids);
 
-        //     const { rows } = e.detail || {};
-        //     if (!Array.isArray(rows) || rows.length === 0) return;
-        //     console.log("rows", rows);
-
-        //     // Filter notification_ids that haven't been marked read yet
-        //     const unreadIdsOnPage = rows
-        //         .map((row) => row.notification_id)
-        //         .filter((id) => id !== undefined && id !== null && !this.markedReadSet.has(id));
-
-        //     if (unreadIdsOnPage.length > 0) {
-        //         // Track them locally to avoid repeated calls when re-rendering
-        //         unreadIdsOnPage.forEach((id) => this.markedReadSet.add(id));
-
-        //         // Send POST request only for active page IDs
-        //         this.markReadNotifications(unreadIdsOnPage);
+        //     if (ids.length) {
+        //         this.markReadNotifications(ids);
         //     }
         // });
+
+        this.addEventListener("visible-data-change", (e) => {
+            const grid = e.target;
+            console.log("grid ---", grid);
+
+            if (!grid?.getVisibleIds) return;
+
+            const ids = grid.getVisibleIds("notification_id");
+
+            console.log(`${grid.id || "grid"} visible notification ids:`, ids);
+
+            if (ids.length) {
+                this.markReadNotifications(ids);
+            }
+        });
 
         const handleSelectChange = (e) => {
             const notificationTypeSelect = e.target.closest("#notifications-type");
@@ -398,8 +396,10 @@ class Notifications extends DynamicElement {
                     <simple-grid
                         serial
                         data='${takenCards}'
+                        id="taken-cards-table"
                         data-type="taken_cards"
-                        columns='["atm_id", "date","address","card_number"]'
+                         hidden-columns='["notification_id"]'
+                        columns='["atm_id", "date","address","card_number","notification_id"]'
                         column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե", "card_number": "Քարտի համար"}'
                         searchable="false">
                     </simple-grid>
@@ -412,8 +412,11 @@ class Notifications extends DynamicElement {
                     <simple-grid
                         serial
                         data='${problematicTransactions}'
+                        id="problematic-transactions-table"
                         data-type="problematic_transactions"
-                        columns='["atm_id", "date","address","amount", "message", "transaction_id"]'
+                         hidden-columns='["notification_id"]'
+
+                        columns='["atm_id", "date","address","amount", "message", "transaction_id","notification_id"]'
                         column-labels='{"atm_id":"Բանկոմատ","date":"Ամսաթիվ","address":"Հասցե", 
                         "amount": "Գումար", "message": "Նկարագրություն","transaction_id": "Գործարքի ID"}'
                         searchable="false">

@@ -42,6 +42,9 @@ export class SimpleGrid extends DynamicElement {
             perPage: 10,
         };
         this.grid = null;
+        this._currentPage = 0;
+        this._paginationObserver = null;
+        this.visibleData = [];
     }
 
     static get observedAttributes() {
@@ -68,6 +71,63 @@ export class SimpleGrid extends DynamicElement {
         if (url) await this.loadData();
     }
 
+    getVisibleData() {
+        return this.visibleData;
+    }
+
+    getVisibleIds(idField = "id") {
+        return this.visibleData
+            .map((row) => row?.[idField])
+            .filter((id) => id !== undefined && id !== null);
+    }
+
+    updateVisibleData(page = this._currentPage) {
+        this._currentPage = page;
+
+        if (this.state.mode === "client") {
+            const start = page * this.state.perPage;
+            const end = start + this.state.perPage;
+
+            this.visibleData = this.state.data.slice(start, end);
+
+            this.dispatch("visible-data-change", {
+                visibleData: this.visibleData,
+            });
+        }
+    }
+
+    setupPaginationObserver(mountPoint) {
+        this._paginationObserver?.disconnect();
+
+        const observer = new MutationObserver(() => {
+            const currentPageButton = mountPoint.querySelector(".gridjs-currentPage");
+
+            if (!currentPageButton) return;
+
+            const page = Number(currentPageButton.getAttribute("aria-label")?.replace("Page ", ""));
+
+            if (Number.isNaN(page)) return;
+
+            const pageIndex = page - 1;
+
+            if (pageIndex === this._currentPage) return;
+
+            this._currentPage = pageIndex;
+
+            console.log("PAGE CHANGED:", pageIndex);
+
+            this.updateVisibleData(pageIndex);
+        });
+
+        observer.observe(mountPoint, {
+            subtree: true,
+            attributes: true,
+            attributeFilter: ["class"],
+        });
+
+        this._paginationObserver = observer;
+    }
+
     addEventListeners() {
         const grid = this.$(".grid-container");
 
@@ -76,6 +136,8 @@ export class SimpleGrid extends DynamicElement {
         const exportBtn = this.$(".csv-export-btn");
         if (exportBtn) {
             this.addListener(exportBtn, "click", async () => {
+                console.log("clicked");
+
                 const event = new CustomEvent("export-clicked", {
                     detail: { url: "" },
                     bubbles: true,
@@ -117,6 +179,11 @@ export class SimpleGrid extends DynamicElement {
                 }
             });
         }
+
+        // REMOVED:
+        // this.grid.on("paginationChanged", ...)
+        //
+        // It is added in onAfterRender() after this.grid exists.
     }
 
     async onAttributeChange(name, oldVal, newVal) {
@@ -539,13 +606,14 @@ export class SimpleGrid extends DynamicElement {
             let endpoint = this.getAttr("data-source");
 
             if (mode === "client") {
+                // NEW: store first page
+                // this.updateVisibleData(0);
+
                 const dataArray = this.state.data.map((row, i) =>
                     includeSerial
                         ? [i + 1, ...this.state.columns.map((c) => row[c] ?? "")]
                         : this.state.columns.map((c) => row[c] ?? ""),
                 );
-
-                console.log("dataArray", dataArray);
 
                 this.grid = new Grid({
                     ...baseConfig,
@@ -554,6 +622,7 @@ export class SimpleGrid extends DynamicElement {
             } else {
                 // Server mode
                 const absoluteUrl = api.buildUrl(endpoint);
+
                 this.grid = new Grid({
                     ...baseConfig,
                     server: {
@@ -565,6 +634,7 @@ export class SimpleGrid extends DynamicElement {
                             // use it directly; otherwise, transform known formats.
                             const dataType = this.getAttr("data-type") || "";
                             let transformed;
+
                             if (resp && resp.data) {
                                 // Try transform helper
                                 try {
@@ -586,53 +656,78 @@ export class SimpleGrid extends DynamicElement {
                                 }
                             }
 
-                            console.log("transformeddata", transformed);
+                            // NEW: in server mode, transformed contains
+                            // the rows for the current page
+                            this.visibleData = transformed;
+                            this.dispatch("visible-data-change", {
+                                visibleData: this.visibleData,
+                            });
 
                             return transformed.map((item, i) => {
                                 const rowVals = this.state.columns.map((c) => item?.[c] ?? "");
+
                                 if (!includeSerial) return rowVals;
-                                const page = this._currentPage || 0; // 0-based
+
+                                const page = this._currentPage || 0;
                                 const offset = page * this.state.perPage;
+
                                 return [offset + i + 1, ...rowVals];
                             });
                         },
+
                         total: (resp) => {
                             // Try common fields for total records
                             if (typeof resp?.data?.total_count === "number")
                                 return resp.data.total_count;
+
                             if (typeof resp?.total === "number") return resp.total;
+
                             if (typeof resp?.data?.total === "number") return resp.data.total;
+
                             // Some APIs return total_count on the first element of the data array
                             if (typeof resp?.data?.[0]?.total_count === "number")
                                 return resp.data[0].total_count;
+
                             if (Array.isArray(resp?.data)) return resp.data.length;
+
                             if (Array.isArray(resp)) return resp.length;
+
                             if (typeof resp?.data[0].total_count === "number")
                                 return resp.data.total_count;
+
                             return 0;
                         },
                     },
+
                     pagination: {
                         enabled: true,
                         limit: this.state.perPage,
+
                         server: {
                             url: (prev, page, limit) => {
                                 this._currentPage = page; // track 0-based page
+
                                 const join = prev.includes("?") ? "&" : "?";
+
                                 // API expects pageSize and 1-based pageNumber
                                 return `${prev}${join}pageSize=${limit}&pageNumber=${page + 1}`;
                             },
                         },
                     },
+
                     sort: {
                         multiColumn: false,
+
                         server: {
                             url: (prev, columns) => {
                                 if (!columns?.length) return prev;
+
                                 const col = columns[0];
                                 const dir = col.direction === 1 ? "asc" : "desc";
+
                                 // If serial column is present and selected, ignore server sort
                                 if (includeSerial && col.index === 0) return prev;
+
                                 const indexOffset = includeSerial ? 1 : 0;
                                 const colName = this.state.columns[col.index - indexOffset];
 
@@ -647,32 +742,12 @@ export class SimpleGrid extends DynamicElement {
                 });
             }
 
-            // this.grid.render(mountPoint);
-
-            // const visibleRows = this.grid.config.pipeline.visibleRows.current || [];
-            // const visibleData = visibleRows.map((row) => {
-            //     return this.rowArrayToObject(row.cells.map((c) => c.data));
-            // });
-
-            // this.dispatch("page-visible-data", {
-            //     dataType: this.getAttr("data-type"),
-            //     rows: visibleData,
-            // });
-
             this.grid.render(mountPoint);
 
-            // Process the pipeline to get current page rows safely
-            // this.grid.config.pipeline.process().then((data) => {
-            //     // data.rows contains the visible row objects for the current page/state
-            //     const visibleData = data.rows.map((row) =>
-            //         this.rowArrayToObject(row.cells.map((c) => c.data)),
-            //     );
-
-            //     this.dispatch("page-visible-data", {
-            //         dataType: JSON.parse(this.getAttr("data")),
-            //         rows: visibleData,
-            //     });
-            // });
+            if (mode === "client") {
+                this.updateVisibleData();
+                this.setupPaginationObserver(mountPoint);
+            }
 
             // Add scope class to mountPoint for scoped hidden-columns CSS
             mountPoint.classList.add(this._scopeClass);
@@ -681,8 +756,10 @@ export class SimpleGrid extends DynamicElement {
             if (includeSerial) {
                 const old = mountPoint.querySelector("style[data-serial-col]");
                 if (old) old.remove();
+
                 const style = document.createElement("style");
                 style.setAttribute("data-serial-col", "1");
+
                 style.textContent = `
                 .grid-container thead tr th:nth-child(1),
                 .grid-container tbody tr td:nth-child(1) {
@@ -693,45 +770,40 @@ export class SimpleGrid extends DynamicElement {
                   padding-right: 0 !important;
                   text-align: center;
                 }`;
+
                 mountPoint.appendChild(style);
             }
 
             // Hide selected columns by name (using nth-child selectors)
             const hidden = this.parseHiddenColumnsAttr();
+
             if (Array.isArray(hidden) && hidden.length) {
                 const offset = includeSerial ? 1 : 0;
+
                 const idxs = this.state.columns
                     .map((c, i) => (hidden.includes(c) ? i + 1 + offset : null))
                     .filter(Boolean);
+
                 const old = mountPoint.querySelector("style[data-hidden-cols]");
+
                 if (old) old.remove();
+
                 if (idxs.length) {
                     const style = document.createElement("style");
                     style.setAttribute("data-hidden-cols", "1");
+
                     style.textContent = idxs
                         .map(
-                            (n) => ` 
+                            (n) => `
                                         .${this._scopeClass} thead tr th:nth-child(${n}),
                                         .${this._scopeClass} tbody tr td:nth-child(${n}) { display: none !important; }`,
                         )
                         .join("\n");
+
                     mountPoint.appendChild(style);
                 }
             }
         });
-    }
-
-    getCurrentPageData() {
-        const currentPage = this._currentPage || 0;
-        const perPage = this.state.perPage;
-
-        const startIndex = currentPage * perPage;
-        const endIndex = startIndex + perPage;
-
-        // Returns array of raw objects for the current page
-        const visibleData = this.state.data.slice(startIndex, endIndex);
-
-        return visibleData;
     }
 
     rowArrayToObject(rowArray) {
@@ -739,9 +811,11 @@ export class SimpleGrid extends DynamicElement {
             rowArray.length === this.state.columns.length + 1 ? rowArray.slice(1) : rowArray;
 
         const obj = {};
+
         for (let i = 0; i < this.state.columns.length; i++) {
             obj[this.state.columns[i]] = arr[i];
         }
+
         return obj;
     }
 

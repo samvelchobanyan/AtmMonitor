@@ -34,7 +34,7 @@ function transformDeviceFaultsData(apiResponse) {
             device_type: device.device_type,
             device_type_id: device.device_type_id,
             ...atm,
-        }))
+        })),
     );
 
     return allAtms.map((data) => ({
@@ -49,13 +49,13 @@ function transformRepairsData(apiResponse) {
     if (!Array.isArray(apiResponse?.data?.repairs)) return [];
     return apiResponse.data.repairs.map((item) => ({
         atm_name: item.atm_name,
-        error_date: item.error_date ? formatCompactDate(item.error_date) : '',
-        mail_sent_at: item.mail_sent_at ? formatCompactDate(item.mail_sent_at) : '',
-        fixed_at: item.fixed_at ? formatCompactDate(item.fixed_at) : '',
+        error_date: item.error_date ? formatCompactDate(item.error_date) : "",
+        mail_sent_at: item.mail_sent_at ? formatCompactDate(item.mail_sent_at) : "",
+        fixed_at: item.fixed_at ? formatCompactDate(item.fixed_at) : "",
         actual_repair_hours: item.actual_repair_hours,
         repair_time: item.repair_time,
         device_type: item.device_type,
-        description: item.description || '',
+        description: item.description || "",
         is_late: item.is_late,
     }));
 }
@@ -68,7 +68,7 @@ function transformEncashmentsData(apiResponse) {
         atm_address: `${item.city}/${item.atm_address}`,
         added_amount: item.added_amount,
         collected_amount: item.collected_amount,
-        marked_as_empty: item.marked_as_empty ? formatCompactDate(item.marked_as_empty) : '',
+        marked_as_empty: item.marked_as_empty ? formatCompactDate(item.marked_as_empty) : "",
         limit_exceeded: item.limit_exceeded,
     }));
 }
@@ -94,6 +94,7 @@ function transformTakenCardsData(apiResponse) {
         date: formatCompactDate(item.created_at),
         address: `${item.city}, ${item.address}`,
         card_number: item.card_number,
+        notification_id: item.notification_id,
     }));
 }
 
@@ -106,6 +107,7 @@ function transformProblematicTransactionsData(apiResponse) {
         amount: item.amount,
         transaction_id: item.transaction_id,
         message: item.message,
+        notification_id: item.notification_id,
     }));
 }
 
@@ -152,35 +154,35 @@ function transformCumulativeData(apiResponse) {
 
 // === Type-Based Routing ===
 
-function transformTableData(apiResponse, dataType = '') {
+function transformTableData(apiResponse, dataType = "") {
     if (!dataType) {
-        console.error('data-type attribute is required for simple-grid');
+        console.error("data-type attribute is required for simple-grid");
         return [];
     }
 
-    switch(dataType) {
-        case 'journal':
+    switch (dataType) {
+        case "journal":
             return transformJournalData(apiResponse);
-        case 'encashments':
+        case "encashments":
             return transformEncashmentsData(apiResponse);
-        case 'repairs':
+        case "repairs":
             return transformRepairsData(apiResponse);
-        case 'notifications':
+        case "notifications":
             return transformNotificationsData(apiResponse);
-        case 'taken_cards':
+        case "taken_cards":
             return transformTakenCardsData(apiResponse);
-        case 'problematic_transactions':
+        case "problematic_transactions":
             return transformProblematicTransactionsData(apiResponse);
-        case 'balance':
+        case "balance":
             return transformBalanceData(apiResponse);
-        case 'cumulative':
+        case "cumulative":
             return transformCumulativeData(apiResponse);
-        case 'device_faults':
+        case "device_faults":
             return transformDeviceFaultsData(apiResponse);
-        case 'failures':
+        case "failures":
             return transformFailuresData(apiResponse);
         default:
-            console.warn('Unknown data-type:', dataType);
+            console.warn("Unknown data-type:", dataType);
             return [];
     }
 }

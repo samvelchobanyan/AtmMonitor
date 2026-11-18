@@ -42,8 +42,8 @@ export class CustomTab extends HTMLElement {
         const groupName = this.getAttribute("name");
         if (!groupName) return;
 
-        // Limit search to this tab's container
-        const container = this.closest(".container");
+        // Limit search to this tab's container (.tab-group = plain wrapper with no card styles)
+        const container = this.closest(".container, .tab-group");
         if (!container) return;
 
         // Find tabs and contents only inside this container

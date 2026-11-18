@@ -84,6 +84,24 @@ class LocationTransformer {
         return [];
     }
 
+    // Cities of one province for the create/edit ATM forms. Unlike getCitiesByProvince there is
+    // no Yerevan special case: the form must save the real city ("Երևան"), not a district.
+    getFormCityOptions(data, provinceName) {
+        const province = data.find(p => p.province === provinceName);
+        return (province?.cities || [])
+            .filter(c => c.city)
+            .map(c => ({ label: c.city, value: c.city }));
+    }
+
+    // Districts of one city inside one province, for the create/edit ATM forms
+    getFormDistrictOptions(data, provinceName, cityName) {
+        const province = data.find(p => p.province === provinceName);
+        const city = province?.cities.find(c => c.city === cityName);
+        return (city?.districts || [])
+            .filter(Boolean)
+            .map(d => ({ label: d, value: d }));
+    }
+
     // Universal method for any level
     getOptionsByLevel(data, level, parentValue = null) {
         switch(level) {

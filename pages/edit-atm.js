@@ -2,9 +2,12 @@ import { DynamicElement } from "../core/dynamic-element.js";
 import { api } from "../core/api-client.js";
 import "../components/dynamic/select-box-search.js";
 import encode from "../assets/js/utils/encode.js";
+import escapeAttr from "../assets/js/utils/escape-attr.js";
 import "../components/dynamic/yandex-address.js";
 import "../components/ui/customCheck.js";
 import "../components/ui/selectBox.js";
+import "../components/ui/customTab.js";
+import locationTransformer from "../core/utils/location-transformer.js";
 
 class EditAtm extends DynamicElement {
     constructor() {
@@ -17,6 +20,7 @@ class EditAtm extends DynamicElement {
             ipAddress: "",
             lat: "",
             lon: "",
+            address: "",
             segmentId: "",
             atmType: 0,
             atmArchived: false,
@@ -34,6 +38,11 @@ class EditAtm extends DynamicElement {
         };
         this.atmInfo = null;
         this.segments = null;
+        this.locationMode = "map"; // active location tab: "map" or "manual"
+        // province → cities → districts list from /dashboard/cities-with-districts (loaded at app start)
+        this.regions = [];
+        // address-tab dropdown choices; kept outside state so picking one doesn't re-render the form
+        this.location = { province: "", city: "", district: "" };
     }
 
     static get observedAttributes() {
@@ -45,6 +54,70 @@ class EditAtm extends DynamicElement {
             value: item.id,
             text: item.name,
         }));
+        this.regions = storeState.regionsData || [];
+    }
+
+    // — Address tab dropdowns: province → city → district —
+
+    getProvinceOptions() {
+        return locationTransformer.getProvinceOptions(this.regions).filter((o) => o.value);
+    }
+
+    getCityOptions() {
+        return locationTransformer.getFormCityOptions(this.regions, this.location.province);
+    }
+
+    getDistrictOptions() {
+        const { province, city } = this.location;
+        return locationTransformer.getFormDistrictOptions(this.regions, province, city);
+    }
+
+    // Pre-select the ATM's saved names, but only ones that are in the list: otherwise the
+    // dropdown would show its placeholder while the old (unlisted) text was still sent.
+    setLocationFromSaved(province, city, district) {
+        const inList = (options, value) => options.some((o) => o.value === value);
+        this.location = { province: "", city: "", district: "" };
+        if (!inList(this.getProvinceOptions(), province)) return;
+        this.location.province = province;
+        if (!inList(this.getCityOptions(), city)) return;
+        this.location.city = city;
+        if (inList(this.getDistrictOptions(), district)) this.location.district = district;
+    }
+
+    locationSelect(id, placeholder, options, value) {
+        // double-quoted attributes: encode() escapes " but not '
+        return /* html */ `<select-box id="${id}" placeholder="${placeholder}" options="${encode(
+            options
+        )}" value="${escapeAttr(value)}"></select-box>`;
+    }
+
+    cityFieldHTML() {
+        return this.locationSelect("city", "Ընտրել քաղաքը", this.getCityOptions(), this.location.city);
+    }
+
+    districtFieldHTML() {
+        return this.locationSelect(
+            "district",
+            "Ընտրել համայնքը",
+            this.getDistrictOptions(),
+            this.location.district
+        );
+    }
+
+    // <select-box> reads its options only once, so a new list means a new element.
+    // Only these fields are replaced; the rest of the form keeps what the user entered.
+    handleLocationChange(e) {
+        const { id, value } = e.target;
+        if (id === "province") {
+            this.location = { province: value || "", city: "", district: "" };
+            this.$("#city-field").innerHTML = this.cityFieldHTML();
+            this.$("#district-field").innerHTML = this.districtFieldHTML();
+        } else if (id === "city") {
+            this.location = { ...this.location, city: value || "", district: "" };
+            this.$("#district-field").innerHTML = this.districtFieldHTML();
+        } else if (id === "district") {
+            this.location.district = value || "";
+        }
     }
 
     async onConnected() {
@@ -75,12 +148,21 @@ class EditAtm extends DynamicElement {
             this.atmInfo = response.data;
             console.log("this.atmInfo loaded:", this.atmInfo);
 
+            // an ATM saved without coordinates was added by address, so open that tab
+            this.locationMode = this.atmInfo.latitude && this.atmInfo.longitude ? "map" : "manual";
+            this.setLocationFromSaved(
+                this.atmInfo.province || "",
+                this.atmInfo.city || "",
+                this.atmInfo.district || ""
+            );
+
             this.setState({
                 name: this.atmInfo.name || "",
                 modelId: this.atmInfo.model_id || "",
                 ipAddress: this.atmInfo.ip_address || "",
                 lat: this.atmInfo.latitude || "",
                 lon: this.atmInfo.longitude || "",
+                address: this.atmInfo.address || "",
                 atmType: this.atmInfo.atm_type || "",
                 atmArchived: this.atmInfo.atm_archived || false,
                 atmVersion: this.atmInfo.atm_version || "",
@@ -169,39 +251,80 @@ class EditAtm extends DynamicElement {
                 if (lonInput) lonInput.value = String(lng ?? "");
             });
         }
+
+        // custom-tab shows/hides the .tab-content; here we only remember which one is active
+        this.$$(".location-tabs custom-tab").forEach((tabEl) => {
+            this.addListener(tabEl, "click", () => {
+                this.locationMode = tabEl.getAttribute("name");
+                // hide the old error without setState: a re-render would wipe what the user typed
+                if (this.state.error) {
+                    this.state.error = "";
+                    this.$("#edit-atm-form > .error")?.remove();
+                }
+                // the map can't size itself while hidden, so resize it once its tab is shown
+                if (this.locationMode === "map") this.$("yandex-address")?.map?.container.fitToViewport();
+            });
+        });
+
+        // one listener for all three dropdowns, so it still works after a dropdown is replaced
+        const manualTab = this.$('.tab-content[data-tab="manual"]');
+        if (manualTab) this.addListener(manualTab, "change", this.handleLocationChange);
+    }
+
+    // Everything currently entered in the form, as shown (untrimmed), keyed like this.state
+    readForm() {
+        const value = (id) => this.$(`#${id}`)?.value ?? "";
+        return {
+            name: value("name"),
+            ipAddress: value("ipAddress"),
+            atmVersion: value("atmVersion"),
+            encashmentLimit: value("encashmentLimit"),
+            repairTime: value("repairTime"),
+            lat: value("lat"),
+            lon: value("lon"),
+            address: value("address"),
+            atmType: value("atmType"),
+            modelId: value("modelId"),
+            atmCimType: value("atmCimType"),
+            atmCdmType: value("atmCdmType"),
+            atmArchived: this.$("#atmArchived")?.hasAttribute("checked") || false,
+            segmentIds: JSON.parse(this.$("#segmentId")?.getAttribute("value") || "[]"),
+        };
     }
 
     async handleSubmit(event) {
         event.preventDefault();
 
-        const nameInput = this.$("#name");
-        const modelIdInput = this.$("#modelId");
-        const ipAddressInput = this.$("#ipAddress");
-        const segmentIdInput = this.$("#segmentId");
-        const atmTypeInput = this.$("#atmType");
-        const atmArchivedInput = this.$("#atmArchived");
-        const atmVersionInput = this.$("#atmVersion");
-        const atmCimTypeInput = this.$("#atmCimType");
-        const atmCdmTypeInput = this.$("#atmCdmType");
-        const lonInput = this.$("#lon");
-        const latInput = this.$("#lat");
-        const encashmentLimitInput = this.$("#encashmentLimit");
-        const repairTimeInput = this.$("#repairTime");
+        // Save what the user entered first: an error or the loading state below re-renders the
+        // form from this.state, so without this every field would go back to the saved ATM's values.
+        const form = this.readForm();
+        this.setState(form);
 
-        const name = nameInput?.value.trim();
-        const modelId = Number(modelIdInput?.value);
-        const ipAddress = ipAddressInput?.value.trim();
-        const atmVersion = atmVersionInput?.value.trim();
-        const atmType = Number(atmTypeInput?.value);
-        const atmArchived = atmArchivedInput?.hasAttribute("checked") || false;
-        const atmCimType = Number(atmCimTypeInput?.value);
-        const atmCdmType = Number(atmCdmTypeInput?.value) || 0;
-        const lon = lonInput?.value.trim();
-        const lat = latInput?.value.trim();
-        const encashmentLimit = Number(encashmentLimitInput?.value.trim()) || 0;
-        const repairTime = Number(repairTimeInput?.value.trim()) || 0;
-        const rawVal = segmentIdInput.getAttribute("value") || "[]";
-        const segmentIds = JSON.parse(rawVal).map((v) => Number(v));
+        const name = form.name.trim();
+        const modelId = Number(form.modelId);
+        const ipAddress = form.ipAddress.trim();
+        const atmVersion = form.atmVersion.trim();
+        const atmType = Number(form.atmType);
+        const atmArchived = form.atmArchived;
+        const atmCimType = Number(form.atmCimType);
+        const atmCdmType = Number(form.atmCdmType) || 0;
+        const lon = form.lon.trim();
+        const lat = form.lat.trim();
+        // province/city/district are names picked from the cities-with-districts list
+        const { province, city, district } = this.location;
+        const address = form.address.trim();
+        // only the active tab's fields are sent
+        const location =
+            this.locationMode === "map" ? { lat, lon } : { province, city, district, address };
+        // some cities have no districts in the list; then district can't be picked, so it isn't required
+        const districtRequired = this.getDistrictOptions().length > 0;
+        const locationMissing =
+            this.locationMode === "map"
+                ? !lat || !lon
+                : !province || !city || !address || (districtRequired && !district);
+        const encashmentLimit = Number(form.encashmentLimit.trim()) || 0;
+        const repairTime = Number(form.repairTime.trim()) || 0;
+        const segmentIds = form.segmentIds.map((v) => Number(v));
 
         if (
             !name ||
@@ -209,11 +332,19 @@ class EditAtm extends DynamicElement {
             !ipAddress ||
             segmentIds.length == 0 ||
             !atmType ||
-            !atmCdmType ||
-            !lon ||
-            !lat
+            !atmCdmType
         ) {
             this.setState({ error: "Լրացրեք բոլոր դաշտերը" });
+            return;
+        }
+
+        if (locationMissing) {
+            this.setState({
+                error:
+                    this.locationMode === "map"
+                        ? "Ընտրեք բանկոմատի գտնվելու վայրը քարտեզի վրա"
+                        : "Լրացրեք հասցեի բոլոր դաշտերը",
+            });
             return;
         }
 
@@ -230,15 +361,16 @@ class EditAtm extends DynamicElement {
                 ...(atmVersion != "" && { atmVersion }),
                 atmCimType,
                 atmCdmType,
-                lon,
-                lat,
+                ...location,
                 encashmentLimit,
                 repairTime,
             });
 
             window.location.href = "all-atms";
         } catch (err) {
-            this.setState({ error: err?.message || "Խմբագրումը ձախողվեց" });
+            // api-client puts the backend's response body on err.data
+            const message = err?.data?.errors || err?.message || "Խմբագրումը ձախողվեց";
+            this.setState({ error: message });
         } finally {
             this.setState({ isLoading: false });
         }
@@ -252,6 +384,7 @@ class EditAtm extends DynamicElement {
         const types = encode(this.state.types);
 
         const selectedSegmentsStr = JSON.stringify(this.state.segmentIds || []);
+        const isMapMode = this.locationMode === "map";
 
         return /* html */ `
             <div class="row align-center">
@@ -261,9 +394,9 @@ class EditAtm extends DynamicElement {
                             <div class="row">
                                 <div class="form__item column sm-6">
                                     <label for="name">Բանկոմատի ID</label>
-                                    <input id="name" class="w-100" name="name" type="text" value="${
+                                    <input id="name" class="w-100" name="name" type="text" value="${escapeAttr(
                                         this.state.name
-                                    }" required />
+                                    )}" required />
                                 </div>
                                 <div class="form__item column sm-6">
                                     <label for="segmentId"></label>
@@ -280,9 +413,9 @@ class EditAtm extends DynamicElement {
                                 </div>
                                 <div class="form__item column sm-6">
                                     <label for="ipAddress">IP հասցե</label>
-                                    <input id="ipAddress" class="w-100" name="ipAddress" type="text" value="${
+                                    <input id="ipAddress" class="w-100" name="ipAddress" type="text" value="${escapeAttr(
                                         this.state.ipAddress
-                                    }" required />
+                                    )}" required />
                                 </div>
                             </div>
 
@@ -301,9 +434,9 @@ class EditAtm extends DynamicElement {
                                 </div>
                                 <div class="form__item column sm-6">
                                     <label for="atmVersion">Վերսիա</label>
-                                    <input id="atmVersion" class="w-100" name="atmVersion" type="text" value="${
+                                    <input id="atmVersion" class="w-100" name="atmVersion" type="text" value="${escapeAttr(
                                         this.state.atmVersion
-                                    }" />
+                                    )}" />
                                 </div>
                             </div>
 
@@ -323,43 +456,84 @@ class EditAtm extends DynamicElement {
 
                                 <div class="form__item column sm-3">
                                     <label for="repairTime">Վերանորոգման ժամկետ (ժամ)</label>
-                                    <input id="repairTime" class="w-100" name="repairTime" type="text" value="${this
-                                        .state.repairTime || ""}" />
+                                    <input id="repairTime" class="w-100" name="repairTime" type="text" value="${escapeAttr(
+                                        this.state.repairTime || ""
+                                    )}" />
                                 </div>
 
                                 <div class="form__item column sm-3">
                                     <label for="encashmentLimit">Լիցքավորման սահմանաչափ</label>
-                                    <input id="encashmentLimit" class="w-100" name="encashmentLimit" type="text" value="${this
-                                        .state.encashmentLimit || ""}" />
+                                    <input id="encashmentLimit" class="w-100" name="encashmentLimit" type="text" value="${escapeAttr(
+                                        this.state.encashmentLimit || ""
+                                    )}" />
                                 </div>
 
                             </div>
 
-                            <div class="row">
-                                <div class="column sm-6">
-                                    <div class="atm-map">
-                                        <yandex-address
-                                            center-lat="${this.state.lat || "40.1772"}"
-                                            center-lng="${this.state.lon || "44.50349"}"
-                                            zoom="14">
-                                        </yandex-address> 
+                            <div class="tab-group">
+                                <div class="tabs location-tabs">
+                                    <custom-tab name="map" ${isMapMode ? "active" : ""}>Քարտեզ</custom-tab>
+                                    <custom-tab name="manual" ${isMapMode ? "" : "active"}>Հասցե</custom-tab>
+                                </div>
+
+                                <div class="tab-content" data-tab="map" ${isMapMode ? "" : 'style="display:none"'}>
+                                    <div class="row">
+                                        <div class="column sm-6">
+                                            <div class="atm-map">
+                                                <yandex-address
+                                                    center-lat="${escapeAttr(this.state.lat || "40.1772")}"
+                                                    center-lng="${escapeAttr(this.state.lon || "44.50349")}"
+                                                    zoom="14">
+                                                </yandex-address>
+                                            </div>
+                                        </div>
+                                        <div class="column sm-6">
+                                            <div class="form__item">
+                                                <label for="lat">Latitude</label>
+                                                <input id="lat" class="w-100" name="lat" type="text" value="${escapeAttr(
+                                                    this.state.lat
+                                                )}" readonly />
+                                            </div>
+                                            <div class="form__item">
+                                                <label for="lon">Longitude</label>
+                                                <input id="lon" class="w-100" name="lon" type="text" value="${escapeAttr(
+                                                    this.state.lon
+                                                )}" readonly />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="column sm-6">
-                                    <div class="form__item">
-                                        <label for="lat">Latitude</label>
-                                        <input id="lat" class="w-100" name="lat" type="text" value="${
-                                            this.state.lat
-                                        }" readonly />
+
+                                <div class="tab-content" data-tab="manual" ${isMapMode ? 'style="display:none"' : ""}>
+                                    <div class="row">
+                                        <div class="form__item column sm-4">
+                                            <p>Մարզ</p>
+                                            ${this.locationSelect(
+                                                "province",
+                                                "Ընտրել մարզը",
+                                                this.getProvinceOptions(),
+                                                this.location.province
+                                            )}
+                                        </div>
+                                        <div class="form__item column sm-4">
+                                            <p>Քաղաք</p>
+                                            <div id="city-field">${this.cityFieldHTML()}</div>
+                                        </div>
+                                        <div class="form__item column sm-4">
+                                            <p>Համայնք</p>
+                                            <div id="district-field">${this.districtFieldHTML()}</div>
+                                        </div>
                                     </div>
-                                    <div class="form__item">
-                                        <label for="lon">Longitude</label>
-                                        <input id="lon" class="w-100" name="lon" type="text" value="${
-                                            this.state.lon
-                                        }" readonly />
+                                    <div class="row">
+                                        <div class="form__item column sm-12">
+                                            <label for="address">Հասցե</label>
+                                            <input id="address" class="w-100" name="address" type="text" value="${escapeAttr(
+                                                this.state.address
+                                            )}" />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>        
+                            </div>
                             ${
                                 this.state.error
                                     ? `<div class="error color-red" style="margin-bottom:10px;">${this.state.error}</div>`

@@ -54,13 +54,18 @@ class HeaderCustom extends DynamicElement {
                 this._applyTitle();
             }
 
-            // Update visibility based on route
+            // Update visibility based on route.
+            // Hide the province/city filters on pages that don't use them.
+            // Pages that DO use them (read selectedRegion/selectedCity from the store):
+            // /home, /inout, /journal, /atms, /notifications
             const pathsToHide = [
                 "/geo",
                 "/cumulative",
                 "/incassate",
                 "/atms/",
                 "/create-atm",
+                "/edit-atm/",
+                "/all-atms",
                 "/failures",
                 "/segments",
             ];

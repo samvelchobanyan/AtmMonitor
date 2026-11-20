@@ -7,7 +7,6 @@ import "../components/dynamic/yandex-address.js";
 import "../components/ui/customCheck.js";
 import "../components/ui/selectBox.js";
 import "../components/ui/customTab.js";
-import locationTransformer from "../core/utils/location-transformer.js";
 
 class CreateAtm extends DynamicElement {
     constructor() {
@@ -21,6 +20,9 @@ class CreateAtm extends DynamicElement {
             lat: "",
             lon: "",
             address: "",
+            province: "",
+            city: "",
+            district: "",
             segmentId: "",
             segmentIds: [],
             atmType: "",
@@ -39,10 +41,6 @@ class CreateAtm extends DynamicElement {
 
         this.segments = null;
         this.locationMode = "map"; // active location tab: "map" or "manual"
-        // province → cities → districts list from /dashboard/cities-with-districts (loaded at app start)
-        this.regions = [];
-        // address-tab dropdown choices; kept outside state so picking one doesn't re-render the form
-        this.location = { province: "", city: "", district: "" };
     }
 
     static get observedAttributes() {
@@ -54,58 +52,6 @@ class CreateAtm extends DynamicElement {
             value: item.id,
             text: item.name,
         }));
-        this.regions = storeState.regionsData || [];
-    }
-
-    // — Address tab dropdowns: province → city → district —
-
-    getProvinceOptions() {
-        return locationTransformer.getProvinceOptions(this.regions).filter((o) => o.value);
-    }
-
-    getCityOptions() {
-        return locationTransformer.getFormCityOptions(this.regions, this.location.province);
-    }
-
-    getDistrictOptions() {
-        const { province, city } = this.location;
-        return locationTransformer.getFormDistrictOptions(this.regions, province, city);
-    }
-
-    locationSelect(id, placeholder, options, value) {
-        // double-quoted attributes: encode() escapes " but not '
-        return /* html */ `<select-box id="${id}" placeholder="${placeholder}" options="${encode(
-            options
-        )}" value="${escapeAttr(value)}"></select-box>`;
-    }
-
-    cityFieldHTML() {
-        return this.locationSelect("city", "Ընտրել քաղաքը", this.getCityOptions(), this.location.city);
-    }
-
-    districtFieldHTML() {
-        return this.locationSelect(
-            "district",
-            "Ընտրել համայնքը",
-            this.getDistrictOptions(),
-            this.location.district
-        );
-    }
-
-    // <select-box> reads its options only once, so a new list means a new element.
-    // Only these fields are replaced; the rest of the form keeps what the user entered.
-    handleLocationChange(e) {
-        const { id, value } = e.target;
-        if (id === "province") {
-            this.location = { province: value || "", city: "", district: "" };
-            this.$("#city-field").innerHTML = this.cityFieldHTML();
-            this.$("#district-field").innerHTML = this.districtFieldHTML();
-        } else if (id === "city") {
-            this.location = { ...this.location, city: value || "", district: "" };
-            this.$("#district-field").innerHTML = this.districtFieldHTML();
-        } else if (id === "district") {
-            this.location.district = value || "";
-        }
     }
 
     onConnected() {
@@ -208,10 +154,6 @@ class CreateAtm extends DynamicElement {
                 if (this.locationMode === "map") this.$("yandex-address")?.map?.container.fitToViewport();
             });
         });
-
-        // one listener for all three dropdowns, so it still works after a dropdown is replaced
-        const manualTab = this.$('.tab-content[data-tab="manual"]');
-        if (manualTab) this.addListener(manualTab, "change", this.handleLocationChange);
     }
 
     // Everything currently entered in the form, as shown (untrimmed), keyed like this.state
@@ -226,6 +168,9 @@ class CreateAtm extends DynamicElement {
             lat: value("lat"),
             lon: value("lon"),
             address: value("address"),
+            province: value("province"),
+            city: value("city"),
+            district: value("district"),
             atmType: value("atmType"),
             modelId: value("modelId"),
             atmCimType: value("atmCimType"),
@@ -257,19 +202,17 @@ class CreateAtm extends DynamicElement {
         const lon = form.lon.trim();
         const lat = form.lat.trim();
 
-        // province/city/district are names picked from the cities-with-districts list
-        const { province, city, district } = this.location;
+        const province = form.province.trim();
+        const city = form.city.trim();
+        const district = form.district.trim();
         const address = form.address.trim();
 
         // only the active tab's fields are sent
         const location =
             this.locationMode === "map" ? { lat, lon } : { province, city, district, address };
-        // some cities have no districts in the list; then district can't be picked, so it isn't required
-        const districtRequired = this.getDistrictOptions().length > 0;
+        // the backend requires all four address fields, district included
         const locationMissing =
-            this.locationMode === "map"
-                ? !lat || !lon
-                : !province || !city || !address || (districtRequired && !district);
+            this.locationMode === "map" ? !lat || !lon : !province || !city || !district || !address;
 
         const encashmentLimit = Number(form.encashmentLimit.trim());
         const repairTime = Number(form.repairTime.trim());
@@ -319,7 +262,7 @@ class CreateAtm extends DynamicElement {
         this.setState({ isLoading: true, error: "" });
 
         try {
-            await api.post("/atm/add-atm", {
+            const response = await api.post("/atm/add-atm", {
                 name,
                 modelId,
                 ipAddress,
@@ -333,6 +276,12 @@ class CreateAtm extends DynamicElement {
                 encashmentLimit,
                 repairTime,
             });
+
+            // the API can also refuse with HTTP 200 and success: false; stay on the form then
+            if (response?.success === false) {
+                this.setState({ error: response.errors || "Ստեղծել ձախողվեց" });
+                return;
+            }
 
             window.location.href = "all-atms";
         } catch (err) {
@@ -479,21 +428,22 @@ class CreateAtm extends DynamicElement {
                                 <div class="tab-content" data-tab="manual" ${isMapMode ? 'style="display:none"' : ""}>
                                     <div class="row">
                                         <div class="form__item column sm-4">
-                                            <p>Մարզ</p>
-                                            ${this.locationSelect(
-                                                "province",
-                                                "Ընտրել մարզը",
-                                                this.getProvinceOptions(),
-                                                this.location.province
-                                            )}
+                                            <label for="province">Մարզ</label>
+                                            <input id="province" class="w-100" name="province" type="text" value="${escapeAttr(
+                                                this.state.province
+                                            )}" />
                                         </div>
                                         <div class="form__item column sm-4">
-                                            <p>Քաղաք</p>
-                                            <div id="city-field">${this.cityFieldHTML()}</div>
+                                            <label for="city">Քաղաք</label>
+                                            <input id="city" class="w-100" name="city" type="text" value="${escapeAttr(
+                                                this.state.city
+                                            )}" />
                                         </div>
                                         <div class="form__item column sm-4">
-                                            <p>Համայնք</p>
-                                            <div id="district-field">${this.districtFieldHTML()}</div>
+                                            <label for="district">Համայնք</label>
+                                            <input id="district" class="w-100" name="district" type="text" value="${escapeAttr(
+                                                this.state.district
+                                            )}" />
                                         </div>
                                     </div>
                                     <div class="row">

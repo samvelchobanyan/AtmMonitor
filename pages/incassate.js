@@ -76,13 +76,7 @@ class Incassate extends DynamicElement {
         });
 
         this.addListener(this.atmDayBalanceTable, "export-clicked", (e) => {
-            // needs only startDate
-            let rawQuery = this.tableQuery ? this.tableQuery : this.initQuery;
-
-            const searchParams = new URLSearchParams(rawQuery);
-            searchParams.delete("endDate");
-            const query = searchParams.toString();
-
+            let query = this.tableQuery ? this.tableQuery : this.initQuery;
             e.detail.url = `/atm/balance-by-date-export?${query}`;
         });
     }
